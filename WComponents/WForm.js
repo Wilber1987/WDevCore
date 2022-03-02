@@ -2,21 +2,39 @@ import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WCo
 import { WCssClass } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.JS";
 let photoB64;
-class WForm  extends HTMLElement {
-    constructor(Config) { 
-        super(); 
+class FormConfig {
+    ObjectDetail = undefined;
+    EditObject = undefined;
+    UserActions = undefined;
+    ObjectModel = undefined;
+    AddItemsFromApi = undefined;
+    DarkMode = false;
+    StyleForm = "columnX1";
+    ValidateFunction = (Object) => { };
+    SaveFunction = (Object) => { };
+    ObjectOptions = { AddObject: false, Url: undefined };
+}
+class WForm extends HTMLElement {
+    constructor(Config = (new FormConfig())) {
+        super();
         this.attachShadow({ mode: 'open' });
-        console.log(Config);
         for (const p in Config) {
             this[p] = Config[p];
         }
-        
+        this.Config = Config;
+        if (this.StyleForm == "columnX1") {
+            this.DivColumns = this.Config.DivColumns = "calc(100%)";
+        } else if (this.StyleForm == "columnX3") {
+            this.DivColumns = this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
+        } else {
+            this.DivColumns = this.Config.DivColumns = "calc(50%) calc(50%)";
+        }
         this.shadowRoot.append(WRender.createElement(StyleScrolls));
         this.shadowRoot.append(WRender.createElement(StylesControlsV2));
         this.shadowRoot.append(WRender.createElement(this.FormStyle()));
     }
-    connectedCallback() { this.DrawComponent(); }    
-    DrawComponent = async () => { 
+    connectedCallback() { this.DrawComponent(); }
+    DrawComponent = async () => {
         this.DarkMode = this.DarkMode ?? false;
         this.DivForm = {
             type: "div",
@@ -32,7 +50,7 @@ class WForm  extends HTMLElement {
                 this.DivForm.children.push(this.SaveOptions());
             }
         } else { //AGREGA FORMULARIO CRUD A LA VISTA
-            
+
             if (this.ObjectOptions == undefined) {
                 this.ObjectOptions = {
                     AddObject: false,
@@ -128,7 +146,7 @@ class WForm  extends HTMLElement {
                 if (prop.includes("_hidden")) {
 
                 } else if (prop.toUpperCase().includes("IMG") ||
-                    prop.toUpperCase().includes("PICT") || 
+                    prop.toUpperCase().includes("PICT") ||
                     prop.toUpperCase().includes("IMAGE") || prop.toUpperCase().includes("Image") ||
                     prop.toUpperCase().includes("PHOTO")) {
                     let cadenaB64 = "";
@@ -194,7 +212,6 @@ class WForm  extends HTMLElement {
             type: 'divForm',
             children: []
         };
-
         for (const prop in Model) {
             if (prop.includes("_operationValue")) {
                 if (ObjectOptions.AddObject == true) {
@@ -218,7 +235,16 @@ class WForm  extends HTMLElement {
                     InputValue = this.EditObject[prop];
                 }
                 let Options = [];
-                if (prop.toUpperCase().includes("PASS") || prop.toUpperCase().includes("PASSWORD")) {
+                console.log(prop,Model[prop]);
+                if (Model[prop].__proto__ == Object.prototype) {
+                    switch (Model[prop].type.toUpperCase()) {
+                        case "IMAGES":
+                            ({ InputType, ControlTagName } = this.CreateImageControl(InputValue, ControlContainer, prop, InputType, ControlTagName));
+                            break;
+                        default:
+                            break;
+                    }
+                } else if (prop.toUpperCase().includes("PASS") || prop.toUpperCase().includes("PASSWORD")) {
                     InputType = "password";
                 } else if (prop.toUpperCase().includes("DATE") || prop.toUpperCase().includes("FECHA") || prop.toUpperCase().includes("TIME")) {
                     InputType = "date";
@@ -226,34 +252,7 @@ class WForm  extends HTMLElement {
                     InputType = "time";
                 } else if (prop.toUpperCase().includes("IMG") || prop.toUpperCase().includes("PICT") ||
                     prop.toUpperCase().includes("IMAGE") || prop.toUpperCase().includes("PHOTO")) {
-                    let cadenaB64 = "";
-                    let base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-                    if (base64regex.test(InputValue)) {
-                        cadenaB64 = "data:image/png;base64,";
-                    }
-                    if (this.ImageUrlPath != undefined
-                        && this.ImageUrlPath.__proto__ == String.prototype) {
-                        cadenaB64 = this.ImageUrlPath + "/";
-                    }
-                    ControlContainer.children.push({
-                        type: "img",
-                        props: {
-                            src: cadenaB64 + InputValue,
-                            class: "imgPhotoWModal",
-                            id: "imgControl" + prop + this.id,
-                        }
-                    })
-                    ControlContainer.children.push({
-                        type: "label",
-                        props: {
-                            class: "LabelFile",
-                            innerText: "Seleccionar Archivo ⇪",
-                            htmlFor: "ControlValue" + prop
-                        }
-                    })
-                    InputType = "file";
-                    ControlTagName = "input";
-                    ControlContainer.props.class += " imageGridForm";
+                        ({ InputType, ControlTagName } = this.CreateImageControl(InputValue, ControlContainer, prop, InputType, ControlTagName));                           
                 } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
                     ControlTagName = "select";
                     InputType = "";
@@ -266,8 +265,7 @@ class WForm  extends HTMLElement {
                     })
                     for (const key in Model[prop]) {
                         let OValue, ODisplay;
-                        if (typeof Model[prop][key] === "object" &&
-                            Model[prop][key].__proto__ == Object.prototype) {
+                        if (Model[prop][key].__proto__ == Object.prototype) {
                             OValue = Model[prop][key]["id"];
                             ODisplay = Model[prop][key]["desc"];
                         } else {
@@ -284,7 +282,7 @@ class WForm  extends HTMLElement {
                         if (key == 0 && ObjectOptions.AddObject == true) {
                             ObjectF[prop] = OValue;
                         } else {
-                            if (ObjectF[prop].toString() == OValue.toString()) {
+                            if (ObjectF[prop] != undefined && ObjectF[prop].toString() == OValue.toString()) {
                                 Option.props.selected = "true";
                             }
                         }
@@ -350,6 +348,38 @@ class WForm  extends HTMLElement {
         }
         return Form;
     }
+    CreateImageControl(InputValue, ControlContainer, prop, InputType, ControlTagName) {
+        let cadenaB64 = "";
+        let base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+        if (base64regex.test(InputValue)) {
+            cadenaB64 = "data:image/png;base64,";
+        }
+        if (this.ImageUrlPath != undefined
+            && this.ImageUrlPath.__proto__ == String.prototype) {
+            cadenaB64 = this.ImageUrlPath + "/";
+        }
+        ControlContainer.children.push({
+            type: "img",
+            props: {
+                src: cadenaB64 + InputValue,
+                class: "imgPhotoWModal",
+                id: "imgControl" + prop + this.id,
+            }
+        });
+        ControlContainer.children.push({
+            type: "label",
+            props: {
+                class: "LabelFile",
+                innerText: "Seleccionar Archivo ⇪",
+                htmlFor: "ControlValue" + prop
+            }
+        });
+        InputType = "file";
+        ControlTagName = "input";
+        ControlContainer.props.class += " imageGridForm";
+        return { InputType, ControlTagName };
+    }
+
     SaveOptions(ObjectF = {}) {
         const DivOptions = {
             type: 'div',
@@ -392,7 +422,7 @@ class WForm  extends HTMLElement {
                         }
                         if (this.SaveFunction != undefined) {
                             this.SaveFunction(ObjectF);
-                        }else if (this.ObjectOptions.SaveFunction != undefined) {
+                        } else if (this.ObjectOptions.SaveFunction != undefined) {
                             this.ObjectOptions.SaveFunction(ObjectF);
                         }
                         if (this.ObjectOptions.Url != undefined) {
@@ -435,8 +465,8 @@ class WForm  extends HTMLElement {
             type: "w-style",
             props: {
                 ClassList: [
-                     new WCssClass("divForm", {
-                        padding: "20px",
+                    new WCssClass("divForm", {
+                        //padding: "20px",
                         "display": "grid",
                         //"grid-gap": "1rem",
                         "grid-template-columns": this.DivColumns,// "calc(50% - 10px) calc(50% - 10px)",
@@ -497,8 +527,8 @@ class WForm  extends HTMLElement {
                         overflow: "hidden",
                         "overflow-y": "auto",
                         "max-height": 300,
-                        margin:5
-                    }),new WCssClass(` .BtnClose`, {
+                        margin: 5
+                    }), new WCssClass(` .BtnClose`, {
                         "font-size": "18pt",
                         "color": "#b9b2b3",
                         "cursor": "pointer",
