@@ -2,17 +2,27 @@ import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WCo
 import { WCssClass } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.JS";
 let photoB64;
+const ImageArray = [];
 class FormConfig {
     ObjectDetail = undefined;
     EditObject = undefined;
     UserActions = undefined;
-    ObjectModel = undefined;
+    ObjectModel = {
+        property: undefined,
+        Operation: {
+            type: "OPERATION", Function: (obj) => {
+                return obj.value1 + obj.value2;
+            }
+        }
+    };
     AddItemsFromApi = undefined;
     DarkMode = false;
     StyleForm = "columnX1";
-    ValidateFunction = (Object) => { };
-    SaveFunction = (Object) => { };
+    ValidateFunction = (Object) => { /* Validacion */ };
+    SaveFunction = (Object) => { /* Guardado */ };
     ObjectOptions = { AddObject: false, Url: undefined };
+    DisplayData = ["prop"];
+
 }
 class WForm extends HTMLElement {
     constructor(Config = (new FormConfig())) {
@@ -26,6 +36,7 @@ class WForm extends HTMLElement {
             this[p] = Config[p];
         }
         this.Config = Config;
+        this.DataRequire = this.DataRequire ?? true;
         if (this.StyleForm == "columnX1") {
             this.DivColumns = this.Config.DivColumns = "calc(100%)";
         } else if (this.StyleForm == "columnX3") {
@@ -53,15 +64,35 @@ class WForm extends HTMLElement {
                     Url: undefined
                 };
             }
-            if (this.ObjectOptions.AddObject == true) { //AGREGA NUEVO OBJETO
-                const NewObject = {};
-                this.DivForm.append(this.CrudForm(NewObject, this.ObjectOptions));
-                this.DivForm.append(this.SaveOptions(NewObject));
-            } else { //EDITA UN OBJETO EXISTENTE               
-
-                this.DivForm.append(await this.CrudForm(this.EditObject, this.ObjectOptions));
-                this.DivForm.append(this.SaveOptions(this.EditObject));
-            }
+            this.FormObject = this.EditObject ?? {};
+            const Model = this.ObjectModel;
+            const ObjHandler = {
+                get: function (target, property) {
+                    return target[property];
+                },
+                set: function (target, property, value, receiver) {
+                    target[property] = value;
+                    for (const prop in Model) {
+                        if (Model[prop].__proto__ == Object.prototype) {
+                            if (Model[prop].type.toUpperCase() == "OPERATION") {
+                                target[prop] = Model[prop].Function(target);
+                            }
+                        }
+                    }
+                    return true;
+                }
+            };
+            const ObjectProxy = new Proxy(this.FormObject, ObjHandler);
+            this.DivForm.append(await this.CrudForm(ObjectProxy, this.ObjectOptions));
+            this.DivForm.append(await this.SaveOptions(ObjectProxy));
+            // if (this.ObjectOptions.AddObject == true) { //AGREGA NUEVO OBJETO
+            //     const NewObject = {};
+            //     this.DivForm.append(this.CrudForm(NewObject, this.ObjectOptions));
+            //     this.DivForm.append(this.SaveOptions(NewObject));
+            // } else { //EDITA UN OBJETO EXISTENTE
+            //     this.DivForm.append(await this.CrudForm(this.EditObject, this.ObjectOptions));
+            //     this.DivForm.append(this.SaveOptions(this.EditObject));
+            // }
         }
         this.shadowRoot.append(this.DivForm);
     }
@@ -128,7 +159,7 @@ class WForm extends HTMLElement {
         }
         return Form;
     }
-    CrudForm = async (ObjectF = {}, ObjectOptions) => {        
+    CrudForm = async (ObjectF = {}, ObjectOptions) => {
         if (this.AddItemsFromApi != undefined) {
             var Config = {
                 MasterDetailTable: true,
@@ -154,20 +185,8 @@ class WForm extends HTMLElement {
         const Form = WRender.Create({ className: 'divForm' });
         for (const prop in Model) {
             let val = ObjectOptions.AddObject == true ? "" : this.EditObject[prop];
-            if (Model[prop].__proto__ == Object.prototype &&
-                Model[prop].type.toUpperCase() == "OPERATION") {
-                const ObjHandler = {
-                    get: function (target, property) {
-                        return target[property];
-                    },
-                    set: function (target, property, value, receiver) {
-                        target[property] = value;
-                        ObjectF[prop] = Model[prop].Function(ObjectF);
-                        console.log(ObjectF[prop]);
-                        return true;
-                    }
-                };
-                this.ObjectProxy = new Proxy(ObjectF, ObjHandler);
+            if (Model[prop].__proto__ == Object.prototype && Model[prop].type.toUpperCase() == "OPERATION") {
+                //---------------------------------------->
             } else if (!prop.includes("_hidden")) {
                 const ControlContainer = WRender.Create({
                     class: "ModalElement", children: [{
@@ -178,7 +197,8 @@ class WForm extends HTMLElement {
                 if (Model[prop].__proto__ == Object.prototype) {
                     switch (Model[prop].type.toUpperCase()) {
                         case "IMAGE": case "IMAGES":
-                            InputControl = this.CreateImageControl(val, ControlContainer, prop);
+                            const Multiple = Model[prop].type.toUpperCase() == "IMAGES" ? true : false;
+                            InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple);
                             break;
                         case "FECHA": case "HORA": case "PASSWORD":
                             let type = "date";
@@ -215,22 +235,25 @@ class WForm extends HTMLElement {
                 InputControl.id = "ControlValue" + prop;
                 InputControl.onchange = async (ev) => { //evento de actualizacion del componente
                     if (ev.target.type == "file") {
-                        await this.SelectedFile(ev.target.files[0]);
-                        await setTimeout(() => {
-                            if (this.ObjectProxy) { this.ObjectProxy[prop] = photoB64.toString();
-                            } else { ObjectF[prop] = photoB64.toString(); }
-                            this.shadowRoot.querySelector("#imgControl" + prop + this.id).src = "data:image/png;base64," + ObjectF[prop];
-                        }, 1000);
+                        if (ev.target.multiple) {
+                            await this.SelectedFile(ev.target.files, true);
+                            ObjectF[prop] = ImageArray;
+                        } else {
+                            await this.SelectedFile(ev.target.files[0]);
+                            
+                            await setTimeout(() => {
+                                ObjectF[prop] = photoB64.toString();
+                                this.shadowRoot.querySelector("#imgControl" + prop + this.id).src = "data:image/png;base64," + ObjectF[prop];
+                            }, 1000);
+                        }
                     } else {
-                        ev.target.style = "";
-                        if (this.ObjectProxy) {  this.ObjectProxy[prop] = ev.target.value;
-                        } else { ObjectF[prop] = ev.target.value; }
+                        WRender.SetStyle(ev.target, {
+                            boxShadow: "none"
+                        });
+                        ObjectF[prop] = ev.target.value;
                     }
                 };
                 ControlContainer.append(InputControl);
-                // if (ObjectOptions.AddObject == true) {
-                //     ObjectF[prop] = "";
-                // }
                 Form.append(ControlContainer);
             } else {
                 if (ObjectOptions.AddObject == true) {
@@ -261,7 +284,7 @@ class WForm extends HTMLElement {
         });
         return InputControl;
     }
-    CreateImageControl(InputValue, ControlContainer, prop) {
+    CreateImageControl(InputValue, ControlContainer, prop, Multiple) {
         let cadenaB64 = "";
         let base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
         if (base64regex.test(InputValue)) {
@@ -271,24 +294,37 @@ class WForm extends HTMLElement {
             && this.ImageUrlPath.__proto__ == String.prototype) {
             cadenaB64 = this.ImageUrlPath + "/";
         }
+        const InputControl = WRender.Create({
+            tagName: "input", className: prop, multiple: Multiple, type: "file", style: {
+                display: "none"
+            }
+        });
+        if (Multiple) {
+            const Div = WRender.Create({ class: "listImage" });
+            ControlContainer.append(Div);
+            InputControl.addEventListener("change", (ev) => {
+                for (const file in ev.target.files) {
+                    if (ev.target.files[file].__proto__ == File.prototype) {
+                        Div.append(ev.target.files[file].name)
+                    }
+                }
+            });
+        } else {
+            ControlContainer.append(WRender.Create({
+                tagName: "img",
+                src: cadenaB64 + InputValue,
+                class: "imgPhotoWModal",
+                id: "imgControl" + prop + this.id,
+            }));
+        }
         ControlContainer.append(WRender.Create({
-            tagName: "img",
-            src: cadenaB64 + InputValue,
-            class: "imgPhotoWModal",
-            id: "imgControl" + prop + this.id,
-        }));
-        ControlContainer.append(WRender.Create({
-            type: "label",
+            tagName: "label",
             class: "LabelFile",
             innerText: "Seleccionar Archivo",
             htmlFor: "ControlValue" + prop
         }));
         ControlContainer.class += " imageGridForm";
-        return WRender.Create({
-            tagName: "input", className: prop, type: "file", style: {
-                display: "none"
-            }
-        });
+        return InputControl;
     }
     SaveOptions(ObjectF = {}) {
         ObjectF = this.ObjectProxy ?? ObjectF;
@@ -311,17 +347,13 @@ class WForm extends HTMLElement {
                     if (this.DataRequire == true) {
                         for (const prop in ObjectF) {
                             if (!prop.includes("_hidden")) {
+                                const control = this.shadowRoot.querySelector("#ControlValue" + prop);
                                 if (ObjectF[prop] == null || ObjectF[prop] == "") {
-                                    if (this.ShadowRoot) {
-                                        const control = this.shadowRoot.querySelector("." + prop);
-                                        control.style = "border-bottom:3px solid #ef4d00";
-                                        return;
-                                    } else {
-                                        const control = this.querySelector("." + prop);
-                                        control.style = "border-bottom:3px solid #ef4d00";
-                                        return;
-                                    }
-                                }
+                                    WRender.SetStyle(control, {
+                                        boxShadow: "0 0 3px #ef4d00"
+                                    });
+                                    return;
+                                } 
                             }
                         }
                     }
@@ -334,7 +366,6 @@ class WForm extends HTMLElement {
                         const response = await WAjaxTools.PostRequest(this.ObjectOptions.Url, ObjectF);
                         console.log(response);
                     }
-                    //ComponentsManager.modalFunction(this);
                 }
             });
             DivOptions.append(InputSave);
@@ -356,12 +387,26 @@ class WForm extends HTMLElement {
         }
         return DivOptions;
     }
-    async SelectedFile(value) {
-        var reader = new FileReader();
-        reader.onloadend = function (e) {
-            photoB64 = e.target.result.split("base64,")[1];
+    async SelectedFile(value, multiple = false) {
+
+        if (multiple) {
+            //console.log(value);
+            for (const file in value) {
+                if (value[file].__proto__ == File.prototype) {
+                    const reader = new FileReader();
+                    reader.onloadend = function (e) {
+                        ImageArray.push(e.target.result.split("base64,")[1]);
+                    }
+                    await reader.readAsDataURL(value[file]);
+                }
+            }
+        } else {
+            var reader = new FileReader();
+            reader.onloadend = function (e) {
+                photoB64 = e.target.result.split("base64,")[1];
+            }
+            reader.readAsDataURL(value);
         }
-        reader.readAsDataURL(value);
     }
     FormStyle = () => {
         const Style = {
