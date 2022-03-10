@@ -85,14 +85,6 @@ class WForm extends HTMLElement {
             const ObjectProxy = new Proxy(this.FormObject, ObjHandler);
             this.DivForm.append(await this.CrudForm(ObjectProxy, this.ObjectOptions));
             this.DivForm.append(await this.SaveOptions(ObjectProxy));
-            // if (this.ObjectOptions.AddObject == true) { //AGREGA NUEVO OBJETO
-            //     const NewObject = {};
-            //     this.DivForm.append(this.CrudForm(NewObject, this.ObjectOptions));
-            //     this.DivForm.append(this.SaveOptions(NewObject));
-            // } else { //EDITA UN OBJETO EXISTENTE
-            //     this.DivForm.append(await this.CrudForm(this.EditObject, this.ObjectOptions));
-            //     this.DivForm.append(this.SaveOptions(this.EditObject));
-            // }
         }
         this.shadowRoot.append(this.DivForm);
     }
@@ -179,12 +171,11 @@ class WForm extends HTMLElement {
             };
         }
         //verifica que el modelo exista,
-        //sino es asi le asigna el valor de un objeto existente
-        //console.log(ObjectF);
+        //sino es asi le asigna el valor de un objeto existente        
         const Model = this.ObjectModel ?? this.EditObject;
         const Form = WRender.Create({ className: 'divForm' });
         for (const prop in Model) {
-            let val = ObjectOptions.AddObject == true ? "" : this.EditObject[prop];
+            let val = ObjectF[prop] == undefined ? "" : ObjectF[prop];
             if (Model[prop].__proto__ == Object.prototype && Model[prop].type.toUpperCase() == "OPERATION") {
                 //---------------------------------------->
             } else if (!prop.includes("_hidden")) {
@@ -199,6 +190,9 @@ class WForm extends HTMLElement {
                         case "IMAGE": case "IMAGES":
                             const Multiple = Model[prop].type.toUpperCase() == "IMAGES" ? true : false;
                             InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple);
+                            if (Multiple) {
+                                ObjectF[prop] = ImageArray;
+                            }
                             break;
                         case "FECHA": case "HORA": case "PASSWORD":
                             let type = "date";
@@ -212,6 +206,7 @@ class WForm extends HTMLElement {
                             break;
                         case "SELECT":
                             InputControl = this.CreateSelect(InputControl, Model, prop, ObjectF);
+                            ObjectF[prop] = InputControl.value;
                             break;
                         case "MULTISELECT":
                             const { MultiSelect } = await import("./WMultiSelect.js");
@@ -225,6 +220,7 @@ class WForm extends HTMLElement {
                     }
                 } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
                     InputControl = this.CreateSelect(InputControl, Model, prop, ObjectF);
+                    ObjectF[prop] = InputControl.value
                 } else if (typeof Model[prop] === "string" && Model[prop].length >= 50) {
                     InputControl = WRender.Create({ tagName: "textarea", className: prop });
                 } else if (parseFloat(Model[prop]).toString() != "NaN") {
@@ -236,11 +232,9 @@ class WForm extends HTMLElement {
                 InputControl.onchange = async (ev) => { //evento de actualizacion del componente
                     if (ev.target.type == "file") {
                         if (ev.target.multiple) {
-                            await this.SelectedFile(ev.target.files, true);
-                            ObjectF[prop] = ImageArray;
+                            await this.SelectedFile(ev.target.files, true);                            
                         } else {
-                            await this.SelectedFile(ev.target.files[0]);
-                            
+                            await this.SelectedFile(ev.target.files[0]);                            
                             await setTimeout(() => {
                                 ObjectF[prop] = photoB64.toString();
                                 this.shadowRoot.querySelector("#imgControl" + prop + this.id).src = "data:image/png;base64," + ObjectF[prop];
@@ -305,7 +299,7 @@ class WForm extends HTMLElement {
             InputControl.addEventListener("change", (ev) => {
                 for (const file in ev.target.files) {
                     if (ev.target.files[file].__proto__ == File.prototype) {
-                        Div.append(ev.target.files[file].name)
+                        Div.append(WRender.Create(ev.target.files[file].name))
                     }
                 }
             });
@@ -347,8 +341,9 @@ class WForm extends HTMLElement {
                     if (this.DataRequire == true) {
                         for (const prop in ObjectF) {
                             if (!prop.includes("_hidden")) {
-                                const control = this.shadowRoot.querySelector("#ControlValue" + prop);
-                                if (ObjectF[prop] == null || ObjectF[prop] == "") {
+                                const control = this.shadowRoot.querySelector("#ControlValue" + prop);                                
+                                if ((ObjectF[prop] == null || ObjectF[prop] == "") && ObjectF[prop].__proto__ != Array.prototype) {
+                                    console.log(prop, ObjectF[prop]);
                                     WRender.SetStyle(control, {
                                         boxShadow: "0 0 3px #ef4d00"
                                     });
@@ -388,9 +383,7 @@ class WForm extends HTMLElement {
         return DivOptions;
     }
     async SelectedFile(value, multiple = false) {
-
         if (multiple) {
-            //console.log(value);
             for (const file in value) {
                 if (value[file].__proto__ == File.prototype) {
                     const reader = new FileReader();
@@ -502,6 +495,12 @@ class WForm extends HTMLElement {
                         "overflow-y": 'auto',
                         "max-height": "calc(100vh - 120px)",
                         margin: 10
+                    }), new WCssClass( `.listImage label`, {
+                        "font-size": 11,
+                        padding: 5,
+                        width: "100%",
+                        overflow: "hidden",
+                        display: "block"
                     }),
                 ], MediaQuery: [{
                     condicion: "(max-width: 800px)",
@@ -529,7 +528,6 @@ class WForm extends HTMLElement {
         }
         return WRender.createElement(Style);
     }
-
 }
 customElements.define('w-form', WForm);
 export { WForm }
