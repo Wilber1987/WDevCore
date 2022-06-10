@@ -22,7 +22,11 @@ WHILE @@FETCH_STATUS = 0
 BEGIN
 
 PRINT 'class ' + @tableName + ' {'
-
+PRINT '	constructor(props) {'
+PRINT '		for (const prop in props) {'
+PRINT '			this[prop] = props[prop];'
+PRINT '		}'
+PRINT '	}'
 DECLARE column_cursor CURSOR FOR 
 SELECT COLUMN_NAME, IS_NULLABLE, DATA_TYPE, isnull(CHARACTER_MAXIMUM_LENGTH,'-1'), ORDINAL_POSITION
 	, CASE WHEN (IS_NULLABLE = 'NO') THEN '' 
@@ -58,8 +62,9 @@ select @sType = case @datatype
 	when 'bit' then 'checkbox'
 else 'string'
 END
-
-	--If (@pos = 1)
+declare @Primary varchar(200) = ''
+	If (@pos = 1)
+		set @Primary = ', primary: true '
 		--PRINT '	[Key]'
 	--If (@nullable = 'NO' AND @pos > 1)
 		--PRINT '	[Required]'
@@ -67,8 +72,15 @@ END
 		--PRINT '	[MaxLength(' +  convert(varchar(4),@maxLen) + ')]'
 	--if (@sType = 'datetime')
 		--PRINT '	[Column(TypeName = "datetime")]'
-	SELECT @sProperty = '	' + @columnName + ' = { type: "'+ @sType +'" }'
-	PRINT @sProperty
+	
+	IF @columnName = 'Estado' BEGIN
+		SELECT @sProperty = '	' + @columnName + ' = { type: "Select", Dataset: ["Activo","Inactivo"] };'
+		PRINT @sProperty
+	END
+	ELSE BEGIN
+		SELECT @sProperty = '	' + @columnName + ' = { type: "'+ @sType +'" '+@Primary+' };'
+		PRINT @sProperty
+	END
 
 	--print ''
 	FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen, @pos, @isNullable
