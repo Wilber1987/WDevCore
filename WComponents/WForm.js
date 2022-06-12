@@ -141,7 +141,7 @@ class WForm extends HTMLElement {
                         value = value.toFixed(2)
                     }
                     FormDivForm.append(WRender.Create({
-                        class: "ModalDetailElement", children: [{ tagName: "label", innerText: prop + ": " + value }]
+                        class: "ModalDetailElement", children: [{ tagName: "label", innerText:  WOrtograficValidation.es(prop) + ": " + value }]
                     }));
                 }
             }
