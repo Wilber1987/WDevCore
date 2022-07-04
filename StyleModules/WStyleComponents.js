@@ -4,24 +4,25 @@ import { WCssClass } from "../WModules/WStyledRender.js";
 const StyleScrolls = {
     type: 'w-style', props: {
         id: '', ClassList: [
-            new WCssClass("*::-webkit-scrollbar-thumb", {
-                "background": " #ccc",
-                "border-radius": " 4px",
-            }), new WCssClass("*::-webkit-scrollbar-thumb:hover", {
-                "background": " #b3b3b3",
-                "box-shadow": " 0 0 3px 2px rgba(0, 0, 0, 0.2)",
-            }), new WCssClass("*::-webkit-scrollbar-thumb:active ", {
-                "background-color": " #999999",
-            }), new WCssClass("*::-webkit-scrollbar ", {
-                "width": " 8px",
-                "height": " 10px",
-                "margin": " 10px",
+            new WCssClass("*::-webkit-scrollbar ", {
+                "width": "20px",
             }), new WCssClass("*::-webkit-scrollbar-track ", {
-                "background": " #e1e1e1",
-                "border-radius": " 4px",
-            }), new WCssClass("*::-webkit-scrollbar-track:active ,*::-webkit-scrollbar-track:hover", {
+                "background": "transparent",
+            }), new WCssClass("*::-webkit-scrollbar-thumb", {
+                "background-color": "#8f8f8f",
+                "border-radius": "20px",
+                "border": "6px solid transparent",
+                "background-clip": "content-box",
+            }), new WCssClass("*::-webkit-scrollbar-thumb:hover", {
+                "background": " #a8bbbf",
+                "background-clip": "content-box",
+            }),/* 
+            
+            new WCssClass("*::-webkit-scrollbar-thumb:active ", {
+                "background-color": " #999999",
+            }),  new WCssClass("*::-webkit-scrollbar-track:active ,*::-webkit-scrollbar-track:hover", {
                 "background": " #d4d4d4",
-            })
+            })*/
         ]
     }
 };
@@ -104,7 +105,7 @@ const StylesControlsV2 = {
                 "font-size": 11,
                 padding: 8
             }), new WCssClass(`.BtnAlert,.BtnPrimary, .BtnSuccess,.BtnSecundary,.Btn`, {
-                width: "150px",
+                "min-width": "150px",
                 "background-color": "#5995fd",
                 border: "none",
                 outline: "none",
@@ -113,7 +114,8 @@ const StylesControlsV2 = {
                 color: "#fff",
                 "text-transform": "uppercase",
                 "font-weight": "600",
-                margin: "10px 0",
+                margin: "10px 5px",
+                padding: "0 10px",
                 cursor: "pointer",
                 transition: "0.5s",
             }), new WCssClass(`.BtnPrimary`, {
@@ -138,6 +140,7 @@ const StylesControlsV2 = {
             input[type=string], 
             input[type=password], 
             input[type=number],
+            input[type=color],
             input[type=date],  input[type=time],select, textarea,
             input:-internal-autofill-selected`, {
                 width: "100%",
@@ -151,7 +154,8 @@ const StylesControlsV2 = {
                 "font-size": "1.1rem !important",
                 color: "#333 !important",
                 "box-sizing": "border-box",
-                cursor: "pointer"
+                cursor: "pointer",
+                height: 40
             }), new WCssClass(`input:active, 
                 input:focus, 
                 select:active, 

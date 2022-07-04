@@ -2,8 +2,22 @@ import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WCo
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { WModalForm } from "./WModalForm.js";
+class TableConfig {
+    Dataset = [];
+    ModelObject = {};
+    paginate = true;
+    TypeMoney = "Dollar";
+    selectedItems = [];
+    DisplayData = [];
+    Options = {
+        UserActions: [{
+            name: "name",
+            Function: () => { }
+        }]
+    }
+}
 class WTableComponent extends HTMLElement {
-    constructor(TableConfig = {}) {
+    constructor(Config = (new TableConfig())) {
         super();
         this.TableClass = "WTable WScroll";
         this.Dataset = [];
@@ -12,7 +26,7 @@ class WTableComponent extends HTMLElement {
         this.paginate = true;
         this.attachShadow({ mode: "open" });
         this.TypeMoney = "Euro";
-        this.TableConfig = TableConfig;
+        this.TableConfig = Config ?? {};
     }
     connectedCallback() {
         this.DarkMode = this.DarkMode ?? false;
@@ -48,7 +62,7 @@ class WTableComponent extends HTMLElement {
         if (this.TableConfig != undefined) {
             this.Dataset = this.TableConfig.Dataset;
             if (this.Dataset == undefined) {
-                this.Dataset = [];
+                this.Dataset = [{ Description: "No Data!!!" }];
             }
             if (this.TableConfig.Options) {
                 this.Options = this.TableConfig.Options;
@@ -60,9 +74,7 @@ class WTableComponent extends HTMLElement {
                     Show: true,
                 };
             }
-            if (this.TableConfig.ModelObject) {
-                this.ModelObject = this.TableConfig.ModelObject;
-            }
+            this.ModelObject = this.TableConfig.ModelObject ?? this.Dataset[0];
             if (this.TableConfig.selectedItems == undefined) {
                 this.selectedItems = [];
             } else {
@@ -257,7 +269,7 @@ class WTableComponent extends HTMLElement {
     }
     DrawTRow = (tr, element) => {
         tr.innerHTML = "";
-        for (const prop in element) {
+        for (const prop in this.ModelObject) {
             if (WArrayF.checkDisplay(this.DisplayData, prop, this.ModelObject)) {
                 if (!prop.includes("_hidden")) {
                     let value = "";
@@ -266,7 +278,8 @@ class WTableComponent extends HTMLElement {
                     }
                     const Model = this.ModelObject;
                     let IsImage = this.IsImage(prop);
-                    ({ IsImage, value } = this.EvalModelPrototype(Model, prop, IsImage, value));
+                    let IsColor = false;
+                    ({ IsImage, value, IsColor } = this.EvalModelPrototype(Model, prop, IsImage, value, IsColor));
                     //DEFINICION DE VALORES-------------
                     if (IsImage) {
                         let cadenaB64 = "";
@@ -288,6 +301,17 @@ class WTableComponent extends HTMLElement {
                                     width: 50
                                 }
                             }]
+                        }));
+                    } else if (IsColor) {
+                        tr.append(WRender.Create({
+                            tagName: "td", children: [{ style: {
+                                background: value,
+                                width: "30px", 
+                                height: "30px", 
+                                borderRadius: "50%", 
+                                boxShadow: "0 0 3px 0 #888",
+                                margin: "auto"
+                            }}]
                         }));
                     } else if (this.IsMoney(prop)) {
                         tr.append(WRender.createElement({
@@ -376,10 +400,10 @@ class WTableComponent extends HTMLElement {
         this.shadowRoot.append(WRender.createElement(this.MediaStyleResponsive()));
         return tbody;
     }
-    EvalModelPrototype(Model, prop, IsImage, value) {
+    EvalModelPrototype(Model, prop, IsImage, value, IsColor) {
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
             switch (Model[prop].type.toUpperCase()) {
-                case "IMAGE": case "IMAGES":
+                case "IMAGE": case "IMAGES": case "IMG":
                     IsImage = true;
                     break;
                 case "SELECT":
@@ -392,10 +416,12 @@ class WTableComponent extends HTMLElement {
                         }
                         return flag;
                     });
-
                     value = element && element.__proto__ == Object.prototype ? element.desc : element;
                     break;
                 case "MULTISELECT":
+                    break;
+                case "COLOR":
+                    IsColor = true;
                     break;
                 case "TABLE":
                     break;
@@ -406,7 +432,7 @@ class WTableComponent extends HTMLElement {
             InputControl = this.CreateSelect(InputControl, Model[prop], prop, ObjectF);
             ObjectF[prop] = InputControl.value;
         }
-        return { IsImage, value };
+        return { IsImage, value, IsColor };
     }
 
     DeleteBTN(Options, element, tr) {
