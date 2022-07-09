@@ -454,6 +454,9 @@ class WTableComponent extends HTMLElement {
                 case "COLOR":
                     IsColor = true;
                     break;
+                case "COLOR":
+                    IsColor = true;
+                    break;
                 case "TABLE":
                     break;
                 default:
