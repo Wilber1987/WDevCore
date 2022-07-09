@@ -2,8 +2,22 @@ import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WCo
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { WModalForm } from "./WModalForm.js";
+class TableConfig {
+    Dataset = [];
+    ModelObject = {};
+    paginate = true;
+    TypeMoney = "Dollar";
+    selectedItems = [];
+    DisplayData = [];
+    Options = {
+        UserActions: [{
+            name: "name",
+            Function: () => { }
+        }]
+    }
+}
 class WTableComponent extends HTMLElement {
-    constructor(TableConfig = {}) {
+    constructor(Config = (new TableConfig())) {
         super();
         this.TableClass = "WTable WScroll";
         this.Dataset = [];
@@ -12,7 +26,7 @@ class WTableComponent extends HTMLElement {
         this.paginate = true;
         this.attachShadow({ mode: "open" });
         this.TypeMoney = "Euro";
-        this.TableConfig = TableConfig;
+        this.TableConfig = Config ?? {};
     }
     connectedCallback() {
         this.DarkMode = this.DarkMode ?? false;
@@ -26,16 +40,15 @@ class WTableComponent extends HTMLElement {
                 break;
         }
         //PAGINACION
-        this.append(WRender.createElement(
-            {
-                type: 'w-style', props: {
-                    id: '', ClassList: [
-                        new WCssClass(`w-table`, {
-                            display: "block"
-                        }),
-                    ]
-                }
-            }));
+        this.append(WRender.createElement({
+            type: 'w-style', props: {
+                id: '', ClassList: [
+                    new WCssClass(`w-table`, {
+                        display: "block"
+                    }),
+                ]
+            }
+        }));
         if (this.TableConfig.maxElementByPage == undefined) {
             this.maxElementByPage = 10;
         } else {
@@ -48,7 +61,7 @@ class WTableComponent extends HTMLElement {
         if (this.TableConfig != undefined) {
             this.Dataset = this.TableConfig.Dataset;
             if (this.Dataset == undefined) {
-                this.Dataset = [];
+                this.Dataset = [{ Description: "No Data!!!" }];
             }
             if (this.TableConfig.Options) {
                 this.Options = this.TableConfig.Options;
@@ -60,9 +73,7 @@ class WTableComponent extends HTMLElement {
                     Show: true,
                 };
             }
-            if (this.TableConfig.ModelObject) {
-                this.ModelObject = this.TableConfig.ModelObject;
-            }
+            this.ModelObject = this.TableConfig.ModelObject ?? this.Dataset[0];
             if (this.TableConfig.selectedItems == undefined) {
                 this.selectedItems = [];
             } else {
@@ -257,7 +268,7 @@ class WTableComponent extends HTMLElement {
     }
     DrawTRow = (tr, element) => {
         tr.innerHTML = "";
-        for (const prop in element) {
+        for (const prop in this.ModelObject) {
             if (WArrayF.checkDisplay(this.DisplayData, prop, this.ModelObject)) {
                 if (!prop.includes("_hidden")) {
                     let value = "";
@@ -266,7 +277,9 @@ class WTableComponent extends HTMLElement {
                     }
                     const Model = this.ModelObject;
                     let IsImage = this.IsImage(prop);
-                    ({ IsImage, value } = this.EvalModelPrototype(Model, prop, IsImage, value));
+                    let IsColor = false;
+                    let IsMultiSelect = false;
+                    ({ IsImage, value, IsColor, IsMultiSelect } = this.EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect));
                     //DEFINICION DE VALORES-------------
                     if (IsImage) {
                         let cadenaB64 = "";
@@ -289,11 +302,54 @@ class WTableComponent extends HTMLElement {
                                 }
                             }]
                         }));
+                    } else if (IsColor) {
+                        tr.append(WRender.Create({
+                            tagName: "td", children: [{
+                                style: {
+                                    background: value,
+                                    width: "30px",
+                                    height: "30px",
+                                    borderRadius: "50%",
+                                    boxShadow: "0 0 3px 0 #888",
+                                    margin: "auto"
+                                }
+                            }]
+                        }));
                     } else if (this.IsMoney(prop)) {
                         tr.append(WRender.createElement({
                             type: "td", props: {
                                 style: "text-align: right",
                                 innerHTML: `${Money[this.TypeMoney]} ${value}`
+                            }
+                        }));
+                    } else if (IsMultiSelect) {
+                        element[prop] = value.map(object => {
+                            const NewObj = {};
+                            const FObject = Model[prop].Dataset.find(fobject => {
+                                let flag = false;
+                                for (const key in fobject) {
+                                    if (key.toUpperCase().includes("ID") && fobject[key] && object[key] == fobject[key]) {
+                                        flag = true;
+                                    }
+                                }
+                                return flag;
+                            });
+                            if (FObject) {
+                                for (const key in object) { NewObj[key] = object[key] }
+                                return FObject;
+                            }
+                            return undefined;
+                        });
+                        tr.append(WRender.createElement({
+                            type: "td", props: {
+                                innerHTML: `${element[prop].map(object => {
+                                    const FObject = Model[prop].Dataset.find(i => WArrayF.compareObj(object, i));
+                                    if (FObject) {
+                                        return `<label class="labelMultiselect">${FObject.Descripcion}</label>`
+                                    } else {
+                                        return `<label class="labelMultiselect">${FObject}</label>`
+                                    }
+                                }).join('')}`
                             }
                         }));
                     } else if (typeof value === "number") {
@@ -376,26 +432,27 @@ class WTableComponent extends HTMLElement {
         this.shadowRoot.append(WRender.createElement(this.MediaStyleResponsive()));
         return tbody;
     }
-    EvalModelPrototype(Model, prop, IsImage, value) {
+    EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect) {
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
             switch (Model[prop].type.toUpperCase()) {
-                case "IMAGE": case "IMAGES":
+                case "IMAGE": case "IMAGES": case "IMG":
                     IsImage = true;
                     break;
                 case "SELECT":
                     const element = Model[prop].Dataset.find(e => {
                         let flag = false;
-                        if (e == value) {
-                            flag = true;
-                        } else if (e.__proto__ == Object.prototype && e.id == value) {
-                            flag = true;
-                        }
+                        if (e == value) { flag = true; }
+                        else if (e.__proto__ == Object.prototype && e.id == value) { flag = true; }
                         return flag;
                     });
-
                     value = element && element.__proto__ == Object.prototype ? element.desc : element;
+                    value = value ?? "";
                     break;
                 case "MULTISELECT":
+                    IsMultiSelect = true;
+                    break;
+                case "COLOR":
+                    IsColor = true;
                     break;
                 case "TABLE":
                     break;
@@ -406,7 +463,7 @@ class WTableComponent extends HTMLElement {
             InputControl = this.CreateSelect(InputControl, Model[prop], prop, ObjectF);
             ObjectF[prop] = InputControl.value;
         }
-        return { IsImage, value };
+        return { IsImage, value, IsColor, IsMultiSelect };
     }
 
     DeleteBTN(Options, element, tr) {
@@ -504,7 +561,6 @@ class WTableComponent extends HTMLElement {
             });
         }
     }
-
     ModalCRUD(element, tr) {
         this.shadowRoot.append(
             new WModalForm({
@@ -624,9 +680,6 @@ class WTableComponent extends HTMLElement {
                 }
             });
         }
-        /*if (tbody.length == 0) {
-            return tfooter;
-        }*/
         tfooter.push({
             type: "label",
             props: {
@@ -801,31 +854,27 @@ class WTableComponent extends HTMLElement {
                             width: "calc(100% - 10px)",
                             margin: "5px"
                         }), new WCssClass(`.WTable`, {
-                            display: "block ", //width: "100%"
+                            display: "block "
                         }), new WCssClass(`.WTable tbody`, {
-                            display: "block ", //width: "100%"
+                            display: "block "
                         }), new WCssClass(`.WTable thead`, {
-                            display: "none ", //width: "100%"
+                            display: "none "
                         }), new WCssClass(`.WTable tr`, {
                             display: "block ",
-                            //border: "1px solid #999",
                             margin: "10px",
                             "border-radius": "0.3cm",
                             overflow: "hidden",
-                            "box-shadow": "0 0 5px 2px rgba(0,0,0,0.4)"
+                            "box-shadow": "0 0 3px 0 rgba(0,0,0,0.5)"
                         }), new WCssClass(`.WTable td`, {
                             display: "flex ",
                             "border-bottom": "1px rgba(10, 10, 10, 0.3) solid",
                             padding: "10px"
-                            //width: "100%"
                         }), new WCssClass(`.WTable .tdAction`, {
                             display: "block ",
                             "justify-content": "center",
                             "align-items": "center",
                             width: "auto",
                             padding: "10px"
-                        }), new WCssClass(`.WTable tbody tr:nth-child(odd)`, {
-                            "background-color": "rgba(0,0,0,0.2)"
                         }), new WCssClass(`input[type=text], input[type=string], input[type=number], input[type=date]`, {
                             padding: "5px 10px",
                             width: "calc(100% - 20px)",
@@ -870,7 +919,7 @@ class WTableComponent extends HTMLElement {
                         "border-radius": "0.2cm",
                         "font-weight": "bold",
                         transition: "all 0.6s",
-                        "text-align": "center",
+                        "text-align": "center"
                     }), new WCssClass(`.tfooter`, {
                         display: "flex",
                         border: "1px rgba(10, 10, 10, 0.2) solid",
@@ -883,6 +932,14 @@ class WTableComponent extends HTMLElement {
                         "max-width": "390px",
                         "text-overflow": "ellipsis",
                         "white-space": "nowrap",
+                    }), new WCssClass(`.labelMultiselect`, {
+                        padding: "5px 10px",
+                        "border-radius": "0.3cm",
+                        "background-color": "#009f97",
+                        color: "#fff",
+                        "font-size": 11,
+                        overflow: "hidden",
+                        "margin-right": 5
                     }),
                     //BTN OPTIONS BOTONES               
                     new WCssClass(`.BtnTable, .BtnTableA, .BtnTableS, .BtnTableSR`, {
