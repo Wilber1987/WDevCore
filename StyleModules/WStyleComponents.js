@@ -137,11 +137,7 @@ const StylesControlsV2 = {
             input[type=string], 
             input[type=password], 
             input[type=number],
-<<<<<<< HEAD
             input[type=color], input[type=email], 
-=======
-            input[type=color],
->>>>>>> 0e04bbb85e533ea3c025905fc0ed832a9d39f04d
             input[type=date],  input[type=time],select, textarea,
             input:-internal-autofill-selected`, {
                 width: "100%",
