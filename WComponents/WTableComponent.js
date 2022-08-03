@@ -322,7 +322,7 @@ class WTableComponent extends HTMLElement {
                                 innerHTML: `${Money[this.TypeMoney]} ${value}`
                             }
                         }));
-                    } else if (IsMultiSelect) {
+                    } else if (IsMultiSelect && value.__proto__ == Array.prototype) {
                         element[prop] = value.map(object => {
                             const NewObj = {};
                             const FObject = Model[prop].Dataset.find(fobject => {
@@ -462,10 +462,7 @@ class WTableComponent extends HTMLElement {
                 default:
                     break;
             }
-        } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
-            InputControl = this.CreateSelect(InputControl, Model[prop], prop, ObjectF);
-            ObjectF[prop] = InputControl.value;
-        }
+        } 
         return { IsImage, value, IsColor, IsMultiSelect };
     }
 
