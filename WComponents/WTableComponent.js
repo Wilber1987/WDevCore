@@ -433,7 +433,7 @@ class WTableComponent extends HTMLElement {
         return tbody;
     }
     EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect) {
-        if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
+        if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
                     IsImage = true;
@@ -794,19 +794,13 @@ class WTableComponent extends HTMLElement {
                         width: "100%",
                         "border-collapse": "collapse",
                         "font-size": "12px",
-                        //"box-shadow": "0 0 2px 0 rgba(0,0,0,0.5)",
                         border: "1px rgba(10, 10, 10, 0.2) solid",
-                        position: "relative",
-                        //overflow: "hidden",
-                        //"border-radius": 10
+                        position: "relative"
                     }), new WCssClass(`.WTable th`, {
-                        "text-align": "left",
-                        //border: "1px rgba(10, 10, 10, 0.3) solid",
+                        "text-align": "left"
                     }), new WCssClass(`.WTable td`, {
                         padding: "0.25rem 0.8rem",
-                        "text-align": "left",
-                        //"border-bottom": "1px rgba(10, 10, 10, 0.5) solid",
-                        //border: "1px #ccc solid"
+                        "text-align": "left"
                     }), new WCssClass(`.WTable .tdAction`, {
                         "text-align": "center",
                         "width": "120px",
@@ -839,7 +833,6 @@ class WTableComponent extends HTMLElement {
                         "font-size": "15px",
                         "border-radius": 10
                     }), new WCssClass(`input:active, input:focus`, {
-                        //"border-bottom": "2px solid #0099cc",
                         outline: "none",
                     }), new WCssClass(`input[type=button]`, {
                         cursor: "pointer",

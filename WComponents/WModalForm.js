@@ -183,7 +183,8 @@ class WModalForm extends HTMLElement {
             props: {
                 ClassList: [
                     new WCssClass(" .ContainerFormWModal", {
-                        "display": "block",
+                        "display": "grid",
+                        "grid-template-rows": "70px calc(100% - 70px)" ,
                         "overflow": "hidden",
                         "margin": "auto",
                         "margin-top": this.StyleForm == "FullScreen" ? 0 : 30,
@@ -195,6 +196,7 @@ class WModalForm extends HTMLElement {
                         "border-radius": "0.3cm",
                         "position": "relative",
                         "box-shadow": "0 0px 3px 0px #000",
+
                     }), new WCssClass(" .ContainerFormWModal h2", {
                         "padding": "10px",
                         "margin": "0px",
@@ -220,8 +222,9 @@ class WModalForm extends HTMLElement {
                         "display": "flex",
                         "justify-content": "space-between",
                         "align-items": "center",
-                        padding: "10px 30px",
-                        "margin-top": "10px"
+                        padding: "20px 30px",
+                        "margin-bottom": "20px",
+                        "box-shadow": "0 0px 3px 0px #000"
                     }), new WCssClass(` .ModalElement`, {
                         "background-color": "#4da6ff",
                         padding: 10,
@@ -246,9 +249,15 @@ class WModalForm extends HTMLElement {
                         overflow: "hidden",
                         "overflow-y": 'auto',
                         "max-height": "calc(100vh - 120px)",
-                        margin: 10
+                        height: "100%"
                     }),
                 ], MediaQuery: [{
+                    condicion: "(max-width: 1200px)",
+                    ClassList: [new WCssClass(" .ContainerFormWModal", {
+                        width: "90%"
+                        
+                    })]
+                },{
                     condicion: "(max-width: 800px)",
                     ClassList: [new WCssClass(" .ContainerFormWModal", {
                         position: "fixed",
@@ -273,7 +282,7 @@ class WModalForm extends HTMLElement {
                         "max-height": "calc(100% - 80px)"
                     }),
                     ]
-                },]
+                }]
             }
         }
         return Style;

@@ -2,8 +2,9 @@ import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WCo
 import { WCssClass } from "../WModules/WStyledRender.js";
 import {StyleScrolls, StylesControlsV1} from "../StyleModules/WStyleComponents.JS";
 import "./WModalForm.js";
+
 class WArticlesComponent extends HTMLElement {
-    constructor() {
+    constructor(WArticlesConfig = {}) {
         super();
         this.ArticlesClass = "WArticles WScroll";
         this.Dataset = [];
@@ -13,6 +14,9 @@ class WArticlesComponent extends HTMLElement {
         this.TypeMoney = "Euro";
         this.ArticleHeader = [];
         this.ArticleBody = [];
+        for (const prop in WArticlesConfig) {
+			this[prop] = WArticlesConfig[prop];
+		}
     }
     connectedCallback() {
         if (this.shadowRoot.innerHTML != "") {
@@ -515,23 +519,26 @@ const ArticleStyle = {
                 "font-size": 13,
                 "font-family": '"Poppins", sans-serif',
                 "box-shadow": "0 0px 2px 0 rgba(0,0,0,0.3)",
-                "justify-content": "space-between"
-            }), new WCssClass(`.WArticles .ArticleBody`, {
-                margin: 10,
+                "justify-content": "space-between",    
+                color: "#888"
+            }), new WCssClass(`.WArticles .ArticleBody`, {                
                 display: "flex",
                 "flex-direction": "column",
                 "font-size": 12,
                 "font-family": '"Poppins", sans-serif',
                 position: "relative",
                 "min-height": 150,
-                "border": "solid 1px rgba(0,0,0,0.3)",
                 "border-radius": "0.2cm",
                 overflow: "hidden"
             }),new WCssClass(`.WArticles  .ArticleBody label`, {
+                color: "#fff",
+                background: "#584d6e",
                 padding: 10,
                 "font-size": 16,
                 "font-weight": "bold", 
-                color: "#444"               
+                color: "#fff",
+                margin : "20px 20px 20px  0px"  ,   
+                "border-radius": "0px 20px 20px  0px"           
             }), new WCssClass(`.WArticles .ArticleBody p`, {
                 "text-align": "justify",
                 "text-overflow": "ellipsis",
@@ -541,17 +548,13 @@ const ArticleStyle = {
                 "-webkit-box-orient": "vertical",
                 "-moz-box-orient": "vertical",
                 "box-orient": "vertical",
-                "-webkit-line-clamp": "4",
-                "line-clamp": "4",
-                height: 75,
-                position: "absolute",
+                "line-clamp": "4",               
                 overflow: "hidden",
-                padding: "5px 15px",
-                color: "#fff",
+                padding: "25px",
+                color: "#888",
                 bottom:0,
-                "background-color": "rgb(0,0,0,50%)",
                 "font-size": 14,
-                width: "calc(100% - 30px)"
+                width: "calc(100% - 50px)"
             }), new WCssClass(`.ArticleHeader img`, {
                 //"grid-row": "1/3",
                 //"grid-column": "1/2",

@@ -224,21 +224,23 @@ class WForm extends HTMLElement {
                             ObjectF[prop] = InputControl.value;
                             break;
                         case "MULTISELECT":
-                            const { MultiSelect } = await import("./WMultiSelect.js");
-                            InputControl = new MultiSelect({
-                                Dataset: Model[prop].Dataset.map(item => {
-                                    const MapObject = {};
-                                    for (const key in item) {
-                                        const element = item[key];
-                                        if (element != null && element != undefined) {
-                                            MapObject[key] = element;
-                                        }
+                            const { MultiSelect } = await import("./WMultiSelect.js");                           
+                            const Datasetilt = Model[prop].Dataset.map(item => {
+                                const MapObject = {};
+                                for (const key in item) {
+                                    const element = item[key];
+                                    if (element != null && element != undefined) {
+                                        MapObject[key] = element;
                                     }
-                                    return MapObject;
-                                })
+                                }
+                                return MapObject;
+                            })
+                            InputControl = new MultiSelect({
+                                Dataset: Datasetilt
                             });
                             if (val != null && val != undefined && val.__proto__ == Array.prototype) {
                                 val.forEach((item) => {
+                                    console.log(item);
                                     const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, item));
                                     if (FindItem) {
                                         InputControl.selectedItems.push(FindItem);

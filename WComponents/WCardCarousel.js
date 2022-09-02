@@ -1,4 +1,4 @@
-﻿import { WCssClass } from "../WModules/WStyledRender.js";
+﻿import { WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 import { WRender } from "../WModules/WComponentsTools.js";
 import { StylesControlsV1 } from "../StyleModules/WStyleComponents.js";
 import { WIcons } from "../WModules/WIcons.js";
@@ -21,6 +21,7 @@ class WCardCarousel extends HTMLElement {
         this.afterLink = WRender.createElement({ type: 'a', props: { onclick: this.myFunctionNext, class: "afterLink", innerText: '>' } });
         this.Container.append(this.CarouselDiv, this.beforeLink, this.afterLink);
         this.Dataset = Dataset;
+        WRender.SetStyle(this, {width: "100%"})
         this.shadowRoot.append(this.Container, this.StyleCarousel, WRender.createElement(StylesControlsV1));
     }
     connectedCallback() {
@@ -100,12 +101,29 @@ class WCardCarousel extends HTMLElement {
     });
 }
 customElements.define('w-card-carousel', WCardCarousel);
-class WCard extends HTMLElement {
+class WCard extends HTMLElement {    
     constructor(element = (new CardModel()), CardType = 1, ActionFunction) {
         super();
+        this.attachShadow({ mode: 'open' });
         this.style.transition = "all 0.6s";
         this.className = "CardElement";
         let cadenaB64 = "data:image/png;base64,";
+        this.append(new WStyledRender({ ClassList: [
+            new WCssClass(`.CardElement`, {
+                width: 220,
+                height: 330,
+                "min-width": 220,
+                margin: "10px !important",
+                overflow: "hidden",
+                position: "relative",
+                "box-shadow": "0 0px 5px 0 rgba(0,0,0,0.6)",
+                "border-radius": "0.3cm",
+                display: "flex",
+                "flex-direction": "column",
+                "align-items": "center",
+                padding: 20,
+            })
+        ]}))
         if (!element.picture) {
             element.picture =  WIcons.UserIcon}
         const Figure = WRender.createElement({
@@ -115,10 +133,10 @@ class WCard extends HTMLElement {
         this.ActionFunction = ActionFunction;
         switch (CardType) {
             case 2:               
-                this.append(this.StyleCard2);
+                this.shadowRoot.append(this.StyleCard2);
                 break;
             default:
-                this.append(this.StyleCard);
+                this.shadowRoot.append(this.StyleCard);
                 break;
         }
         const cardC = WRender.createElement({
@@ -144,7 +162,7 @@ class WCard extends HTMLElement {
                 }
             }));
         }
-        this.append( WRender.createElement(Figure), cardC);
+        this.shadowRoot.append( WRender.createElement(StylesControlsV1), WRender.createElement(Figure), cardC);
     }
     connectedCallback() {
         setTimeout(() => {
@@ -157,20 +175,7 @@ class WCard extends HTMLElement {
     StyleCard = WRender.createElement({
         type: 'w-style', props: {
             id: '', ClassList: [
-                new WCssClass(`.CardElement`, {
-                    width: 220,
-                    height: 330,
-                    "min-width": 220,
-                    margin: "10px !important",
-                    overflow: "hidden",
-                    position: "relative",
-                    "box-shadow": "0 0px 5px 0 rgba(0,0,0,0.6)",
-                    "border-radius": "0.3cm",
-                    display: "flex",
-                    "flex-direction": "column",
-                    "align-items": "center",
-                    padding: 20,
-                }), new WCssClass(`.Details .aLabel`, {
+                new WCssClass(`.Details .aLabel`, {
                     color: "#09f !important",
                     padding: 10,
                     margin: 0,
@@ -267,7 +272,7 @@ class WCard extends HTMLElement {
                     "height": "250px",
                     "max-height": "250px",
                     "width": "100%",
-                    //"border-radius": "50%",
+                    "border-radius": "0.5cm",
                     "box-shadow": "0 0 6px 0 rgb(0,0,0,50%)",
                     //"filter": "grayscale(100%)",
                 })

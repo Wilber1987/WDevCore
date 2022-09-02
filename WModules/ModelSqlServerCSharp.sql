@@ -58,15 +58,6 @@ select @sType = case @datatype
 	when 'bit' then 'bool'
 else 'string'
 END
-
-	--If (@pos = 1)
-		--PRINT '	[Key]'
-	--If (@nullable = 'NO' AND @pos > 1)
-		--PRINT '	[Required]'
-	--if (@sType = 'string' and @maxLen <> '-1')
-		--PRINT '	[MaxLength(' +  convert(varchar(4),@maxLen) + ')]'
-	--if (@sType = 'datetime')
-		--PRINT '	[Column(TypeName = "datetime")]'
 	SELECT @sProperty = '	public ' + @sType + @isNullable + ' ' + @columnName + ' { get; set; }'
 	PRINT @sProperty
 
