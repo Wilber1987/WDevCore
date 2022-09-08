@@ -82,10 +82,7 @@ class WAppNavigator extends HTMLElement {
             this.shadowRoot.appendChild(WRender.createElement(header));
         }
         const Nav = { type: "nav", props: { id: "MainNav", className: this.NavStyle }, children: [] };
-        this.Elements.forEach((element, Index) => {
-            if (element.url == undefined) {
-                element.url = "#" + this.id;
-            }
+        this.Elements.forEach((element, Index) => {            
             const elementNav = WRender.createElement({
                 type: "a",
                 props: { class: "elementNav" },
@@ -102,47 +99,19 @@ class WAppNavigator extends HTMLElement {
             if (element.url != undefined && element.url != "#") {
                 elementNav.href = element.url
             }
-            elementNav.onclick = async (ev) => {
-                this.ActiveMenu(elementNav);
-                if (element.action != undefined) {
-                    element.action();
-                }
-            }
+
             Nav.children.push(elementNav);
             if (element.SubNav != undefined) {
-                elementNav.href = "#";
-                const SubMenuId = "SubMenu" + Index + this.id;
-                const SubNav = {
-                    type: "section",
-                    props: {
-                        id: SubMenuId, href: element.url, className: "UnDisplayMenu"
-                    },
-                    children: []
+                this.AddSubNav(Index, element, elementNav, Nav);
+            } else {
+                if (elementNav.url == undefined) {
+                    elementNav.url = "#" + this.id;
                 }
-                if (element.SubNav.Elements != undefined) {
-                    element.SubNav.Elements.forEach(SubElement => {
-                        SubNav.children.push({
-                            type: "a",
-                            props: {
-                                innerText: SubElement.name, href: SubElement.url,
-                                onclick: async (ev) => {
-                                    if (SubElement.action != undefined) {
-                                        SubElement.action(ev);
-                                    }
-                                }
-                            }
-                        });
-                    });
-                    elementNav.onclick = (ev) => {
-                        this.ActiveMenu(ev);
-                        const MenuSelected = this.shadowRoot.querySelector("#" + SubMenuId);
-                        if (MenuSelected.className == "UnDisplayMenu") {
-                            MenuSelected.className = "DisplayMenu"
-                        } else {
-                            MenuSelected.className = "UnDisplayMenu"
-                        }
+                elementNav.onclick = async (ev) => {
+                    this.ActiveMenu(elementNav);
+                    if (element.action != undefined) {
+                        element.action();
                     }
-                    Nav.children.push(SubNav);
                 }
             }
             if (Index == 0 && element.SubNav == undefined) {
@@ -153,6 +122,42 @@ class WAppNavigator extends HTMLElement {
         });
         this.shadowRoot.append(WRender.createElement(Nav));
     }
+    AddSubNav(Index, element, elementNav, Nav) {
+        const SubMenuId = "SubMenu" + Index + this.id;
+        const SubNav = {
+            type: "section",
+            props: {
+                id: SubMenuId, href: element.url, className: "UnDisplayMenu"
+            },
+            children: []
+        };
+        if (element.SubNav.Elements != undefined) {
+            element.SubNav.Elements.forEach(SubElement => {
+                SubNav.children.push({
+                    type: "a",
+                    props: {
+                        innerText: SubElement.name, 
+                        onclick: async (ev) => {
+                            if (SubElement.action != undefined) {
+                                SubElement.action(ev);
+                            }
+                        }
+                    }
+                });
+            });
+            elementNav.onclick = (ev) => {
+                this.ActiveMenu(ev);
+                const MenuSelected = this.shadowRoot.querySelector("#" + SubMenuId);
+                if (MenuSelected.className == "UnDisplayMenu") {
+                    MenuSelected.className = "DisplayMenu";
+                } else {
+                    MenuSelected.className = "UnDisplayMenu";
+                }
+            };
+            Nav.children.push(SubNav);
+        }
+    }
+
     Style() {
         const style = this.querySelector("#NavStyle" + this.id);
         if (style) {
