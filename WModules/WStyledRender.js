@@ -199,10 +199,10 @@ class StyleConfig {
 }
 class WStyledRender extends HTMLElement {
     constructor(Config = (new StyleConfig())) {
-        super();  
+        super();
         for (const p in Config) {
             this[p] = Config[p];
-        }     
+        }
     }
     attributeChangedCallBack() {
         this.DrawStyle();
@@ -218,18 +218,18 @@ class WStyledRender extends HTMLElement {
         let styleFrag = {
             type: "style",
             props: {
-                innerHTML : "",
+                innerHTML: "",
             },
         }
         if (this.ClassList != undefined && this.ClassList.__proto__ == Array.prototype) {
-            styleFrag.props.innerHTML =  styleFrag.props.innerHTML + " " + this.DrawClassList(this.ClassList);
+            styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + this.DrawClassList(this.ClassList);
         }
         if (this.MediaQuery != undefined && this.MediaQuery.__proto__ == Array.prototype) {
             this.MediaQuery.forEach(MediaQ => {
                 let MediaQuery = `@media ${MediaQ.condicion}{
                     ${this.DrawClassList(MediaQ.ClassList)}
                 }`;
-                styleFrag.props.innerHTML =  styleFrag.props.innerHTML + " " + MediaQuery;
+                styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + MediaQuery;
             });
         }
         if (this.KeyFrame != undefined && this.KeyFrame.__proto__ == Array.prototype) {
@@ -237,7 +237,7 @@ class WStyledRender extends HTMLElement {
                 let KeyFrame = `@keyframes ${KeyF.animate} {
                     ${this.DrawClassList(KeyF.ClassList)}
                 }`;
-                styleFrag.props.innerHTML =  styleFrag.props.innerHTML + " " + KeyFrame;
+                styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + KeyFrame;
             });
         }
         this.append(WRender.createElement(styleFrag));
@@ -261,5 +261,8 @@ class WStyledRender extends HTMLElement {
         return bodyStyle;
     }
 }
+function css(body = "") {
+    return WRender.Create({ tagName: "style", innerHTML: body });
+}
 customElements.define("w-style", WStyledRender);
-export { WCssClass, WStyledRender }; 
+export { WCssClass, WStyledRender, css }; 
