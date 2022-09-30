@@ -4,6 +4,7 @@ import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents
 import { WModalForm } from './WModalForm.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { WIcons } from '../WModules/WIcons.js';
+import { WTableComponent } from './WTableComponent.js';
 let photoB64;
 const ImageArray = [];
 class FormConfig {
@@ -173,7 +174,7 @@ class WForm extends HTMLElement {
         const Model = this.ModelObject ?? this.EditObject;
         const Form = WRender.Create({ className: 'divForm' });
         for (const prop in Model) {
-            if (!WArrayF.checkDisplay(this.DisplayData, prop, Model)) {
+            if (!WArrayF.checkDisplay(undefined, prop, Model)) {
                 continue;
             }
             let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
@@ -219,8 +220,12 @@ class WForm extends HTMLElement {
                             });
                             ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
                             break;
-                        case "SELECT":
-                            InputControl = this.CreateSelect(InputControl, Model[prop].Dataset, prop, ObjectF);
+                        case "SELECT":   
+                            InputControl = await this.CreateSelect(InputControl, Model[prop].Dataset, prop, ObjectF);
+                            ObjectF[prop] = InputControl.value;
+                            break;
+                        case "WSELECT":   
+                            InputControl = await this.CreateWSelect(InputControl, Model[prop].Dataset, prop, ObjectF);
                             ObjectF[prop] = InputControl.value;
                             break;
                         case "MULTISELECT":
@@ -240,7 +245,7 @@ class WForm extends HTMLElement {
                             });
                             if (val != null && val != undefined && val.__proto__ == Array.prototype) {
                                 val.forEach((item) => {
-                                    console.log(item);
+                                    //console.log(item);
                                     const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, item));
                                     if (FindItem) {
                                         InputControl.selectedItems.push(FindItem);
@@ -255,9 +260,12 @@ class WForm extends HTMLElement {
                                 className: prop, value: val, type: Model[prop].type,
                                 placeholder: "me@email.com",
                                 pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                            });
+                            }); 
                             break;
-                        case "TABLE":
+                        case "MASTERDETAIL":
+                            ControlContainer.classList.add("tableContainer");
+                            ObjectF[prop] = ObjectF[prop] ?? [];
+                            InputControl = new WTableComponent({Dataset: ObjectF[prop], ModelObject:  Model[prop].ModelObject});
                             break;
                         default:
                             //val = Model[prop].defaultValue ?? "";
@@ -333,14 +341,25 @@ class WForm extends HTMLElement {
         }
         return Form;
     }
-    CreateSelect(InputControl, Dataset, prop, ObjectF) {
+    async CreateWSelect(InputControl, Dataset, prop, ObjectF) {
+        const { MultiSelect } = await import("./WMultiSelect.js");
+        InputControl = new MultiSelect({
+            MultiSelect: false, 
+            Dataset: Dataset,
+            Action: (ItemSelects)=>{
+                ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_ ?? "ElementIndex_0";
+            }
+        }); 
+        return InputControl; 
+    }
+    async CreateSelect(InputControl, Dataset, prop, ObjectF) {        
         InputControl = WRender.Create({
             tagName: "select", value: null, className: prop,
             children: Dataset.map(option => {
                 let OValue, ODisplay;
                 if (option.__proto__ == Object.prototype) {
                     OValue = option["id"];
-                    ODisplay = option["desc"];
+                    ODisplay = option["desc"] ?? option["Descripcion"] ?? option["descripcion"];
                 } else {
                     OValue = option;
                     ODisplay = option;
@@ -533,7 +552,7 @@ class WForm extends HTMLElement {
             props: {
                 ClassList: [
                     new WCssClass(" .ContainerFormWModal", {
-                        overflow: "hidden",
+                        //overflow: "hidden",
                     }), new WCssClass(".divForm", {
                         display: "grid",
                         "grid-template-columns": this.DivColumns,// "calc(50% - 10px) calc(50% - 10px)",
@@ -544,7 +563,11 @@ class WForm extends HTMLElement {
                     }), new WCssClass(".divForm .imageGridForm", {
                         "grid-row": "1/4",
                         //width: "calc(50% - 10px)", margin: "5px"
-                    }), new WCssClass(` input:-internal-autofill-selected`, {
+                    }), new WCssClass(".divForm .imageGridForm, .divForm .tableContainer", {
+                        "grid-column": "1/3",
+                        "grid-row": "span 4"
+                        //width: "calc(50% - 10px)", margin: "5px"
+                    }),new WCssClass(` input:-internal-autofill-selected`, {
                         "appearance": "menulist-button",
                         "background-color": "none !important",
                         "background-image": "none !important",

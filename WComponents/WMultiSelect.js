@@ -1,5 +1,5 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
-import { WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
+import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV1 } from "../StyleModules/WStyleComponents.JS";
 import { WModalForm } from "./WModalForm.js";
 import { WIcons } from "../WModules/WIcons.js";
@@ -52,7 +52,7 @@ class MultiSelect extends HTMLElement {
             this.LabelMultiselect,
             WRender.createElement(StyleScrolls),
             new WStyledRender(MainMenu)
-        );        
+        );
         if (Style != null && Style.__proto__ == WStyledRender.prototype) {
             this.shadowRoot.append(Style);
         }
@@ -69,12 +69,12 @@ class MultiSelect extends HTMLElement {
             //console.log(element);
             const OType = this.MultiSelect == true ? "checkbox" : "radio";
             const OptionLabel = WRender.Create({
-                tagName: "label", htmlFor: "OType" + (element.id_ ?? "ElementIndex_" + index),
-                innerText: element.Descripcion ?? "Element" + index, className: "OptionLabel"
+                tagName: "label", htmlFor: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
+                innerText: element.Descripcion ?? element.desc ?? "Element" + index, className: "OptionLabel"
             });
             const Option = WRender.Create({
                 tagName: "input",
-                id: "OType" + (element.id_ ?? "ElementIndex_" + index),
+                id: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
                 type: OType,
                 name: element.name,
                 checked: WArrayF.FindInArray(element, this.selectedItems),
@@ -99,6 +99,10 @@ class MultiSelect extends HTMLElement {
                             this.SubOptionsFieldName = "";
                         }
                     }
+                    //console.log(this.selectedItems);
+                    if (this.Config.Action) {
+                        this.Config.Action(this.selectedItems);
+                    }
                     this.DrawLabel();
                 }
             });
@@ -119,17 +123,14 @@ class MultiSelect extends HTMLElement {
                 children: [OptionLabel, Option, SubContainer]
             }));
         });
+        this.shadowRoot.append(this.SelectModal());
     }
-    SelectModal = ()=>{
-        this.Modal = new WModalForm({
-            title: "Seleccionar",
-            ShadowRoot: false,
-            ObjectModal: [
-                this.SearchControl,
-                this.OptionsContainer
-            ]
-        });
-        return this.Modal
+    SelectModal = () => {
+        this.tool = new WToolTip([
+            this.SearchControl,
+            this.OptionsContainer
+        ]);
+        return this.tool
     }
     DrawLabel = () => {
         this.LabelMultiselect.innerHTML = "Selecteds: "
@@ -158,13 +159,49 @@ class MultiSelect extends HTMLElement {
         this.LabelMultiselect.append(WRender.Create({
             tagName: "spam", className: "btnSelect",
             onclick: () => {
-                this.shadowRoot.append(this.SelectModal());
+                //this.tool.Display();
+                //this.shadowRoot.append();
             }
         }))
     }
 }
 customElements.define("w-multi-select", MultiSelect);
 export { MultiSelect }
+
+class WToolTip extends HTMLElement {
+    constructor(Element) {
+        super();
+        this.append(WRender.Create(Element))
+        this.append(css`
+            w-tooltip{
+                position: absolute;
+                width: 100%;
+                z-index: 1;
+                box-shadow: 0 0 5px rgb(0 0 0 / 50%);
+                transition: all .5s;
+                max-height: 0px;
+                overflow-y: auto;
+            }
+            w-tooltip.active {
+                max-height: 600px;
+            }
+        `)
+    }
+    connectedCallback() { }
+    Display = async () => {
+        setTimeout(() => {
+            if (this.className == "active") {
+                this.className = "";
+            } else {
+                this.className = "active"
+            }           
+        }, 100);
+    }
+}
+customElements.define('w-tooltip', WToolTip);
+export { WToolTip }
+
+
 const MainMenu = {
     ClassList: [
         new WCssClass(`.LabelMultiselect`, {
@@ -177,8 +214,7 @@ const MainMenu = {
             "border-bottom": "#c3c3c3 solid 1px",
             cursor: "pointer",
             height: "100%",
-        }), new WCssClass(`.LabelMultiselect:hover ~ .OptionsContainer,
-         .OptionsContainer:hover, .txtControl:focus ~ .OptionsContainer`, {
+        }), new WCssClass(`.LabelMultiselect:hover ~ w-tooltip, w-tooltip:hover`, {
             "max-height": 500
         }), new WCssClass(`.LabelMultiselect label`, {
             padding: "5px 10px",
@@ -233,8 +269,8 @@ const MainMenu = {
             //display: "block",            
             "max-height": 500,
         }), new WCssClass(`.txtControl`, {
-            width: 'calc(100% - 20px)',
-            padding: "8px 10px",
+            width: 'calc(100% - 30px)',
+            padding: "10px 15px",
             border: "none",
             outline: "none",
         }), new WCssClass(`.txtControl:active,.txtControl:focus,`, {

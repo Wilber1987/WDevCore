@@ -185,13 +185,13 @@ class WModalForm extends HTMLElement {
                     new WCssClass(" .ContainerFormWModal", {
                         "display": "grid",
                         "grid-template-rows": "70px calc(100% - 70px)" ,
-                        "overflow": "hidden",
+                        //"overflow": "hidden",
                         "margin": "auto",
                         "margin-top": this.StyleForm == "FullScreen" ? 0 : 30,
                         "background-color": this.DarkMode ? "#444444" : "#fff",
                         "width": this.WidthContainer,
                         "max-height": "calc(100vh - 40px)",
-                        "overflow-y": "auto",
+                        //"overflow-y": "auto",
                         "min-height": this.StyleForm == "FullScreen" ? "100vh" : 200,
                         "border-radius": "0.3cm",
                         "position": "relative",
@@ -209,9 +209,9 @@ class WModalForm extends HTMLElement {
                         "text-align": "center",
                         font: "400 13.3333px !important"
                     }), new WCssClass(`.ModalContent`, {
-                        height: 'calc(100% - 60px)',
-                        overflow: "hidden",
-                        "overflow-y": "auto",
+                        //height: 'calc(100% - 60px)',
+                        //overflow: "hidden",
+                        //"overflow-y": "auto",
                         display: "block"
                     }),
                     //encabezado

@@ -438,14 +438,14 @@ class WTableComponent extends HTMLElement {
                 case "IMAGE": case "IMAGES": case "IMG":
                     IsImage = true;
                     break;
-                case "SELECT":
+                case "SELECT": case "WSELECT":
                     const element = Model[prop].Dataset.find(e => {
                         let flag = false;
                         if (e == value) { flag = true; }
                         else if (e.__proto__ == Object.prototype && e.id == value) { flag = true; }
                         return flag;
                     });
-                    value = element && element.__proto__ == Object.prototype ? element.desc : element;
+                    value = element && element.__proto__ == Object.prototype ? (element.desc??element.Descripcion??element.descripcion ): element;
                     value = value ?? "";
                     break;
                 case "MULTISELECT":
