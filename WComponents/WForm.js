@@ -220,38 +220,22 @@ class WForm extends HTMLElement {
                             });
                             ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
                             break;
-                        case "SELECT":   
+                        case "SELECT":
                             InputControl = await this.CreateSelect(InputControl, Model[prop].Dataset, prop, ObjectF);
                             ObjectF[prop] = InputControl.value;
                             break;
-                        case "WSELECT":   
-                            InputControl = await this.CreateWSelect(InputControl, Model[prop].Dataset, prop, ObjectF);
-                            ObjectF[prop] = InputControl.value;
+                        case "WSELECT":
+                            const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
+                            InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
+                            ObjectF[prop] = this.FindObjectMultiselect(val, InputControl);
                             break;
                         case "MULTISELECT":
-                            const { MultiSelect } = await import("./WMultiSelect.js");                           
-                            const Datasetilt = Model[prop].Dataset.map(item => {
-                                const MapObject = {};
-                                for (const key in item) {
-                                    const element = item[key];
-                                    if (element != null && element != undefined) {
-                                        MapObject[key] = element;
-                                    }
-                                }
-                                return MapObject;
-                            })
+                            const { MultiSelect } = await import("./WMultiSelect.js");
+                            const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                             InputControl = new MultiSelect({
                                 Dataset: Datasetilt
                             });
-                            if (val != null && val != undefined && val.__proto__ == Array.prototype) {
-                                val.forEach((item) => {
-                                    //console.log(item);
-                                    const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, item));
-                                    if (FindItem) {
-                                        InputControl.selectedItems.push(FindItem);
-                                    }
-                                });
-                            }
+                            this.FindObjectMultiselect(val, InputControl);
                             ObjectF[prop] = InputControl.selectedItems;
                             break;
                         case "EMAIL":
@@ -260,12 +244,12 @@ class WForm extends HTMLElement {
                                 className: prop, value: val, type: Model[prop].type,
                                 placeholder: "me@email.com",
                                 pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                            }); 
+                            });
                             break;
                         case "MASTERDETAIL":
                             ControlContainer.classList.add("tableContainer");
-                            ObjectF[prop] = ObjectF[prop] ?? [];
-                            InputControl = new WTableComponent({Dataset: ObjectF[prop], ModelObject:  Model[prop].ModelObject});
+                            ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
+                            InputControl = new WTableComponent({ Dataset: ObjectF[prop], ModelObject: Model[prop].ModelObject });
                             break;
                         default:
                             //val = Model[prop].defaultValue ?? "";
@@ -341,18 +325,47 @@ class WForm extends HTMLElement {
         }
         return Form;
     }
+    CreateDatasetForMultiSelect(Model, prop) {
+        return Model[prop].Dataset.map(item => {
+            const MapObject = {};
+            for (const key in item) {
+                const element = item[key];
+                if (element != null && element != undefined) {
+                    MapObject[key] = element;
+                }
+            }
+            return MapObject;
+        });
+    }
+
+    FindObjectMultiselect(val, InputControl) {
+        if (val != null && val != undefined && val.__proto__ == Array.prototype) {
+            val.forEach((item) => {
+                const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, item));
+                if (FindItem) {
+                    InputControl.selectedItems.push(FindItem);
+                }
+            });
+        } else {
+            const FindItem = InputControl.Dataset.find(i => i.id == val || i.id_ == val);
+            if (FindItem) {
+                InputControl.selectedItems.push(FindItem);
+            }
+        }
+    }
+
     async CreateWSelect(InputControl, Dataset, prop, ObjectF) {
         const { MultiSelect } = await import("./WMultiSelect.js");
         InputControl = new MultiSelect({
-            MultiSelect: false, 
+            MultiSelect: false,
             Dataset: Dataset,
-            Action: (ItemSelects)=>{
+            Action: (ItemSelects) => {
                 ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_ ?? "ElementIndex_0";
             }
-        }); 
-        return InputControl; 
+        });
+        return InputControl;
     }
-    async CreateSelect(InputControl, Dataset, prop, ObjectF) {        
+    async CreateSelect(InputControl, Dataset, prop, ObjectF) {
         InputControl = WRender.Create({
             tagName: "select", value: null, className: prop,
             children: Dataset.map(option => {
@@ -567,7 +580,7 @@ class WForm extends HTMLElement {
                         "grid-column": "1/3",
                         "grid-row": "span 4"
                         //width: "calc(50% - 10px)", margin: "5px"
-                    }),new WCssClass(` input:-internal-autofill-selected`, {
+                    }), new WCssClass(` input:-internal-autofill-selected`, {
                         "appearance": "menulist-button",
                         "background-color": "none !important",
                         "background-image": "none !important",
