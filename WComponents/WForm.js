@@ -706,5 +706,29 @@ class WForm extends HTMLElement {
         return WRender.createElement(Style);
     }
 }
+const ModalVericateAction = (Action) => {
+    const ModalCheck = new WModalForm({
+        ObjectModal: [
+            WRender.Create({ tagName: "h3", innerText: "¿Esta seguro que desea guardar este registro?" }),
+            WRender.Create({
+                style: { textAlign: "center" },
+                children: [
+                    WRender.Create({
+                        tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async () => {
+                           await Action();
+                           ModalCheck.close();
+                        }
+                    }),
+                    WRender.Create({
+                        tagName: 'input', type: 'button', className: 'Btn', value: 'NO', onclick: async () => {
+                           
+                        }
+                    })
+                ]
+            })
+        ]
+    });
+    return ModalCheck;
+}
 customElements.define('w-form', WForm);
-export { WForm }
+export { WForm, ModalVericateAction }

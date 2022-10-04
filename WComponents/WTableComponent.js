@@ -9,6 +9,7 @@ class TableConfig {
     TypeMoney = "Dollar";
     selectedItems = [];
     DisplayData = [];
+    maxElementByPage = 10;
     Options = {
         UserActions: [{
             name: "name",
@@ -165,7 +166,7 @@ class WTableComponent extends HTMLElement {
         if (this.Options != undefined) {
             if (this.Options.Search != undefined || this.Options.Add != undefined) {
                 const trOptions = { type: "div", props: { class: "thOptions" }, children: [] }
-                if (this.Options.Search != undefined) {
+                if (this.Options.Search == true) {
                     const InputOptions = {
                         type: "input",
                         props: {
@@ -179,7 +180,7 @@ class WTableComponent extends HTMLElement {
                     }
                     trOptions.children.push(InputOptions);
                 }
-                if (this.Options.Add != undefined) {
+                if (this.Options.Add == true) {
                     const BtnOptions = {
                         type: "button",
                         props: {
