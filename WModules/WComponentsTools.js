@@ -378,7 +378,7 @@ class ComponentsManager {
             }
         }
     }
-    Back = ()=>{
+    Back = () => {
         if (this.NavigationLog.length < 2) return;
         const IdComponent = this.NavigationLog[this.NavigationLog.length - 2];
         this.NavigateFunction(IdComponent);
@@ -629,8 +629,8 @@ class WArrayF {
     }
     //verifica que un objeto este dentro de un array
     static checkDisplay(DisplayData, prop, Model = {}) {
-        let flag = true;        
-        if (Model[prop] == undefined  && Model[prop] == null) {
+        let flag = true;
+        if (Model[prop] == undefined && Model[prop] == null) {
             flag = false;
         }
         if (Model[prop] != undefined && Model[prop] != null
@@ -657,23 +657,6 @@ const GenerateColor = () => {
     }
     return color_aleatorio
 }
-//Date
-function pad(number) {
-    if (number < 10) {
-        return '0' + number;
-    }
-    return number;
-}
-Date.prototype.toISO = function () {
-    return this.getUTCFullYear() +
-        '-' + pad(this.getUTCMonth() + 1) +
-        '-' + pad(this.getUTCDate()) /* +
-      'T' + pad(this.getUTCHours()) +
-      ':' + pad(this.getUTCMinutes()) +
-      ':' + pad(this.getUTCSeconds()) +
-      '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
-      'Z' */;
-};
 export { WAjaxTools, WRender, ComponentsManager, WArrayF, type, GenerateColor }
 class WNode {
     constructor(props = {}) {
@@ -884,4 +867,34 @@ class ElementStyle {
     gridColumn = null;
     gridRow = null;
     gridGap = null;
+};
+//Date UTILITYS
+function pad(number) {
+    if (number < 10) {
+        return '0' + number;
+    }
+    return number;
+}
+Date.prototype.toISO = function () {
+    return this.getUTCFullYear() +
+        '-' + pad(this.getUTCMonth() + 1) +
+        '-' + pad(this.getUTCDate()) /* +
+      'T' + pad(this.getUTCHours()) +
+      ':' + pad(this.getUTCMinutes()) +
+      ':' + pad(this.getUTCSeconds()) +
+      '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+      'Z' */;
+};
+String.prototype.toDateFormatEs = function () {
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const dias_semana = ['Domingo', 'Lunes', 'martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const fecha = new Date(this);
+    return dias_semana[fecha.getDay()]
+        + ', ' + fecha.getDate()
+        + ' de ' + meses[fecha.getMonth()]
+        + ' de ' + fecha.getUTCFullYear();
+};
+String.prototype.toDateTimeFormatEs = function () {
+    const fecha = new Date(this);
+    return this.toDateFormatEs() + ' hora ' + pad(fecha.getUTCHours()) + ':' + pad(fecha.getUTCMinutes()) ;
 };

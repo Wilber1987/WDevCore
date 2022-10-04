@@ -1,5 +1,5 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
-import { WCssClass } from "../WModules/WStyledRender.js";
+import { css, WCssClass } from "../WModules/WStyledRender.js";
 //#region  GENERIC STYLESSS#####################################################################################
 const StyleScrolls = {
     type: 'w-style', props: {
@@ -164,6 +164,44 @@ const StylesControlsV2 = {
         ]
     }
 }
+const basicButtons = css`      
+        .btn {
+            padding: 8px;
+            font-size: 12px;
+            max-width: 120px;
+            min-width: 80px;
+            background-color: #335888;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor:pointer;
+        }
+        .btn-alert {
+            padding: 8px;
+            font-size: 12px;
+            max-width: 120px;
+            min-width: 80px;
+            background-color: #6e1515;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor:pointer;
+        }
+        .btn-secundary {
+            padding: 8px;
+            font-size: 12px;
+            max-width: 120px;
+            min-width: 80px;
+            background-color: #156e49;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor:pointer;
+        }
+    `
 //#endregion  #################################################################################################
 
-export { StyleScrolls, StylesControlsV1, StylesControlsV2 }
+export { StyleScrolls, StylesControlsV1, StylesControlsV2, basicButtons }

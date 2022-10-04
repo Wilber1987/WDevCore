@@ -88,14 +88,15 @@ class WAppNavigator extends HTMLElement {
                 props: { class: "elementNav" },
 
             });
+           
+            elementNav.append(element.name)
             if (element.icon) {
                 elementNav.append(WRender.createElement({
                     type: 'img', props: {
-                        src: "data:image/png;base64," + element.icon, class: 'IconNav'
+                        src: element.icon, class: 'IconNav'
                     }
                 }));
             }
-            elementNav.append(element.name)
             if (element.url != undefined && element.url != "#") {
                 elementNav.href = element.url
             }
