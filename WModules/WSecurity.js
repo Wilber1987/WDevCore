@@ -27,6 +27,7 @@ class WSecurity {
     static UserData = localStorage.getItem(WSecurity.urlLogIn) != null ? 
         localStorage.getItem(WSecurity.urlLogIn):{
             success: false,
+            mail: "null",
             nickname: "null",
             password: "null"
         };
