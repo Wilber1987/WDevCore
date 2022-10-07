@@ -309,10 +309,9 @@ class ComponentsManager {
 
             }
         }
-
     }
     NavigationLog = [];
-    NavigateFunction = async (IdComponent, ComponentsInstance, ContainerName = "ContainerName") => {
+    NavigateFunction = async (IdComponent, ComponentsInstance, ContainerName = "ContainerName", back = false) => {
         this.ContainerName = ContainerName ?? this.ContainerName;
         if (this.MainContainer == undefined) {
             this.MainContainer = document.querySelector("#" + this.ContainerName);
@@ -354,7 +353,7 @@ class ComponentsManager {
                 navigateComponets.push(newNode);
                 sessionStorage.setItem("navigateComponets", JSON.stringify(navigateComponets));
             }
-            this.NavigationLog.push(IdComponent);
+            if (!back) this.NavigationLog.push(IdComponent);
         }
     }
     AddComponent = async (IdComponent, ComponentsInstance, ContainerName, order = "last") => {
@@ -378,10 +377,11 @@ class ComponentsManager {
             }
         }
     }
-    Back = () => {
+    Back = () => {        
         if (this.NavigationLog.length < 2) return;
         const IdComponent = this.NavigationLog[this.NavigationLog.length - 2];
-        this.NavigateFunction(IdComponent);
+        this.NavigationLog.pop();
+        this.NavigateFunction(IdComponent, undefined, undefined, true);
     }
     static modalFunction(ventanaM) {
         if (ventanaM.style.opacity == 0) {

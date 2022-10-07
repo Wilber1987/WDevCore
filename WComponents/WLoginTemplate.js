@@ -162,7 +162,7 @@ class WLoginTemplate extends HTMLElement {
                         "border-right": "rgb(3, 106, 175) 5px solid",
                     }), new WCssClass(`#${this.id} .BtnPrimary`, {
                         "color": "#fff",
-                        "background-color": "007bff",
+                        "background-color": "#007bff",
                         "border-right": "rgb(3, 106, 175) 5px solid",
                     }), new WCssClass(`#${this.id} .BtnAlert`, {
                         "color": "#fff",

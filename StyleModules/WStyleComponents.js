@@ -40,7 +40,7 @@ const StylesControlsV1 = {
                 "max-height": 40
             }), new WCssClass(`.BtnPrimary`, {
                 "color": "#fff",
-                "background-color": "007bff",
+                "background-color": "#007bff",
                 //"border-right": "rgb(3, 106, 175) 5px solid",
             }), new WCssClass(`.BtnAlert`, {
                 "color": "#fff",
@@ -117,7 +117,7 @@ const StylesControlsV2 = {
                 transition: "0.5s",
             }), new WCssClass(`.BtnPrimary`, {
                 "color": "#fff",
-                "background-color": "007bff",
+                "background-color": "#007bff",
             }), new WCssClass(`.BtnAlert`, {
                 "color": "#fff",
                 "background-color": "#dc3545",
