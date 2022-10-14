@@ -24,6 +24,7 @@ class FormConfig {
     StyleForm = "columnX1";
     ValidateFunction = (Object) => { /* Validacion */ };
     SaveFunction = (Object) => { /* Guardado */ };
+    Options = true;
     ObjectOptions = { AddObject: false, Url: undefined };
     DisplayData = ["prop"];
 }
@@ -39,6 +40,7 @@ class WForm extends HTMLElement {
             this[p] = Config[p];
         }
         this.Config = Config;
+        this.Options = this.Options ?? true;
         this.DataRequire = this.DataRequire ?? true;
         if (this.StyleForm == "columnX1") {
             this.DivColumns = this.Config.DivColumns = "calc(100%)";
@@ -93,7 +95,9 @@ class WForm extends HTMLElement {
             };
             const ObjectProxy = new Proxy(this.FormObject, ObjHandler);
             this.DivForm.append(await this.CrudForm(ObjectProxy, this.ObjectOptions));
-            this.DivForm.append(await this.SaveOptions(ObjectProxy));
+            if (this.Options == true) {
+                this.DivForm.append(await this.SaveOptions(ObjectProxy));
+            }
         }
     }
     checkDisplay(prop) {
@@ -187,16 +191,18 @@ class WForm extends HTMLElement {
                     ObjectF[prop] = ObjectF[prop] ?? Model[prop];
                 }
             } else if (!prop.includes("_hidden")) {
+                const ControlLabel = WRender.Create({
+                    tagName: "label", class: "inputTitle",
+                    innerText: WOrtograficValidation.es(prop)
+                });
                 const ControlContainer = WRender.Create({
-                    class: "ModalElement", children: [{
-                        tagName: "label", class: "inputTitle",
-                        innerText: WOrtograficValidation.es(prop)
-                    }]
+                    class: "ModalElement", children: [ControlLabel]
                 });
                 let validateFunction = undefined;
                 let InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text" });
                 if (Model[prop].__proto__ == Object.prototype) {
                     validateFunction = Model[prop].validateFunction;
+                    ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop);
                     switch (Model[prop].type.toUpperCase()) {
                         case "IMAGE": case "IMAGES":
                             const Multiple = Model[prop].type.toUpperCase() == "IMAGES" ? true : false;
@@ -250,6 +256,15 @@ class WForm extends HTMLElement {
                             ControlContainer.classList.add("tableContainer");
                             ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
                             InputControl = new WTableComponent({ Dataset: ObjectF[prop], ModelObject: Model[prop].ModelObject });
+                            break;
+                        case "MODEL":
+                            ControlContainer.classList.add("tableContainer");
+                            ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : {};
+                            InputControl = new WForm({
+                                EditObject: ObjectF[prop],
+                                ModelObject: Model[prop].ModelObject,
+                                Options: false
+                            });
                             break;
                         default:
                             //val = Model[prop].defaultValue ?? "";
@@ -571,8 +586,6 @@ class WForm extends HTMLElement {
                         "grid-template-columns": this.DivColumns,// "calc(50% - 10px) calc(50% - 10px)",
                         "grid-template-rows": "auto",
                         height: "calc(100% - 70px)",
-                        //"overflow-y": "auto",
-                        "border-bottom": "1px solid #888"
                     }), new WCssClass(".divForm .imageGridForm", {
                         "grid-row": "1/4",
                         //width: "calc(50% - 10px)", margin: "5px"
@@ -589,7 +602,7 @@ class WForm extends HTMLElement {
                         "margin-top": "10px",
                         "margin-bottom": "10px",
                         "text-align": "center",
-                        //height: 100
+                        "border-top": "solid 1px #999"
                     }), new WCssClass(`.imgPhoto`, {
                         "grid-row": "1/3",
                         "grid-column": "1/" + this.limit
@@ -715,13 +728,13 @@ const ModalVericateAction = (Action) => {
                 children: [
                     WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async () => {
-                           await Action();
-                           ModalCheck.close();
+                            await Action();
+                            ModalCheck.close();
                         }
                     }),
                     WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'NO', onclick: async () => {
-                           
+
                         }
                     })
                 ]
