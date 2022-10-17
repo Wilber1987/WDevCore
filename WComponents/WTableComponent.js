@@ -206,11 +206,10 @@ class WTableComponent extends HTMLElement {
         const thead = { type: "thead", props: {}, children: [] };
         //const element = this.Dataset[0];
         let tr = { type: "tr", children: [] }
-
         for (const prop in element) {
             const flag = WArrayF.checkDisplay(this.DisplayData, prop, this.ModelObject);
             if (flag) {
-                if (!prop.includes("_hidden")) {
+                if (!prop.includes("_hidden") && !this.notIsDrawableRow(element, prop)) {
                     const th = {
                         type: "th",
                         children: [WOrtograficValidation.es(prop)]
@@ -271,7 +270,7 @@ class WTableComponent extends HTMLElement {
         tr.innerHTML = "";
         for (const prop in this.ModelObject) {
             if (WArrayF.checkDisplay(this.DisplayData, prop, this.ModelObject)) {
-                if (!prop.includes("_hidden")) {
+                if (!prop.includes("_hidden") && !this.notIsDrawableRow(element, prop)) {
                     let value = "";
                     if (element[prop] != null) {
                         value = element[prop];
@@ -280,29 +279,15 @@ class WTableComponent extends HTMLElement {
                     let IsImage = this.IsImage(prop);
                     let IsColor = false;
                     let IsMultiSelect = false;
-                    ({ IsImage, value, IsColor, IsMultiSelect } = this.EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect));
+                    let IsModel = false;
+                    ({ IsImage, value, IsColor, IsMultiSelect, IsModel } = this.EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect));
                     //DEFINICION DE VALORES-------------                    
                     if (IsImage) {
-                        let cadenaB64 = "";
-                        //console.log(this.TableConfig)
-                        var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-                        if (base64regex.test(value)) {
-                            cadenaB64 = "data:image/png;base64,";
-                        } else if (this.TableConfig.ImageUrlPath != undefined) {
-                            cadenaB64 = this.TableConfig.ImageUrlPath + "/";
-                        }
-                        tr.append(WRender.createElement({
+                        const image = WRender.Create({
                             type: "td", props: { class: "tdImage" },
-                            children: [{
-                                type: "img",
-                                props: {
-                                    src: cadenaB64 + value,
-                                    class: "imgPhoto",
-                                    height: 50,
-                                    width: 50
-                                }
-                            }]
-                        }));
+                            children: [createImageObject(value, this.TableConfig)]
+                        });
+                        tr.append(image);
                     } else if (IsColor) {
                         tr.append(WRender.Create({
                             tagName: "td", children: [{
@@ -315,6 +300,12 @@ class WTableComponent extends HTMLElement {
                                     margin: "auto"
                                 }
                             }]
+                        }));
+                    } else if (IsModel) {
+                        tr.append(WRender.Create({
+                            tagName: "td", className: "cardTable", children: [
+                                new WCardTable(element[prop], Model[prop].ModelObject, this.TableConfig)
+                            ]
                         }));
                     } else if (this.IsMoney(prop)) {
                         tr.append(WRender.createElement({
@@ -347,11 +338,8 @@ class WTableComponent extends HTMLElement {
                                 "<label class='LabelTd'> Elementos " + element[prop].length + ": </label>" +
                                 `${element[prop].map(object => {
                                     const FObject = Model[prop].Dataset.find(i => WArrayF.compareObj(object, i));
-                                    if (FObject.__proto__ == Object.prototype) {
-                                        return `<label class="labelMultiselect">${FObject.Descripcion}</label>`
-                                    } else {
-                                        return `<label class="labelMultiselect">${FObject}</label>`
-                                    }
+                                    const label = FObject.Descripcion ?? FObject.descripcion ?? FObject;
+                                    return `<label class="labelMultiselect">${label}</label>`;
                                 }).join('')}`
                         }));
                     } else if (typeof value === "number") {
@@ -434,7 +422,13 @@ class WTableComponent extends HTMLElement {
         this.shadowRoot.append(WRender.createElement(this.MediaStyleResponsive()));
         return tbody;
     }
-    EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect) {
+    notIsDrawableRow(element, prop) {
+        return (this.ModelObject[prop].type == undefined || this.ModelObject[prop].hiddenInTable == true)
+            || element[prop].__proto__ == Function.prototype
+            || element[prop].__proto__.constructor.name == "AsyncFunction";
+    }
+
+    EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect, IsModel) {
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
@@ -456,16 +450,14 @@ class WTableComponent extends HTMLElement {
                 case "COLOR":
                     IsColor = true;
                     break;
-                case "COLOR":
-                    IsColor = true;
-                    break;
-                case "TABLE":
+                case "MODEL":
+                    IsModel = true;
                     break;
                 default:
                     break;
             }
         }
-        return { IsImage, value, IsColor, IsMultiSelect };
+        return { IsImage, value, IsColor, IsMultiSelect, IsModel };
     }
 
     DeleteBTN(Options, element, tr) {
@@ -1081,6 +1073,93 @@ const WIcons = {
     delete: "data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNTEyIDUxMiIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxnPjxwYXRoIGQ9Im00MjQgNjRoLTg4di0xNmMwLTI2LjQ2Ny0yMS41MzMtNDgtNDgtNDhoLTY0Yy0yNi40NjcgMC00OCAyMS41MzMtNDggNDh2MTZoLTg4Yy0yMi4wNTYgMC00MCAxNy45NDQtNDAgNDB2NTZjMCA4LjgzNiA3LjE2NCAxNiAxNiAxNmg4Ljc0NGwxMy44MjMgMjkwLjI4M2MxLjIyMSAyNS42MzYgMjIuMjgxIDQ1LjcxNyA0Ny45NDUgNDUuNzE3aDI0Mi45NzZjMjUuNjY1IDAgNDYuNzI1LTIwLjA4MSA0Ny45NDUtNDUuNzE3bDEzLjgyMy0yOTAuMjgzaDguNzQ0YzguODM2IDAgMTYtNy4xNjQgMTYtMTZ2LTU2YzAtMjIuMDU2LTE3Ljk0NC00MC00MC00MHptLTIxNi0xNmMwLTguODIyIDcuMTc4LTE2IDE2LTE2aDY0YzguODIyIDAgMTYgNy4xNzggMTYgMTZ2MTZoLTk2em0tMTI4IDU2YzAtNC40MTEgMy41ODktOCA4LThoMzM2YzQuNDExIDAgOCAzLjU4OSA4IDh2NDBjLTQuOTMxIDAtMzMxLjU2NyAwLTM1MiAwem0zMTMuNDY5IDM2MC43NjFjLS40MDcgOC41NDUtNy40MjcgMTUuMjM5LTE1Ljk4MSAxNS4yMzloLTI0Mi45NzZjLTguNTU1IDAtMTUuNTc1LTYuNjk0LTE1Ljk4MS0xNS4yMzlsLTEzLjc1MS0yODguNzYxaDMwMi40NHoiLz48cGF0aCBkPSJtMjU2IDQ0OGM4LjgzNiAwIDE2LTcuMTY0IDE2LTE2di0yMDhjMC04LjgzNi03LjE2NC0xNi0xNi0xNnMtMTYgNy4xNjQtMTYgMTZ2MjA4YzAgOC44MzYgNy4xNjMgMTYgMTYgMTZ6Ii8+PHBhdGggZD0ibTMzNiA0NDhjOC44MzYgMCAxNi03LjE2NCAxNi0xNnYtMjA4YzAtOC44MzYtNy4xNjQtMTYtMTYtMTZzLTE2IDcuMTY0LTE2IDE2djIwOGMwIDguODM2IDcuMTYzIDE2IDE2IDE2eiIvPjxwYXRoIGQ9Im0xNzYgNDQ4YzguODM2IDAgMTYtNy4xNjQgMTYtMTZ2LTIwOGMwLTguODM2LTcuMTY0LTE2LTE2LTE2cy0xNiA3LjE2NC0xNiAxNnYyMDhjMCA4LjgzNiA3LjE2MyAxNiAxNiAxNnoiLz48L2c+PC9zdmc+",
     edit: "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjUxMnB0IiB2aWV3Qm94PSIwIDAgNTEyIDUxMSIgd2lkdGg9IjUxMnB0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im00MDUuMzMyMDMxIDI1Ni40ODQzNzVjLTExLjc5Njg3NSAwLTIxLjMzMjAzMSA5LjU1ODU5NC0yMS4zMzIwMzEgMjEuMzMyMDMxdjE3MC42Njc5NjljMCAxMS43NTM5MDYtOS41NTg1OTQgMjEuMzMyMDMxLTIxLjMzMjAzMSAyMS4zMzIwMzFoLTI5OC42Njc5NjljLTExLjc3NzM0NCAwLTIxLjMzMjAzMS05LjU3ODEyNS0yMS4zMzIwMzEtMjEuMzMyMDMxdi0yOTguNjY3OTY5YzAtMTEuNzUzOTA2IDkuNTU0Njg3LTIxLjMzMjAzMSAyMS4zMzIwMzEtMjEuMzMyMDMxaDE3MC42Njc5NjljMTEuNzk2ODc1IDAgMjEuMzMyMDMxLTkuNTU4NTk0IDIxLjMzMjAzMS0yMS4zMzIwMzEgMC0xMS43NzczNDQtOS41MzUxNTYtMjEuMzM1OTM4LTIxLjMzMjAzMS0yMS4zMzU5MzhoLTE3MC42Njc5NjljLTM1LjI4NTE1NiAwLTY0IDI4LjcxNDg0NC02NCA2NHYyOTguNjY3OTY5YzAgMzUuMjg1MTU2IDI4LjcxNDg0NCA2NCA2NCA2NGgyOTguNjY3OTY5YzM1LjI4NTE1NiAwIDY0LTI4LjcxNDg0NCA2NC02NHYtMTcwLjY2Nzk2OWMwLTExLjc5Njg3NS05LjUzOTA2My0yMS4zMzIwMzEtMjEuMzM1OTM4LTIxLjMzMjAzMXptMCAwIi8+PHBhdGggZD0ibTIwMC4wMTk1MzEgMjM3LjA1MDc4MWMtMS40OTIxODcgMS40OTIxODgtMi40OTYwOTMgMy4zOTA2MjUtMi45MjE4NzUgNS40Mzc1bC0xNS4wODIwMzEgNzUuNDM3NWMtLjcwMzEyNSAzLjQ5NjA5NC40MDYyNSA3LjEwMTU2MyAyLjkyMTg3NSA5LjY0MDYyNSAyLjAyNzM0NCAyLjAyNzM0NCA0Ljc1NzgxMiAzLjExMzI4MiA3LjU1NDY4OCAzLjExMzI4Mi42Nzk2ODcgMCAxLjM4NjcxOC0uMDYyNSAyLjA4OTg0My0uMjEwOTM4bDc1LjQxNDA2My0xNS4wODIwMzFjMi4wODk4NDQtLjQyOTY4OCAzLjk4ODI4MS0xLjQyOTY4OCA1LjQ2MDkzNy0yLjkyNTc4MWwxNjguNzg5MDYzLTE2OC43ODkwNjMtNzUuNDE0MDYzLTc1LjQxMDE1NnptMCAwIi8+PHBhdGggZD0ibTQ5Ni4zODI4MTIgMTYuMTAxNTYyYy0yMC43OTY4NzQtMjAuODAwNzgxLTU0LjYzMjgxMi0yMC44MDA3ODEtNzUuNDE0MDYyIDBsLTI5LjUyMzQzOCAyOS41MjM0MzggNzUuNDE0MDYzIDc1LjQxNDA2MiAyOS41MjM0MzctMjkuNTI3MzQzYzEwLjA3MDMxMy0xMC4wNDY4NzUgMTUuNjE3MTg4LTIzLjQ0NTMxMyAxNS42MTcxODgtMzcuNjk1MzEzcy01LjU0Njg3NS0yNy42NDg0MzctMTUuNjE3MTg4LTM3LjcxNDg0NHptMCAwIi8+PC9zdmc+"
 }
-const Money = { Euro: "€",    Dollar: "$",  Cordoba: "C$" }
+const Money = { Euro: "€", Dollar: "$", Cordoba: "C$" }
 customElements.define("w-table", WTableComponent);
 export { WTableComponent }
+class WCardTable extends HTMLElement {
+    constructor(Element, Model, Config) {
+        super();
+        this.Element = Element;
+        this.Model = Model ?? this.Element;
+        this.Config = Config;
+        this.CardTableContainer = WRender.Create({ className: "CardTableContainer" });
+        this.append(this.CardTableContainer, this.CardStyle);
+        this.DrawWCardTable();
+    }
+    connectedCallback() { }
+    DrawWCardTable = async () => {
+        for (const prop in this.Model) {
+            this.EvalModelPrototype(prop, this.Model);
+        }
+    }
+    EvalModelPrototype(prop, Model) {
+        let value = "";
+        if (this.Element[prop] != null) {
+            value = this.Element[prop];
+        }
+        if (Model != undefined && Model[prop] != undefined
+            && Model[prop].__proto__ == Object.prototype 
+            && Model[prop].type && !Model[prop]?.hidden && !Model[prop]?.hiddenInTable) {
+            switch (Model[prop].type.toUpperCase()) {
+                case "IMAGE": case "IMAGES": case "IMG":
+                    this.CardTableContainer.append(createImageObject(value, this.Config));
+                    break;
+                case "SELECT": case "WSELECT":
+                    break;
+                case "MULTISELECT":
+                    break;
+                case "COLOR":
+                    break;
+                case "MODEL":
+                    break;
+                default:
+                    this.CardTableContainer.append(
+                        WRender.Create({
+                            tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value)
+                        }))
+                    break;
+            }
+        }
+    }
+    CardStyle = css`
+        .CardTableContainer{
+            display: grid;
+            grid-template-columns: auto auto;
+            grid-template-rows: repeat(4, 1fr);
+            overflow: hidden;
+            padding:10px;
+        }
+        .CardTableContainer img {
+            grid-row: span 4;
+            margin-bottom: 10px;
+        }
+        .CardTableContainer label {
+            min-width: 180px;
+            margin-bottom:5px;
+        }
+        .CardTableContainer label::first-letter {
+            text-transform: uppercase;
+        }
+    `
+}
+customElements.define('w-card-table', WCardTable);
+export { WCardTable }
+function createImageObject(value, tableConfig) {
+    let cadenaB64 = "";
+    var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+    if (base64regex.test(value)) {
+        cadenaB64 = "data:image/png;base64,";
+    } else if (tableConfig.ImageUrlPath != undefined) {
+        cadenaB64 = tableConfig.ImageUrlPath + "/";
+    }
+    const image = WRender.createElement({
+        type: "img",
+        props: {
+            src: cadenaB64 + value,
+            class: "imgPhoto",
+            height: 50,
+            width: 50
+        }
+    });
+    return image;
+}

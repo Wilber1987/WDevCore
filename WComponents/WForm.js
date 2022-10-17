@@ -44,13 +44,13 @@ class WForm extends HTMLElement {
         this.DataRequire = this.DataRequire ?? true;
         if (this.StyleForm == "columnX1") {
             this.DivColumns = this.Config.DivColumns = "calc(100%)";
-            this.limit = 2;
+            this.limit = 1;
         } else if (this.StyleForm == "columnX3") {
             this.DivColumns = this.Config.DivColumns = "calc(33%) calc(33%) calc(33%)";
-            this.limit = 4;
+            this.limit = 3;
         } else {
             this.DivColumns = this.Config.DivColumns = "calc(50%) calc(50%)";
-            this.limit = 3;
+            this.limit = 2;
         }
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot.append(WRender.createElement(StyleScrolls));
@@ -85,7 +85,7 @@ class WForm extends HTMLElement {
                     target[property] = value;
                     for (const prop in Model) {
                         if (Model[prop] != undefined && Model[prop] != null && Model[prop].__proto__ == Object.prototype) {
-                            if (Model[prop].type.toUpperCase() == "OPERATION") {
+                            if (Model[prop].type?.toUpperCase() == "OPERATION") {
                                 target[prop] = Model[prop].Function(target);
                             }
                         }
@@ -184,7 +184,10 @@ class WForm extends HTMLElement {
             let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
             ObjectF[prop] = val;
             Model[prop] = Model[prop] != null ? Model[prop] : "";
-            if (Model[prop].__proto__ == Object.prototype && (Model[prop].primary || Model[prop].hidden)) {
+            if ((Model[prop].__proto__ == Object.prototype &&
+                (Model[prop].primary || Model[prop].hidden || !Model[prop].type))
+                || Model[prop].__proto__ == Function.prototype
+                || Model[prop].__proto__.constructor.name == "AsyncFunction") {
                 if (ObjectOptions.AddObject == true) {
                     ObjectF[prop] = -1;
                 } else {
@@ -203,74 +206,7 @@ class WForm extends HTMLElement {
                 if (Model[prop].__proto__ == Object.prototype) {
                     validateFunction = Model[prop].validateFunction;
                     ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop);
-                    switch (Model[prop].type.toUpperCase()) {
-                        case "IMAGE": case "IMAGES":
-                            const Multiple = Model[prop].type.toUpperCase() == "IMAGES" ? true : false;
-                            InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple);
-                            if (Multiple) {
-                                ObjectF[prop] = ImageArray;
-                            }
-                            ControlContainer.className += " imgPhoto";
-                            break;
-                        case "DATE": case "FECHA": case "HORA": case "PASSWORD":
-                            let type = "date";
-                            let date_val = val == "" ? (new Date()).toISO() : ObjectF[prop];
-                            if (Model[prop].type.toUpperCase() == "HORA") {
-                                type = "time";
-                                date_val = val ?? "08:00";
-                            } else if (Model[prop].type.toUpperCase() == "PASSWORD") {
-                                type = "password";
-                            }
-                            InputControl = WRender.Create({
-                                tagName: "input", className: prop, type: type, placeholder: WOrtograficValidation.es(prop)
-                            });
-                            ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
-                            break;
-                        case "SELECT":
-                            InputControl = await this.CreateSelect(InputControl, Model[prop].Dataset, prop, ObjectF);
-                            ObjectF[prop] = InputControl.value;
-                            break;
-                        case "WSELECT":
-                            const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
-                            InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
-                            ObjectF[prop] = this.FindObjectMultiselect(val, InputControl);
-                            break;
-                        case "MULTISELECT":
-                            const { MultiSelect } = await import("./WMultiSelect.js");
-                            const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
-                            InputControl = new MultiSelect({
-                                Dataset: Datasetilt
-                            });
-                            this.FindObjectMultiselect(val, InputControl);
-                            ObjectF[prop] = InputControl.selectedItems;
-                            break;
-                        case "EMAIL":
-                            InputControl = WRender.Create({
-                                tagName: "input",
-                                className: prop, value: val, type: Model[prop].type,
-                                placeholder: "me@email.com",
-                                pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                            });
-                            break;
-                        case "MASTERDETAIL":
-                            ControlContainer.classList.add("tableContainer");
-                            ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
-                            InputControl = new WTableComponent({ Dataset: ObjectF[prop], ModelObject: Model[prop].ModelObject });
-                            break;
-                        case "MODEL":
-                            ControlContainer.classList.add("tableContainer");
-                            ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : {};
-                            InputControl = new WForm({
-                                EditObject: ObjectF[prop],
-                                ModelObject: Model[prop].ModelObject,
-                                Options: false
-                            });
-                            break;
-                        default:
-                            //val = Model[prop].defaultValue ?? "";
-                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: Model[prop].type, placeholder: WOrtograficValidation.es(prop) });
-                            break;
-                    }
+                    InputControl = await this.CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF);
                 } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
                     InputControl = this.CreateSelect(InputControl, Model[prop], prop, ObjectF);
                     ObjectF[prop] = InputControl.value
@@ -292,6 +228,8 @@ class WForm extends HTMLElement {
                             return;
                         }
                     }
+                    const tool = ev.target.parentNode.querySelector(".ToolTip");
+                    if (tool) tool.remove();
                     if (ev.target.type == "file") {
                         if (ev.target.multiple) {
                             await this.SelectedFile(ev.target.files, true);
@@ -307,8 +245,6 @@ class WForm extends HTMLElement {
                         if (ev.target.pattern) {
                             let regex = new RegExp(ev.target.pattern);
                             if (regex.test(ObjectF[prop])) {
-                                const tool = ev.target.parentNode.querySelector(".ToolTip");
-                                if (tool) tool.remove();
                                 WRender.SetStyle(ev.target, {
                                     boxShadow: "none"
                                 });
@@ -340,6 +276,81 @@ class WForm extends HTMLElement {
         }
         return Form;
     }
+    async CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF) {
+        switch (Model[prop].type?.toUpperCase()) {
+            case "IMG": case "IMAGE": case "IMAGES":
+                const Multiple = Model[prop].type.toUpperCase() == "IMAGES" ? true : false;
+                InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple);
+                if (Multiple) {
+                    ObjectF[prop] = ImageArray;
+                }
+                ControlContainer.className += " imgPhoto";
+                break;
+            case "DATE": case "FECHA": case "HORA": case "PASSWORD":
+                let type = "date";
+                let date_val = val == "" ? (new Date()).toISO() : ObjectF[prop];
+                if (Model[prop].type.toUpperCase() == "HORA") {
+                    type = "time";
+                    date_val = val ?? "08:00";
+                } else if (Model[prop].type.toUpperCase() == "PASSWORD") {
+                    type = "password";
+                }
+                InputControl = WRender.Create({
+                    tagName: "input", className: prop, type: type, placeholder: WOrtograficValidation.es(prop)
+                });
+                ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
+                break;
+            case "SELECT":
+                InputControl = await this.CreateSelect(InputControl, Model[prop].Dataset, prop, ObjectF);
+                ObjectF[prop] = InputControl.value;
+                break;
+            case "WSELECT":
+                const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
+                InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
+                ObjectF[prop] = this.FindObjectMultiselect(val, InputControl);
+                break;
+            case "MULTISELECT":
+                const { MultiSelect } = await import("./WMultiSelect.js");
+                const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
+                InputControl = new MultiSelect({
+                    Dataset: Datasetilt
+                });
+                this.FindObjectMultiselect(val, InputControl);
+                ObjectF[prop] = InputControl.selectedItems;
+                break;
+            case "EMAIL":
+                InputControl = WRender.Create({
+                    tagName: "input",
+                    className: prop, value: val, type: Model[prop].type,
+                    placeholder: "me@email.com",
+                    pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                });
+                break;
+            case "MASTERDETAIL":
+                ControlContainer.classList.add("tableContainer");
+                ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
+                InputControl = new WTableComponent({ Dataset: ObjectF[prop], ModelObject: Model[prop].ModelObject });
+                break;
+            case "MODEL":
+                ControlContainer.classList.add("tableContainer");
+                ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : {};
+                InputControl = new WForm({
+                    StyleForm: this.StyleForm,
+                    EditObject: ObjectF[prop],
+                    ModelObject: Model[prop].ModelObject,
+                    Options: false
+                });
+                //if(this.StyleForm == "columnX1") WRender.SetStyle(InputControl,  { width: "calc(100% - 80px)" })
+                break;
+            default:
+                //val = Model[prop].defaultValue ?? "";
+                InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: Model[prop].type, placeholder: WOrtograficValidation.es(prop) });
+                break;
+        }
+        if ( Model[prop].pattern) InputControl.pattern = Model[prop].pattern;        
+        return InputControl;
+    }
+
     CreateDatasetForMultiSelect(Model, prop) {
         return Model[prop].Dataset.map(item => {
             const MapObject = {};
@@ -495,6 +506,13 @@ class WForm extends HTMLElement {
                         WRender.SetStyle(control, {
                             boxShadow: "0 0 3px #ef4d00"
                         });
+                        const toolTip = WRender.Create({
+                            tagName: "span",
+                            innerHTML: WOrtograficValidation.es(prop) + ` es requerida`,
+                            className: "ToolTip"
+                        })
+                        control.parentNode.append(toolTip);
+                        control.focus();
                         return;
                     } else if (control != null && control.pattern) {
                         let regex = new RegExp(control.pattern);
@@ -521,8 +539,6 @@ class WForm extends HTMLElement {
         } else {
             if (this.SaveFunction != undefined) {
                 this.SaveFunction(ObjectF);
-            } else if (this.ObjectOptions.SaveFunction != undefined) {
-                this.ObjectOptions.SaveFunction(ObjectF);
             }
         }
     }
@@ -590,7 +606,7 @@ class WForm extends HTMLElement {
                         "grid-row": "1/4",
                         //width: "calc(50% - 10px)", margin: "5px"
                     }), new WCssClass(".divForm .imageGridForm, .divForm .tableContainer", {
-                        "grid-column": "1/3",
+                        "grid-column": "span " + this.limit,
                         "grid-row": "span 4"
                         //width: "calc(50% - 10px)", margin: "5px"
                     }), new WCssClass(` input:-internal-autofill-selected`, {
@@ -605,7 +621,7 @@ class WForm extends HTMLElement {
                         "border-top": "solid 1px #999"
                     }), new WCssClass(`.imgPhoto`, {
                         "grid-row": "1/3",
-                        "grid-column": "1/" + this.limit
+                        "grid-column": "span " + this.limit
                     }), new WCssClass(` .imgPhotoWModal`, {
                         "max-height": "250px",
                         "max-width": "250px",
@@ -637,7 +653,7 @@ class WForm extends HTMLElement {
                         position: "absolute",
                         color: "#fff",
                         padding: 5,
-                        background: "rgba(0,0,0,.5)",
+                        background: "rgb(177 6 6 / 80%)",
                         "border-radius": "0.3cm",
                         left: 10,
                         bottom: -20,
@@ -719,10 +735,10 @@ class WForm extends HTMLElement {
         return WRender.createElement(Style);
     }
 }
-const ModalVericateAction = (Action) => {
+const ModalVericateAction = (Action, title) => {
     const ModalCheck = new WModalForm({
         ObjectModal: [
-            WRender.Create({ tagName: "h3", innerText: "¿Esta seguro que desea guardar este registro?" }),
+            WRender.Create({ tagName: "h3", innerText: title ?? "¿Esta seguro que desea guardar este registro?" }),
             WRender.Create({
                 style: { textAlign: "center" },
                 children: [
@@ -734,7 +750,7 @@ const ModalVericateAction = (Action) => {
                     }),
                     WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'NO', onclick: async () => {
-
+                            ModalCheck.close();
                         }
                     })
                 ]

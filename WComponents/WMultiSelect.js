@@ -70,7 +70,7 @@ class MultiSelect extends HTMLElement {
             const OType = this.MultiSelect == true ? "checkbox" : "radio";
             const OptionLabel = WRender.Create({
                 tagName: "label", htmlFor: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
-                innerText: element.Descripcion ?? element.desc ?? "Element" + index, className: "OptionLabel"
+                innerText: this.DisplayText(element, index), className: "OptionLabel"
             });
             const Option = WRender.Create({
                 tagName: "input",
@@ -134,10 +134,10 @@ class MultiSelect extends HTMLElement {
     }
     DrawLabel = () => {
         this.LabelMultiselect.innerHTML = "Selecteds: "
-        this.selectedItems.forEach(element => {
+        this.selectedItems.forEach((element, index) => {
             const LabelM = WRender.Create({
                 tagName: "label",
-                innerText: element.Descripcion,
+                innerText: this.DisplayText(element, index),
             });
             this.LabelMultiselect.append(LabelM);
             if (this.MultiSelect == true) {
@@ -164,6 +164,15 @@ class MultiSelect extends HTMLElement {
             }
         }))
     }
+
+    DisplayText(element, index) {
+        return element.Descripcion ??
+            element.descripcion ??
+            element.desc ??
+            element.name ??
+            element.nombre ??
+            "Element" + index;
+    }
 }
 customElements.define("w-multi-select", MultiSelect);
 export { MultiSelect }
@@ -180,7 +189,8 @@ class WToolTip extends HTMLElement {
                 box-shadow: 0 0 5px rgb(0 0 0 / 50%);
                 transition: all .5s;
                 max-height: 0px;
-                overflow-y: auto;
+                background-color: #fff;
+                overflow: hidden;
             }
             w-tooltip.active {
                 max-height: 600px;
@@ -194,7 +204,7 @@ class WToolTip extends HTMLElement {
                 this.className = "";
             } else {
                 this.className = "active"
-            }           
+            }
         }, 100);
     }
 }
@@ -237,6 +247,7 @@ const MainMenu = {
             transition: "all .6s",
             // "z-index": "100",
             width: "100%",
+            background: "#fff",
             position: "relative",
             "box-shadow": "0 0 4px 0 rgb(0,0,0,50%)",
         }), new WCssClass(`.MenuActive`, {

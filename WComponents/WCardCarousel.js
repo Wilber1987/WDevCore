@@ -21,7 +21,7 @@ class WCardCarousel extends HTMLElement {
         this.afterLink = WRender.createElement({ type: 'a', props: { onclick: this.myFunctionNext, class: "afterLink", innerText: '>' } });
         this.Container.append(this.CarouselDiv, this.beforeLink, this.afterLink);
         this.Dataset = Dataset;
-        WRender.SetStyle(this, {width: "100%"})
+        WRender.SetStyle(this, { width: "100%" })
         this.shadowRoot.append(this.Container, this.StyleCarousel, WRender.createElement(StylesControlsV1));
     }
     connectedCallback() {
@@ -101,38 +101,41 @@ class WCardCarousel extends HTMLElement {
     });
 }
 customElements.define('w-card-carousel', WCardCarousel);
-class WCard extends HTMLElement {    
-    constructor(element = (new CardModel()), CardType = 1, ActionFunction) {
+class WCard extends HTMLElement {
+    constructor(element = (new CardModel()), CardType = 1, ActionFunction, url) {
         super();
         this.attachShadow({ mode: 'open' });
         this.style.transition = "all 0.6s";
         this.className = "CardElement";
         let cadenaB64 = "data:image/png;base64,";
-        this.append(new WStyledRender({ ClassList: [
-            new WCssClass(`.CardElement`, {
-                width: 220,
-                height: 330,
-                "min-width": 220,
-                margin: "10px !important",
-                overflow: "hidden",
-                position: "relative",
-                "box-shadow": "0 0px 5px 0 rgba(0,0,0,0.6)",
-                "border-radius": "0.3cm",
-                display: "flex",
-                "flex-direction": "column",
-                "align-items": "center",
-                padding: 20,
-            })
-        ]}))
-        if (!element.picture) {
-            element.picture =  WIcons.UserIcon}
+        this.append(new WStyledRender({
+            ClassList: [
+                new WCssClass(`.CardElement`, {
+                    width: 220,
+                    height: 330,
+                    "min-width": 220,
+                    margin: "10px !important",
+                    overflow: "hidden",
+                    position: "relative",
+                    "box-shadow": "0 0px 5px 0 rgba(0,0,0,0.6)",
+                    "border-radius": "0.3cm",
+                    display: "flex",
+                    "flex-direction": "column",
+                    "align-items": "center",
+                    padding: 20,
+                })
+            ]
+        }))
+       
+        element.picture = element.picture ?? WIcons.UserIcon
+        console.log( element.picture);
         const Figure = WRender.createElement({
             type: 'img',
-            props: { class: 'fotoColaborador', src: cadenaB64 + element.picture }
+            props: { class: 'fotoColaborador', src: (url ?? cadenaB64) + element.picture }
         });
         this.ActionFunction = ActionFunction;
         switch (CardType) {
-            case 2:               
+            case 2:
                 this.shadowRoot.append(this.StyleCard2);
                 break;
             default:
@@ -162,7 +165,7 @@ class WCard extends HTMLElement {
                 }
             }));
         }
-        this.shadowRoot.append( WRender.createElement(StylesControlsV1), WRender.createElement(Figure), cardC);
+        this.shadowRoot.append(WRender.createElement(StylesControlsV1), WRender.createElement(Figure), cardC);
     }
     connectedCallback() {
         setTimeout(() => {
@@ -265,7 +268,7 @@ class WCard extends HTMLElement {
                     "font-size": 14,
                     "border-radius": "0.2cm",
                     //heigth: "100%",
-                   // margin: 5
+                    // margin: 5
                 }), new WCssClass(".fotoColaborador", {
                     "object-fit": "cover",
                     "object-position": "top",
