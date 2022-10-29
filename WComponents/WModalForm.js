@@ -53,8 +53,8 @@ class WModalForm extends HTMLElement {
         } //NO MODAL 
         if (this.ShadowRoot) {
             this.attachShadow({ mode: "open" });
-            this.shadowRoot.append(WRender.createElement(StyleScrolls));
-            this.shadowRoot.append(WRender.createElement(StylesControlsV2));
+            this.shadowRoot.append(WRender.createElement(StyleScrolls.cloneNode(true)));
+            this.shadowRoot.append(WRender.createElement(StylesControlsV2.cloneNode(true)));
             this.shadowRoot.append(WRender.createElement(this.FormStyle()));
         } else {
             this.append(WRender.createElement(this.FormStyle()));
@@ -211,7 +211,7 @@ class WModalForm extends HTMLElement {
                     }), new WCssClass(`.ModalContent`, {
                         //height: 'calc(100% - 60px)',
                         //overflow: "hidden",
-                        //"overflow-y": "auto",
+                        "overflow-y": "auto",
                         display: "block"
                     }),
                     //encabezado

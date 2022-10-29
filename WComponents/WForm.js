@@ -1,5 +1,5 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WComponentsTools.js';
-import { WCssClass } from '../WModules/WStyledRender.js';
+import { css, WCssClass } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.JS";
 import { WModalForm } from './WModalForm.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
@@ -45,16 +45,16 @@ class WForm extends HTMLElement {
         if (this.StyleForm == "columnX1") {
             this.DivColumns = this.Config.DivColumns = "calc(100%)";
             this.limit = 1;
-        } else if (this.StyleForm == "columnX3") {
-            this.DivColumns = this.Config.DivColumns = "calc(33%) calc(33%) calc(33%)";
+        } else if (this.StyleForm == "columnX3") {            
+            this.DivColumns  = "calc(33%) calc(33%) calc(33%)";
             this.limit = 3;
         } else {
-            this.DivColumns = this.Config.DivColumns = "calc(50%) calc(50%)";
+            this.DivColumns = this.Config.DivColumns = "calc(50%) calc(50%)";           
             this.limit = 2;
         }
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
-        this.shadowRoot.append(WRender.createElement(StyleScrolls));
-        this.shadowRoot.append(WRender.createElement(StylesControlsV2));
+        this.shadowRoot.append(StyleScrolls.cloneNode(true));
+        this.shadowRoot.append(StylesControlsV2.cloneNode(true));
         this.shadowRoot.append(WRender.createElement(this.FormStyle()));
         this.shadowRoot.append(this.DivForm);
     }
@@ -184,10 +184,7 @@ class WForm extends HTMLElement {
             let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
             ObjectF[prop] = val;
             Model[prop] = Model[prop] != null ? Model[prop] : "";
-            if ((Model[prop].__proto__ == Object.prototype &&
-                (Model[prop].primary || Model[prop].hidden || !Model[prop].type))
-                || Model[prop].__proto__ == Function.prototype
-                || Model[prop].__proto__.constructor.name == "AsyncFunction") {
+            if (this.isNotDrawable(Model, prop)) {
                 if (ObjectOptions.AddObject == true) {
                     ObjectF[prop] = -1;
                 } else {
@@ -206,9 +203,9 @@ class WForm extends HTMLElement {
                 if (Model[prop].__proto__ == Object.prototype) {
                     validateFunction = Model[prop].validateFunction;
                     ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop);
-                    InputControl = await this.CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF);
+                    InputControl = await this.CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF, ControlLabel);
                 } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
-                    InputControl = this.CreateSelect(InputControl, Model[prop], prop, ObjectF);
+                    InputControl = await this.CreateSelect(InputControl, Model[prop], prop, ObjectF);
                     ObjectF[prop] = InputControl.value
                 } else {
                     if (typeof Model[prop] === "string" && Model[prop].length >= 50) {
@@ -240,6 +237,8 @@ class WForm extends HTMLElement {
                                 this.shadowRoot.querySelector("#imgControl" + prop + this.id).src = "data:image/png;base64," + ObjectF[prop];
                             }, 1000);
                         }
+                    } else if (ev.target.type == "radio" || ev.target.type == "checkbox") {
+                        ObjectF[prop] = ev.target.checked;
                     } else {
                         ObjectF[prop] = ev.target.value;
                         if (ev.target.pattern) {
@@ -276,7 +275,15 @@ class WForm extends HTMLElement {
         }
         return Form;
     }
-    async CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF) {
+    isNotDrawable(Model, prop) {
+        return (Model[prop].__proto__ == Object.prototype &&
+            (Model[prop].primary || Model[prop].hidden || !Model[prop].type))
+            || Model[prop].__proto__ == Function.prototype
+            || Model[prop].__proto__.constructor.name == "AsyncFunction";
+    }
+
+    async CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF, ControlLabel) {
+        Model[prop].require = Model[prop].require ?? true;
         switch (Model[prop].type?.toUpperCase()) {
             case "IMG": case "IMAGE": case "IMAGES":
                 const Multiple = Model[prop].type.toUpperCase() == "IMAGES" ? true : false;
@@ -340,14 +347,166 @@ class WForm extends HTMLElement {
                     ModelObject: Model[prop].ModelObject,
                     Options: false
                 });
-                //if(this.StyleForm == "columnX1") WRender.SetStyle(InputControl,  { width: "calc(100% - 80px)" })
                 break;
+            case "FILE":
+                InputControl = WRender.Create({
+                    tagName: "input", className: prop, value: val, type: Model[prop].type,
+                    placeholder: WOrtograficValidation.es(prop)
+                });
+                if (Model[prop].fileType) InputControl.accept = Model[prop].fileType.map(x => "." + x).join(",")
+                break;
+            case "RADIO": case "CHECKBOX":
+                ControlContainer.className += " radioCheckedControl";
+                ControlLabel.htmlFor = "ControlValue" + prop;
+                ControlLabel.className += " radioCheckedLabel";
+                InputControl = WRender.Create({
+                    tagName: "input",
+                    id: "ControlValue" + prop,
+                    className: prop,
+                    value: val,
+                    type: Model[prop].type, placeholder: WOrtograficValidation.es(prop)
+                });
+                break;
+            case "DRAW":
+                InputControl = this.createDrawComponent(InputControl, prop, ControlContainer, ObjectF); break;
             default:
                 //val = Model[prop].defaultValue ?? "";
                 InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: Model[prop].type, placeholder: WOrtograficValidation.es(prop) });
                 break;
         }
-        if ( Model[prop].pattern) InputControl.pattern = Model[prop].pattern;        
+        if (Model[prop].pattern) InputControl.pattern = Model[prop].pattern;
+        return InputControl;
+    }
+
+    createDrawComponent(InputControl, prop, ControlContainer, ObjectF) {
+        InputControl = WRender.Create({
+            tagName: "canvas",
+            id: "ControlValue" + prop,
+            className: prop + " draw-canvas"
+        });
+        var ctx = InputControl.getContext("2d");
+        const baseData = InputControl.toDataURL();
+        ControlContainer.className += " DrawControlContainer"
+        ControlContainer.append(
+            WRender.Create({
+                className: "canvasOptions", children: [
+                    {
+                        tagName: 'input', type: 'button', className: 'Btn-Mini', value: 'clear', onclick: async () => {
+                            clearCanvas();
+                            ObjectF[prop] = undefined;
+                        }
+                    }, {
+                        tagName: 'input', type: 'button', className: 'Btn-Mini', value: 'aceptar', onclick: async () => {
+                            const tool = InputControl.parentNode.querySelector(".ToolTip");
+                            if (tool) tool.remove();
+                            const dataUrl = InputControl.toDataURL();
+                            WRender.SetStyle(InputControl, {
+                                boxShadow: "0 0 3px #ef4d00"
+                            });
+                            if (dataUrl == baseData) {
+                                WRender.SetStyle(InputControl, {
+                                    boxShadow: "0 0 3px #ef4d00"
+                                });
+                                const toolTip = WRender.Create({
+                                    tagName: "span",
+                                    innerHTML: WOrtograficValidation.es(prop) + ` es requerida`,
+                                    className: "ToolTip"
+                                })
+                                InputControl.parentNode.append(toolTip);
+                                InputControl.focus();
+                            }
+                            ObjectF[prop] = dataUrl;
+                        }
+                    }
+                ]
+            })
+        );
+        window.requestAnimFrame = (function (callback) {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimaitonFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        })();
+        var drawing = false;
+        var mousePos = { x: 0, y: 0 };
+        var lastPos = mousePos;
+        InputControl.addEventListener("mousedown", function (e) {
+            drawing = true;
+            lastPos = getMousePos(InputControl, e);
+        }, false);
+        InputControl.addEventListener("mouseup", function (e) {
+            drawing = false;
+        }, false);
+        InputControl.addEventListener("mousemove", function (e) {
+            mousePos = getMousePos(InputControl, e);
+        }, false);
+        InputControl.addEventListener("touchstart", function (e) {
+            mousePos = getTouchPos(InputControl, e);
+            e.preventDefault();
+            var touch = e.touches[0];
+            var mouseEvent = new MouseEvent("mousedown", {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            InputControl.dispatchEvent(mouseEvent);
+        }, false);
+        InputControl.addEventListener("touchend", function (e) {
+            e.preventDefault();
+            var mouseEvent = new MouseEvent("mouseup", {});
+            InputControl.dispatchEvent(mouseEvent);
+        }, false);
+        InputControl.addEventListener("touchleave", function (e) {
+            e.preventDefault(); // Prevent scrolling when touching the InputControl
+            var mouseEvent = new MouseEvent("mouseup", {});
+            InputControl.dispatchEvent(mouseEvent);
+        }, false);
+        InputControl.addEventListener("touchmove", function (e) {
+            e.preventDefault(); // Prevent scrolling when touching the InputControl
+            var touch = e.touches[0];
+            var mouseEvent = new MouseEvent("mousemove", {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            InputControl.dispatchEvent(mouseEvent);
+        }, false);
+        function getMousePos(canvasDom, mouseEvent) {
+            var rect = canvasDom.getBoundingClientRect(); return {
+                x: mouseEvent.clientX - rect.left,
+                y: mouseEvent.clientY - rect.top
+            };
+        }
+        function getTouchPos(canvasDom, touchEvent) {
+            var rect = canvasDom.getBoundingClientRect();
+            return {
+                x: touchEvent.touches[0].clientX - rect.left,
+                y: touchEvent.touches[0].clientY - rect.top
+            };
+        }
+        function renderCanvas() {
+            if (drawing) {
+                ctx.strokeStyle = "#000";
+                ctx.beginPath();
+                ctx.moveTo(lastPos.x, lastPos.y);
+                ctx.lineTo(mousePos.x, mousePos.y);
+                console.log(1);
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.closePath();
+                lastPos = mousePos;
+            }
+        }
+
+        function clearCanvas() {
+            InputControl.width = InputControl.width;
+        }
+        (function drawLoop() {
+            requestAnimFrame(drawLoop);
+            renderCanvas();
+        })();
         return InputControl;
     }
 
@@ -465,7 +624,7 @@ class WForm extends HTMLElement {
                 tagName: 'button',
                 class: 'Btn',
                 type: "button",
-                innerText: 'Aceptar',
+                innerText: 'CONFIRMAR',
                 onclick: async () => {
                     await this.Save(ObjectF);
                 }
@@ -474,17 +633,15 @@ class WForm extends HTMLElement {
         }
         if (this.UserActions != undefined && this.UserActions != Array) {
             this.UserActions.forEach(Action => {
-                DivOptions.append({
+                DivOptions.append(WRender.Create({
+                    tagName: "button",
+                    class: "Btn",
                     type: "button",
-                    props: {
-                        class: "Btn",
-                        type: "button",
-                        innerText: Action.name,
-                        onclick: async (ev) => {
-                            Action.Function(ev.target);
-                        }
+                    innerText: Action.name,
+                    onclick: async (ev) => {
+                        Action.Function(ev.target);
                     }
-                });
+                }));
             });
         }
         return DivOptions;
@@ -500,7 +657,7 @@ class WForm extends HTMLElement {
         }
         if (this.DataRequire == true) {
             for (const prop in ObjectF) {
-                if (!prop.includes("_hidden")) {
+                if (!prop.includes("_hidden") && this.ModelObject[prop]?.require) {
                     const control = this.shadowRoot.querySelector("#ControlValue" + prop);
                     if ((ObjectF[prop] == null || ObjectF[prop] == "") && control != null) {
                         WRender.SetStyle(control, {
@@ -591,148 +748,240 @@ class WForm extends HTMLElement {
         }
     }
     FormStyle = () => {
-        const Style = {
-            type: "w-style",
-            props: {
-                ClassList: [
-                    new WCssClass(" .ContainerFormWModal", {
-                        //overflow: "hidden",
-                    }), new WCssClass(".divForm", {
-                        display: "grid",
-                        "grid-template-columns": this.DivColumns,// "calc(50% - 10px) calc(50% - 10px)",
-                        "grid-template-rows": "auto",
-                        height: "calc(100% - 70px)",
-                    }), new WCssClass(".divForm .imageGridForm", {
-                        "grid-row": "1/4",
-                        //width: "calc(50% - 10px)", margin: "5px"
-                    }), new WCssClass(".divForm .imageGridForm, .divForm .tableContainer", {
-                        "grid-column": "span " + this.limit,
-                        "grid-row": "span 4"
-                        //width: "calc(50% - 10px)", margin: "5px"
-                    }), new WCssClass(` input:-internal-autofill-selected`, {
-                        "appearance": "menulist-button",
-                        "background-color": "none !important",
-                        "background-image": "none !important",
-                        "color": "-internal-light-dark(black, white) !important",
-                    }), new WCssClass(` .DivSaveOptions`, {
-                        "margin-top": "10px",
-                        "margin-bottom": "10px",
-                        "text-align": "center",
-                        "border-top": "solid 1px #999"
-                    }), new WCssClass(`.imgPhoto`, {
-                        "grid-row": "1/3",
-                        "grid-column": "span " + this.limit
-                    }), new WCssClass(` .imgPhotoWModal`, {
-                        "max-height": "250px",
-                        "max-width": "250px",
-                        "min-height": "250px",
-                        display: "block",
-                        margin: "auto",
-                        width: "100%",
-                        "object-fit": "cover",
-                        "box-shadow": "0 0px 2px 0px #000",
-                        "object-position": "top",
-                        "border-radius": ".5cm"
-                    }), new WCssClass(` .LabelFile`, {
-                        padding: "5px",
-                        "max-width": "250px",
-                        margin: "auto",
-                        cursor: "pointer",
-                        "background-color": "#4894aa",
-                        "border-radius": "0.2cm",
-                        display: "block",
-                        color: "#fff",
-                        "text-align": "center",
-                    }), new WCssClass(` .inputTitle`, {
-                        padding: "2px",
-                        display: "block",
-                        "text-align": "center",
-                        "font-weight": "bold",
-                        "text-transform": "capitalize"
-                    }), new WCssClass(`.ToolTip`, {
-                        position: "absolute",
-                        color: "#fff",
-                        padding: 5,
-                        background: "rgb(177 6 6 / 80%)",
-                        "border-radius": "0.3cm",
-                        left: 10,
-                        bottom: -20,
-                        "font-size": 12
-                    }),
-                    //encabezado
-                    new WCssClass(` .ModalHeader`, {
-                        "color": this.DarkMode ? "#fff" : "#444",
-                        "font-weight": "bold",
-                        "font-size": "20px",
-                        "display": "flex",
-                        "justify-content": "space-between",
-                        "align-items": "center",
-                        padding: "10px 30px",
-                        "margin-top": "10px"
-                    }), new WCssClass(`.ModalElement`, {
-                        padding: 10,
-                        "border-radius": 5,
-                        position: "relative"
-                    }), new WCssClass(`.ModalDetailElement`, {
-                        "background-color": "#4da6ff",
-                        padding: 10,
-                        "border-radius": 5,
-                        overflow: "hidden",
-                        "overflow-y": "auto",
-                        "max-height": 300,
-                        margin: 5
-                    }), new WCssClass(` .BtnClose`, {
-                        "font-size": "18pt",
-                        "color": "#b9b2b3",
-                        "cursor": "pointer",
-                        "width": "30px",
-                        "border-radius": "10px",
-                        "display": "flex",
-                        "justify-content": "center",
-                        "align-items": "center",
-                        border: "none",
-                        "background-color": "rgba(0,0,0,0.2)"
-                    }), new WCssClass(` .HeaderIcon`, {
-                        "height": "50px",
-                        "width": "50px",
-                        "position": "relative",
-                        "left": "-10px;",
-                    }), new WCssClass(`.ObjectModalContainer`, {
-                        overflow: "hidden",
-                        "overflow-y": 'auto',
-                        "max-height": "calc(100vh - 120px)",
-                        margin: 10
-                    }), new WCssClass(`.listImage label`, {
-                        "font-size": 11,
-                        padding: 5,
-                        width: "100%",
-                        overflow: "hidden",
-                        display: "block"
-                    }),
-                ], MediaQuery: [{
-                    condicion: "(max-width: 800px)",
-                    ClassList: [new WCssClass(".divForm", {
-                        "display": "grid",
-                        "grid-gap": "1rem",
-                        "grid-template-columns": "calc(100% - 20px) !important",
-                        "grid-template-rows": "auto",
-                        "justify-content": "center"
-                    }), new WCssClass(" .ContainerFormWModal", {
-                        "margin-top": "0px",
-                        "border-radius": "0cm",
-                    }), new WCssClass("", {
-                        "padding-bottom": "0px",
-                    }), new WCssClass(`.ObjectModalContainer`, {
-                        "max-height": "calc(100% - 80px)"
-                    }), new WCssClass(`.imgPhoto`, {
-                        "grid-row": "1/3",
-                        "grid-column": "1/2"
-                    }),
-                    ]
-                },]
+        console.log(this.DivColumns);
+        const style = css`
+            .ContainerFormWModal {
+                font-family: 'Montserrat-Medium', sans-serif !important;
             }
-        }
-        return WRender.createElement(Style);
+            .divForm {
+                display: grid;
+                grid-template-columns: "auto auto";
+                grid-template-rows: auto;
+                height: calc(100% - 70px);
+            }
+
+            .divForm .imageGridForm {
+                grid-row: span 3;
+            }
+
+            .divForm .imageGridForm,
+            .divForm .tableContainer {
+                grid-column: span  ${this.limit};
+                grid-row: span 4;
+            }
+
+            input:-internal-autofill-selected {
+                appearance: menulist-button;
+                background-color: none !important;
+                background-image: none !important;
+                color: -internal-light-dark(black, white) !important;
+            }
+
+            .DivSaveOptions {
+                margin-top: 10px;
+                margin-bottom: 10px;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .imgPhoto {
+                grid-row: 1/3;
+                grid-column: span ${this.limit};
+            }
+            .DrawControlContainer{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                grid-column: span ${this.limit};
+            }
+            .imgPhotoWModal {
+                max-height: 250px;
+                max-width: 250px;
+                min-height: 250px;
+                display: block;
+                margin: auto;
+                width: 100%;
+                object-fit: cover;
+                box-shadow: 0 0px 2px 0px #000;
+                object-position: top;
+                border-radius: .5cm;
+            }
+            .LabelFile {
+                padding: 5px;
+                max-width: 250px;
+                margin: auto;
+                cursor: pointer;
+                background-color: #4894aa;
+                border-radius: 0.2cm;
+                display: block;
+                color: #fff;
+                text-align: center;
+            }
+
+            .inputTitle {
+                padding: 2px;
+                display: block;
+                text-align: center;
+                font-weight: bold;
+                text-transform: capitalize;
+                margin: 0 0 15px 0;
+            }
+
+            .radioCheckedControl{
+                display: flex; 
+                align-items: center;
+                justify-content: flex-end;
+                flex-direction: row-reverse;
+            }
+
+            input[type=checkbox] {
+                appearance: none;
+                background-color: #fff;
+                margin: 0;
+                font: inherit;
+                color: currentColor;
+                width: 1.15em;
+                height: 1.15em;
+                border: 0.15em solid #999;
+                border-radius: 0.15em;
+                display: grid;
+                place-content: center;
+            }
+
+            input[type=checkbox]::before {
+                content: "";
+                width: 0.65em;
+                height: 0.65em;
+                transform: scale(0);
+                transition: 120ms transform ease-in-out;
+                box-shadow: inset 1em 1em var(--form-control-color);
+                transform-origin: bottom left;
+                clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            }           
+
+            input[type=checkbox]:checked::before {
+                content: " ";
+                background-color: cornflowerblue;
+                transform: scale(1);
+            }
+
+            .radioCheckedLabel{
+                cursor: pointer;
+                margin: 15px 0px 15px 10px;
+            }
+
+            .ToolTip {
+                position: absolute;
+                padding: 5px 15px;               
+                border-radius: 0.3cm;
+                left: 10px;
+                bottom: -10px;
+                font-size: 10px;
+                font-weight: 500;
+                color: rgb(227, 0, 0);
+            }
+            .ToolTip::first-letter{                
+                text-transform: capitalize;                
+            }
+            .draw-canvas {
+                border: 2px dotted #CCCCCC;
+                border-radius: 5px;
+                cursor: crosshair;
+            }
+
+            .ModalHeader {
+                color: ${this.DarkMode ? "#fff" : "#444"};
+                font-weight: bold;
+                font-size: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 30px;
+                margin-top: 10px;
+            }
+
+            .ModalElement {
+                padding: 10px;
+                border-radius: 5px;
+                position: relative;
+            }
+
+            .ModalDetailElement {
+                background-color: #4da6ff;
+                padding: 10px;
+                border-radius: 5px;
+                overflow: hidden;
+                overflow-y: auto;
+                max-height: 300px;
+                margin: 5px;
+            }
+
+            .BtnClose {
+                font-size: 18pt;
+                color: #b9b2b3;
+                cursor: pointer;
+                width: 30px;
+                border-radius: 10px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: none;
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+
+            .HeaderIcon {
+                height: 50px;
+                width: 50px;
+                position: relative;
+                left: -10px;
+                ;
+            }
+
+            .ObjectModalContainer {
+                overflow: hidden;
+                overflow-y: auto;
+                max-height: calc(100vh - 120px);
+                margin: 10px;
+            }
+
+            .listImage label {
+                font-size: 11px;
+                padding: 5px;
+                width: 100%;
+                overflow: hidden;
+                display: block;
+            }
+
+            @media (max-width: 800px) {
+                .divForm {
+                    display: grid;
+                    grid-gap: 1rem;
+                    grid-template-columns: calc(100% - 20px) !important;
+                    grid-template-rows: auto;
+                    justify-content: center;
+                }
+
+                .ContainerFormWModal {
+                    margin-top: 0px;
+                    border-radius: 0cm;
+                    padding-bottom: 0px;
+                }
+
+                .ObjectModalContainer {
+                    max-height: calc(100% - 80px);
+                }
+
+                .imgPhoto {
+                    grid-row: 1/3;
+                    grid-column: 1/2;
+                }
+            }
+        `;
+        return WRender.createElement(style);
     }
 }
 const ModalVericateAction = (Action, title) => {

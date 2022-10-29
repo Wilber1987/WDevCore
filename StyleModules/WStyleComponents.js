@@ -1,25 +1,27 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 //#region  GENERIC STYLESSS#####################################################################################
-const StyleScrolls = {
-    type: 'w-style', props: {
-        id: '', ClassList: [
-            new WCssClass("*::-webkit-scrollbar ", {
-                "width": "20px",
-            }), new WCssClass("*::-webkit-scrollbar-track ", {
-                "background": "transparent",
-            }), new WCssClass("*::-webkit-scrollbar-thumb", {
-                "background-color": "#8f8f8f",
-                "border-radius": "20px",
-                "border": "6px solid transparent",
-                "background-clip": "content-box",
-            }), new WCssClass("*::-webkit-scrollbar-thumb:hover", {
-                "background": " #646464",
-                "background-clip": "content-box",
-            })
-        ]
+const StyleScrolls = css`
+     *::-webkit-scrollbar {
+        width: 20px;
     }
-};
+
+    *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background-color: #8f8f8f;
+        border-radius: 20px;
+        border: 6px solid transparent;
+        background-clip: content-box;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+        background: #646464;
+        background-clip: content-box;
+    }
+`;
 const StylesControlsV1 = {
     type: 'w-style', props: {
         id: '', ClassList: [
@@ -84,86 +86,107 @@ const StylesControlsV1 = {
         ]
     }
 }
-const StylesControlsV2 = {
-    type: 'w-style', props: {
-        id: '', ClassList: [
-            //BOTONES
-            new WCssClass(`.Btn-Mini`, {
-                width: 120,
-                "background-color": "#5995fd",
-                border: "none",
-                outline: "none",
-                "border-radius": "10px",
-                color: "#fff",
-                "font-weight": "600",
-                margin: "10px 0",
-                cursor: "pointer",
-                transition: "0.5s",
-                "font-size": 11,
-                padding: 8
-            }), new WCssClass(`.BtnAlert,.BtnPrimary, .BtnSuccess,.BtnSecundary,.Btn`, {
-                "min-width": "150px",
-                "background-color": "#5995fd",
-                border: "none",
-                outline: "none",
-                height: "40px",
-                "border-radius": "49px",
-                color: "#fff",
-                "text-transform": "uppercase",
-                "font-weight": "600",
-                margin: "10px 5px",
-                padding: "0 10px",
-                cursor: "pointer",
-                transition: "0.5s",
-            }), new WCssClass(`.BtnPrimary`, {
-                "color": "#fff",
-                "background-color": "#007bff",
-            }), new WCssClass(`.BtnAlert`, {
-                "color": "#fff",
-                "background-color": "#dc3545",
-            }), new WCssClass(`.BtnSuccess`, {
-                "color": "#fff",
-                "background-color": "#28a745",
-            }), new WCssClass(`.BtnSecundary`, {
-                "color": "#fff",
-                "background-color": "#17a2b8",
-            }), new WCssClass(`.Btn[type=checkbox]`, {
-                "height": "20px",
-                "min-width": "20px",
-                "margin": "5px",
-            }),
-            //INPUTS
-            new WCssClass(`input[type=text], 
-            input[type=string], 
-            input[type=password], 
-            input[type=number],
-            input[type=color], input[type=email], 
-            input[type=date],  input[type=time],select, textarea,
-            input:-internal-autofill-selected`, {
-                width: "100%",
-                "background-color": "#f0f0f0 !important",
-                "border-radius": "55px",
-                padding: "10px 15px",
-                outline: "none",
-                border: "none",
-                "line-height": "1",
-                "font-weight": "600 !important",
-                "font-size": "1.1rem !important",
-                color: "#333 !important",
-                "box-sizing": "border-box",
-                cursor: "pointer",
-                height: 40
-            }), new WCssClass(`input:active, 
-                input:focus, 
-                select:active, 
-                select:focus,
-                textarea:focus,textarea:focus`, {
-                "box-shadow": "0 0 5px #4894aa",
-                // outline: "none",
-            })
-        ]
+const StylesControlsV2 = css`
+    .Btn-Mini {
+        width: 120px;
+        background-color: #5995fd;
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        color: #fff;
+        font-weight: 600;
+        margin: 10px 0;
+        cursor: pointer;
+        transition: 0.5s;
+        font-size: 11px;
+        padding: 8px;
     }
-}
+    
+    .BtnAlert,
+    .BtnPrimary,
+    .BtnSuccess,
+    .BtnSecundary,
+    .Btn {
+        min-width: 150px;
+        background-color: #5995fd;
+        border: none;
+        outline: none;
+        height: 40px;
+        border-radius: 49px;
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin: 10px 5px;
+        padding: 0 15px;
+        cursor: pointer;
+        transition: 0.5s;
+        width: 100%;
+        max-width: 250px;
+    }
+
+    .BtnPrimary {
+        color: #fff;
+        background-color: #007bff;
+    }
+
+    .BtnAlert {
+        color: #fff;
+        background-color: #dc3545;
+    }
+
+    .BtnSuccess {
+        color: #fff;
+        background-color: #28a745;
+    }
+
+    .BtnSecundary {
+        color: #fff;
+        background-color: #17a2b8;
+    }
+
+    .Btn[type=checkbox] {
+        height: 20px;
+        min-width: 20px;
+        margin: 5px;
+    }
+
+    input[type=text],
+    input[type=string],
+    input[type=password],
+    input[type=number],
+    input[type=color],
+    input[type=email],
+    input[type=date],
+    input[type=time],
+    select,
+    textarea,
+    input:-internal-autofill-selected {
+        width: 100%;
+        background-color: #f0f0f0 !important;
+        border-radius: 55px;
+        padding: 10px 15px;
+        outline: none;
+        border: none;
+        line-height: 1;
+        font-weight: 600 !important;
+        font-size: 1.1rem !important;
+        color: #333 !important;
+        box-sizing: border-box;
+        cursor: pointer;
+        height: 40px;
+        box-shadow: 0 0 5px #c1c1c1;
+        text-transform: capitalize;
+    }
+
+    input:active,
+    input:focus,
+    select:active,
+    select:focus,
+    textarea:focus,
+    textarea:focus {
+        box-shadow: 0 0 5px #4894aa;
+    }
+`
 const basicButtons = css`      
         .btn {
             padding: 8px;
@@ -201,7 +224,7 @@ const basicButtons = css`
             margin-left: 10px;
             cursor:pointer;
         }
-    `
+`
 //#endregion  #################################################################################################
 
 export { StyleScrolls, StylesControlsV1, StylesControlsV2, basicButtons }
