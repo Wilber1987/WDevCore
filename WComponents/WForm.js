@@ -1,7 +1,7 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WComponentsTools.js';
 import { css, WCssClass } from '../WModules/WStyledRender.js';
-import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.JS";
-import { WModalForm } from './WModalForm.js';
+import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { WModalForm, WSimpleModalForm } from './WModalForm.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { WIcons } from '../WModules/WIcons.js';
 import { WTableComponent } from './WTableComponent.js';
@@ -40,16 +40,17 @@ class WForm extends HTMLElement {
             this[p] = Config[p];
         }
         this.Config = Config;
+        this.ImageUrlPath = Config.ImageUrlPath;
         this.Options = this.Options ?? true;
         this.DataRequire = this.DataRequire ?? true;
         if (this.StyleForm == "columnX1") {
             this.DivColumns = this.Config.DivColumns = "calc(100%)";
             this.limit = 1;
-        } else if (this.StyleForm == "columnX3") {            
-            this.DivColumns  = "calc(33%) calc(33%) calc(33%)";
+        } else if (this.StyleForm == "columnX3") {
+            this.DivColumns = this.Config.DivColumns = "calc(33%) calc(33%) calc(33%)";
             this.limit = 3;
         } else {
-            this.DivColumns = this.Config.DivColumns = "calc(50%) calc(50%)";           
+            this.DivColumns = this.Config.DivColumns = "calc(50%) calc(50%)";
             this.limit = 2;
         }
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
@@ -57,9 +58,9 @@ class WForm extends HTMLElement {
         this.shadowRoot.append(StylesControlsV2.cloneNode(true));
         this.shadowRoot.append(WRender.createElement(this.FormStyle()));
         this.shadowRoot.append(this.DivForm);
+        this.DrawComponent();
     }
     connectedCallback() {
-        this.DrawComponent();
     }
     DrawComponent = async () => {
         this.DarkMode = this.DarkMode ?? false;
@@ -84,9 +85,9 @@ class WForm extends HTMLElement {
                 }, set: function (target, property, value, receiver) {
                     target[property] = value;
                     for (const prop in Model) {
-                        if (Model[prop] != undefined && Model[prop] != null && Model[prop].__proto__ == Object.prototype) {
+                        if (Model[prop]?.__proto__ == Object.prototype) {
                             if (Model[prop].type?.toUpperCase() == "OPERATION") {
-                                target[prop] = Model[prop].Function(target);
+                                target[prop] = Model[prop].action(target);
                             }
                         }
                     }
@@ -126,7 +127,7 @@ class WForm extends HTMLElement {
                     prop.toUpperCase().includes("PHOTO")) {
                     let cadenaB64 = "";
                     var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-                    if (base64regex.test(ObjectF[prop])) {
+                    if (base64regex.test(ObjectF[prop]) && !ObjectF[prop].includes("data:")) {
                         cadenaB64 = "data:image/png;base64,";
                     }
                     if (this.ImageUrlPath != undefined
@@ -146,7 +147,7 @@ class WForm extends HTMLElement {
                         value = value.toFixed(2)
                     }
                     FormDivForm.append(WRender.Create({
-                        class: "ModalDetailElement", children: [{ tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + value }]
+                        class: "ModalDetailElement", children: [{ tagName: "label", innerText: WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ": " + value }]
                     }));
                 }
             }
@@ -174,7 +175,7 @@ class WForm extends HTMLElement {
             };
         }
         //verifica que el modelo exista,
-        //sino es asi le asigna el valor de un objeto existente        
+        //sino es asi le asigna el valor de un objeto existente
         const Model = this.ModelObject ?? this.EditObject;
         const Form = WRender.Create({ className: 'divForm' });
         for (const prop in Model) {
@@ -192,7 +193,7 @@ class WForm extends HTMLElement {
                 }
             } else if (!prop.includes("_hidden")) {
                 const ControlLabel = WRender.Create({
-                    tagName: "label", class: "inputTitle",
+                    tagName: "label", class: "inputTitle label_" + prop,
                     innerText: WOrtograficValidation.es(prop)
                 });
                 const ControlContainer = WRender.Create({
@@ -202,18 +203,18 @@ class WForm extends HTMLElement {
                 let InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text" });
                 if (Model[prop].__proto__ == Object.prototype) {
                     validateFunction = Model[prop].validateFunction;
-                    ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop);
+                    ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop)
                     InputControl = await this.CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF, ControlLabel);
                 } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
-                    InputControl = await this.CreateSelect(InputControl, Model[prop], prop, ObjectF);
+                    InputControl = this.CreateSelect(InputControl, Model[prop], prop, ObjectF);
                     ObjectF[prop] = InputControl.value
                 } else {
                     if (typeof Model[prop] === "string" && Model[prop].length >= 50) {
                         InputControl = WRender.Create({ tagName: "textarea", className: prop });
                     } else if (parseFloat(Model[prop]).toString() != "NaN") {
-                        InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "number", placeholder: WOrtograficValidation.es(prop) });
+                        InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "number", placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
                     } else {
-                        InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text", placeholder: WOrtograficValidation.es(prop) });
+                        InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text", placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
                     }
                 }
                 InputControl.id = "ControlValue" + prop;
@@ -231,10 +232,27 @@ class WForm extends HTMLElement {
                         if (ev.target.multiple) {
                             await this.SelectedFile(ev.target.files, true);
                         } else {
+                            let base64Type = "";
+                            switch (ev.target.files[0].type.toUpperCase()) {
+                                case "IMAGE/PNG": case "IMAGE/JPG": case "IMAGE/JPEG":
+                                    base64Type = "data:image/png;base64,";
+                                    break;
+                                case "APPLICATION/PDF":
+                                    base64Type = "data:application/pdf;base64,";
+                                default:
+                                    base64Type = "data:" + ev.target.files[0].type + ";base64,";
+                                    break;
+                            }
+                            if (ev.target.parentNode.querySelector("#labelFile" + prop) != null) {
+                                ev.target.parentNode.querySelector("#labelFile" + prop).innerText = ev.target.files[0].name;
+                            }
                             await this.SelectedFile(ev.target.files[0]);
                             await setTimeout(() => {
-                                ObjectF[prop] = photoB64.toString();
-                                this.shadowRoot.querySelector("#imgControl" + prop + this.id).src = "data:image/png;base64," + ObjectF[prop];
+                                ObjectF[prop] = base64Type + photoB64.toString();
+                                console.log("#imgControl" + prop, this.shadowRoot.querySelector("#imgControl" + prop));
+                                if (this.shadowRoot.querySelector("#imgControl" + prop) != null) {
+                                    this.shadowRoot.querySelector("#imgControl" + prop).src = ObjectF[prop];
+                                }
                             }, 1000);
                         }
                     } else if (ev.target.type == "radio" || ev.target.type == "checkbox") {
@@ -264,6 +282,10 @@ class WForm extends HTMLElement {
                             }
                         }
                     }
+                    if (Model[prop].fieldRequire) {
+                        this.shadowRoot.querySelector(".label_" + Model[prop].fieldRequire).append("*")
+                        Model[Model[prop].fieldRequire].require = true;
+                    }
                 };
                 ControlContainer.append(InputControl);
                 Form.append(ControlContainer);
@@ -285,6 +307,14 @@ class WForm extends HTMLElement {
     async CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF, ControlLabel) {
         Model[prop].require = Model[prop].require ?? true;
         switch (Model[prop].type?.toUpperCase()) {
+            case "TITLE":
+                Model[prop].require = false;
+                ObjectF[prop] = undefined;
+                ControlLabel.className += " formHeader";
+                ControlLabel.innerHTML = Model[prop].label;
+                ControlContainer.classList.add("tableContainer");
+                InputControl = WRender.CreateStringNode("<span/>");
+                break;
             case "IMG": case "IMAGE": case "IMAGES":
                 const Multiple = Model[prop].type.toUpperCase() == "IMAGES" ? true : false;
                 InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple);
@@ -303,7 +333,7 @@ class WForm extends HTMLElement {
                     type = "password";
                 }
                 InputControl = WRender.Create({
-                    tagName: "input", className: prop, type: type, placeholder: WOrtograficValidation.es(prop)
+                    tagName: "input", className: prop, type: type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop))
                 });
                 ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
                 break;
@@ -314,13 +344,17 @@ class WForm extends HTMLElement {
             case "WSELECT":
                 const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
-                ObjectF[prop] = this.FindObjectMultiselect(val, InputControl);
+                this.FindObjectMultiselect(val, InputControl);
                 break;
             case "MULTISELECT":
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = new MultiSelect({
-                    Dataset: Datasetilt
+                    action: (selecteds) => {
+                        if (Model[prop].action) {
+                            Model[prop].action(selecteds, ControlLabel, InputControl)
+                        }
+                    }, Dataset: Datasetilt
                 });
                 this.FindObjectMultiselect(val, InputControl);
                 ObjectF[prop] = InputControl.selectedItems;
@@ -329,16 +363,40 @@ class WForm extends HTMLElement {
                 InputControl = WRender.Create({
                     tagName: "input",
                     className: prop, value: val, type: Model[prop].type,
-                    placeholder: "me@email.com",
+                    placeholder: "Ejem.: me@email.com",
                     pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
                 });
                 break;
+            case "TEL":
+                InputControl = WRender.Create({
+                    tagName: "input",
+                    className: prop, value: val, type: Model[prop].type,
+                    placeholder: "Ejem.: +54-88888888",
+                    pattern: "[+]{1}[0-9]{2,3}[-]{1}[0-9]{3,4}[0-9]{4,5}"
+                });
+                break;
+            case "URL":
+                InputControl = WRender.Create({
+                    tagName: "input",
+                    className: prop, value: val, type: Model[prop].type,
+                    placeholder: "Ejem.: https://site.com",
+                    pattern: "https?://.+"
+                });
+                break;
             case "MASTERDETAIL":
+                ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
                 ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
-                InputControl = new WTableComponent({ Dataset: ObjectF[prop], ModelObject: Model[prop].ModelObject });
+                InputControl = new WTableComponent({
+                    Dataset: ObjectF[prop],
+                    ModelObject: Model[prop].ModelObject,
+                    Options: {
+                        Add: true, Edit: true, Delete: true, Search: true
+                    }
+                });
                 break;
             case "MODEL":
+                ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
                 ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : {};
                 InputControl = new WForm({
@@ -351,8 +409,24 @@ class WForm extends HTMLElement {
             case "FILE":
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, value: val, type: Model[prop].type,
-                    placeholder: WOrtograficValidation.es(prop)
+                    style: { display: "none" },
+                    placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop))
                 });
+                const label = WRender.Create({ tagName: 'label', id: "labelFile" + prop, innerText: '' });
+                const content = {
+                    class: "contentLabelFile", children: [
+                        {
+                            tagName: "label",
+                            class: "LabelFile",
+                            innerText: "Seleccionar archivo",
+                            htmlFor: "ControlValue" + prop, children: [
+                                { tagName: 'img', src: WIcons.upload, class: 'labelIcon' }
+                            ]
+                        }, label
+                    ]
+                }
+                ControlContainer.append(WRender.Create(content));
+                ControlContainer.class += " file";
                 if (Model[prop].fileType) InputControl.accept = Model[prop].fileType.map(x => "." + x).join(",")
                 break;
             case "RADIO": case "CHECKBOX":
@@ -364,17 +438,33 @@ class WForm extends HTMLElement {
                     id: "ControlValue" + prop,
                     className: prop,
                     value: val,
-                    type: Model[prop].type, placeholder: WOrtograficValidation.es(prop)
+                    type: Model[prop].type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop))
                 });
                 break;
             case "DRAW":
                 InputControl = this.createDrawComponent(InputControl, prop, ControlContainer, ObjectF); break;
+            case "TEXTAREA":
+                ControlContainer.classList.add("tableContainer");
+                ControlContainer.style.height = "auto";
+                InputControl = WRender.Create({
+                    tagName: "textarea", style: { height: "100px", borderRadius: "10px" }, className: prop, value: val
+                });
+                break;
             default:
-                //val = Model[prop].defaultValue ?? "";
-                InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: Model[prop].type, placeholder: WOrtograficValidation.es(prop) });
+                val = ObjectF[prop] ?? Model[prop].defaultValue ?? "";
+                const placeholder = Model[prop].placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
+                InputControl = WRender.Create({
+                    tagName: "input", className: prop, value: val,
+                    type: Model[prop].type, placeholder: placeholder
+                });
                 break;
         }
+        if (Model[prop].fieldRequire && val != undefined && val != "") {
+            Model[Model[prop].fieldRequire].require = true;
+        }
         if (Model[prop].pattern) InputControl.pattern = Model[prop].pattern;
+        ControlLabel.innerHTML += Model[prop].require == true ? "*" : "";
+
         return InputControl;
     }
 
@@ -391,12 +481,12 @@ class WForm extends HTMLElement {
             WRender.Create({
                 className: "canvasOptions", children: [
                     {
-                        tagName: 'input', type: 'button', className: 'Btn-Mini', value: 'clear', onclick: async () => {
+                        tagName: 'input', type: 'button', className: 'Btn-Mini-Alert', value: 'Limpiar', onclick: async () => {
                             clearCanvas();
                             ObjectF[prop] = undefined;
                         }
                     }, {
-                        tagName: 'input', type: 'button', className: 'Btn-Mini', value: 'aceptar', onclick: async () => {
+                        tagName: 'input', type: 'button', className: 'Btn-Mini', value: 'Confirmar', onclick: async () => {
                             const tool = InputControl.parentNode.querySelector(".ToolTip");
                             if (tool) tool.remove();
                             const dataUrl = InputControl.toDataURL();
@@ -409,7 +499,7 @@ class WForm extends HTMLElement {
                                 });
                                 const toolTip = WRender.Create({
                                     tagName: "span",
-                                    innerHTML: WOrtograficValidation.es(prop) + ` es requerida`,
+                                    innerHTML: WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ` es requerido y debe ser confirmada`,
                                     className: "ToolTip"
                                 })
                                 InputControl.parentNode.append(toolTip);
@@ -492,7 +582,6 @@ class WForm extends HTMLElement {
                 ctx.beginPath();
                 ctx.moveTo(lastPos.x, lastPos.y);
                 ctx.lineTo(mousePos.x, mousePos.y);
-                console.log(1);
                 ctx.lineWidth = 1;
                 ctx.stroke();
                 ctx.closePath();
@@ -532,23 +621,36 @@ class WForm extends HTMLElement {
                 }
             });
         } else {
-            const FindItem = InputControl.Dataset.find(i => i.id == val || i.id_ == val);
+            const FindItem = InputControl.Dataset.find(i => i.id == val || i.id_ == val || i[this.findKey(i)] == val);
             if (FindItem) {
                 InputControl.selectedItems.push(FindItem);
             }
         }
     }
 
+
     async CreateWSelect(InputControl, Dataset, prop, ObjectF) {
         const { MultiSelect } = await import("./WMultiSelect.js");
         InputControl = new MultiSelect({
             MultiSelect: false,
             Dataset: Dataset,
-            Action: (ItemSelects) => {
-                ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_ ?? "ElementIndex_0";
+            action: (ItemSelects) => {
+                ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_ ?? ItemSelects[0][this.findKey(ItemSelects[0])] ?? "ElementIndex_0";
             }
         });
         return InputControl;
+    }
+
+    findKey = (object) => {
+        let keyF = undefined;
+        for (const key in object) {
+            if ((typeof object[key] === "string" || typeof object[key] === "number")
+                && key.includes("id_")) {
+                keyF = key;
+                break;
+            }
+        }
+        return keyF
     }
     async CreateSelect(InputControl, Dataset, prop, ObjectF) {
         InputControl = WRender.Create({
@@ -593,11 +695,12 @@ class WForm extends HTMLElement {
             if (InputValue == "") {
                 InputValue = WIcons.UserIcon;
             }
-            if (base64regex.test(InputValue)) {
+            if (base64regex.test(InputValue.replace("data:image/png;base64,", "")) && !InputValue.includes("data:image/png;base64,")) {
                 cadenaB64 = "data:image/png;base64,";
             } else if (this.ImageUrlPath != undefined && InputValue
                 && InputValue.__proto__ != Object.prototype
-                && this.ImageUrlPath.__proto__ == String.prototype) {
+                && this.ImageUrlPath.__proto__ == String.prototype
+                && !base64regex.test(InputValue.replace("data:image/png;base64,", ""))) {
                 cadenaB64 = this.ImageUrlPath + "/";
             }
             ControlContainer.append(WRender.Create({
@@ -610,10 +713,11 @@ class WForm extends HTMLElement {
         ControlContainer.append(WRender.Create({
             tagName: "label",
             class: "LabelFile",
-            innerText: "Seleccionar Archivo",
+            innerText: "Seleccionar archivo",
             htmlFor: "ControlValue" + prop
         }));
         ControlContainer.class += " imageGridForm";
+        InputControl.accept = ".jpg, .jpeg, .png";
         return InputControl;
     }
     SaveOptions(ObjectF = {}) {
@@ -646,7 +750,7 @@ class WForm extends HTMLElement {
         }
         return DivOptions;
     }
-    Save = async (ObjectF) => {
+    Save = async (ObjectF = this.FormObject) => {
         if (this.ValidateFunction != undefined &&
             this.ValidateFunction.__proto__ == Function.prototype) {
             const response = this.ValidateFunction(ObjectF);
@@ -655,40 +759,8 @@ class WForm extends HTMLElement {
                 return;
             }
         }
-        if (this.DataRequire == true) {
-            for (const prop in ObjectF) {
-                if (!prop.includes("_hidden") && this.ModelObject[prop]?.require) {
-                    const control = this.shadowRoot.querySelector("#ControlValue" + prop);
-                    if ((ObjectF[prop] == null || ObjectF[prop] == "") && control != null) {
-                        WRender.SetStyle(control, {
-                            boxShadow: "0 0 3px #ef4d00"
-                        });
-                        const toolTip = WRender.Create({
-                            tagName: "span",
-                            innerHTML: WOrtograficValidation.es(prop) + ` es requerida`,
-                            className: "ToolTip"
-                        })
-                        control.parentNode.append(toolTip);
-                        control.focus();
-                        return;
-                    } else if (control != null && control.pattern) {
-                        let regex = new RegExp(control.pattern);
-                        if (!regex.test(ObjectF[prop])) {
-                            if (!control.parentNode.querySelector(".ToolTip")) {
-                                control.parentNode.append(WRender.Create({
-                                    tagName: "span",
-                                    innerHTML: `Ingresar formato correcto: ${control.placeholder}`,
-                                    className: "ToolTip"
-                                }));
-                            }
-                            WRender.SetStyle(control, {
-                                boxShadow: "0 0 3px #ef4d00"
-                            });
-                            return;
-                        }
-                    }
-                }
-            }
+        if (!this.Validate(ObjectF)) {
+            return;
         }
         if (this.ObjectOptions.Url != undefined) {
             const ModalCheck = this.ModalCheck(ObjectF);
@@ -699,6 +771,60 @@ class WForm extends HTMLElement {
             }
         }
     }
+    Validate = (ObjectF) => {
+        if (this.DataRequire == true) {
+            for (const prop in ObjectF) {
+                if (!prop.includes("_hidden") && this.ModelObject[prop]?.require) {
+                    const control = this.shadowRoot.querySelector("#ControlValue" + prop);
+                    if (this.ModelObject[prop]?.type == "MODEL") {
+                        //console.log(control.Validate(control.FormObject));
+                        if (!control.Validate(control.FormObject)) {
+                            return false;
+                        }
+                    } else if (this.ModelObject[prop]?.type == "MASTERDETAIL") {
+                        if (this.ModelObject[prop]?.MaxRequired
+                            && ObjectF[prop].length > this.ModelObject[prop]?.MaxRequired) {
+                            this.createAlertToolTip(control, `El máximo de registros permitidos es `
+                                + this.ModelObject[prop]?.MaxRequired);
+                            return false;
+                        }
+                        if (this.ModelObject[prop]?.MinimunRequired
+                            || ObjectF[prop].length < this.ModelObject[prop]?.MinimunRequired) {
+                            this.createAlertToolTip(control, `El mínimo de registros permitidos es `
+                                + this.ModelObject[prop]?.MinimunRequired);
+                            return false;
+                        }
+
+                    } else if ((ObjectF[prop] == null || ObjectF[prop] == "") && control != null) {
+                        this.createAlertToolTip(control, WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ` es requerido`);
+                        return false;
+                    } else if (control != null && control.pattern) {
+                        let regex = new RegExp(control.pattern);
+                        if (!regex.test(ObjectF[prop])) {
+                            this.createAlertToolTip(control, `Ingresar formato correcto: ${control.placeholder}`);
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    createAlertToolTip(control, message) {
+        if (!control.parentNode.querySelector(".ToolTip")) {
+            const toolTip = WRender.Create({
+                tagName: "span",
+                innerHTML: message,
+                className: "ToolTip"
+            });
+            control.parentNode.append(toolTip);
+        }
+        WRender.SetStyle(control, {
+            boxShadow: "0 0 3px #ef4d00"
+        });
+        control.focus();
+    }
+
     ModalCheck(ObjectF) {
         const ModalCheck = new WModalForm({
             ObjectModal: [
@@ -748,14 +874,13 @@ class WForm extends HTMLElement {
         }
     }
     FormStyle = () => {
-        console.log(this.DivColumns);
         const style = css`
             .ContainerFormWModal {
                 font-family: 'Montserrat-Medium', sans-serif !important;
             }
             .divForm {
                 display: grid;
-                grid-template-columns: "auto auto";
+                grid-template-columns: ${this.DivColumns};
                 grid-template-rows: auto;
                 height: calc(100% - 70px);
             }
@@ -776,6 +901,7 @@ class WForm extends HTMLElement {
                 background-image: none !important;
                 color: -internal-light-dark(black, white) !important;
             }
+
 
             .DivSaveOptions {
                 margin-top: 10px;
@@ -825,14 +951,22 @@ class WForm extends HTMLElement {
             .inputTitle {
                 padding: 2px;
                 display: block;
-                text-align: center;
+                text-align: left;
                 font-weight: bold;
-                text-transform: capitalize;
                 margin: 0 0 15px 0;
+            }
+            .inputTitle::first-letter {
+                text-transform: capitalize;
+            }
+
+            .formHeader{
+                color: #1c4786;
+                text-transform: uppercase;
+                margin-top: 40px;
             }
 
             .radioCheckedControl{
-                display: flex; 
+                display: flex;
                 align-items: center;
                 justify-content: flex-end;
                 flex-direction: row-reverse;
@@ -861,7 +995,7 @@ class WForm extends HTMLElement {
                 box-shadow: inset 1em 1em var(--form-control-color);
                 transform-origin: bottom left;
                 clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-            }           
+            }
 
             input[type=checkbox]:checked::before {
                 content: " ";
@@ -876,7 +1010,7 @@ class WForm extends HTMLElement {
 
             .ToolTip {
                 position: absolute;
-                padding: 5px 15px;               
+                padding: 5px 15px;
                 border-radius: 0.3cm;
                 left: 10px;
                 bottom: -10px;
@@ -884,28 +1018,16 @@ class WForm extends HTMLElement {
                 font-weight: 500;
                 color: rgb(227, 0, 0);
             }
-            .ToolTip::first-letter{                
-                text-transform: capitalize;                
+            .ToolTip::first-letter{
+                text-transform: capitalize;
             }
             .draw-canvas {
                 border: 2px dotted #CCCCCC;
                 border-radius: 5px;
                 cursor: crosshair;
             }
-
-            .ModalHeader {
-                color: ${this.DarkMode ? "#fff" : "#444"};
-                font-weight: bold;
-                font-size: 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 30px;
-                margin-top: 10px;
-            }
-
             .ModalElement {
-                padding: 10px;
+                padding: 10px 0px;
                 border-radius: 5px;
                 position: relative;
             }
@@ -955,6 +1077,25 @@ class WForm extends HTMLElement {
                 overflow: hidden;
                 display: block;
             }
+            .contentLabelFile {
+                display: flex;
+                width: 100%;
+                justify-content: flex-start;
+                align-items: center;
+            }
+            .contentLabelFile .LabelFile{
+                margin: 0 20px 0 0;
+                padding: 10px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+            }
+            .labelIcon{
+                height: 16px;
+                width: 16px;
+                filter: invert(1);
+                margin-left: 10px;
+            }
 
             @media (max-width: 800px) {
                 .divForm {
@@ -985,20 +1126,16 @@ class WForm extends HTMLElement {
     }
 }
 const ModalVericateAction = (Action, title) => {
-    const ModalCheck = new WModalForm({
+    const ModalCheck = new WSimpleModalForm({
+        title: "AVISO",
         ObjectModal: [
             WRender.Create({ tagName: "h3", innerText: title ?? "¿Esta seguro que desea guardar este registro?" }),
             WRender.Create({
                 style: { textAlign: "center" },
                 children: [
                     WRender.Create({
-                        tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async () => {
+                        tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {
                             await Action();
-                            ModalCheck.close();
-                        }
-                    }),
-                    WRender.Create({
-                        tagName: 'input', type: 'button', className: 'Btn', value: 'NO', onclick: async () => {
                             ModalCheck.close();
                         }
                     })
@@ -1008,5 +1145,23 @@ const ModalVericateAction = (Action, title) => {
     });
     return ModalCheck;
 }
+const ModalMessege = (message, detail = "") => {
+    const ModalCheck = new WSimpleModalForm({
+        title: message,
+        ObjectModal: [WRender.Create({ tagName: 'p', class: "modalP", innerText: detail }), WRender.Create({
+            style: { textAlign: "center" },
+            children: [WRender.Create({
+                tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {
+                    ModalCheck.close();
+                }
+            }), css`
+                .modalP{
+                    text-align: center;
+                }
+            `]
+        })]
+    });
+    return ModalCheck;
+}
 customElements.define('w-form', WForm);
-export { WForm, ModalVericateAction }
+export { WForm, ModalVericateAction, ModalMessege }

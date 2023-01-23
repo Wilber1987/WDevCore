@@ -12,9 +12,15 @@ class CardModel {
 }
 
 class WCardCarousel extends HTMLElement {
-    constructor(Dataset = []) {
+    constructor(Dataset = [], Config = {
+        ActionFunction:()=>{},
+        url: "http://.."
+    }) {
         super();
         this.attachShadow({ mode: 'open' });
+        for (const p in Config) {
+            this[p] = Config[p];
+        }
         this.Container = WRender.createElement({ type: 'div', props: { class: 'Links' }, children: [] });
         this.CarouselDiv = WRender.createElement({ type: 'div', props: { class: 'CarouselDiv' }, children: [] });
         this.beforeLink = WRender.createElement({ type: 'a', props: { onclick: this.myFunctionPrev, class: "beforeLink", innerText: '<' } });
@@ -30,9 +36,10 @@ class WCardCarousel extends HTMLElement {
         }
         this.DrawCardCarousel();
     }
-    DrawCardCarousel = async () => {
-        this.Dataset.forEach((element, index) => {
-            const Card = WRender.createElement(new WCard(element, this.CardType, this.ActionFunction));
+    DrawCardCarousel = async (Dataset = this.Dataset) => {
+        this.CarouselDiv.innerHTML = "";
+        Dataset.forEach((element, index) => {
+            const Card = new WCard(element, this.CardType, this.ActionFunction, this.url);
             this.CarouselDiv.append(Card);
         });
     }
@@ -128,10 +135,10 @@ class WCard extends HTMLElement {
         }))
        
         element.picture = element.picture ?? WIcons.UserIcon
-        console.log( element.picture);
+        //console.log( element.picture);
         const Figure = WRender.createElement({
             type: 'img',
-            props: { class: 'fotoColaborador', src: (url ?? cadenaB64) + element.picture }
+            props: { class: 'fotoColaborador', src: (url ?? cadenaB64) + "/" + element.picture }
         });
         this.ActionFunction = ActionFunction;
         switch (CardType) {
@@ -151,7 +158,7 @@ class WCard extends HTMLElement {
                     }
                 },
                 { type: 'label', props: { innerText: element.subtitulo } },
-                { type: 'label', props: { innerText: element.descripcion } }
+                //{ type: 'label', props: { innerText: element.descripcion } }
             ]
         })
         if (this.ActionFunction != undefined) {
@@ -183,13 +190,18 @@ class WCard extends HTMLElement {
                     padding: 10,
                     margin: 0,
                     "font-weight": "bold",
-                    "font-size": 20,
+                    "font-size": 18,
+                    "text-align": "center",
                 }), new WCssClass(`.Details`, {
-                    display: "flex",
+                    display: "grid",
                     "flex-direction": "column",
                     "justify-content": "center",
                     "align-items": "center",
-                    "margin-top": 10
+                    "margin-top": 10,
+                    "grid-template-rows": "50px 50px 40px",
+                    "grid-template-columns": "100%",
+                    "text-align": "center",
+                    width: "100%"
                 }), new WCssClass(`.CardElement .Details p`, {
                     height: 75,
                     overflow: "hidden",

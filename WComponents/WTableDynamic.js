@@ -1,13 +1,14 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import "./WChartJSComponents.js";
-import "./WModalForm.js";
+import { WModalForm } from "./WModalForm.js";
 import { WTableComponent } from "./WTableComponent.js";
-import {  WFilterOptions } from "./WFilterControls.js";
+import { WFilterOptions } from "./WFilterControls.js";
 class WTableDynamicComp extends HTMLElement {
     constructor(TableConfig = {}) {
         super();
         this.TableClass = "WTable WScroll";
+        this.className = "DinamicContainer";
         this.Dataset = [];
         this.TableConfig = TableConfig;
         this.groupParams = this.TableConfig.groupParams ?? [];
@@ -16,7 +17,7 @@ class WTableDynamicComp extends HTMLElement {
         this.EvalValue = this.TableConfig.EvalValue ?? null;
         this.AttNameEval = this.TableConfig.AttNameEval ?? null;
         this.OperationsType = "sum";//"sum" count;
-        
+
         this.attachShadow({ mode: "open" });
         this.MainTable = WRender.createElement({ type: "div", props: { class: this.TableClass, id: "MainTable" + this.id }, children: [] });
         this.divTableContainer = WRender.createElement({
@@ -33,7 +34,7 @@ class WTableDynamicComp extends HTMLElement {
     connectedCallback() {
         if (this.MainTable.innerHTML != "") {
             return;
-        } 
+        }
         this.RunTable();
     }
     RunTable() {
@@ -52,8 +53,7 @@ class WTableDynamicComp extends HTMLElement {
         this.GroupsData = [];
         this.ProcessData = [];
         this.EvalArray = WArrayF.ArrayUnique(this.TableConfig.Dataset, this.AttNameEval);
-        this.className = "DinamicContainer";
-        this.append(WRender.createElement({
+       this.append(WRender.createElement({
             type: 'w-style', props: {
                 id: '', ClassList: [
                     new WCssClass(`.DinamicContainer`, {
@@ -71,12 +71,12 @@ class WTableDynamicComp extends HTMLElement {
                     }),
                 ]
             }
-        }));  
+        }));
         this.GridTC = "1/3";
         if (this.TableConfig.DisplayOptions != false) {
             this.GridTC = "1/2";
             this.shadowRoot.append(WRender.createElement(this.TableOptions()));
-        } 
+        }
         this.TableStyle = WRender.createElement(this.TableStyleDinamic());
         this.shadowRoot.append(this.TableStyle);
         this.shadowRoot.append(this.divTableContainer);
@@ -147,7 +147,7 @@ class WTableDynamicComp extends HTMLElement {
                         }
                     });
                     let sum = 0;
-                    dataGroup.children.forEach(element => {                    
+                    dataGroup.children.forEach(element => {
                         const value = parseFloat(element.children[0]);
                         if (typeof value === "number" && value.toString() != "NaN") {
                             sum = sum + value;
@@ -210,7 +210,7 @@ class WTableDynamicComp extends HTMLElement {
             props: {
                 id: "Select" + this.id, class: "titleParam", onchange: (ev) => {
                     this.OperationsType = ev.target.value;
-                    this.DefineTable(); 
+                    this.DefineTable();
                 }
             }, children: [
                 { type: "option", props: { innerText: "Value - Suma", value: "sum" } },
@@ -282,14 +282,11 @@ class WTableDynamicComp extends HTMLElement {
                 }, {//filters
                     type: 'button', props: {
                         class: 'BtnDinamictT', innerText: '', onclick: async () => {
-                            this.shadowRoot.append(WRender.createElement({
-                                type: "w-modal-form",
-                                props: {
-                                    title: "Filtros",
-                                    ObjectModal: this.FilterControl,
-                                    ObjectOptions: {
-                                        SaveFunction: (NewObject) => { }
-                                    }
+                            this.shadowRoot.append(new WModalForm({
+                                title: "Filtros",
+                                ObjectModal: this.FilterControl,
+                                ObjectOptions: {
+                                    SaveFunction: (NewObject) => { }
                                 }
                             }));
                         }
@@ -297,16 +294,13 @@ class WTableDynamicComp extends HTMLElement {
                 }, {//Data
                     type: 'button', props: {
                         class: 'BtnDinamictT', innerText: '', onclick: async () => {
-                            this.shadowRoot.append(WRender.createElement({
-                                type: "w-modal-form",
-                                props: {
-                                    title: "Datos",
-                                    ObjectModal: new WTableComponent({
-                                        Dataset: this.TableConfig.Dataset,
-                                        Options: { Search: true }
-                                    }), ObjectOptions: {
-                                        SaveFunction: (NewObject) => { }
-                                    }
+                            this.shadowRoot.append(new WModalForm({
+                                title: "Datos",
+                                ObjectModal: new WTableComponent({
+                                    Dataset: this.TableConfig.Dataset,
+                                    Options: { Search: true }
+                                }), ObjectOptions: {
+                                    SaveFunction: (NewObject) => { }
                                 }
                             }));
                         }
@@ -318,8 +312,8 @@ class WTableDynamicComp extends HTMLElement {
                             const MainChart = this.ChartContainer.querySelector("w-colum-chart");
                             const PrintNode = MainTable + MainChart.shadowRoot.innerHTML;
                             //console.log(PrintNode);
-                            const ventimp =  window.open(' ', 'popimpr');
-                            ventimp.document.write( PrintNode );
+                            const ventimp = window.open(' ', 'popimpr');
+                            ventimp.document.write(PrintNode);
                             ventimp.document.close();
                             ventimp.print();
                             ventimp.close();
@@ -491,7 +485,7 @@ class WTableDynamicComp extends HTMLElement {
         return new WFilterOptions({
             Dataset: this.TableConfig.Dataset,
             DisplayFilts: this.DisplayFilts,
-            FilterFunction: (DFilt)=>{
+            FilterFunction: (DFilt) => {
                 this.DefineTable(DFilt);
             }
         })
@@ -536,8 +530,8 @@ class WTableDynamicComp extends HTMLElement {
                         //transition: "all 1s"
                     }), new WCssClass(`.tableContainer`, {
                         overflow: "auto",
-                        "grid-row": "1/2" ,
-                        "grid-column":  this.GridTC
+                        "grid-row": "1/2",
+                        "grid-column": this.GridTC
                     }), new WCssClass(`.WTable`, {
                         "font-family": "Verdana, sans-serif",
                         width: "100%",
@@ -729,7 +723,7 @@ class WTableDynamicComp extends HTMLElement {
                     //CHART.....
                     new WCssClass(`.CharttableReport`, {
                         "grid-row": "2/3",
-                        "grid-column": this.GridTC 
+                        "grid-column": this.GridTC
                     }),
                 ],
                 MediaQuery: [{

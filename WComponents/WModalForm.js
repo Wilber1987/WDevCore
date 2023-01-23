@@ -1,6 +1,6 @@
 import { WRender, WAjaxTools, ComponentsManager } from "../WModules/WComponentsTools.js";
-import { WCssClass } from "../WModules/WStyledRender.js";
-import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.JS";
+import { css, WCssClass } from "../WModules/WStyledRender.js";
+import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 let photoB64;
 class ModalConfig {
     ShadowRoot = null;
@@ -11,6 +11,8 @@ class ModalConfig {
     ObjectDetail = undefined;
     EditObject = undefined;
     UserActions = undefined;
+    ObjectModal = undefined;
+    CloseOption = false;
     ModelObject = {
         property: undefined,
         Operation: {
@@ -50,17 +52,17 @@ class WModalForm extends HTMLElement {
     connectedCallback() {
         if (this.innerHTML != "") {
             return;
-        } //NO MODAL 
+        } //NO MODAL
         if (this.ShadowRoot) {
             this.attachShadow({ mode: "open" });
-            this.shadowRoot.append(WRender.createElement(StyleScrolls.cloneNode(true)));
-            this.shadowRoot.append(WRender.createElement(StylesControlsV2.cloneNode(true)));
+            this.shadowRoot.append(StyleScrolls.cloneNode(true));
+            this.shadowRoot.append(StylesControlsV2.cloneNode(true));
             this.shadowRoot.append(WRender.createElement(this.FormStyle()));
         } else {
             this.append(WRender.createElement(this.FormStyle()));
         }
         //NO MODAL
-        this.append(WRender.createElement(StyleScrolls));
+        this.append(StyleScrolls.cloneNode(true));
         this.append(WRender.createElement({
             type: "w-style",
             props: {
@@ -76,7 +78,7 @@ class WModalForm extends HTMLElement {
                         "bottom": "0px !important",
                         "transition": "all linear 1s",
                         "box-shadow": "0 0px 1px 0px #000",
-                        "z-index": "200 !important",
+                        "z-index": "20000 !important",
                         "overflow-y": "auto",
                         "padding-bottom": this.StyleForm == "FullScreen" ? 0 : 50
                     })
@@ -110,32 +112,29 @@ class WModalForm extends HTMLElement {
         }
         this.className = "ModalContentWModal";
         this.Modal = {
-            type: "div",
-            props: {
-                class: "ContainerFormWModal"
-            },
+            class: "ContainerFormWModal",
             children: []
         };
         this.Modal.children.push(this.DrawModalHead());
         if (this.ObjectModal) { //AGREGA UN OBJETO AL MODAL ENVIDO DESDE LA CONFIGURACION
-            this.Modal.children.push({ type: "div", props: { class: "ObjectModalContainer" }, children: [this.ObjectModal] });
+            const modalOb = this.ObjectModal.tagName ? WRender.Create(this.ObjectModal) : WRender.createElement(this.ObjectModal)
+            this.Modal.children.push({ class: "ObjectModalContainer", children: [modalOb] });
         } else if (this.ObjectDetail || this.ModelObject || this.EditObject) { // MUESTRA EL DETALLE DE UN OBJETO EN UNA LISTA
             const { WForm } = await import("./WForm.js");
             this.Config.SaveFunction = (ObjectF) => {
-                if (this.ObjectOptions != undefined) {
+                if (this.ObjectOptions != undefined) {  /**TODO REVISAR */
                     if (this.ObjectOptions.SaveFunction != undefined) {
                         this.ObjectOptions.SaveFunction(ObjectF);
                     }
                 }
                 this.close();
             }
-
-            this.Modal.children.push({ type: "div", props: { class: "ModalContent" }, children: [new WForm(this.Config)] });
+            this.Modal.children.push({ class: "ModalContent", children: [new WForm(this.Config)] });
         }
         if (this.ShadowRoot) {
-            this.shadowRoot.append(WRender.createElement(this.Modal));
+            this.shadowRoot.append(WRender.Create(this.Modal));
         } else {
-            this.append(WRender.createElement(this.Modal));
+            this.append(WRender.Create(this.Modal));
         }
         ComponentsManager.modalFunction(this)
     }
@@ -165,10 +164,13 @@ class WModalForm extends HTMLElement {
             type: 'div',
             props: { className: "ModalHeader" },
             children: [
-                icon, { type: "label", props: { innerText: this.title } }, InputClose
+                icon, { type: "label", props: { innerText: this.title } }
             ]
         };
-        return Section;
+        if (this.CloseOption != false) {
+             Section.children.push(InputClose)
+        }       
+        return WRender.createElement(Section);
     }
     close = () => {
         ComponentsManager.modalFunction(this);
@@ -184,7 +186,7 @@ class WModalForm extends HTMLElement {
                 ClassList: [
                     new WCssClass(" .ContainerFormWModal", {
                         "display": "grid",
-                        "grid-template-rows": "70px calc(100% - 70px)" ,
+                        "grid-template-rows": "70px calc(100% - 70px)",
                         //"overflow": "hidden",
                         "margin": "auto",
                         "margin-top": this.StyleForm == "FullScreen" ? 0 : 30,
@@ -196,12 +198,13 @@ class WModalForm extends HTMLElement {
                         "border-radius": "0.3cm",
                         "position": "relative",
                         "box-shadow": "0 0px 3px 0px #000",
+                        padding: "0 0 50px 0"
 
                     }), new WCssClass(" .ContainerFormWModal h2", {
                         "padding": "10px",
                         "margin": "0px",
                         "background": "#09f",
-                    }), new WCssClass(` .ContainerFormWModal h1, 
+                    }), new WCssClass(` .ContainerFormWModal h1,
                          .ContainerFormWModal h3,
                          .ContainerFormWModal h4, .ContainerFormWModal h5`, {
                         display: "block",
@@ -211,8 +214,9 @@ class WModalForm extends HTMLElement {
                     }), new WCssClass(`.ModalContent`, {
                         //height: 'calc(100% - 60px)',
                         //overflow: "hidden",
-                        "overflow-y": "auto",
-                        display: "block"
+                        //"overflow-y": "auto",
+                        display: "block",
+                        padding: 30
                     }),
                     //encabezado
                     new WCssClass(` .ModalHeader`, {
@@ -220,17 +224,19 @@ class WModalForm extends HTMLElement {
                         "font-weight": "bold",
                         "font-size": "20px",
                         "display": "flex",
-                        "justify-content": "space-between",
+                        "justify-content": "center",
                         "align-items": "center",
-                        padding: "20px 30px",
+                        padding: "40px 30px 20px 30px",
                         "margin-bottom": "20px",
-                        "box-shadow": "0 0px 3px 0px #000"
+                        "text-transform": "uppercase",
+                        position: "relative"
                     }), new WCssClass(` .ModalElement`, {
                         "background-color": "#4da6ff",
                         padding: 10,
                         "border-radius": 5
                     }), new WCssClass(` .BtnClose`, {
                         "font-size": "18pt",
+                        position: "absolute",
                         "color": "#b9b2b3",
                         "cursor": "pointer",
                         "width": "30px",
@@ -239,7 +245,9 @@ class WModalForm extends HTMLElement {
                         "justify-content": "center",
                         "align-items": "center",
                         border: "none",
-                        "background-color": "rgba(0,0,0,0.2)"
+                        "background-color": "unset",
+                        top: 10,
+                        right: 20,
                     }), new WCssClass(` .HeaderIcon`, {
                         "height": "50px",
                         "width": "50px",
@@ -249,15 +257,19 @@ class WModalForm extends HTMLElement {
                         overflow: "hidden",
                         "overflow-y": 'auto',
                         "max-height": "calc(100vh - 120px)",
-                        height: "100%"
+                        height: "100%",
+                        width: "90%",
+                        margin: "auto",
+                        "margin-bottom": 20,
+                        "text-align": "center"
                     }),
                 ], MediaQuery: [{
                     condicion: "(max-width: 1200px)",
                     ClassList: [new WCssClass(" .ContainerFormWModal", {
                         width: "90%"
-                        
+
                     })]
-                },{
+                }, {
                     condicion: "(max-width: 800px)",
                     ClassList: [new WCssClass(" .ContainerFormWModal", {
                         position: "fixed",
@@ -287,7 +299,125 @@ class WModalForm extends HTMLElement {
         }
         return Style;
     }
-
 }
+
 customElements.define("w-modal-form", WModalForm);
 export { WModalForm }
+
+class WSimpleModalForm extends HTMLElement {
+    constructor(Config = (new ModalConfig())) {
+        super();
+        this.attachShadow({ mode: "open" });
+        this.append(this.modalStyle);
+        this.shadowRoot.append(StyleScrolls.cloneNode(true));
+        this.shadowRoot.append(StylesControlsV2.cloneNode(true));
+        this.shadowRoot.append(this.FormStyle());
+        this.Modal = WRender.Create({ class: "ContainerFormWModal" });
+        this.shadowRoot.append(this.Modal);
+        for (const p in Config) {
+            this[p] = Config[p];
+        }
+        this.DrawComponent();
+
+    }
+    connectedCallback() { }
+    DrawComponent = async () => {
+        this.Modal.append(this.DrawModalHead());
+        if (this.ObjectModal) { //AGREGA UN OBJETO AL MODAL ENVIDO DESDE LA CONFIGURACION
+            this.Modal.append(WRender.Create({ class: "ObjectModalContainer", children: [this.ObjectModal] }));
+        } else {
+            this.Modal.append("definir contenido");
+        }
+        ComponentsManager.modalFunction(this)
+    }
+    DrawModalHead() {
+        const InputClose = WRender.Create({
+            tagName: 'button',
+            class: 'BtnClose', //class: 'Btn',
+            onclick: this.close
+        });
+        console.log(this.title);
+        const Section = WRender.Create({
+            className: "ModalHeader",
+            innerHTML: this.title
+        });
+        Section.append(InputClose);
+        return Section;
+    }
+    close = () => {
+        ComponentsManager.modalFunction(this);
+        setTimeout(() => {
+            this.parentNode.removeChild(this);
+        }, 1000);
+    }
+    //STYLES----------------------------------------------------------------->
+    modalStyle = css`
+        w-simple-modal{
+            position: fixed;
+            background-color: rgba(255, 255, 255, 0.25);
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, .5);
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+   `
+    FormStyle = () => {
+        return css`
+            :root {
+                --color-primary: rgb(53, 128, 226);
+                --color-secundary: rgb(255, 25, 133);
+                --color-terciario: rgb(52, 12, 56);
+            }
+
+            .ContainerFormWModal {
+                display: flex;
+                flex-direction: column;
+                top: 80px;
+                margin: auto;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 0 5px 0 #999;
+                width: 500px;
+                position: absolute;
+                left: 50%;
+                transform: translate(-50%, 0%);
+                padding: 2em;
+                background: white;
+                border-radius: 20px;
+
+
+                /*ESTILO PSICO*/
+                border-radius: 2cm;
+                border: 3px solid var(--color-primary);
+                padding: 40px;
+                text-align: center;
+
+            }
+
+            .BtnClose{
+                right: 50px;
+                text-align: center;
+                top: 10px;
+            }
+
+            .ModalHeader {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-transform: uppercase;
+                font-weight: 500;
+                color: #1c4786;
+                font-size: 20px;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+        `;
+    }
+}
+
+customElements.define("w-simple-modal", WSimpleModalForm);
+export { WSimpleModalForm }

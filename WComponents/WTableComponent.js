@@ -1,6 +1,7 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
+import { ModalVericateAction } from "./WForm.js";
 import { WModalForm } from "./WModalForm.js";
 import { WToolTip } from "./WMultiSelect.js";
 class TableConfig {
@@ -186,7 +187,7 @@ class WTableComponent extends HTMLElement {
                         props: {
                             class: "BtnTableSR",
                             type: "button",
-                            innerText: "Add+",
+                            innerText: "Nuevo",
                             onclick: async () => {
                                 if (this.Options.AddFunction)
                                     this.Options.AddFunction();
@@ -249,7 +250,7 @@ class WTableComponent extends HTMLElement {
                             }
                         }
                     };
-                    if (element[prop] != null && parseFloat(element[prop].toString().replaceAll("%", "").replaceAll(Money[this.TypeMoney], "")).toString() != "NaN") {
+                    if (this.isSorteable(element, prop)) {
                         th.children.push(BtnU);
                         th.children.push(BtnD);
                     }
@@ -259,7 +260,7 @@ class WTableComponent extends HTMLElement {
         }
         if (this.Options != undefined) {
             if (this.TrueOptions()) {
-                const Options = { type: "th", props: { class: "" }, children: ["Options"] };
+                const Options = { type: "th", props: { class: "" }, children: ["Opciones"] };
                 tr.children.push(Options);
             }
         }
@@ -280,8 +281,9 @@ class WTableComponent extends HTMLElement {
                     let IsColor = false;
                     let IsMultiSelect = false;
                     let IsModel = false;
-                    ({ IsImage, value, IsColor, IsMultiSelect, IsModel } = this.EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect));
-                    //DEFINICION DE VALORES-------------                    
+                    let IsOperation = false;
+                    ({ IsImage, value, IsColor, IsMultiSelect, IsModel, IsOperation } = this.EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect, IsOperation));
+                    //DEFINICION DE VALORES-------------
                     if (IsImage) {
                         const image = WRender.Create({
                             type: "td", props: { class: "tdImage" },
@@ -306,6 +308,13 @@ class WTableComponent extends HTMLElement {
                             tagName: "td", className: "cardTable", children: [
                                 new WCardTable(element[prop], Model[prop].ModelObject, this.TableConfig)
                             ]
+                        }));
+                    }  else if (IsOperation) {
+                        tr.append(WRender.createElement({
+                            type: "td", props: {
+                                style: "text-align: right",
+                                innerHTML: `${Money[this.TypeMoney]} ${  Model[prop].action(element)}`
+                            }
                         }));
                     } else if (this.IsMoney(prop)) {
                         tr.append(WRender.createElement({
@@ -335,17 +344,19 @@ class WTableComponent extends HTMLElement {
                         });
                         tr.append(WRender.Create({
                             tagName: "td", className: "tdAcordeon", innerHTML:
-                                "<label class='LabelTd'> Elementos " + element[prop].length + ": </label>" +
+                                //"<label class='LabelTd'>" + element[prop].length + " Elementos: </label>" +
                                 `${element[prop].map(object => {
                                     const FObject = Model[prop].Dataset.find(i => WArrayF.compareObj(object, i));
-                                    const label = FObject.Descripcion ?? FObject.descripcion ?? FObject;
+                                    const label = FObject?.Descripcion ?? FObject?.descripcion ?? FObject;
                                     return `<label class="labelMultiselect">${label}</label>`;
                                 }).join('')}`
                         }));
-                    } else if (typeof value === "number") {
-                        tr.append(WRender.createElement({ type: "td", props: { innerHTML: value.toFixed(2) } }));
-                    } else {
-                        tr.append(WRender.createElement({ type: "td", props: { innerHTML: value } }));
+                    } /* else if (this.IsNumber(element, prop)) {
+                        const label = WRender.Create({ tagName: 'label', innerText: parseFloat(value) })
+                        tr.append(WRender.Create({ tagName: "td",   style: "text-align: right", children: [label] }));
+                     }*/ else {
+                        const label = WRender.Create({ tagName: 'label', innerText: value })
+                        tr.append(WRender.Create({ tagName: "td", children: [label] }));
                     }
                 }
             }
@@ -422,13 +433,17 @@ class WTableComponent extends HTMLElement {
         this.shadowRoot.append(WRender.createElement(this.MediaStyleResponsive()));
         return tbody;
     }
+
     notIsDrawableRow(element, prop) {
-        return (this.ModelObject[prop].type == undefined || this.ModelObject[prop].hiddenInTable == true)
-            || element[prop].__proto__ == Function.prototype
-            || element[prop].__proto__.constructor.name == "AsyncFunction";
+        if (this.TableConfig.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
+            return false;
+        }
+        return (this.ModelObject[prop]?.type == undefined || this.ModelObject[prop]?.hiddenInTable == true)
+            || element[prop]?.__proto__ == Function.prototype
+            || element[prop]?.__proto__.constructor.name == "AsyncFunction";
     }
 
-    EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect, IsModel) {
+    EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect, IsModel, IsOperation) {
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
@@ -453,11 +468,14 @@ class WTableComponent extends HTMLElement {
                 case "MODEL":
                     IsModel = true;
                     break;
+                case "OPERATION":
+                    IsOperation = true;
+                    break;
                 default:
                     break;
             }
         }
-        return { IsImage, value, IsColor, IsMultiSelect, IsModel };
+        return { IsImage, value, IsColor, IsMultiSelect, IsModel, IsOperation };
     }
 
     DeleteBTN(Options, element, tr) {
@@ -469,23 +487,14 @@ class WTableComponent extends HTMLElement {
                     class: "BtnTableA",
                     type: "button",
                     onclick: async () => {
-                        this.shadowRoot.append(
-                            new WModalForm({
-                                icon: this.TableConfig.icon,
-                                title: "Eliminar",
-                                id: "Alert" + this.id,
-                                ObjectModal: { type: "h5", children: ["¿Esta seguro de eliminar este elemento?"] },
-                                ObjectOptions: {
-                                    Url: this.Options.UrlDelete,
-                                    SaveFunction: () => {
-                                        const index = Dataset.indexOf(element);
-                                        if (WArrayF.FindInArray(element, Dataset) == true) {
-                                            Dataset.splice(index, 1);
-                                            tr.parentNode.removeChild(tr);
-                                        } else { console.log("No Object"); }
-                                    }
-                                }
-                            }));
+                        this.shadowRoot.append(ModalVericateAction(() => {
+                            const index = this.Dataset.indexOf(element);
+                            if (WArrayF.FindInArray(element, this.Dataset) == true) {
+                                this.Dataset.splice(index, 1);
+                                //tr.parentNode.removeChild(tr);
+                                this.DrawTable();
+                            } else { console.log("No Object"); }
+                        }, "¿Esta seguro de eliminar este elemento?"));
                     }
                 }
             });
@@ -576,7 +585,8 @@ class WTableComponent extends HTMLElement {
                             }
                             this.DrawTable();
                         } else {
-                            this.DrawTRow(tr, element);
+                            //this.DrawTRow(tr, element);
+                            this.DrawTable();
                         }
                     }
                 }
@@ -625,6 +635,11 @@ class WTableComponent extends HTMLElement {
             this.Options.UserActions != undefined;
     }
 
+    isSorteable(element, prop) {
+        return element[prop] != null &&
+        parseFloat(element[prop].toString().replaceAll("%", "").replaceAll(Money[this.TypeMoney], "")).toString() != "NaN";
+    }
+
     IsMoney(prop) {
         return prop.toUpperCase().includes("TOTAL")
             || prop.toUpperCase().includes("MONTO")
@@ -636,6 +651,12 @@ class WTableComponent extends HTMLElement {
             || prop.toUpperCase().includes("TAXT")
             || prop.toUpperCase().includes("P/U")
             || prop.toUpperCase().includes("P-U");
+    }
+
+    IsNumber(element, prop) {
+        return  element[prop] != null &&
+            parseFloat(element[prop]).toString() != "NaN";
+
     }
 
     IsImage(prop) {
@@ -727,7 +748,7 @@ class WTableComponent extends HTMLElement {
         });
         return tfooter;
     }
-    //#endregion fin tabla basica   
+    //#endregion fin tabla basica
     //#region ESTILOS-------------------------------------------------------------------------------------------
     MediaStyleResponsive() {
         if (this.shadowRoot.querySelector("MediaStyleResponsive" + this.id)) {
@@ -793,9 +814,14 @@ class WTableComponent extends HTMLElement {
                 text-align: left;
             }
 
+            .WTable th label::first-letter{
+                text-transform: uppercase;
+            }
+
             .WTable td {
-                padding: 0.25rem 0.8rem;
+                padding: 0.8rem;
                 text-align: left;
+                vertical-align: top;
             }
 
             .WTable .tdAction {
@@ -836,7 +862,7 @@ class WTableComponent extends HTMLElement {
                 flex-wrap: wrap;
                 overflow: hidden;
                 align-items: center;
-                justify-content: flex-start;                
+                justify-content: flex-start;
             }
             .thOptions {
                 display: flex;
@@ -979,6 +1005,7 @@ class WTableComponent extends HTMLElement {
                 font-size: 9px;
                 overflow: hidden;
                 margin: 5px;
+                width: 100%
             }
 
             .BtnTable,.BtnTableA,.BtnTableS,.BtnTableSR {
@@ -1029,6 +1056,7 @@ class WTableComponent extends HTMLElement {
                 margin: auto;
                 object-fit: cover;
                 box-shadow: 0 2px 5px 0 rgb(0 0 0 / 30%);
+                margin: 10px;
             }
 
             *::-webkit-scrollbar-thumb {
@@ -1074,7 +1102,7 @@ const WIcons = {
     edit: "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjUxMnB0IiB2aWV3Qm94PSIwIDAgNTEyIDUxMSIgd2lkdGg9IjUxMnB0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im00MDUuMzMyMDMxIDI1Ni40ODQzNzVjLTExLjc5Njg3NSAwLTIxLjMzMjAzMSA5LjU1ODU5NC0yMS4zMzIwMzEgMjEuMzMyMDMxdjE3MC42Njc5NjljMCAxMS43NTM5MDYtOS41NTg1OTQgMjEuMzMyMDMxLTIxLjMzMjAzMSAyMS4zMzIwMzFoLTI5OC42Njc5NjljLTExLjc3NzM0NCAwLTIxLjMzMjAzMS05LjU3ODEyNS0yMS4zMzIwMzEtMjEuMzMyMDMxdi0yOTguNjY3OTY5YzAtMTEuNzUzOTA2IDkuNTU0Njg3LTIxLjMzMjAzMSAyMS4zMzIwMzEtMjEuMzMyMDMxaDE3MC42Njc5NjljMTEuNzk2ODc1IDAgMjEuMzMyMDMxLTkuNTU4NTk0IDIxLjMzMjAzMS0yMS4zMzIwMzEgMC0xMS43NzczNDQtOS41MzUxNTYtMjEuMzM1OTM4LTIxLjMzMjAzMS0yMS4zMzU5MzhoLTE3MC42Njc5NjljLTM1LjI4NTE1NiAwLTY0IDI4LjcxNDg0NC02NCA2NHYyOTguNjY3OTY5YzAgMzUuMjg1MTU2IDI4LjcxNDg0NCA2NCA2NCA2NGgyOTguNjY3OTY5YzM1LjI4NTE1NiAwIDY0LTI4LjcxNDg0NCA2NC02NHYtMTcwLjY2Nzk2OWMwLTExLjc5Njg3NS05LjUzOTA2My0yMS4zMzIwMzEtMjEuMzM1OTM4LTIxLjMzMjAzMXptMCAwIi8+PHBhdGggZD0ibTIwMC4wMTk1MzEgMjM3LjA1MDc4MWMtMS40OTIxODcgMS40OTIxODgtMi40OTYwOTMgMy4zOTA2MjUtMi45MjE4NzUgNS40Mzc1bC0xNS4wODIwMzEgNzUuNDM3NWMtLjcwMzEyNSAzLjQ5NjA5NC40MDYyNSA3LjEwMTU2MyAyLjkyMTg3NSA5LjY0MDYyNSAyLjAyNzM0NCAyLjAyNzM0NCA0Ljc1NzgxMiAzLjExMzI4MiA3LjU1NDY4OCAzLjExMzI4Mi42Nzk2ODcgMCAxLjM4NjcxOC0uMDYyNSAyLjA4OTg0My0uMjEwOTM4bDc1LjQxNDA2My0xNS4wODIwMzFjMi4wODk4NDQtLjQyOTY4OCAzLjk4ODI4MS0xLjQyOTY4OCA1LjQ2MDkzNy0yLjkyNTc4MWwxNjguNzg5MDYzLTE2OC43ODkwNjMtNzUuNDE0MDYzLTc1LjQxMDE1NnptMCAwIi8+PHBhdGggZD0ibTQ5Ni4zODI4MTIgMTYuMTAxNTYyYy0yMC43OTY4NzQtMjAuODAwNzgxLTU0LjYzMjgxMi0yMC44MDA3ODEtNzUuNDE0MDYyIDBsLTI5LjUyMzQzOCAyOS41MjM0MzggNzUuNDE0MDYzIDc1LjQxNDA2MiAyOS41MjM0MzctMjkuNTI3MzQzYzEwLjA3MDMxMy0xMC4wNDY4NzUgMTUuNjE3MTg4LTIzLjQ0NTMxMyAxNS42MTcxODgtMzcuNjk1MzEzcy01LjU0Njg3NS0yNy42NDg0MzctMTUuNjE3MTg4LTM3LjcxNDg0NHptMCAwIi8+PC9zdmc+"
 }
 const Money = { Euro: "€", Dollar: "$", Cordoba: "C$" }
-customElements.define("w-table", WTableComponent);
+customElements.define("w-table-basic", WTableComponent);
 export { WTableComponent }
 class WCardTable extends HTMLElement {
     constructor(Element, Model, Config) {
@@ -1098,8 +1126,9 @@ class WCardTable extends HTMLElement {
             value = this.Element[prop];
         }
         if (Model != undefined && Model[prop] != undefined
-            && Model[prop].__proto__ == Object.prototype 
-            && Model[prop].type && !Model[prop]?.hidden && !Model[prop]?.hiddenInTable) {
+            && Model[prop].__proto__ == Object.prototype
+            && Model[prop].type && !Model[prop]?.hidden
+            && !Model[prop]?.hiddenInTable) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
                     this.CardTableContainer.append(createImageObject(value, this.Config));

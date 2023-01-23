@@ -178,7 +178,8 @@ class WAppNavigator extends HTMLElement {
                         "flex-direction": navDirection,
                         padding: "0px 10px",
                         transition: "all 1s",
-                        "justify-content": this.alignItems
+                        "justify-content": this.alignItems,
+                        "flex-wrap": "wrap",
                     }), new WCssClass(`.tab`, {
                         display: "flex",
                         "flex-direction": navDirection,
