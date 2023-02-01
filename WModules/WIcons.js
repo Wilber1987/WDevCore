@@ -8,4 +8,10 @@ const WIcons = {
     RowDown: Origin + "/downRow.svg",
     RowWhiteDown: Origin + "/downWhiteRow.svg"
 }
-export { WIcons };
+const WIconsPath = {
+    close: "clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);",
+    leftRow: "clip-path: polygon(50% 0%, 100% 0%, 50% 50%, 100% 100%, 50% 100%, 0% 50%);",
+    rightRow: "clip-path: polygon(0% 0%, 50% 0%, 100% 50%, 50% 100%, 0% 100%, 50% 50%);",
+    downRow: "clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);"
+}
+ export { WIcons , WIconsPath};
