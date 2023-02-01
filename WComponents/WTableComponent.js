@@ -32,6 +32,9 @@ class WTableComponent extends HTMLElement {
         this.TableConfig = Config ?? {};
     }
     connectedCallback() {
+        this.Draw();
+    }
+    Draw = async ()=>{
         this.DarkMode = this.DarkMode ?? false;
         if (this.shadowRoot.innerHTML != "") {
             return;
@@ -63,6 +66,9 @@ class WTableComponent extends HTMLElement {
         //this.TableConfig.MasterDetailTable = true
         if (this.TableConfig != undefined) {
             this.Dataset = this.TableConfig.Dataset;
+            if (this.TableConfig.Options.UrlSearch != null || this.TableConfig.Options.UrlSearch != undefined) {
+                this.Dataset = await WAjaxTools.PostRequest(this.TableConfig.Options.UrlSearch);
+            }            
             if (this.Dataset == undefined) {
                 this.Dataset = [{ Description: "No Data!!!" }];
             }

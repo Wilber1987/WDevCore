@@ -389,7 +389,7 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
-                    ModelObject: Model[prop].ModelObject,
+                    ModelObject: this.isModelFromFunction(Model, prop),
                     Options: {
                         Add: true, Edit: true, Delete: true, Search: true
                     }
@@ -402,7 +402,7 @@ class WForm extends HTMLElement {
                 InputControl = new WForm({
                     StyleForm: this.StyleForm,
                     EditObject: ObjectF[prop],
-                    ModelObject: Model[prop].ModelObject,
+                    ModelObject: this.isModelFromFunction(Model, prop),
                     Options: false
                 });
                 break;
@@ -466,6 +466,10 @@ class WForm extends HTMLElement {
         ControlLabel.innerHTML += Model[prop].require == true ? "*" : "";
 
         return InputControl;
+    }
+
+    isModelFromFunction(Model, prop) {
+        return Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject;
     }
 
     createDrawComponent(InputControl, prop, ControlContainer, ObjectF) {
@@ -600,7 +604,8 @@ class WForm extends HTMLElement {
     }
 
     CreateDatasetForMultiSelect(Model, prop) {
-        return Model[prop].Dataset.map(item => {
+
+        return Model[prop].Dataset?.map(item => {
             const MapObject = {};
             for (const key in item) {
                 const element = item[key];
