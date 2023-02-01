@@ -175,7 +175,6 @@ const StylesControlsV2 = css`
         cursor: pointer;
         height: 40px;
         box-shadow: 0 0 5px #c1c1c1;
-        text-transform: capitalize;
     }
 
     input:active,

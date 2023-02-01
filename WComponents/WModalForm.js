@@ -214,7 +214,7 @@ class WModalForm extends HTMLElement {
                     }), new WCssClass(`.ModalContent`, {
                         //height: 'calc(100% - 60px)',
                         //overflow: "hidden",
-                        //"overflow-y": "auto",
+                        "overflow-y": "auto",
                         display: "block",
                         padding: 30
                     }),
