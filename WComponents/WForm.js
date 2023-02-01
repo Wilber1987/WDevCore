@@ -342,6 +342,9 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = InputControl.value;
                 break;
             case "WSELECT":
+                if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
+                    Model[prop].Dataset == await Model[prop].ModelObject().Get();                
+                }
                 const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
                 this.FindObjectMultiselect(val, InputControl);
@@ -389,7 +392,7 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
-                    ModelObject: this.isModelFromFunction(Model, prop),
+                    ModelObject: await this.isModelFromFunction(Model, prop),
                     Options: {
                         Add: true, Edit: true, Delete: true, Search: true
                     }
@@ -402,7 +405,7 @@ class WForm extends HTMLElement {
                 InputControl = new WForm({
                     StyleForm: this.StyleForm,
                     EditObject: ObjectF[prop],
-                    ModelObject: this.isModelFromFunction(Model, prop),
+                    ModelObject: await this.isModelFromFunction(Model, prop),
                     Options: false
                 });
                 break;
@@ -603,8 +606,7 @@ class WForm extends HTMLElement {
         return InputControl;
     }
 
-    CreateDatasetForMultiSelect(Model, prop) {
-
+    CreateDatasetForMultiSelect(Model, prop) {        
         return Model[prop].Dataset?.map(item => {
             const MapObject = {};
             for (const key in item) {
