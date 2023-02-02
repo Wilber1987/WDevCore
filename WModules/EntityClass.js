@@ -7,9 +7,9 @@ class EntityClass {
         }
         this.ApiMethods = {
             ApiRoute: window.origin + "/api/",
-            Get: Namespace + "/get" + this.__proto__.constructor.name,
-            Set: Namespace + "/get" + "/save" + this.__proto__.constructor.name,
-            Update: Namespace + "/get" + "/update" + this.__proto__.constructor.name,
+            Get: "Api" + Namespace + "/get" + this.__proto__.constructor.name,
+            Set: "Api" + Namespace + "/get" + "/save" + this.__proto__.constructor.name,
+            Update: "Api" + Namespace + "/get" + "/update" + this.__proto__.constructor.name,
         }
     }   
     Get = async (Param = "") => {
