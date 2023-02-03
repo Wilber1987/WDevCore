@@ -343,7 +343,7 @@ class WForm extends HTMLElement {
                 break;
             case "WSELECT":
                 if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
-                    Model[prop].Dataset == await Model[prop].ModelObject().Get();                
+                    Model[prop].Dataset = await Model[prop].ModelObject().Get();
                 }
                 const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
@@ -606,7 +606,7 @@ class WForm extends HTMLElement {
         return InputControl;
     }
 
-    CreateDatasetForMultiSelect(Model, prop) {        
+    CreateDatasetForMultiSelect(Model, prop) {
         return Model[prop].Dataset?.map(item => {
             const MapObject = {};
             for (const key in item) {
@@ -642,7 +642,8 @@ class WForm extends HTMLElement {
             MultiSelect: false,
             Dataset: Dataset,
             action: (ItemSelects) => {
-                ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_ ?? ItemSelects[0][this.findKey(ItemSelects[0])] ?? "ElementIndex_0";
+                ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_
+                    ?? ItemSelects[0][this.findKey(ItemSelects[0])] ?? ItemSelects[0];
             }
         });
         return InputControl;

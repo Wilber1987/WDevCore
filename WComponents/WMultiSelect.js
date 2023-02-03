@@ -178,7 +178,9 @@ class MultiSelect extends HTMLElement {
             element.descripcion ??
             element.desc ??
             element.name ??
+            element.Name ??
             element.nombre ??
+            element.Nombres ??
             "Element" + index;
     }
     DisplayOptions = () => {

@@ -273,7 +273,7 @@ class WTableComponent extends HTMLElement {
         thead.children.push(tr);
         return thead;
     }
-    DrawTRow = (tr, element) => {
+     DrawTRow = async(tr, element) => {
         tr.innerHTML = "";
         for (const prop in this.ModelObject) {
             if (WArrayF.checkDisplay(this.DisplayData, prop, this.ModelObject)) {
@@ -288,7 +288,7 @@ class WTableComponent extends HTMLElement {
                     let IsMultiSelect = false;
                     let IsModel = false;
                     let IsOperation = false;
-                    ({ IsImage, value, IsColor, IsMultiSelect, IsModel, IsOperation } = this.EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect, IsOperation));
+                    ({ IsImage, value, IsColor, IsMultiSelect, IsModel, IsOperation } = await this.EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect, IsOperation));
                     //DEFINICION DE VALORES-------------
                     if (IsImage) {
                         const image = WRender.Create({
@@ -449,14 +449,18 @@ class WTableComponent extends HTMLElement {
             || element[prop]?.__proto__.constructor.name == "AsyncFunction";
     }
 
-    EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect, IsModel, IsOperation) {
+    async EvalModelPrototype(Model, prop, IsImage, value, IsColor, IsMultiSelect, IsModel, IsOperation) {
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
                     IsImage = true;
                     break;
                 case "SELECT": case "WSELECT":
-                    const element = Model[prop].Dataset.find(e => {
+                    if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
+                        Model[prop].ModelObject = Model[prop].ModelObject();
+                        Model[prop].Dataset = await Model[prop].ModelObject.Get();
+                    }
+                    const element = Model[prop].Dataset?.find(e => {
                         let flag = false;
                         if (e == value) { flag = true; }
                         else if (e.__proto__ == Object.prototype && e.id == value) { flag = true; }
