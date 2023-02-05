@@ -201,7 +201,12 @@ class WForm extends HTMLElement {
                 });
                 let validateFunction = undefined;
                 let InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text" });
-                if (Model[prop].__proto__ == Object.prototype) {
+                if (Model[prop].__proto__ == Object.prototype) {   
+                    if (Model[prop].ModelObject?.__proto__ == Function.prototype && Model[prop].ModelObject()?.constructor?.name == this.Config.ParentModel?.constructor?.name) {
+                        Model[prop] = undefined;
+                        ObjectF[prop] = undefined;
+                        continue;
+                    }
                     validateFunction = Model[prop].validateFunction;
                     ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop)
                     InputControl = await this.CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF, ControlLabel);
@@ -305,7 +310,7 @@ class WForm extends HTMLElement {
     }
 
     async CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF, ControlLabel) {
-        Model[prop].require = Model[prop].require ?? true;
+        Model[prop].require = Model[prop].require ?? true;        
         switch (Model[prop].type?.toUpperCase()) {
             case "TITLE":
                 Model[prop].require = false;
@@ -343,8 +348,9 @@ class WForm extends HTMLElement {
                 break;
             case "WSELECT":
                 if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
-                    Model[prop].Dataset = await Model[prop].ModelObject().Get();
-                }
+                    Model[prop].ModelObject = Model[prop].ModelObject();
+                    Model[prop].Dataset = await Model[prop].ModelObject.Get();
+                }                            
                 const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
                 this.FindObjectMultiselect(val, InputControl);
@@ -393,6 +399,7 @@ class WForm extends HTMLElement {
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
                     ModelObject: await this.isModelFromFunction(Model, prop),
+                    ParentModel: Model,
                     Options: {
                         Add: true, Edit: true, Delete: true, Search: true
                     }
