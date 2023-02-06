@@ -43,16 +43,8 @@ class EntityClass {
         //Dataset = await Dataset.json()
         return Dataset;
     }
-
     SaveData = async (Path, Data) => {
         return await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, Data)
-    }
-    replacer(key, value) {
-        // Filtrando propiedades 
-        if (value.get && value.set) {
-            return undefined;
-        }
-        return value;
     }
 }
 export { EntityClass }

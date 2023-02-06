@@ -377,7 +377,7 @@ class ComponentsManager {
             }
         }
     }
-    Back = () => {        
+    Back = () => {
         if (this.NavigationLog.length < 2) return;
         const IdComponent = this.NavigationLog[this.NavigationLog.length - 2];
         this.NavigationLog.pop();
@@ -619,6 +619,21 @@ class WArrayF {
         }
         return val;
     }
+    static async searchFunction(Dataset, param, apiUrl) {
+        return Dataset.filter((element) => {
+            for (const prop in element) {
+                try {
+                    if (element[prop] != null) {
+                        if (element[prop].toString().toUpperCase().includes(param.toUpperCase())) {
+                            return element;
+                        }
+                    }
+                } catch (error) {
+                    console.log(element);
+                }
+            }
+        });
+    }
     //STRINGS
     static Capitalize(str) {
         if (str == null) {
@@ -645,6 +660,31 @@ class WArrayF {
             }
         }
         return flag;
+    }
+    static replacer(value) {
+        const replacerElement = {};
+        for (const prop in value) {
+            if ((prop == "get" && prop == "set") ||
+                prop == "ApiMethods" ||
+                prop == "Get" ||
+                prop == "GetByProps" ||
+                prop == "FindByProps" ||
+                prop == "Save" ||
+                prop == "Update" ||
+                prop == "GetData" ||
+                prop == "SaveData" || 
+                value[prop] == null || 
+                value[prop] == undefined ||
+                value[prop]?.__proto__ == Object.prototype ||
+                value[prop]?.__proto__ == Array.prototype) {
+                //return undefined;
+            }else {
+                replacerElement[prop] = value
+            }
+        }
+        // Filtrando propiedades 
+
+        return replacerElement;
     }
 }
 //METODOS VARIOS
@@ -896,5 +936,5 @@ String.prototype.toDateFormatEs = function () {
 };
 String.prototype.toDateTimeFormatEs = function () {
     const fecha = new Date(this);
-    return this.toDateFormatEs() + ' hora ' + pad(fecha.getUTCHours()) + ':' + pad(fecha.getUTCMinutes()) ;
+    return this.toDateFormatEs() + ' hora ' + pad(fecha.getUTCHours()) + ':' + pad(fecha.getUTCMinutes());
 };

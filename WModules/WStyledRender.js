@@ -262,6 +262,7 @@ class WStyledRender extends HTMLElement {
     }
 }
 function css(body = "") {
+    console.log(body.toString());
     return WRender.Create({ tagName: "style", innerHTML: body });
 }
 customElements.define("w-style", WStyledRender);
