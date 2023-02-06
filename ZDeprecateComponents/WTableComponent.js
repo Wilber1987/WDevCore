@@ -1,9 +1,9 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
-import { ModalVericateAction } from "./WForm.js";
-import { WModalForm } from "./WModalForm.js";
-import { WToolTip } from "./WMultiSelect.js";
+import { ModalVericateAction } from "../WComponents/WForm.js";
+import { WModalForm } from "../WComponents/WModalForm.js";
+import { WToolTip } from "../WComponents/WMultiSelect.js";
 class TableConfig {
     Dataset = [];
     ModelObject = {};
