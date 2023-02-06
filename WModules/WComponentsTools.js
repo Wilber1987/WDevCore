@@ -672,18 +672,16 @@ class WArrayF {
                 prop == "Save" ||
                 prop == "Update" ||
                 prop == "GetData" ||
-                prop == "SaveData" || 
-                value[prop] == null || 
+                prop == "SaveData" ||
+                value[prop] == null ||
                 value[prop] == undefined ||
                 value[prop]?.__proto__ == Object.prototype ||
                 value[prop]?.__proto__ == Array.prototype) {
-                //return undefined;
-            }else {
-                replacerElement[prop] = value
+                continue;
             }
-        }
-        // Filtrando propiedades 
+            replacerElement[prop] = value
 
+        }
         return replacerElement;
     }
 }

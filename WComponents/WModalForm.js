@@ -192,7 +192,7 @@ class WModalForm extends HTMLElement {
                         "margin-top": this.StyleForm == "FullScreen" ? 0 : 30,
                         "background-color": this.DarkMode ? "#444444" : "#fff",
                         "width": this.WidthContainer,
-                        "max-height": "calc(100vh - 40px)",
+                        "max-height": "calc(100vh - 120px)",
                         //"overflow-y": "auto",
                         "min-height": this.StyleForm == "FullScreen" ? "100vh" : 200,
                         "border-radius": "0.3cm",

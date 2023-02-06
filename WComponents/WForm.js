@@ -1,5 +1,5 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WComponentsTools.js';
-import { css, WCssClass } from '../WModules/WStyledRender.js';
+import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WModalForm, WSimpleModalForm } from './WModalForm.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
@@ -201,7 +201,7 @@ class WForm extends HTMLElement {
                 });
                 let validateFunction = undefined;
                 let InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text" });
-                if (Model[prop].__proto__ == Object.prototype) {   
+                if (Model[prop].__proto__ == Object.prototype) {
                     if (Model[prop].ModelObject?.__proto__ == Function.prototype && Model[prop].ModelObject()?.constructor?.name == this.Config.ParentModel?.constructor?.name) {
                         Model[prop] = undefined;
                         ObjectF[prop] = undefined;
@@ -310,7 +310,7 @@ class WForm extends HTMLElement {
     }
 
     async CreateModelControl(Model, prop, InputControl, val, ControlContainer, ObjectF, ControlLabel) {
-        Model[prop].require = Model[prop].require ?? true;        
+        Model[prop].require = Model[prop].require ?? true;
         switch (Model[prop].type?.toUpperCase()) {
             case "TITLE":
                 Model[prop].require = false;
@@ -350,7 +350,7 @@ class WForm extends HTMLElement {
                 if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
                     Model[prop].ModelObject = Model[prop].ModelObject();
                     Model[prop].Dataset = await Model[prop].ModelObject.Get();
-                }                            
+                }
                 const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
                 this.FindObjectMultiselect(val, InputControl);
@@ -898,26 +898,22 @@ class WForm extends HTMLElement {
                 grid-template-columns: ${this.DivColumns};
                 grid-template-rows: auto;
                 height: calc(100% - 70px);
+                gap: 20px;
             }
-
             .divForm .imageGridForm {
                 grid-row: span 3;
             }
-
             .divForm .imageGridForm,
             .divForm .tableContainer {
                 grid-column: span  ${this.limit};
                 grid-row: span 4;
             }
-
             input:-internal-autofill-selected {
                 appearance: menulist-button;
                 background-color: none !important;
                 background-image: none !important;
                 color: -internal-light-dark(black, white) !important;
             }
-
-
             .DivSaveOptions {
                 margin-top: 10px;
                 margin-bottom: 10px;
@@ -1137,7 +1133,16 @@ class WForm extends HTMLElement {
                 }
             }
         `;
-        return WRender.createElement(style);
+        const wstyle = new WStyledRender({
+            ClassList: [
+                new WCssClass(`.divForm`, {
+                    "grid-template-columns": this.DivColumns
+                }),new WCssClass(` .divForm .imageGridForm,  .divForm .tableContainer, .imgPhoto`, {
+                    "grid-column": `span  ${this.limit}`
+                })
+            ]
+        })   
+        return WRender.createElement({ style: { display: "none" }, children: [style, wstyle] });
     }
 }
 const ModalVericateAction = (Action, title) => {

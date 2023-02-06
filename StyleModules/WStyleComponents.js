@@ -87,19 +87,58 @@ const StylesControlsV1 = {
     }
 }
 const StylesControlsV2 = css`
-    .Btn-Mini {
-        width: 120px;
-        background-color: #5995fd;
+    .Btn-Mini, .Btn-Mini-Alert {
+        width: 100px;
+        background-color: #1c4786;
         border: none;
         outline: none;
         border-radius: 10px;
         color: #fff;
         font-weight: 600;
-        margin: 10px 0;
+        margin: 10px;
         cursor: pointer;
         transition: 0.5s;
         font-size: 11px;
         padding: 8px;
+    }
+
+    .BtnClose {
+        appearance: none;
+        display: flex;
+        border: none;
+        background: none;
+        position: absolute;
+        right: 20px;  
+        top: 30px;    
+        cursor:pointer;
+    }
+
+    .BtnClose::before {
+        content: " ";
+        margin-right: 8px;
+        height: 15px;
+        width: 15px;
+        display: block;
+        background-color: #202020;
+        clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+    }
+
+    .Btn-Mini-Alert {
+        background-color: #861c1c;
+    }
+    .BtnReturn{
+        appearance: none;
+        display: flex;        
+    }
+
+    .BtnReturn::before {
+        content: " ";
+        margin-right: 8px;
+        height: 15px;
+        width: 15px;
+        display: block;
+        background-color: #fdfcfc;
+        clip-path: polygon(50% 0%, 100% 0%, 50% 50%, 100% 100%, 50% 100%, 0% 50%);
     }
     
     .BtnAlert,
@@ -158,6 +197,9 @@ const StylesControlsV2 = css`
     input[type=email],
     input[type=date],
     input[type=time],
+    input[type=tel],
+    input[type=url],
+    w-multi-select,
     select,
     textarea,
     input:-internal-autofill-selected {
@@ -175,6 +217,10 @@ const StylesControlsV2 = css`
         cursor: pointer;
         height: 40px;
         box-shadow: 0 0 5px #c1c1c1;
+    }
+
+    w-multi-select{
+        padding: 0px;
     }
 
     input:active,
