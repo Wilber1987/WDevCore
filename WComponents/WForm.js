@@ -347,6 +347,8 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = InputControl.value;
                 break;
             case "WSELECT":
+                ObjectF[prop] = ObjectF[prop].__proto__ == Object.prototype ? ObjectF[prop] : null;
+                val = ObjectF[prop];
                 if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
                     Model[prop].ModelObject = Model[prop].ModelObject();
                     Model[prop].Dataset = await Model[prop].ModelObject.Get();
@@ -634,7 +636,14 @@ class WForm extends HTMLElement {
                     InputControl.selectedItems.push(FindItem);
                 }
             });
-        } else {
+        } else if (val != null && val != undefined && val.__proto__ == Object.prototype) {
+            console.log(val);
+            const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, val));
+            console.log(FindItem);
+            if (FindItem) {
+                InputControl.selectedItems.push(FindItem);
+            }
+        } else if (val != null && val != undefined) {
             const FindItem = InputControl.Dataset.find(i => i.id == val || i.id_ == val || i[this.findKey(i)] == val);
             if (FindItem) {
                 InputControl.selectedItems.push(FindItem);
@@ -1137,11 +1146,11 @@ class WForm extends HTMLElement {
             ClassList: [
                 new WCssClass(`.divForm`, {
                     "grid-template-columns": this.DivColumns
-                }),new WCssClass(` .divForm .imageGridForm,  .divForm .tableContainer, .imgPhoto`, {
+                }), new WCssClass(` .divForm .imageGridForm,  .divForm .tableContainer, .imgPhoto`, {
                     "grid-column": `span  ${this.limit}`
                 })
             ]
-        })   
+        })
         return WRender.createElement({ style: { display: "none" }, children: [style, wstyle] });
     }
 }

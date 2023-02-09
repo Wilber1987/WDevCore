@@ -610,8 +610,8 @@ class WArrayF {
             if (ComparativeObject == EvalObject) return true;
             else return false;
         }
-        let val = true;
-        for (const prop in ComparativeObject) {
+        let val = true;               
+        for (const prop in this.replacer(ComparativeObject)) {
             if (ComparativeObject[prop] !== EvalObject[prop]) {
                 val = false;
                 break;
@@ -679,7 +679,7 @@ class WArrayF {
                 value[prop]?.__proto__ == Array.prototype) {
                 continue;
             }
-            replacerElement[prop] = value
+            replacerElement[prop] = value[prop]
 
         }
         return replacerElement;

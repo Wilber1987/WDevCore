@@ -352,7 +352,7 @@ class WTableComponent extends HTMLElement {
                 case "MODEL": case "WSELECT":
                     tr.append(WRender.Create({
                         tagName: "td", className: "cardTable", children: [
-                            new WCardTable(element[prop], Model[prop].ModelObject, this.TableConfig)
+                            new WCardTable(WArrayF.replacer(element[prop]), Model[prop].ModelObject, this.TableConfig)
                         ]
                     }));
                     break;
@@ -973,7 +973,7 @@ const Money = { Euro: "€", Dollar: "$", Cordoba: "C$" }
 customElements.define("w-table-basic", WTableComponent);
 export { WTableComponent }
 class WCardTable extends HTMLElement {
-    constructor(Element, Model, Config) {
+    constructor(Element, Model, Config) {      
         super();
         if (Model?.__proto__ == Function.prototype) {
             Model = Model();
