@@ -13,7 +13,7 @@ class CardModel {
 
 class WCardCarousel extends HTMLElement {
     constructor(Dataset = [], Config = {
-        ActionFunction:()=>{},
+        ActionFunction: () => { },
         url: "http://.."
     }) {
         super();
@@ -133,12 +133,12 @@ class WCard extends HTMLElement {
                 })
             ]
         }))
-       
+
         element.picture = element.picture ?? WIcons.UserIcon
         //console.log( element.picture);
         const Figure = WRender.createElement({
             type: 'img',
-            props: { class: 'fotoColaborador', src: (url ?? cadenaB64) + "/" + element.picture }
+            props: { class: 'fotoColaborador', src: (url != undefined ? url + "/" : cadenaB64) + element.picture }
         });
         this.ActionFunction = ActionFunction;
         switch (CardType) {

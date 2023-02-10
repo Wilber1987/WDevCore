@@ -488,7 +488,6 @@ class WArrayF {
                 for (const prop in element) {
                     NewElement[prop] = element[prop]
                 }
-                //NewElement[param] =  element[param];
                 if (!element.count) {
                     NewElement.count = 1;
                 }
