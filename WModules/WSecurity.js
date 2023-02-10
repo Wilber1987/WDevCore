@@ -1,5 +1,5 @@
 import { ComponentsManager, WAjaxTools, WArrayF, WRender } from "./WComponentsTools.js";
-// import "../WComponents/WModalForm.js";
+//import { WModalForm } from "../WComponents/WModalForm.js";
 // import "../WComponents/WLoginTemplate.js";
 
 class WSecurity {
@@ -10,7 +10,7 @@ class WSecurity {
             if (result == false) {
                 console.log("no auth");
                 WSecurity.LogOut();
-            } 
+            }
         })
     }
     static Path = location.origin;
@@ -23,9 +23,9 @@ class WSecurity {
     static urlLogIn = WSecurity.Path + "/api/Security/Login";
     static urlRegister = WSecurity.Path + "/api/Security/Register";
     static urlLogOut = WSecurity.Path + "/api/Security/LogOut";
-    
-    static UserData = localStorage.getItem(WSecurity.urlLogIn) != null ? 
-        localStorage.getItem(WSecurity.urlLogIn):{
+
+    static UserData = localStorage.getItem(WSecurity.urlLogIn) != null ?
+        localStorage.getItem(WSecurity.urlLogIn) : {
             success: false,
             mail: "null",
             nickname: "null",
@@ -45,17 +45,21 @@ class WSecurity {
     static Login = async (UserData, url) => {
         const result = await WAjaxTools.PostRequest(WSecurity.urlLogIn, UserData)
         console.log(result);
-        if (result == true) {
+        if (result == true || result.success == true) {
             //this.UserData = result;
             window.location = url ?? WSecurity.urlHomeView;
+        } else if (result != false || result.success == false) {
+           alert( result?.message)
+            console.log("Fail to login");
         } else {
+           alert("ERROR")
             console.log("Fail to login");
         }
     }
     static LogOut = async () => {
         const result = await WAjaxTools.PostRequest(WSecurity.urlLogOut);
-        localStorage.clear();        
-        window.location = WSecurity.LoginInView;  
+        localStorage.clear();
+        window.location = WSecurity.LoginInView;
         return result;
     }
 }
