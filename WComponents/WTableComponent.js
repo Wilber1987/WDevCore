@@ -329,7 +329,7 @@ class WTableComponent extends HTMLElement {
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
-                    td.append(ControlBuilder.BuildImage(value, this.Config.ImageUrlPath));
+                    td.append(ControlBuilder.BuildImage(value, this.Config?.ImageUrlPath));
                     tr.append(td);
                     break;
                 case "SELECT":
@@ -349,6 +349,33 @@ class WTableComponent extends HTMLElement {
                     tr.append(td);
                     break;
                 case "MULTISELECT":
+                    element[prop] = value.map(object => {
+                        const NewObj = {};
+                        const FObject = Model[prop].Dataset.find(fobject => {
+                            let flag = false;
+                            for (const key in fobject) {
+                                if ((key.toUpperCase().includes("ID") || (key.toUpperCase().includes("ID_")))
+                                    && fobject[key] && object[key] == fobject[key]) {
+                                    flag = true;
+                                }
+                            }
+                            return flag;
+                        });
+                        if (FObject) {
+                            for (const key in object) { NewObj[key] = object[key] }
+                            return FObject;
+                        }
+                        return undefined;
+                    });
+                    tr.append(WRender.Create({
+                        tagName: "td", className: "tdAcordeon", innerHTML:
+                            //"<label class='LabelTd'>" + element[prop].length + " Elementos: </label>" +
+                            `${element[prop].map(object => {
+                                const FObject = Model[prop].Dataset.find(i => WArrayF.compareObj(object, i));
+                                const label = FObject?.Descripcion ?? FObject?.descripcion ?? FObject;
+                                return `<label class="labelMultiselect">${label}</label>`;
+                            }).join('')}`
+                    }));
                     break;
                 case "COLOR":
                     td.append(WRender.Create({
@@ -370,8 +397,12 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "MASTERDETAIL":
                     break;
+                case "DATE": case "FECHA":
+                    td.append(value.toString().toDateFormatEs());
+                    tr.append(td);
+                    break;
                 default:
-                    td.append(value);
+                    td.append(WOrtograficValidation.es(value));
                     tr.append(td);
                     break;
             }
@@ -1006,6 +1037,7 @@ class WCardTable extends HTMLElement {
         if (this.Element[prop] != null) {
             value = this.Element[prop];
         }
+        console.log(this.Config.ImageUrlPath);
         if (this.IsDrawableProp(this.Element, prop)) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
@@ -1056,8 +1088,7 @@ class WCardTable extends HTMLElement {
         }
         else if ((this.Model[prop]?.type == undefined
             || this.Model[prop]?.type.toUpperCase() == "MASTERDETAIL"
-            || this.Model[prop]?.primary == true
-            || this.Model[prop]?.hiddenInTable == true)
+            || this.Model[prop]?.primary == true)
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
             return false;
