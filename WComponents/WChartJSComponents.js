@@ -148,14 +148,15 @@ class ColumChart extends HTMLElement {
     DrawBar(DataValue, Config, index, SerieName = "") {
         var Size = Config.ContainerSize;
         var Size = 180;
-        var BarSize = DataValue == "n/a" ? 0 : ((DataValue - this.MinVal) / (this.MaxVal + 10  - this.MinVal)); //% de tamaño
+        var BarSize = DataValue == "n/a" ? 0 : ((DataValue > this.MinVal ? DataValue - this.MinVal : DataValue)
+            / (DataValue > 10 ? this.MaxVal + 10 - this.MinVal : this.MaxVal)); //% de tamaño
         var labelCol = DataValue;
         var styleP = "";
         if (Config.ColumnLabelDisplay == 1) {
             //dibujar el valor en porcentaje
-            styleP = ";flex-grow: 1;"
+            //styleP = ";flex-grow: 1;"
             var multiplier = Math.pow(10, 1 || 0);
-            var number = labelCol / total[Config.EvalValue] * 100
+            var number = DataValue / (this.MaxVal > 0 ? this.MaxVal : 1) * 100
             number = Math.round(number * multiplier) / multiplier
             labelCol = number + '%';
         }
@@ -177,7 +178,8 @@ class ColumChart extends HTMLElement {
     _DrawBackgroundLine(value, size = 600, ValP, label = true) {
         //console.log(value)
         var countLine = 8;
-        var val  = parseFloat((value + 10 - this.MinVal) / countLine);
+        var val = value > 10 ? parseFloat((value + 10 - this.MinVal) / countLine)
+            : parseFloat((value) / countLine);
         //console.log( value, this.MinVal);
         //%
         //countLine = 7
@@ -188,7 +190,7 @@ class ColumChart extends HTMLElement {
         }
         var ContainerLine = document.createElement('section');
         ContainerLine.className = "BackGrounLineX";
-        var valueLabel = this.MinVal;
+        var valueLabel = this.MinVal > 10 ? this.MinVal : 0;
 
         for (let index = 0; index < countLine; index++) {
             if (label) {
@@ -333,6 +335,7 @@ class RadialChart extends HTMLElement {
         super();
         this.attachShadow({ mode: "open" });
         this.ChartInstance = ChartInstance;
+        this.ChartInstance.Colors = this.ChartInstance.Colors ?? []
     }
     attributeChangedCallBack() {
         this.DrawChart();
@@ -605,7 +608,7 @@ const WChartStyle = (ChartInstance) => {
                     "height": " 180px",
                     "right": " 0px",
                 }), new WCssClass(".groupBars .BackGrounLineXNumber ", {
-                    "left": ChartInstance.TypeChart == "Line" ? 0 : -40 ,
+                    "left": ChartInstance.TypeChart == "Line" ? 0 : -40,
                 }),
                 new WCssClass(".groupBars .IconsGroup ", {
                     "left": " -25px",
@@ -744,13 +747,15 @@ const WChartStyle = (ChartInstance) => {
                 }),
                 //#endregion RADIAL
             ], KeyFrame: [
-                { animate: "dash", ClassList: [
-                    new WCssClass( `from`, {
-                        "stroke-dashoffset": "1000"
-                    }), new WCssClass( `to`, {
-                        "stroke-dashoffset": "0"
-                    }),
-                ]  }
+                {
+                    animate: "dash", ClassList: [
+                        new WCssClass(`from`, {
+                            "stroke-dashoffset": "1000"
+                        }), new WCssClass(`to`, {
+                            "stroke-dashoffset": "0"
+                        }),
+                    ]
+                }
             ]
         }
     };

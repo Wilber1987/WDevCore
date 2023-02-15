@@ -50,7 +50,7 @@ class WForm extends HTMLElement {
             this.DivColumns = this.Config.DivColumns = "calc(33%) calc(33%) calc(33%)";
             this.limit = 3;
         } else {
-            this.DivColumns = this.Config.DivColumns = "calc(50%) calc(50%)";
+            this.DivColumns = this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
             this.limit = 2;
         }
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
@@ -112,48 +112,8 @@ class WForm extends HTMLElement {
         }
         return flag;
     }
-    ShowFormDetail(ObjectF = this.ObjectDetail) {
-        const FormDivForm = WRender.Create({
-            tagName: 'divForm'
-        });
-        for (const prop in ObjectF) {
-            const flag = this.checkDisplay(prop);
-            if (flag) {
-                if (prop.includes("_hidden")) {
-
-                } else if (prop.toUpperCase().includes("IMG") ||
-                    prop.toUpperCase().includes("PICT") ||
-                    prop.toUpperCase().includes("IMAGE") || prop.toUpperCase().includes("Image") ||
-                    prop.toUpperCase().includes("PHOTO")) {
-                    let cadenaB64 = "";
-                    var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-                    if (base64regex.test(ObjectF[prop]) && !ObjectF[prop].includes("data:")) {
-                        cadenaB64 = "data:image/png;base64,";
-                    }
-                    if (this.ImageUrlPath != undefined
-                        && this.ImageUrlPath.__proto__ == String.prototype) {
-                        cadenaB64 = this.ImageUrlPath + "/";
-                    }
-                    FormDivForm.append(WRender.Create({
-                        tagName: "img",
-                        src: cadenaB64 + ObjectF[prop],
-                        class: "imgPhotoWModal",
-                        id: "imgControl" + prop + this.id
-                    }))
-
-                } else {
-                    let value = ObjectF[prop];
-                    if (typeof value === "number") {
-                        value = value.toFixed(2)
-                    }
-                    FormDivForm.append(WRender.Create({
-                        class: "ModalDetailElement", children: [{ tagName: "label", innerText: WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ": " + value }]
-                    }));
-                }
-            }
-        }
-
-        return FormDivForm;
+    ShowFormDetail(ObjectF = this.ObjectDetail) {  
+           
     }
     CrudForm = async (ObjectF = {}, ObjectOptions) => {
         if (this.AddItemsFromApi != undefined) {
@@ -904,10 +864,10 @@ class WForm extends HTMLElement {
             }
             .divForm {
                 display: grid;
-                grid-template-columns: ${this.DivColumns};
                 grid-template-rows: auto;
                 height: calc(100% - 70px);
                 gap: 20px;
+                margin: 20px;
             }
             .divForm .imageGridForm {
                 grid-row: span 3;

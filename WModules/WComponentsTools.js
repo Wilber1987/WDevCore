@@ -488,7 +488,6 @@ class WArrayF {
                 for (const prop in element) {
                     NewElement[prop] = element[prop]
                 }
-                //NewElement[param] =  element[param];
                 if (!element.count) {
                     NewElement.count = 1;
                 }
@@ -610,7 +609,7 @@ class WArrayF {
             if (ComparativeObject == EvalObject) return true;
             else return false;
         }
-        let val = true;               
+        let val = true;
         for (const prop in this.replacer(ComparativeObject)) {
             if (ComparativeObject[prop] !== EvalObject[prop]) {
                 val = false;
@@ -924,8 +923,9 @@ Date.prototype.toISO = function () {
       'Z' */;
 };
 String.prototype.toDateFormatEs = function () {
+    if (this == null || this == undefined || this == "") return "";
     const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    const dias_semana = ['Domingo', 'Lunes', 'martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const dias_semana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const fecha = new Date(this);
     return dias_semana[fecha.getDay()]
         + ', ' + fecha.getDate()

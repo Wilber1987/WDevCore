@@ -2,6 +2,12 @@ class WOrtograficValidation {
     static es = (val = "") => {
         try {
             val = val.toString().replaceAll("_id", "")
+                .replaceAll("Tbl_", "")
+                .replaceAll("Cat_", "")
+                .replaceAll("cat_", "")
+                .replaceAll("tbl_", "")
+                .replaceAll("Tbl", "")
+                .replaceAll("tbl", "")
                 .replaceAll("id_", "")
                 .replaceAll("Id_", "")
                 .replaceAll("_Id", "")

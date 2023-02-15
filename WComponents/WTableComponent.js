@@ -67,14 +67,14 @@ class WTableComponent extends HTMLElement {
         //this.TableConfig.MasterDetailTable = true
         if (this.TableConfig != undefined) {
             this.Dataset = this.TableConfig.Dataset;
-            if (this.TableConfig.Options.UrlSearch != null || this.TableConfig.Options.UrlSearch != undefined) {
-                this.Dataset = await WAjaxTools.PostRequest(this.TableConfig.Options.UrlSearch);
+            if (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined) {
+                this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             }
             if (this.Dataset == undefined) {
                 this.Dataset = [{ Description: "No Data!!!" }];
             }
-            if (this.TableConfig.Options) {
-                this.Options = this.TableConfig.Options;
+            if (this.TableConfig?.Options) {
+                this.Options = this.TableConfig?.Options;
             } else {
                 this.Options = {
                     Search: true,
@@ -97,7 +97,7 @@ class WTableComponent extends HTMLElement {
         }
         this.Dataset = this.TableConfig.Dataset;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
-        this.Options = this.TableConfig.Options;
+        this.Options = this.TableConfig?.Options;
         if (this.TableConfig.paginate != undefined) {
             this.paginate = this.TableConfig.paginate;
         }
@@ -329,22 +329,59 @@ class WTableComponent extends HTMLElement {
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
-                    td.append(ControlBuilder.BuildImage(value, this.Config));
+                    td.append(ControlBuilder.BuildImage(value, this.Config?.ImageUrlPath));
                     tr.append(td);
                     break;
                 case "SELECT":
+                    if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
+                        Model[prop].ModelObject = Model[prop].ModelObject();
+                        Model[prop].Dataset = await Model[prop].ModelObject.Get();
+                    }
+                    const findElement = Model[prop].Dataset?.find(e => {
+                        let flag = false;
+                        if (e == value) { flag = true; }
+                        else if (e.__proto__ == Object.prototype && e.id == value) { flag = true; }
+                        return flag;
+                    });
+                    value = findElement && findElement.__proto__ == Object.prototype
+                        ? (findElement.desc ?? findElement.Descripcion ?? findElement.descripcion) : findElement;
+                    td.append(value ?? "");
+                    tr.append(td);
                     break;
                 case "MULTISELECT":
+                    element[prop] = value.map(object => {
+                        const NewObj = {};
+                        const FObject = Model[prop].Dataset.find(fobject => {
+                            let flag = false;
+                            for (const key in fobject) {
+                                if ((key.toUpperCase().includes("ID") || (key.toUpperCase().includes("ID_")))
+                                    && fobject[key] && object[key] == fobject[key]) {
+                                    flag = true;
+                                }
+                            }
+                            return flag;
+                        });
+                        if (FObject) {
+                            for (const key in object) { NewObj[key] = object[key] }
+                            return FObject;
+                        }
+                        return undefined;
+                    });
+                    tr.append(WRender.Create({
+                        tagName: "td", className: "tdAcordeon", innerHTML:
+                            //"<label class='LabelTd'>" + element[prop].length + " Elementos: </label>" +
+                            `${element[prop].map(object => {
+                                const FObject = Model[prop].Dataset.find(i => WArrayF.compareObj(object, i));
+                                const label = FObject?.Descripcion ?? FObject?.descripcion ?? FObject;
+                                return `<label class="labelMultiselect">${label}</label>`;
+                            }).join('')}`
+                    }));
                     break;
                 case "COLOR":
                     td.append(WRender.Create({
                         style: {
-                            background: value,
-                            width: "30px",
-                            height: "30px",
-                            borderRadius: "50%",
-                            boxShadow: "0 0 3px 0 #888",
-                            margin: "auto"
+                            background: value, width: "30px", height: "30px",
+                            borderRadius: "50%", boxShadow: "0 0 3px 0 #888", margin: "auto"
                         }
                     }))
                     tr.append();
@@ -360,8 +397,12 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "MASTERDETAIL":
                     break;
+                case "DATE": case "FECHA":
+                    td.append(value.toString().toDateFormatEs());
+                    tr.append(td);
+                    break;
                 default:
-                    td.append(value);
+                    td.append(WOrtograficValidation.es(value));
                     tr.append(td);
                     break;
             }
@@ -973,7 +1014,7 @@ const Money = { Euro: "€", Dollar: "$", Cordoba: "C$" }
 customElements.define("w-table-basic", WTableComponent);
 export { WTableComponent }
 class WCardTable extends HTMLElement {
-    constructor(Element, Model, Config) {      
+    constructor(Element, Model, Config) {
         super();
         if (Model?.__proto__ == Function.prototype) {
             Model = Model();
@@ -996,10 +1037,11 @@ class WCardTable extends HTMLElement {
         if (this.Element[prop] != null) {
             value = this.Element[prop];
         }
+        console.log(this.Config.ImageUrlPath);
         if (this.IsDrawableProp(this.Element, prop)) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
-                    this.CardTableContainer.append(ControlBuilder.BuildImage(value, this.Config));
+                    this.CardTableContainer.append(ControlBuilder.BuildImage(value, this.Config.ImageUrlPath));
                     break;
                 case "SELECT": case "WSELECT":
                     break;
@@ -1014,7 +1056,7 @@ class WCardTable extends HTMLElement {
                 default:
                     this.CardTableContainer.append(
                         WRender.Create({
-                            tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "": value)
+                            tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)
                         }))
                     break;
             }
@@ -1024,7 +1066,7 @@ class WCardTable extends HTMLElement {
         .CardTableContainer{
             display: grid;
             grid-template-columns: auto;
-            grid-template-rows: repeat(4, 1fr);
+            grid-template-rows: auto;
             overflow: hidden;
             padding:10px;
         }
@@ -1046,8 +1088,7 @@ class WCardTable extends HTMLElement {
         }
         else if ((this.Model[prop]?.type == undefined
             || this.Model[prop]?.type.toUpperCase() == "MASTERDETAIL"
-            || this.Model[prop]?.primary == true
-            || this.Model[prop]?.hiddenInTable == true)
+            || this.Model[prop]?.primary == true)
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
             return false;

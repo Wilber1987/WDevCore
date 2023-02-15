@@ -232,6 +232,154 @@ const StylesControlsV2 = css`
         box-shadow: 0 0 5px #4894aa;
     }
 `
+
+const StylesControlsV3 = css`
+    .Btn-Mini, .Btn-Mini-Alert {
+        width: 100px;
+        background-color: #1c4786;
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        color: #fff;
+        font-weight: 600;
+        margin: 10px;
+        cursor: pointer;
+        transition: 0.5s;
+        font-size: 11px;
+        padding: 8px;
+    }
+
+    .BtnClose {
+        appearance: none;
+        display: flex;
+        border: none;
+        background: none;
+        position: absolute;
+        right: 20px;  
+        top: 30px;    
+        cursor:pointer;
+    }
+
+    .BtnClose::before {
+        content: " ";
+        margin-right: 8px;
+        height: 15px;
+        width: 15px;
+        display: block;
+        background-color: #202020;
+        clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+    }
+
+    .Btn-Mini-Alert {
+        background-color: #861c1c;
+    }
+    .BtnReturn{
+        appearance: none;
+        display: flex;        
+    }
+
+    .BtnReturn::before {
+        content: " ";
+        margin-right: 8px;
+        height: 15px;
+        width: 15px;
+        display: block;
+        background-color: #fdfcfc;
+        clip-path: polygon(50% 0%, 100% 0%, 50% 50%, 100% 100%, 50% 100%, 0% 50%);
+    }
+    
+    .Btn-Alert,
+    .Btn-Primary,
+    .Btn-Success,
+    .Btn-Secundary,
+    .Btn-Basic {
+        min-width: 100px;
+        background-color: #5995fd;
+        border: none;
+        outline: none;
+        height: 60px;
+        border-radius: 5px;
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin: 5px;
+        padding: 15px;
+        cursor: pointer;
+        transition: 0.5s;
+        width: 100%;
+        max-width: 250px;
+        text-align: left;
+    }
+
+    .Btn-Primary {
+        color: #fff;
+        background-color: #007bff;
+    }
+
+    .Btn-Alert {
+        color: #fff;
+        background-color: #dc3545;
+    }
+
+    .Btn-Success {
+        color: #fff;
+        background-color: #28a745;
+    }
+
+    .Btn-Secundary {
+        color: #fff;
+        background-color: #17a2b8;
+    }
+
+    .Btn[type=checkbox] {
+        height: 20px;
+        min-width: 20px;
+        margin: 5px;
+    }
+
+    input[type=text],
+    input[type=string],
+    input[type=password],
+    input[type=number],
+    input[type=color],
+    input[type=email],
+    input[type=date],
+    input[type=time],
+    input[type=tel],
+    input[type=url],
+    w-multi-select,
+    select,
+    textarea,
+    input:-internal-autofill-selected {
+        width: 100%;
+        background-color: #f0f0f0 !important;
+        border-radius: 55px;
+        padding: 10px 15px;
+        outline: none;
+        border: none;
+        line-height: 1;
+        font-weight: 600 !important;
+        font-size: 1.1rem !important;
+        color: #333 !important;
+        box-sizing: border-box;
+        cursor: pointer;
+        height: 40px;
+        box-shadow: 0 0 5px #c1c1c1;
+    }
+
+    w-multi-select{
+        padding: 0px;
+    }
+
+    input:active,
+    input:focus,
+    select:active,
+    select:focus,
+    textarea:focus,
+    textarea:focus {
+        box-shadow: 0 0 5px #4894aa;
+    }
+`
 const basicButtons = css`      
         .btn {
             padding: 8px;
@@ -272,4 +420,4 @@ const basicButtons = css`
 `
 //#endregion  #################################################################################################
 
-export { StyleScrolls, StylesControlsV1, StylesControlsV2, basicButtons }
+export { StyleScrolls, StylesControlsV1, StylesControlsV2 , StylesControlsV3, basicButtons }
