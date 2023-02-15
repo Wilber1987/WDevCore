@@ -45,7 +45,7 @@ class WSecurity {
     static Login = async (UserData, url) => {
         const result = await WAjaxTools.PostRequest(WSecurity.urlLogIn, UserData)
         console.log(result);
-        if (result == true) {
+        if (result == true || result.success == true) {
             //this.UserData = result;
             window.location = url ?? WSecurity.urlHomeView;
         } else {
@@ -54,9 +54,10 @@ class WSecurity {
     }
     static LogOut = async () => {
         const result = await WAjaxTools.PostRequest(WSecurity.urlLogOut);
+        console.log(result);
         localStorage.clear();        
         window.location = WSecurity.LoginInView;  
-        return result;
+        //return result;
     }
 }
 export { WSecurity }
