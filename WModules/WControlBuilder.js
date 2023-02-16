@@ -23,9 +23,9 @@ class ControlBuilder {
     static BuildProgressBar(value = 0, total = 100, barColor = "#34495ecc", progressColor = "#2c3e50") {
         return WRender.CreateStringNode(`<div class="progressDivContainer">        
         <div class="progressDiv">
-          <div class="progress"></div>
+          <div class="progress" style="width:${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%;"></div>
         </div>
-        <h3>${value / total * 100}%</h3>
+        <h3>${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%</h3>
         <style>
           .progressDivContainer{
             position: relative; width: 100%;  height: auto;  margin: 10px 0px;
@@ -34,7 +34,7 @@ class ControlBuilder {
             width: 100%;  height: 30px;  background: ${barColor};
           }          
           .progressDivContainer > .progressDiv > .progress{
-            width: ${value / total * 100}%; height: 30px;  background: ${progressColor};
+            height: 30px;  background: ${progressColor};
           }          
           .progressDivContainer > h3{
             margin-top: 10px; font-family: sans-serif; color: #2c3e50;

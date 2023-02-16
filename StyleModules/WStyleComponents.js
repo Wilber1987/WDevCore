@@ -95,7 +95,7 @@ const StylesControlsV2 = css`
         border-radius: 10px;
         color: #fff;
         font-weight: 600;
-        margin: 10px;
+        margin: 0px 5px;
         cursor: pointer;
         transition: 0.5s;
         font-size: 11px;
