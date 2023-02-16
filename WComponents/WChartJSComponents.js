@@ -5,15 +5,17 @@ class ChartConfig {
     TypeChart = 0;
     Dataset = [];
     Colors = [];
-    ColumnLabelDisplay = 0;
+    percentCalc = true
     AttNameEval = "series";
     EvalValue = "value";
     groupParams = [];
 }
+const ColorsList = ["#5995fd", "#dc3545", "#28a745", "#17a2b8", "#6e1515", "#156e49", "#1c4786"];
 class ColumChart extends HTMLElement {
     constructor(ChartInstance = (new ChartConfig())) {
         super();
         this.ChartInstance = ChartInstance;
+        this.ChartInstance.Colors = this.ChartInstance.Colors ?? ColorsList
         this.GroupsData = [];
         this.ProcessData = [];
         this.IconsGroupColores = ["#c39c10", "#ab5", "#285a76", "#4640a3", "#8640a3"]
@@ -56,6 +58,9 @@ class ColumChart extends HTMLElement {
         this.MinVal = WArrayF.MinValue(this.Totals, this.EvalValue);
         this.EvalArray = WArrayF.ArrayUnique(this.ChartInstance.Dataset, this.AttNameEval);
         let ChartFragment = WRender.createElement({ type: 'div', props: { id: '', class: 'WChartContainer' } });
+        if (this.ChartInstance.Title) {
+            ChartFragment.append(WRender.Create({ tagName: "h3", innerText: this.ChartInstance.Title }))
+        }
         ChartFragment.append(this.DrawSeries(this.EvalArray, this.ChartInstance.Colors));
         const SectionBars = WRender.createElement(this._AddSectionBars());
         ChartFragment.append(SectionBars);
@@ -80,7 +85,10 @@ class ColumChart extends HTMLElement {
         let ObjGroup = {
             data: Groups[inicio],
             groupParam: this.groupParams[inicio],
-            children: this.ChargeGroup(Groups, inicio + 1)
+            children: this.ChargeGroup(Groups, inicio + 1),
+            //maxVal: WArrayF.MaxValue(Groups[0], this.EvalValue),
+            //minVal: WArrayF.MinValue(Groups[0], this.EvalValue),
+            //sumValue: WArrayF.SumValue(WArrayF.ArrayUnique(Groups[0], this.EvalValue) , "count"),
         }
         return ObjGroup;
     }
@@ -92,7 +100,7 @@ class ColumChart extends HTMLElement {
             let trGroup = { type: "GroupSection", props: { class: "GroupSection" }, children: [WArrayF.Capitalize(Group[Groups.groupParam])] };
             let groupBar = { type: "containerbar", props: { style: "padding:0px", class: "ContainerBars" }, children: [] };
             if (GroupIndex == 0) {
-                trGroup.children.push(this._DrawBackgroundLine(this.MaxVal, null, this.ChartInstance.ColumnLabelDisplay));
+                trGroup.children.push(this._DrawBackgroundLine());
                 trGroup.children.push(this._DrawIconsGroups());
             }
             GroupIndex++;
@@ -106,15 +114,18 @@ class ColumChart extends HTMLElement {
                 trGroup.type = "groupbar";
                 trGroup.props.class = "groupBars";
                 groupBar.props.style = "height: 180px";
-                groupBar.children.push(this._DrawBackgroundLine(this.MaxVal, null, this.ChartInstance.ColumnLabelDisplay, false));
+                groupBar.children.push(this._DrawBackgroundLine(false));
                 if (this.EvalArray != null) {
                     let index = 0;
                     this.EvalArray.forEach(Eval => {
                         arrayP[this.AttNameEval] = Eval[this.AttNameEval];
                         const Data = this.FindData(arrayP);
-                        //if (Data != "n/a") {
-                        groupBar.children.push(this.DrawBar(Data, this.ChartInstance, index, arrayP[this.AttNameEval]));
-                        //}
+                        groupBar.children.push(this.DrawBar(
+                            Data,
+                            index,
+                            arrayP[this.AttNameEval],
+                            this.ChartInstance.percentCalc == true ? Group.count : this.MaxVal
+                        ));
                         index++;
                     });
                 }
@@ -145,24 +156,24 @@ class ColumChart extends HTMLElement {
         })
         return SectionLabels;
     }
-    DrawBar(DataValue, Config, index, SerieName = "") {
-        var Size = Config.ContainerSize;
+    DrawBar(DataValue, index, SerieName = "", MaxVal) {
+        //console.log(MaxVal);
+        var Size = this.ChartInstance.ContainerSize;
         var Size = 180;
-        var BarSize = DataValue == "n/a" ? 0 : ((DataValue > this.MinVal ? DataValue - this.MinVal : DataValue)
-            / (DataValue > 10 ? this.MaxVal + 10 - this.MinVal : this.MaxVal)); //% de tamaño
+        var BarSize = DataValue == "n/a" ? 0 : DataValue / MaxVal;
         var labelCol = DataValue;
         var styleP = "";
-        if (Config.ColumnLabelDisplay == 1) {
+        if (this.ChartInstance.percentCalc == true) {
             //dibujar el valor en porcentaje
             //styleP = ";flex-grow: 1;"
             var multiplier = Math.pow(10, 1 || 0);
-            var number = DataValue / (this.MaxVal > 0 ? this.MaxVal : 1) * 100
+            var number = DataValue / (MaxVal > 0 ? MaxVal : 1) * 100
             number = Math.round(number * multiplier) / multiplier
             labelCol = number + '%';
         }
         var Bars = WRender.CreateStringNode(`<Bars class="Bars"
                 name="${SerieName.replaceAll(" ", "_")}"
-                style="${styleP}height:${Size * BarSize}px;background:${Config.Colors[index]}">
+                style="${styleP}height:${Size * BarSize}px;background:${this.ChartInstance.Colors[index]}">
                 <label>
                     ${labelCol}
                 </labe>
@@ -175,27 +186,20 @@ class ColumChart extends HTMLElement {
         }
         return Bars;
     }
-    _DrawBackgroundLine(value, size = 600, ValP, label = true) {
-        //console.log(value)
+    _DrawBackgroundLine(label = true) {
         var countLine = 8;
-        var val = value > 10 ? parseFloat((value + 10 - this.MinVal) / countLine)
-            : parseFloat((value) / countLine);
-        //console.log( value, this.MinVal);
-        //%
-        //countLine = 7
-        if (ValP == 1) {
-            countLine = 7
-            //var value = parseInt(value / 10) * 10 + 10;
-            val = 7;
+        var val = parseFloat(this.MaxVal / countLine)
+        if (this.ChartInstance.percentCalc == true) {
+            countLine = 10
+            val = 10;
         }
         var ContainerLine = document.createElement('section');
         ContainerLine.className = "BackGrounLineX";
-        var valueLabel = this.MinVal > 10 ? this.MinVal : 0;
-
+        var valueLabel = 0;
         for (let index = 0; index < countLine; index++) {
             if (label) {
                 ContainerLine.className = "BackGrounLineX BackGrounLineXNumber";
-                if (ValP == 1) {
+                if (this.ChartInstance.percentCalc == true) {
                     valueLabel = valueLabel + val;
                     ContainerLine.appendChild(WRender.CreateStringNode(
                         `<path class="CharLineXNumber"><label>${valueLabel}%</label></path>`
@@ -207,7 +211,7 @@ class ColumChart extends HTMLElement {
                     ));
                 }
             } else {
-                if (ValP == 1) {
+                if (this.ChartInstance.percentCalc == true) {
                     valueLabel = valueLabel + val;
                     ContainerLine.appendChild(WRender.CreateStringNode(
                         `<path class="CharLineX"></path>`
@@ -335,7 +339,7 @@ class RadialChart extends HTMLElement {
         super();
         this.attachShadow({ mode: "open" });
         this.ChartInstance = ChartInstance;
-        this.ChartInstance.Colors = this.ChartInstance.Colors ?? []
+        this.ChartInstance.Colors = this.ChartInstance.Colors ?? ColorsList
     }
     attributeChangedCallBack() {
         this.DrawChart();
@@ -441,7 +445,7 @@ class RadialChart extends HTMLElement {
                     transform: `translate(0,0),rotate(-${degs + (degs2)})`,
                 }
             })
-            if (Config.ColumnLabelDisplay == 0) {
+            if (Config.percentCalc == true) {
                 TextSVG.append(document.createTextNode(porcentaje + "%"));
             } else {
                 TextSVG.append(document.createTextNode(element[Config.EvalValue]));
@@ -514,6 +518,12 @@ const WChartStyle = (ChartInstance) => {
                     "white-space": "nowrap",
                     "max-height": 450,
                     position: "relative"
+                }),new WCssClass(".WChartContainer h3", {
+                    color: "#444",
+                    "font-size": " 18px",
+                    "padding-bottom": 10,
+                    display: "flex",
+                    "justify-content": "center",
                 }), new WCssClass(".SectionLabels, .SectionLabelGroup ", {
                     "display": " flex",
                     "justify-content": " center",

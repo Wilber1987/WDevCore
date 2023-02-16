@@ -1032,15 +1032,14 @@ class WForm extends HTMLElement {
                 justify-content: center;
                 align-items: center;
                 border: none;
-                background-color: rgba(0, 0, 0, 0.2);
+                background-color: rgba(0, 0, 0, 0.2);                
             }
 
             .HeaderIcon {
                 height: 50px;
                 width: 50px;
                 position: relative;
-                left: -10px;
-                ;
+                left: -10px;                
             }
 
             .ObjectModalContainer {
