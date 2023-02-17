@@ -26,23 +26,13 @@ class WCalendar extends HTMLElement {
         this.now = new Date();
         this.year = this.now.getFullYear();
         this.attachShadow({ mode: "open" });
+        this.SetStyle({
+            boxShadow: "0 2px 5px 0px rgb(0 0 0 / 50%)", borderRadius: "0.5cm", overflow: "hidden", height: "390px", position: "relative"
+        });
     }
     connectedCallback() {
         if (this.shadowRoot.innerHTML != "") { return; }
         this.shadowRoot.append(WRender.createElement(this.StyleCalendar()));
-        this.append(WRender.createElement({
-            type: "w-style",
-            props: {
-                ClassList: [
-                    new WCssClass("#" + this.id, {
-                        overflow: "hidden",
-                        "border-radius": "0.2cm",
-                        display: "block",
-                        border: "solid 1px #e9e9e9",
-                    })
-                ]
-            }
-        }))
         this.DrawComponent();
     }
     async DrawComponent() {
@@ -183,9 +173,7 @@ class WCalendar extends HTMLElement {
                 innerText: "<", class: "pagBTN",
                 onclick: () => {
                     this.ActualPage = this.ActualPage - 1;
-                    if (this.ActualPage < 0) {
-                        this.ActualPage = 11;
-                    }
+                    if (this.ActualPage < 0) this.ActualPage = 11;
                     SelectPage(this.ActualPage);
                 }
             }
@@ -195,9 +183,7 @@ class WCalendar extends HTMLElement {
                 innerText: ">", class: "pagBTN",
                 onclick: () => {
                     this.ActualPage = this.ActualPage + 1;
-                    if (this.ActualPage > 11) {
-                        this.ActualPage = 0;
-                    }
+                    if (this.ActualPage > 11) this.ActualPage = 0;
                     SelectPage(this.ActualPage);
                 }
             }
@@ -231,16 +217,16 @@ class WCalendar extends HTMLElement {
                         "text-align": "center"
                     }), new WCssClass(`.GridDayColum`, {
                         display: "grid",
-                        "grid-template-rows": "35px 35px 35px 35px 35px 35px",
+                        "grid-template-rows": "45px 45px 45px 45px 45px 45px",
                     }), new WCssClass(`.CalendarDayDisable`, {
                         padding: 10,
                         "font-size": 12,
-                        border: "solid 1px #999",
-                        "background-color": "#bebebe",
+                        border: "solid 1px #bbbb",
+                        "background-color": "rgb(242 242 242)",
                     }), new WCssClass(`.CalendarDay`, {
                         padding: 10,
                         "font-size": 12,
-                        border: "solid 1px #c6c5c5",
+                        border: "solid 1px #bbbb",
                         cursor: "pointer",
                         transition: "all 0.5s"
                     }), new WCssClass(`.CalendarDay:hover`, {
@@ -270,6 +256,10 @@ class WCalendar extends HTMLElement {
                         "padding-left": "20px",
                         "padding-right": "20px",
                         background: "#d8d8d8",
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
                     }),
                 ],
                 MediaQuery: [{
@@ -281,9 +271,8 @@ class WCalendar extends HTMLElement {
         return Style;
     }
 }
-const Reservaciones = []
 class DetailDayClass extends HTMLElement {
-    constructor(Props = {}, DateParam, agenda = [], reservaciones = []) {
+    constructor(Props = {}, DateParam, agenda = [],  Calendario = [],  SelectedBlocks = []) {
         super();
         this.id = "baseDayDetail";
         for (const p in Props) {
@@ -295,7 +284,6 @@ class DetailDayClass extends HTMLElement {
         if (DateParam == null) {
             this.append(WRender.Create({
                 class: "DayContent", children: [
-                    { tagName: "h5", innerText: "Detalle" },
                     { tagName: "label", innerText: "Seleccionar el día" }
                 ]
             }));
@@ -304,8 +292,8 @@ class DetailDayClass extends HTMLElement {
         this.append(WRender.Create({
             class: "DayContent",
             children: [
-                { tagName: "h5", innerText: ListDays[DateParam.day] },
-                { tagName: "h3", innerText: (new Date(DateParam.date)).getDate() + 1 }
+                { tagName: "label", innerText: ListDays[DateParam.day] },
+                { tagName: "label", innerText: (new Date(DateParam.date)).getDate() + 1 }
             ]
         }));
         const hours = [
@@ -331,7 +319,7 @@ class DetailDayClass extends HTMLElement {
             if (DayState == true) {
                 hour.className = "hourDetail hourH";
                 let Reservable = true;
-                reservaciones.forEach(reserva => {
+                Calendario.forEach(reserva => {
                     const fecha1R = new Date(reserva.Fecha_Inicial);
                     const fecha2R = new Date(reserva.Fecha_Final);
                     if (fecha1.toString() == fecha1R.toString()
@@ -348,10 +336,10 @@ class DetailDayClass extends HTMLElement {
                     hour.append(checkB);
                     checkB.onchange = async (ev) => {
                         if (checkB.checked == false) {
-                            let filtObject = Reservaciones.indexOf(
-                                Reservaciones.find(a => a.id == element)
+                            let filtObject = SelectedBlocks.indexOf(
+                                SelectedBlocks.find(a => a.id == element)
                             );
-                            Reservaciones.splice(filtObject, 1);
+                            SelectedBlocks.splice(filtObject, 1);
                             return;
                         }
                         const dataPost = {
@@ -359,7 +347,7 @@ class DetailDayClass extends HTMLElement {
                             Fecha_Inicial: `${DateParam.date}T${element}:00.000Z`,
                             Fecha_Final: `${DateParam.date}T${element.replace(":00", ":59")}:00.000Z`
                         }
-                        Reservaciones.push(dataPost);
+                        SelectedBlocks.push(dataPost);
                     }
                 }
             }
@@ -378,18 +366,17 @@ class DetailDayClass extends HTMLElement {
         props: {
             ClassList: [
                 new WCssClass(`.DayDetail`, {
-                    //border: "1px solid #888",
                     display: "flex",
                     "flex-direction": "column",
                     overflow: "auto",
-                    "margin": "15px",
+                    "margin-left": 15,
                     "border-radius": "0.5cm",
                     "box-shadow": "0 2px 5px 0px rgb(0 0 0 / 50%)",
                 }), new WCssClass(`.hourDetail label`, {
                     //border: "1px solid #888",
                     display: "block",
                     padding: "5px 25px",
-                    "font-size": "18px",
+                    "font-size": "12px",
                     "margin-bottom": "0px !important",
                     cursor: "pointer",
                 }), new WCssClass(`.hourDetail`, {
@@ -401,15 +388,15 @@ class DetailDayClass extends HTMLElement {
                 }), new WCssClass(`.hourH label::after`, {
                     'content': '""',
                     'background': 'transparent',
-                    'border': '2px solid #757575 !important',
-                    'height': '15px',
-                    'line-height': '15px',
+                    'border': '2px solid #b2b2b2 !important',
+                    'height': '12px',
+                    'line-height': '12px',
                     'margin-right': '5px',
                     'text-align': 'center',
                     'vertical-align': 'middle',
-                    'width': '15px',
+                    'width': '12px',
                     'position': 'relative',
-                    'margin': '5px',
+                    'margin': '0px',
                     'float': 'right',
                     'top': '0px'
                 }), new WCssClass(
@@ -417,8 +404,8 @@ class DetailDayClass extends HTMLElement {
                     "content": "''",
                     "font-size": "15px",
                     "color": "#757575",
-                    "background-color": "#757575;   ",
-                    "box-shadow": "inset 0 0 0 3px #e2e2e2",
+                    "background-color": "#4894aa;   ",
+                    "box-shadow": "inset 0 0 0 2px #e2e2e2",
                     "transition": "all ease 0.5s",
                 }), new WCssClass(`.hourR`, {
                     background: "#cdccdb",
@@ -426,35 +413,39 @@ class DetailDayClass extends HTMLElement {
                     background: "#fff",
                     cursor: "pointer",
                 }), new WCssClass(`.DayContent`, {
-                    "text-align": "center",
-                    padding: "10px",
-                    "border-bottom": "1px solid #b2b2b2",
+                    display: "flex",
+                    padding: "10px 15px",
+                    gap: 10,
+                    "font-weight": "600",
+                    "border-bottom": "1px solid #b2b2b2"
                 })
             ]
         }
     };
 }
 
-const CalendarManager = new ComponentsManager();
-class ReservaConfig {
-    Reservaciones = [];
+
+class CalendarComponentConfig {
+    SelectedBlocks = [];
+    ModelObject = () => { };
     CalendarFunction = async () => {
         return {
-            agenda: [],
-            calendario: []
+            Agenda: [],
+            Calendario: []
         };
     };
     SaveFunction = async () => { };
     Form = undefined;
 }
-class ReservarComponent extends HTMLElement {
-    constructor(Config = (new ReservaConfig())) {
+class WCalendarComponent extends HTMLElement {
+    constructor(Config = (new CalendarComponentConfig())) {
         super();
         for (const p in Config) {
             this[p] = Config[p];
         }
-        this.Reservaciones = Reservaciones;
+        this.SelectedBlocks = this.SelectedBlocks ?? [];
         this.className = "Reservar";
+        this.CalendarManager = new ComponentsManager();
         this.DrawComponent();
     }
     DrawComponent = async () => {
@@ -463,11 +454,11 @@ class ReservarComponent extends HTMLElement {
             Function: async (DateParam) => {
                 const IdDetailDay = `DetailDay${DateParam.date}`;
                 const response = await this.CalendarFunction();
-                CalendarManager.NavigateFunction(
+                this.CalendarManager.NavigateFunction(
                     IdDetailDay,
                     new DetailDayClass({
                         id: IdDetailDay
-                    }, DateParam, response.Agenda, response.Calendario));
+                    }, DateParam, response.Agenda, response.Calendario, this.SelectedBlocks));
             }
         });
         const DetailDay = WRender.Create({
@@ -475,15 +466,14 @@ class ReservarComponent extends HTMLElement {
             id: "DetailCalendar",
             children: [new DetailDayClass()]
         });
-        CalendarManager.MainContainer = DetailDay;
-        this.append(this.Style, this.Form, calendar, DetailDay);
+        this.CalendarManager.MainContainer = DetailDay;
+        this.append(this.Style, calendar, DetailDay);
     }
     Style = new WStyledRender({
         ClassList: [
             new WCssClass(`.Reservar`, {
                 display: "grid",
-                "grid-template-rows": "330px 400px",
-                "grid-template-columns": "50% 50%",
+                "grid-template-columns": "70% 30%",
                 "text-align": "left"
             }), new WCssClass(`.Form`, {
                 margin: "auto",
@@ -492,14 +482,15 @@ class ReservarComponent extends HTMLElement {
                 width: "calc(100% - 30px)",
                 padding: "10px",
                 "grid-row": "1/3",
-            }), new WCssClass(`.DetailCalendar`, {
+            }), new WCssClass(`w-day-calendar`, {
                 width: "100%",
-            }), new WCssClass(`#Calendar`, { })
+                height: 390
+            })
         ]
     });
 }
 
-customElements.define('w-reserva-calendar', ReservarComponent);
+customElements.define('w-calendar-component', WCalendarComponent);
 customElements.define('w-day-calendar', DetailDayClass);
 customElements.define("w-calendar", WCalendar);
-export { WCalendar, DetailDayClass, ReservarComponent }
+export { WCalendar, DetailDayClass, WCalendarComponent }

@@ -5,6 +5,7 @@ import { WModalForm, WSimpleModalForm } from './WModalForm.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { WIcons } from '../WModules/WIcons.js';
 import { WTableComponent } from './WTableComponent.js';
+import { WCalendar, WCalendarComponent } from './WCalendar.js';
 let photoB64;
 const ImageArray = [];
 class FormConfig {
@@ -112,8 +113,8 @@ class WForm extends HTMLElement {
         }
         return flag;
     }
-    ShowFormDetail(ObjectF = this.ObjectDetail) {  
-           
+    ShowFormDetail(ObjectF = this.ObjectDetail) {
+
     }
     CrudForm = async (ObjectF = {}, ObjectOptions) => {
         if (this.AddItemsFromApi != undefined) {
@@ -146,11 +147,7 @@ class WForm extends HTMLElement {
             ObjectF[prop] = val;
             Model[prop] = Model[prop] != null ? Model[prop] : "";
             if (this.isNotDrawable(Model, prop)) {
-                if (ObjectOptions.AddObject == true) {
-                    ObjectF[prop] = -1;
-                } else {
-                    ObjectF[prop] = ObjectF[prop] ?? Model[prop];
-                }
+                ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;
             } else if (!prop.includes("_hidden")) {
                 const ControlLabel = WRender.Create({
                     tagName: "label", class: "inputTitle label_" + prop,
@@ -193,7 +190,8 @@ class WForm extends HTMLElement {
                     }
                     const tool = ev.target.parentNode.querySelector(".ToolTip");
                     if (tool) tool.remove();
-                    if (ev.target.type == "file") {
+                    if (ev.currentTarget.tagName.toUpperCase().includes("W-CALENDAR-COMPONENT")) {
+                    } else if (ev.target.type == "file") {
                         if (ev.target.multiple) {
                             await this.SelectedFile(ev.target.files, true);
                         } else {
@@ -422,6 +420,12 @@ class WForm extends HTMLElement {
                     tagName: "textarea", style: { height: "100px", borderRadius: "10px" }, className: prop, value: val
                 });
                 break;
+            case "CALENDAR":
+                ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
+                ControlContainer.classList.add("tableContainer");
+                ControlContainer.style.height = "auto";
+                InputControl = this.createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model);
+                break;
             default:
                 val = ObjectF[prop] ?? Model[prop].defaultValue ?? "";
                 const placeholder = Model[prop].placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
@@ -436,14 +440,20 @@ class WForm extends HTMLElement {
         }
         if (Model[prop].pattern) InputControl.pattern = Model[prop].pattern;
         ControlLabel.innerHTML += Model[prop].require == true ? "*" : "";
-
         return InputControl;
     }
 
     isModelFromFunction(Model, prop) {
         return Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject;
     }
-
+    createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
+        InputControl = new WCalendarComponent({
+            CalendarFunction: Model[prop].CalendarFunction,
+            SelectedBlocks: ObjectF[prop]
+        });
+        //ObjectF[prop] = InputControl.SelectedBlocks;
+        return InputControl;
+    }
     createDrawComponent(InputControl, prop, ControlContainer, ObjectF) {
         InputControl = WRender.Create({
             tagName: "canvas",
@@ -564,7 +574,6 @@ class WForm extends HTMLElement {
                 lastPos = mousePos;
             }
         }
-
         function clearCanvas() {
             InputControl.width = InputControl.width;
         }
@@ -597,9 +606,7 @@ class WForm extends HTMLElement {
                 }
             });
         } else if (val != null && val != undefined && val.__proto__ == Object.prototype) {
-            console.log(val);
             const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, val));
-            console.log(FindItem);
             if (FindItem) {
                 InputControl.selectedItems.push(FindItem);
             }
@@ -610,7 +617,6 @@ class WForm extends HTMLElement {
             }
         }
     }
-
 
     async CreateWSelect(InputControl, Dataset, prop, ObjectF) {
         const { MultiSelect } = await import("./WMultiSelect.js");
@@ -746,13 +752,15 @@ class WForm extends HTMLElement {
         if (!this.Validate(ObjectF)) {
             return;
         }
-        if (this.ObjectOptions.Url != undefined) {
+
+        if (this.SaveFunction != undefined) {
+            this.SaveFunction(ObjectF);
+        } else if (this.ObjectOptions.Url != undefined) {
             const ModalCheck = this.ModalCheck(ObjectF);
             this.shadowRoot.append(ModalCheck)
         } else {
-            if (this.SaveFunction != undefined) {
-                this.SaveFunction(ObjectF);
-            }
+            const ModalCheck = this.ModalCheck(ObjectF, true);
+            this.shadowRoot.append(ModalCheck)
         }
     }
     Validate = (ObjectF) => {
@@ -809,7 +817,7 @@ class WForm extends HTMLElement {
         control.focus();
     }
 
-    ModalCheck(ObjectF) {
+    ModalCheck(ObjectF, withModel = false) {
         const ModalCheck = new WModalForm({
             ObjectModal: [
                 WRender.Create({ tagName: "h3", innerText: "¿Esta seguro que desea guardar este registro?" }),
@@ -818,13 +826,24 @@ class WForm extends HTMLElement {
                     children: [
                         WRender.Create({
                             tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async () => {
-                                const response = await WAjaxTools.PostRequest(this.ObjectOptions.Url, ObjectF);
-                                ModalCheck.close();
+                                try {
+                                    if (withModel) {
+                                        console.log(this.ModelObject);
+                                        const response = await this.ModelObject?.SaveWithModel(ObjectF);
+                                    } else {
+                                        const response = await WAjaxTools.PostRequest(this.ObjectOptions.Url, ObjectF);
+                                    }
+                                    ModalCheck.close(); 
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                                
                                 if (this.SaveFunction != undefined) {
                                     this.SaveFunction(ObjectF);
                                 } else if (this.ObjectOptions.SaveFunction != undefined) {
                                     this.ObjectOptions.SaveFunction(ObjectF);
                                 }
+
                             }
                         }),
                         WRender.Create({

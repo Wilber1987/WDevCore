@@ -1,15 +1,12 @@
 import { WAjaxTools } from "./WComponentsTools.js";
 
 class EntityClass {
-    constructor(props, Namespace) {
-        for (const prop in props) {
-            this[prop] = props[prop];
-        }
+    constructor(props, Namespace) {       
         this.ApiMethods = {
             ApiRoute: window.origin + "/api/",
             Get: "Api" + Namespace + "/get" + this.__proto__.constructor.name,
-            Set: "Api" + Namespace + "/get" + "/save" + this.__proto__.constructor.name,
-            Update: "Api" + Namespace + "/get" + "/update" + this.__proto__.constructor.name,
+            Set: "Api" + Namespace + "/save" + this.__proto__.constructor.name,
+            Update: "Api" + Namespace + "/update" + this.__proto__.constructor.name,
         }
     }   
     Get = async (Param = "") => {
@@ -42,6 +39,10 @@ class EntityClass {
         // let Dataset = await fetch(this.ApiMethods.ApiRoute + this.constructor.name + '.json');
         //Dataset = await Dataset.json()
         return Dataset;
+    }
+    SaveWithModel = async (Object) => {
+        await this.SaveData(this.ApiMethods.Set, Object);
+        return true;
     }
     SaveData = async (Path, Data) => {
         return await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, Data)

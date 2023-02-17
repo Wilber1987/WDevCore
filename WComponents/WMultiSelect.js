@@ -13,6 +13,7 @@ class MultiSelect extends HTMLElement {
         super();
         this.Config = Config;
         this.Dataset = this.Config.Dataset ?? [];
+        this.ModelObject = this.Config.ModelObject ?? undefined;
         this.attachShadow({ mode: 'open' });
         this.selectedItems = [];
         this.NameSelected = "";
@@ -123,7 +124,7 @@ class MultiSelect extends HTMLElement {
             const Detail = this.FullDetail == true ? this.BuilDetail(element) : "";
             this.OptionsContainer.append(WRender.Create({
                 className: "OContainer",
-                children: [OptionLabel, Option , Detail , SubContainer]
+                children: [OptionLabel, Option, Detail, SubContainer]
             }));
         });
     }
@@ -162,7 +163,6 @@ class MultiSelect extends HTMLElement {
                 }));
             }
         });
-        //this.LabelMultiselect.append(WRender.Create())
     }
     DisplayText(element, index) {
         return element.Descripcion ??
@@ -205,14 +205,15 @@ class WToolTip extends HTMLElement {
                 width: 100%;
                 z-index: 1;
                 box-shadow: 0 0 5px rgb(0 0 0 / 50%);
-                transition: all .5s;
+                transition: all .1s;
                 max-height: 0px;
                 background-color: #fff;
-                overflow: hidden;
+                overflow: hidden;    
+                width: 400px;           
             }
             w-tooltip.active {
                 max-height: 600px;
-                overflow: auto;
+                overflow: auto;                
             }
         `)
     }
@@ -253,6 +254,8 @@ const MainMenu = css`
     w-tooltip:hover,
     .txtControl:focus~w-tooltip,
     .toolActive {
+        position: fixed;
+        border: solid 1px #9b9b9b;
         max-height: 600px;
     }
     .toolInactive {
@@ -279,7 +282,7 @@ const MainMenu = css`
     .OptionsContainer {
         max-height: 500px;
         overflow-y: auto;
-        transition: all .6s;
+        transition: all .1s;
         width: 100%;
         background: #fff;
         position: relative;
@@ -289,7 +292,7 @@ const MainMenu = css`
         max-height: 500px;
     }
     .OContainer {
-        transition: all 0.6s;
+        transition: all 0.1s;
         cursor: pointer;
         display: grid;
         background: #fff;
@@ -311,7 +314,7 @@ const MainMenu = css`
         width: 100%;
         grid-column: 1/3;
         background-color: rgb(0, 0, 0, 35%);
-        transition: all 0.6s;
+        transition: all 0.1s;
         overflow: hidden;
     }
     .SubMenu w-multi-select:first-child {
@@ -342,18 +345,21 @@ const MainMenu = css`
         background: #000;
         clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
         ;
-        transition: all 0.6s;
+        transition: all 0.1s;
     }
     .spanActive {
         transform: rotate(-180deg);
     }
-    .ElementDetail{
+    .ElementDetail {
         display: grid;
-        grid-template-columns: 120px calc(100% - 120px);
-        padding: 20px;
-        background-color: #dedcdc;
+        grid-template-columns: auto auto auto auto;
+        padding: 10px;
+        background-color: #eeeeee;
         border-radius: 10px;
-        margin: 10px;    
+        margin: 10px;
+        font-size: 11px;
+        grid-column: span 2;
+        font-weight: 500;
     }
     .ElementProp{
 

@@ -934,3 +934,6 @@ String.prototype.toDateTimeFormatEs = function () {
     const fecha = new Date(this);
     return this.toDateFormatEs() + ' hora ' + pad(fecha.getUTCHours()) + ':' + pad(fecha.getUTCMinutes());
 };
+HTMLElement.prototype.SetStyle = function (Style = (new ElementStyle())) {
+    WRender.SetStyle(this, Style);
+}

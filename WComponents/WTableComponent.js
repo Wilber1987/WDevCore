@@ -67,7 +67,8 @@ class WTableComponent extends HTMLElement {
         //this.TableConfig.MasterDetailTable = true
         if (this.TableConfig != undefined) {
             this.Dataset = this.TableConfig.Dataset;
-            if (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined) {
+            if ((this.Dataset == undefined || this.Dataset == null) 
+            && (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined)) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             }
             if (this.Dataset == undefined) {
@@ -352,7 +353,7 @@ class WTableComponent extends HTMLElement {
                     if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
                         Model[prop].ModelObject = Model[prop].ModelObject();
                         Model[prop].Dataset = await Model[prop].ModelObject.Get();
-                    }  
+                    }
                     tr.append(WRender.Create({
                         tagName: "td", className: "tdAcordeon", innerHTML:
                             //"<label class='LabelTd'>" + element[prop].length + " Elementos: </label>" +
@@ -1023,7 +1024,6 @@ class WCardTable extends HTMLElement {
         if (this.Element[prop] != null) {
             value = this.Element[prop];
         }
-        console.log(this.Config.ImageUrlPath);
         if (this.IsDrawableProp(this.Element, prop)) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
