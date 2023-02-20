@@ -1,10 +1,10 @@
-import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
+import { WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
-import { css, WCssClass } from "../WModules/WStyledRender.js";
+import { WCssClass, css } from "../WModules/WStyledRender.js";
 import { ModalVericateAction } from "./WForm.js";
 import { WModalForm } from "./WModalForm.js";
-import { WToolTip } from "./WMultiSelect.js";
+
 class TableConfig {
     Dataset = [];
     ModelObject = {};
@@ -21,7 +21,11 @@ class TableConfig {
     }
 }
 class WTableComponent extends HTMLElement {
-    constructor(Config = (new TableConfig())) {
+    /**
+     * 
+     * @param {TableConfig} Config 
+     */
+    constructor(Config) {
         super();
         this.TableClass = "WTable WScroll";
         this.Dataset = [];
@@ -108,6 +112,10 @@ class WTableComponent extends HTMLElement {
     }
     //BASIC TABLE-----------------------------------------------------------------------
     //#region tabla basica --------------------------------------------------------------
+    /**
+     * 
+     * @param {Array} Dataset 
+     */
     DefineModelObject(Dataset = this.Dataset) {
         if (this.TableConfig.ModelObject == undefined) {
             for (const prop in Dataset[0]) {
@@ -117,6 +125,10 @@ class WTableComponent extends HTMLElement {
             this.ModelObject = this.TableConfig.ModelObject;
         }
     }
+    /**
+     * 
+     * @param {Array} Dataset 
+     */
     DrawTable(Dataset = this.Dataset) {
         this.DefineModelObject(Dataset);
         let table = this.shadowRoot.querySelector("#MainTable" + this.id);
@@ -210,7 +222,7 @@ class WTableComponent extends HTMLElement {
             return null;
         }
         return null;
-    }
+    }    
     DrawTHead = (element = this.ModelObject) => {
         const thead = WRender.Create({ tagName: "thead" });
         //const element = this.Dataset[0];
@@ -228,7 +240,7 @@ class WTableComponent extends HTMLElement {
         }
         thead.append(tr);
         return thead;
-    }
+    }    
     DrawTBody = (Dataset = this.Dataset) => {
         let tbody = { type: "tbody", props: {}, children: [] };
         if (this.paginate == true && Dataset.length > this.maxElementByPage) {
@@ -999,7 +1011,8 @@ const WIcons = {
 }
 const Money = { Euro: "€", Dollar: "$", Cordoba: "C$" }
 customElements.define("w-table-basic", WTableComponent);
-export { WTableComponent }
+export { WTableComponent };
+export { WCardTable };
 class WCardTable extends HTMLElement {
     constructor(Element, Model, Config) {
         super();
@@ -1083,4 +1096,3 @@ class WCardTable extends HTMLElement {
     }
 }
 customElements.define('w-card-table', WCardTable);
-export { WCardTable }

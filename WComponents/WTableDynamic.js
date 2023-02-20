@@ -52,7 +52,7 @@ class WTableDynamicComp extends HTMLElement {
         }
         this.GroupsData = [];
         this.ProcessData = [];
-        this.EvalArray = WArrayF.ArrayUnique(this.TableConfig.Dataset, this.AttNameEval);
+        this.EvalArray = WArrayF.GroupBy(this.TableConfig.Dataset, this.AttNameEval);
        this.append(WRender.createElement({
             type: 'w-style', props: {
                 id: '', ClassList: [
@@ -90,7 +90,7 @@ class WTableDynamicComp extends HTMLElement {
     //#region TABLA DINAMICA-------------------------------------------------------------
     DrawGroupTable(Dataset) {
         this.groupParams.forEach(groupParam => {
-            this.GroupsData.push(WArrayF.ArrayUnique(Dataset, groupParam))
+            this.GroupsData.push(WArrayF.GroupBy(Dataset, groupParam))
         });
         let div = this.DrawGroupDiv(this.ChargeGroup(this.GroupsData))
         this.MainTable.append(WRender.createElement(div));
@@ -166,7 +166,7 @@ class WTableDynamicComp extends HTMLElement {
         if (this.EvalValue == null) {
             this.MainTable.innerHTML = "Agregue un Value";
         } else {
-            this.EvalArray = WArrayF.ArrayUnique(Dataset, this.AttNameEval);
+            this.EvalArray = WArrayF.GroupBy(Dataset, this.AttNameEval);
             this.MainTable.innerHTML = "";
             this.GroupsData = [];
             //this.MainTable.style.display = "flex";
@@ -406,7 +406,7 @@ class WTableDynamicComp extends HTMLElement {
                     return;
                 }
                 this.AttNameEval = this.shadowRoot.querySelector("#" + data).name;
-                this.EvalArray = WArrayF.ArrayUnique(this.TableConfig.Dataset, this.AttNameEval);
+                this.EvalArray = WArrayF.GroupBy(this.TableConfig.Dataset, this.AttNameEval);
                 let find = this.groupParams.find(a => a == this.shadowRoot.querySelector("#" + data).name);
                 if (find) {
                     this.groupParams.splice(this.groupParams.indexOf(find), 1);

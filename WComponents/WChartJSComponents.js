@@ -53,10 +53,10 @@ class ColumChart extends HTMLElement {
         this.groupParams.forEach(element => {
             object[element] = "";
         });
-        this.Totals = WArrayF.ArrayUniqueByObject(this.ChartInstance.Dataset, object, this.EvalValue);
+        this.Totals = WArrayF.GroupByObject(this.ChartInstance.Dataset, object, this.EvalValue);
         this.MaxVal = WArrayF.MaxValue(this.Totals, this.EvalValue);
         this.MinVal = WArrayF.MinValue(this.Totals, this.EvalValue);
-        this.EvalArray = WArrayF.ArrayUnique(this.ChartInstance.Dataset, this.AttNameEval);
+        this.EvalArray = WArrayF.GroupBy(this.ChartInstance.Dataset, this.AttNameEval);
         let ChartFragment = WRender.createElement({ type: 'div', props: { id: '', class: 'WChartContainer' } });
         if (this.ChartInstance.Title) {
             ChartFragment.append(WRender.Create({ tagName: "h3", innerText: this.ChartInstance.Title }))
@@ -74,7 +74,7 @@ class ColumChart extends HTMLElement {
         this.groupParams.forEach(groupParam => {
             let object = {};
             object[groupParam] = "";
-            this.GroupsData.push(WArrayF.ArrayUniqueByObject(Dataset, object))
+            this.GroupsData.push(WArrayF.GroupByObject(Dataset, object))
         });
         return this.DrawGroupBars(this.ChargeGroup(this.GroupsData));
     }
@@ -88,7 +88,7 @@ class ColumChart extends HTMLElement {
             children: this.ChargeGroup(Groups, inicio + 1),
             //maxVal: WArrayF.MaxValue(Groups[0], this.EvalValue),
             //minVal: WArrayF.MinValue(Groups[0], this.EvalValue),
-            //sumValue: WArrayF.SumValue(WArrayF.ArrayUnique(Groups[0], this.EvalValue) , "count"),
+            //sumValue: WArrayF.SumValue(WArrayF.GroupBy(Groups[0], this.EvalValue) , "count"),
         }
         return ObjGroup;
     }
