@@ -672,7 +672,9 @@ class WArrayF {
                 prop == "SaveData" ||
                 value[prop] == null ||
                 value[prop] == undefined ||
+                value[prop].__proto__.constructor.name == "AsyncFunction" ||
                 value[prop]?.__proto__ == Object.prototype ||
+                value[prop]?.__proto__ == Function.prototype ||
                 value[prop]?.__proto__ == Array.prototype) {
                 continue;
             }
