@@ -23,7 +23,7 @@ class WReportList extends HTMLElement {
             const Pages = { type:'div', props: { id: '', class: 'GFormPrint'}, children:[
                 { type:'div', props: { id: '', class: 'pageA4'}, children:[]}
             ]} ;
-            const codes = WArrayF.ArrayUnique(this.Dataset, this.groupParam);   
+            const codes = WArrayF.GroupBy(this.Dataset, this.groupParam);   
             codes.forEach((code, index) => {
                 const header = {
                     type: 'div', props: { id: '', class: "header" }, children: []
@@ -156,7 +156,7 @@ class WReportView extends HTMLElement{
                 const select = {type:'select', props: {id: prop}, children:[
                     { type:'option', props: { innerText:'Seleccione', value: ''} }
                 ]}            
-                const SelectData = WArrayF.ArrayUnique(this.Config.Dataset, prop);
+                const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop);
                 SelectData.forEach(data => {
                     if (data[prop] != "" && data[prop] != null) {
                         select.children.push({
@@ -253,7 +253,7 @@ class WReportView extends HTMLElement{
                 if (this.Config.bodyGroup) {    
                     console.log(this.Config.bodyGroup);               
                     const ArraySum = [];
-                    const groups = WArrayF.ArrayUnique(this.Config.Dataset, this.Config.bodyGroup[0].leyend);
+                    const groups = WArrayF.GroupBy(this.Config.Dataset, this.Config.bodyGroup[0].leyend);
                     const SumContainer = { type:'div', props: { class: 'sumaryContainer'},
                     children:[]};
                     groups.forEach(element => {

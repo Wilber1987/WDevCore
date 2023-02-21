@@ -43,7 +43,7 @@ class WFilterOptions extends HTMLElement {
                             { type: 'option', props: { innerText: 'Seleccione', value: '' } }
                         ]
                     }
-                    const SelectData = WArrayF.ArrayUnique(this.Config.Dataset, prop);
+                    const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop);
                     SelectData.forEach(data => {
                         if (data[prop] != "" && data[prop] != null) {
                             select.children.push({

@@ -1,3 +1,4 @@
+import { ElementStyle, WNode } from "./CommonModel.js";
 import { WSecurity } from "./WSecurity.js";
 function type(value) {
     var r;
@@ -431,8 +432,13 @@ class ComponentsManager {
 class WArrayF {
     static JSONParse(param) {
         return JSON.parse((param).replace(/&quot;/gi, '"'));
-    }
-    static orderByDate(Arry, type) {
+    } 
+    /**     * 
+     * @param {Array} Array Arreglo para ordenar 
+     * @param {number} type Valor 1 o 2
+     * @returns 
+     */   
+    static orderByDate(Array, type) {
         var meses = [
             "enero", "febrero", "marzo",
             "abril", "mayo", "junio", "julio",
@@ -440,24 +446,24 @@ class WArrayF {
             "noviembre", "diciembre"
         ];
         if (type == 1) {
-            Arry.sort((a, b) => a.time - b.time);
+            Array.sort((a, b) => a.time - b.time);
         } else if (type == 2) {
-            Arry.forEach(element => {
+            Array.forEach(element => {
                 if (element.time.includes("diciembre")) {
                     var Year = new Date(Date.parse(element.time)).getFullYear();
                     element.time = Date.parse(Year + " December");
                 } else element.time = Date.parse(element.time);
             });
-            Arry.sort((a, b) => a.time - b.time);
+            Array.sort((a, b) => a.time - b.time);
 
-            Arry.forEach(element => {
+            Array.forEach(element => {
                 var fecha = new Date(element.time);
                 element.time = meses[fecha.getMonth()] + " " + fecha.getFullYear();
             });
 
         } else {
             var Array2 = [];
-            Arry.forEach(element => {
+            Array.forEach(element => {
                 var object = {
                     cuarter: null,
                     year: null
@@ -469,18 +475,25 @@ class WArrayF {
             Array2.sort((a, b) => a.year - b.year);
             var Array3 = [];
             Array2.forEach(element => {
-                var object = Arry.find(x => x.time.substring(1, 0).includes(element.cuarter) &&
+                var object = Array.find(x => x.time.substring(1, 0).includes(element.cuarter) &&
                     x.time.includes(element.year));
                 Array3.push(object);
             });
-            Arry = Array3;
+            Array = Array3;
         }
-        return Arry;
+        return Array;
     }
-    static ArrayUnique(DataArray, param, sumParam = null) {
+    /**
+     * Agrupa un arreglo por medio de un parametros
+     * @param {Array} DataArray arreglo original
+     * @param {String} param propiedad por la cual se va a evaluar el arreglo agrupado
+     * @param {String} sumParam parametro a sumar
+     * @returns Arreglo agrupado por parametro con su contador y suma
+     */
+    static GroupBy(DataArray, Property, sumProperty = null) {
         let DataArraySR = []
         DataArray.forEach(element => {
-            const DFilt = DataArraySR.find(x => x[param] == element[param]);
+            const DFilt = DataArraySR.find(x => x[Property] == element[Property]);
             if (!DFilt) {
                 const NewElement = {};
                 for (const prop in element) {
@@ -496,14 +509,14 @@ class WArrayF {
                     DFilt.count = DFilt.count + 1;
                 }
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
-                if (sumParam != null) {
-                    DFilt[sumParam] = DFilt[sumParam] + element[sumParam];
+                if (sumProperty != null) {
+                    DFilt[sumProperty] = DFilt[sumProperty] + element[sumProperty];
                 }
             }
         });
         return DataArraySR;
     }
-    static ArrayUniqueByObject(DataArray, param = {}, sumParam = null) {
+    static GroupByObject(DataArray, param = {}, sumParam = null) {
         let DataArraySR = [];
         DataArray.forEach(element => {
             const DFilt = DataArraySR.find(obj => {
@@ -695,216 +708,7 @@ const GenerateColor = () => {
     return color_aleatorio
 }
 export { WAjaxTools, WRender, ComponentsManager, WArrayF, type, GenerateColor }
-class WNode {
-    constructor(props = {}) {
-        for (const prop in props) {
-            this[prop] = props[prop]
-        }
-        this.tagName = this.tagName ?? "div";
-        this.children = this.children ?? [];
-    }
-    tagName = "div";
-    style = new ElementStyle();
-    className = null;
-    innerText = null;
-    value = null;
-    innerHTML = null;
-    children = [] ?? { tagName: "", N: 0 };
-}
-class ElementStyle {
-    alignContent = null;
-    alignItems = null;
-    alignSelf = null;
-    animation = null;
-    animationDelay = null;
-    animationDirection = null;
-    animationDuration = null;
-    animationFillMode = null;
-    animationIterationCount = null;
-    animationName = null;
-    animationTimingFunction = null;
-    animationPlayState = null;
-    background = null;
-    backgroundAttachment = null;
-    backgroundColor = null;
-    backgroundImage = null;
-    backgroundPosition = null;
-    backgroundRepeat = null;
-    backgroundClip = null;
-    backgroundOrigin = null;
-    backgroundSize = null;
-    backfaceVisibility = null;
-    border = null;
-    borderBottom = null;
-    borderBottomColor = null;
-    borderBottomLeftRadius = null;
-    borderBottomRightRadius = null;
-    borderBottomStyle = null;
-    borderBottomWidth = null;
-    borderCollapse = null;
-    borderColor = null;
-    borderImage = null;
-    borderImageOutset = null;
-    borderImageRepeat = null;
-    borderImageSlice = null;
-    borderImageSource = null;
-    borderImageWidth = null;
-    borderLeft = null;
-    borderLeftColor = null;
-    borderLeftStyle = null;
-    borderLeftWidth = null;
-    borderRadius = null;
-    borderRight = null;
-    borderRightColor = null;
-    borderRightStyle = null;
-    borderRightWidth = null;
-    borderSpacing = null;
-    borderStyle = null;
-    borderTop = null;
-    borderTopColor = null;
-    borderTopLeftRadius = null;
-    borderTopRightRadius = null;
-    borderTopStyle = null;
-    borderTopWidth = null;
-    borderWidth = null;
-    bottom = null;
-    boxDecorationBreak = null;
-    boxShadow = null;
-    boxSizing = null;
-    captionSide = null;
-    caretColor = null;
-    clear = null;
-    clip = null;
-    color = null;
-    columnCount = null;
-    columnFill = null;
-    columnGap = null;
-    columnRule = null;
-    columnRuleColor = null;
-    columnRuleStyle = null;
-    columnRuleWidth = null;
-    columns = null;
-    columnSpan = null;
-    columnWidth = null;
-    content = null;
-    counterIncrement = null;
-    counterReset = null;
-    cursor = null;
-    direction = null;
-    display = null;
-    emptyCells = null;
-    filter = null;
-    flex = null;
-    flexBasis = null;
-    flexDirection = null;
-    flexFlow = null;
-    flexGrow = null;
-    flexShrink = null;
-    flexWrap = null;
-    cssFloat = null;
-    font = null;
-    fontFamily = null;
-    fontSize = null;
-    fontStyle = null;
-    fontVariant = null;
-    fontWeight = null;
-    fontSizeAdjust = null;
-    fontStretch = null;
-    hangingPunctuation = null;
-    height = null;
-    hyphens = null;
-    icon = null;
-    imageOrientation = null;
-    isolation = null;
-    justifyContent = null;
-    left = null;
-    letterSpacing = null;
-    lineHeight = null;
-    listStyle = null;
-    listStyleImage = null;
-    listStylePosition = null;
-    listStyleType = null;
-    margin = null;
-    marginBottom = null;
-    marginLeft = null;
-    marginRight = null;
-    marginTop = null;
-    maxHeight = null;
-    maxWidth = null;
-    minHeight = null;
-    minWidth = null;
-    navDown = null;
-    navIndex = null;
-    navLeft = null;
-    navRight = null;
-    navUp = null;
-    objectFit = null;
-    objectPosition = null;
-    opacity = null;
-    order = null;
-    orphans = null;
-    outline = null;
-    outlineColor = null;
-    outlineOffset = null;
-    outlineStyle = null;
-    outlineWidth = null;
-    overflow = null;
-    overflowX = null;
-    overflowY = null;
-    padding = null;
-    paddingBottom = null;
-    paddingLeft = null;
-    paddingRight = null;
-    paddingTop = null;
-    pageBreakAfter = null;
-    pageBreakBefore = null;
-    pageBreakInside = null;
-    perspective = null;
-    perspectiveOrigin = null;
-    position = null;
-    quotes = null;
-    resize = null;
-    right = null;
-    scrollBehavior = null;
-    tableLayout = null;
-    tabSize = null;
-    textAlign = null;
-    textAlignLast = null;
-    textDecoration = null;
-    textDecorationColor = null;
-    textDecorationLine = null;
-    textDecorationStyle = null;
-    textIndent = null;
-    textJustify = null;
-    textOverflow = null;
-    textShadow = null;
-    textTransform = null;
-    top = null;
-    transform = null;
-    transformOrigin = null;
-    transformStyle = null;
-    transition = null;
-    transitionProperty = null;
-    transitionDuration = null;
-    transitionTimingFunction = null;
-    transitionDelay = null;
-    unicodeBidi = null;
-    userSelect = null;
-    verticalAlign = null;
-    visibility = null;
-    whiteSpace = null;
-    width = null;
-    wordBreak = null;
-    wordSpacing = null;
-    wordWrap = null;
-    widows = null;
-    zIndex = null;
-    gridTemplateColumns = null;
-    gridTemplateRows = null;
-    gridColumn = null;
-    gridRow = null;
-    gridGap = null;
-};
+
 //Date UTILITYS
 function pad(number) {
     if (number < 10) {
@@ -936,6 +740,9 @@ String.prototype.toDateTimeFormatEs = function () {
     const fecha = new Date(this);
     return this.toDateFormatEs() + ' hora ' + pad(fecha.getUTCHours()) + ':' + pad(fecha.getUTCMinutes());
 };
+/**
+ * @param {ElementStyle} Style Estilos del HTMLElement
+ */
 HTMLElement.prototype.SetStyle = function (Style = (new ElementStyle())) {
     WRender.SetStyle(this, Style);
 }
