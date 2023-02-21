@@ -279,7 +279,7 @@ class DetailDayClass extends HTMLElement {
             this[p] = Props[p];
         }
         this.className = "DayDetail DivContainer";
-        const ListDays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        const ListDays = [ "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
         this.append(WRender.createElement(this.Style));
         if (DateParam == null) {
             this.append(WRender.Create({

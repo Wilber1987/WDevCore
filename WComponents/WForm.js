@@ -753,14 +753,12 @@ class WForm extends HTMLElement {
             return;
         }
 
-        if (this.SaveFunction != undefined) {
+        if (this.ObjectOptions.Url != undefined || this.SaveFunction == undefined) {
+            const ModalCheck = this.ModalCheck(ObjectF, this.SaveFunction == undefined);
+            this.shadowRoot.append(ModalCheck)
+        } else  {
+           
             this.SaveFunction(ObjectF);
-        } else if (this.ObjectOptions.Url != undefined) {
-            const ModalCheck = this.ModalCheck(ObjectF);
-            this.shadowRoot.append(ModalCheck)
-        } else {
-            const ModalCheck = this.ModalCheck(ObjectF, true);
-            this.shadowRoot.append(ModalCheck)
         }
     }
     Validate = (ObjectF) => {
@@ -828,22 +826,18 @@ class WForm extends HTMLElement {
                             tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async () => {
                                 try {
                                     if (withModel) {
-                                        console.log(this.ModelObject);
                                         const response = await this.ModelObject?.SaveWithModel(ObjectF);
-                                    } else {
+                                    } else if (this.ObjectOptions.Url != undefined) {
                                         const response = await WAjaxTools.PostRequest(this.ObjectOptions.Url, ObjectF);
                                     }
-                                    ModalCheck.close(); 
+                                    if (this.SaveFunction != undefined) {
+                                        this.SaveFunction(ObjectF);
+                                    } else if (this.ObjectOptions.SaveFunction != undefined) {
+                                        this.ObjectOptions.SaveFunction(ObjectF);
+                                    }
                                 } catch (error) {
                                     console.log(error);
-                                }
-                                
-                                if (this.SaveFunction != undefined) {
-                                    this.SaveFunction(ObjectF);
-                                } else if (this.ObjectOptions.SaveFunction != undefined) {
-                                    this.ObjectOptions.SaveFunction(ObjectF);
-                                }
-
+                                }    
                             }
                         }),
                         WRender.Create({
