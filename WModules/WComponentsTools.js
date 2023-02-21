@@ -516,6 +516,13 @@ class WArrayF {
         });
         return DataArraySR;
     }
+    /**
+     * Agrupa un arreglo por medio de un parametros
+     * @param {Array} DataArray arreglo original
+     * @param {Object} param Objeto con el cual por la cual se va a evaluar el arreglo agrupado
+     * @param {String} sumParam parametro a sumar
+     * @returns Arreglo agrupado por parametro con su contador y suma
+     */
     static GroupByObject(DataArray, param = {}, sumParam = null) {
         let DataArraySR = [];
         DataArray.forEach(element => {
