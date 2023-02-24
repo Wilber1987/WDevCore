@@ -32,7 +32,7 @@ class WAppNavigator extends HTMLElement {
             this.id = "Menu" + Rand;
         }
         this.DrawAppNavigator();
-        if (this.Inicialize == true) {
+        if (this.Inicialize == true && this.InitialNav != undefined) {
             this.InitialNav();
         }
     }

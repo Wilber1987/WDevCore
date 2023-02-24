@@ -171,6 +171,7 @@ class MultiSelect extends HTMLElement {
             element.name ??
             element.Name ??
             element.nombre ??
+            element.Nombre ??
             element.Nombres ??
             "Element" + index;
     }
@@ -186,10 +187,28 @@ class MultiSelect extends HTMLElement {
     BuilDetail = (element) => {
         const elementDetail = WRender.Create({ className: "ElementDetail" });
         for (const prop in WArrayF.replacer(element)) {
-            elementDetail.append(WRender.Create({ className: "ElementProp", innerHTML: WOrtograficValidation.es(prop) }));
-            elementDetail.append(WRender.Create({ className: "ElementValue", innerHTML: WOrtograficValidation.es(element[prop]) }));
+            if (this.IsDrawableProp(element, prop)) {
+                elementDetail.append(WRender.Create({ className: "ElementProp", innerHTML: WOrtograficValidation.es(prop) + ":" }));
+                elementDetail.append(WRender.Create({ className: "ElementValue", innerHTML: WOrtograficValidation.es(element[prop]) }));
+            }
         }
         return elementDetail;
+    }
+    IsDrawableProp(element, prop) {
+        if (this.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
+            return true;
+        }
+        else if ((this.ModelObject[prop]?.type == undefined
+            || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+            || this.ModelObject[prop]?.primary == true
+            || this.ModelObject[prop]?.hidden == true
+            || this.ModelObject[prop]?.hiddenInTable == true)
+            || element[prop] == null || element[prop] == undefined
+            || element[prop]?.__proto__ == Function.prototype
+            || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
+            return false;
+        }
+        return true;
     }
 }
 customElements.define("w-multi-select", MultiSelect);
@@ -360,6 +379,9 @@ const MainMenu = css`
         font-size: 11px;
         grid-column: span 2;
         font-weight: 500;
+    }
+    .ElementDetail:hover,  .OContainer:hover > .ElementDetail {
+        background-color: #d2d2d2;
     }
     .ElementProp{
 

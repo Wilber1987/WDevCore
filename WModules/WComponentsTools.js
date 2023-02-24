@@ -433,7 +433,7 @@ class WArrayF {
     static JSONParse(param) {
         return JSON.parse((param).replace(/&quot;/gi, '"'));
     } 
-    /**     * 
+    /**
      * @param {Array} Array Arreglo para ordenar 
      * @param {number} type Valor 1 o 2
      * @returns 

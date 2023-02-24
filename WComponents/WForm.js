@@ -316,6 +316,10 @@ class WForm extends HTMLElement {
                 this.FindObjectMultiselect(val, InputControl);
                 break;
             case "MULTISELECT":
+                if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
+                    Model[prop].ModelObject = Model[prop].ModelObject();
+                    Model[prop].Dataset = await Model[prop].ModelObject.Get();
+                }
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = new MultiSelect({
@@ -323,7 +327,7 @@ class WForm extends HTMLElement {
                         if (Model[prop].action) {
                             Model[prop].action(selecteds, ControlLabel, InputControl)
                         }
-                    }, Dataset: Datasetilt
+                    }, Dataset: Datasetilt, ModelObject: Model[prop].ModelObject
                 });
                 this.FindObjectMultiselect(val, InputControl);
                 ObjectF[prop] = InputControl.selectedItems;
@@ -623,6 +627,7 @@ class WForm extends HTMLElement {
         InputControl = new MultiSelect({
             MultiSelect: false,
             Dataset: Dataset,
+            ModelObject: this.ModelObject[prop].ModelObject,
             action: (ItemSelects) => {
                 ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_
                     ?? ItemSelects[0][this.findKey(ItemSelects[0])] ?? ItemSelects[0];
@@ -752,12 +757,13 @@ class WForm extends HTMLElement {
         if (!this.Validate(ObjectF)) {
             return;
         }
-
         if (this.ObjectOptions.Url != undefined || this.SaveFunction == undefined) {
             const ModalCheck = this.ModalCheck(ObjectF, this.SaveFunction == undefined);
             this.shadowRoot.append(ModalCheck)
-        } else  {
-           
+        } else if(this.ModelObject?.SaveWithModel != undefined){
+            const ModalCheck = this.ModalCheck(ObjectF, true);
+            this.shadowRoot.append(ModalCheck)
+        } else {
             this.SaveFunction(ObjectF);
         }
     }
@@ -837,7 +843,7 @@ class WForm extends HTMLElement {
                                     }
                                 } catch (error) {
                                     console.log(error);
-                                }    
+                                }
                             }
                         }),
                         WRender.Create({

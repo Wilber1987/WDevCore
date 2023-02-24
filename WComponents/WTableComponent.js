@@ -327,7 +327,9 @@ class WTableComponent extends HTMLElement {
         }
         else if ((this.ModelObject[prop]?.type == undefined
             || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+            || this.ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
             || this.ModelObject[prop]?.primary == true
+            || this.ModelObject[prop]?.hidden == true
             || this.ModelObject[prop]?.hiddenInTable == true)
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
@@ -362,19 +364,19 @@ class WTableComponent extends HTMLElement {
                     tr.append(td);
                     break;
                 case "MULTISELECT":
-                    if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
-                        Model[prop].ModelObject = Model[prop].ModelObject();
-                        Model[prop].Dataset = await Model[prop].ModelObject.Get();
-                    }
-                    tr.append(WRender.Create({
-                        tagName: "td", className: "tdAcordeon", innerHTML:
-                            //"<label class='LabelTd'>" + element[prop].length + " Elementos: </label>" +
-                            `${element[prop].map(object => {
-                                const FObject = Model[prop].Dataset?.find(i => WArrayF.compareObj(object, i));
-                                const label = FObject?.Descripcion ?? FObject?.descripcion ?? FObject?.Correo_institucional ?? FObject;
-                                return `<label class="labelMultiselect">${label}</label>`;
-                            }).join('')}`
-                    }));
+                    // if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
+                    //     Model[prop].ModelObject = Model[prop].ModelObject();
+                    //     Model[prop].Dataset = await Model[prop].ModelObject.Get();
+                    // }
+                    // tr.append(WRender.Create({
+                    //     tagName: "td", className: "tdAcordeon", innerHTML:
+                    //         //"<label class='LabelTd'>" + element[prop].length + " Elementos: </label>" +
+                    //         `${element[prop].map(object => {
+                    //             const FObject = Model[prop].Dataset?.find(i => WArrayF.compareObj(object, i));
+                    //             const label = FObject?.Descripcion ?? FObject?.descripcion ?? FObject?.Correo_institucional ?? FObject;
+                    //             return `<label class="labelMultiselect">${label}</label>`;
+                    //         }).join('')}`
+                    // }));
                     break;
                 case "COLOR":
                     td.append(WRender.Create({
@@ -393,6 +395,15 @@ class WTableComponent extends HTMLElement {
                     }));
                     break;
                 case "OPERATION":
+                    break;
+                case "CALENDAR":
+                    tr.append(WRender.Create({
+                        tagName: "td", className: "tdAcordeon", innerHTML:
+                            `${element[prop].map(object => {
+                                const label = object?.Fecha_Inicial.toDateFormatEs() + " al "+ object?.Fecha_Final.toDateFormatEs() ;
+                                return `<label class="labelMultiselect">${label}</label>`;
+                            }).join('')}`
+                    }));
                     break;
                 case "MASTERDETAIL":
                     break;
@@ -1081,13 +1092,16 @@ class WCardTable extends HTMLElement {
             text-transform: uppercase;
         }
     `
-    IsDrawableProp(element, prop) {
+    IsDrawableProp(element, prop) {            
         if (this.Model == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
-            return true;
+           return true;
         }
         else if ((this.Model[prop]?.type == undefined
             || this.Model[prop]?.type.toUpperCase() == "MASTERDETAIL"
-            || this.Model[prop]?.primary == true)
+            || this.Model[prop]?.primary == true
+            || this.Model[prop]?.hidden == true
+            || this.Model[prop]?.hiddenInTable == true)
+            || element[prop] == null || element[prop] == undefined
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
             return false;
