@@ -760,7 +760,7 @@ class WForm extends HTMLElement {
         if (this.ObjectOptions.Url != undefined || this.SaveFunction == undefined) {
             const ModalCheck = this.ModalCheck(ObjectF, this.SaveFunction == undefined);
             this.shadowRoot.append(ModalCheck)
-        } else if(this.ModelObject?.SaveWithModel != undefined){
+        } else if(this.ModelObject?.SaveWithModel != undefined && this.Autosave == true){
             const ModalCheck = this.ModalCheck(ObjectF, true);
             this.shadowRoot.append(ModalCheck)
         } else {
@@ -832,7 +832,7 @@ class WForm extends HTMLElement {
                             tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async () => {
                                 try {
                                     if (withModel) {
-                                        const response = await this.ModelObject?.SaveWithModel(ObjectF);
+                                        const response = await this.ModelObject?.SaveWithModel(ObjectF);                                        
                                     } else if (this.ObjectOptions.Url != undefined) {
                                         const response = await WAjaxTools.PostRequest(this.ObjectOptions.Url, ObjectF);
                                     }
@@ -840,6 +840,8 @@ class WForm extends HTMLElement {
                                         this.SaveFunction(ObjectF);
                                     } else if (this.ObjectOptions.SaveFunction != undefined) {
                                         this.ObjectOptions.SaveFunction(ObjectF);
+                                    } else {
+                                        ModalCheck.close();
                                     }
                                 } catch (error) {
                                     console.log(error);
