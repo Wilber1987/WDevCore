@@ -306,13 +306,16 @@ class WForm extends HTMLElement {
                 break;
             case "WSELECT":
                 ObjectF[prop] = ObjectF[prop].__proto__ == Object.prototype ? ObjectF[prop] : null;
-                val = ObjectF[prop];
                 if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
                     Model[prop].ModelObject = Model[prop].ModelObject();
                     Model[prop].Dataset = await Model[prop].ModelObject.Get();
+                    if (ObjectF[prop] == null && Model[prop].require != false && Model[prop].Dataset.length > 0) {
+                        ObjectF[prop] = Model[prop].Dataset[0];
+                    }
                 }
-                const Datasetilter = this.CreateDatasetForMultiSelect(Model, prop);
-                InputControl = await this.CreateWSelect(InputControl, Datasetilter, prop, ObjectF);
+                val = ObjectF[prop];
+                const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop);
+                InputControl = await this.CreateWSelect(InputControl, DataseFilter, prop, ObjectF);
                 this.FindObjectMultiselect(val, InputControl);
                 break;
             case "MULTISELECT":
@@ -451,6 +454,7 @@ class WForm extends HTMLElement {
         return Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject;
     }
     createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
+        console.log(Model[prop]);
         InputControl = new WCalendarComponent({
             CalendarFunction: Model[prop].CalendarFunction,
             SelectedBlocks: ObjectF[prop]
@@ -609,7 +613,7 @@ class WForm extends HTMLElement {
                     InputControl.selectedItems.push(FindItem);
                 }
             });
-        } else if (val != null && val != undefined && val.__proto__ == Object.prototype) {
+        } else if (val != null && val != undefined && WArrayF.replacer(val).__proto__ == Object.prototype) {
             const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, val));
             if (FindItem) {
                 InputControl.selectedItems.push(FindItem);
@@ -760,7 +764,7 @@ class WForm extends HTMLElement {
         if (this.ObjectOptions.Url != undefined || this.SaveFunction == undefined) {
             const ModalCheck = this.ModalCheck(ObjectF, this.SaveFunction == undefined);
             this.shadowRoot.append(ModalCheck)
-        } else if(this.ModelObject?.SaveWithModel != undefined){
+        } else if (this.ModelObject?.SaveWithModel != undefined && this.AutoSave) {
             const ModalCheck = this.ModalCheck(ObjectF, true);
             this.shadowRoot.append(ModalCheck)
         } else {

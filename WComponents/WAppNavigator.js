@@ -74,7 +74,6 @@ class WAppNavigator extends HTMLElement {
                 }]
             }
             if (typeof this.NavTitle === "string") {
-                //console.log( this.NavTitle);
                 header.children.push({
                     type: "label", props: { class: "NavTitle", innerText: this.NavTitle }
                 });

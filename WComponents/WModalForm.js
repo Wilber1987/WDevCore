@@ -1,7 +1,7 @@
 import { WRender, WAjaxTools, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
-let photoB64;
+
 class ModalConfig {
     ShadowRoot = null;
     icon = null;
@@ -198,7 +198,7 @@ class WModalForm extends HTMLElement {
                         "border-radius": "0.3cm",
                         "position": "relative",
                         "box-shadow": "0 0px 3px 0px #000",
-                        padding: "0 0 50px 0"
+                        padding: "0 0 10px 0"
 
                     }), new WCssClass(" .ContainerFormWModal h2", {
                         "padding": "10px",
@@ -212,8 +212,6 @@ class WModalForm extends HTMLElement {
                         "text-align": "center",
                         font: "400 13.3333px !important"
                     }), new WCssClass(`.ModalContent`, {
-                        //height: 'calc(100% - 60px)',
-                        //overflow: "hidden",
                         "overflow-y": "auto",
                         display: "block",
                         padding: 30
@@ -267,7 +265,6 @@ class WModalForm extends HTMLElement {
                     condicion: "(max-width: 1200px)",
                     ClassList: [new WCssClass(" .ContainerFormWModal", {
                         width: "90%"
-
                     })]
                 }, {
                     condicion: "(max-width: 800px)",
@@ -388,14 +385,6 @@ class WSimpleModalForm extends HTMLElement {
                 padding: 2em;
                 background: white;
                 border-radius: 20px;
-
-
-                /*ESTILO PSICO*/
-                border-radius: 2cm;
-                border: 3px solid var(--color-primary);
-                padding: 40px;
-                text-align: center;
-
             }
 
             .BtnClose{

@@ -383,12 +383,6 @@ const MainMenu = css`
     .ElementDetail:hover,  .OContainer:hover > .ElementDetail {
         background-color: #d2d2d2;
     }
-    .ElementProp{
-
-    }
-    .ElementValue{
-        
-    }
 `
 const SubMenu = {
     ClassList: [
