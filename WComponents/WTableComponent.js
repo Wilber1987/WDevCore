@@ -397,12 +397,12 @@ class WTableComponent extends HTMLElement {
                 case "OPERATION":
                     break;
                 case "CALENDAR":
+                    const label =  `${element[prop]?.map(object => {
+                        const label = object?.Fecha_Inicial.toDateFormatEs() + " al "+ object?.Fecha_Final.toDateFormatEs() ;
+                        return `<label class="labelMultiselect">${label}</label>`;
+                    }).join('')}`
                     tr.append(WRender.Create({
-                        tagName: "td", className: "tdAcordeon", innerHTML:
-                            `${element[prop].map(object => {
-                                const label = object?.Fecha_Inicial.toDateFormatEs() + " al "+ object?.Fecha_Final.toDateFormatEs() ;
-                                return `<label class="labelMultiselect">${label}</label>`;
-                            }).join('')}`
+                        tagName: "td", className: "tdAcordeon", innerHTML: label == "undefined" ? "" : label                         
                     }));
                     break;
                 case "MASTERDETAIL":
