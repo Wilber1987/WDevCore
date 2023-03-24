@@ -4,6 +4,7 @@ import { css, WCssClass } from "../WModules/WStyledRender.js";
 const StyleScrolls = css`
      *::-webkit-scrollbar {
         width: 20px;
+        height: 20px;
     }
 
     *::-webkit-scrollbar-track {
@@ -87,7 +88,7 @@ const StylesControlsV1 = {
     }
 }
 const StylesControlsV2 = css`
-    .Btn-Mini, .Btn-Mini-Alert {
+    .Btn-Mini, .Btn-Mini-Alert, .Btn-Mini-Success {
         width: 100px;
         background-color: #1c4786;
         border: none;
@@ -121,6 +122,9 @@ const StylesControlsV2 = css`
         display: block;
         background-color: #202020;
         clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+    }
+    .Btn-Mini-Success {
+        background-color: #28a745;
     }
 
     .Btn-Mini-Alert {

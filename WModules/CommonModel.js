@@ -1,4 +1,11 @@
+/**
+ * 
+ */
 class WNode {
+    /**
+     * 
+     * @param {*} props 
+     */
     constructor(props = {}) {
         for (const prop in props) {
             this[prop] = props[prop]
@@ -6,13 +13,40 @@ class WNode {
         this.tagName = this.tagName ?? "div";
         this.children = this.children ?? [];
     }
+     /**
+     * @property {!String} [tagName="div"] 
+     */
     tagName = "div";
+     /**
+     * @property {!String} [x="div"] 
+     */
+    type = new String();
+    /**
+     * @property {!String || !Object} [x="div"] 
+     */
     style = new ElementStyle();
-    className = null;
-    innerText = null;
-    value = null;
-    innerHTML = null;
+     /**
+     * @property {!String} [x="div"] 
+     */
+    className = new String();
+    /**
+     * @property {!String} [innerText=]
+     */
+    innerText = new String();
+    /**
+     * @property {!String}  [x="div"] 
+     */
+    value = new String();
+    /**
+     * @property {!String} [x="div"] 
+     */
+    innerHTML = new String();
+    /**
+     * @property {!Array<WNode>} [x=[]] 
+     */
     children = [] ?? { tagName: "", N: 0 };
+    /** @param {function()} x */
+    onclick = ()=>{} 
 }
 class ElementStyle {
     alignContent = null;

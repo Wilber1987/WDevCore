@@ -40,8 +40,12 @@ class EntityClass {
         //Dataset = await Dataset.json()
         return Dataset;
     }
-    SaveWithModel = async (Object) => {
-        await this.SaveData(this.ApiMethods.Set, Object);
+    SaveWithModel = async (Object, Edit = false) => {
+        if (Edit == false) {
+            await this.SaveData(this.ApiMethods.Set, Object);
+        }else {
+            await this.SaveData(this.ApiMethods.Update, Object);
+        }         
         return true;
     }
     SaveData = async (Path, Data) => {

@@ -337,7 +337,6 @@ class WPaginatorViewer extends HTMLElement {
             input[type=button] {
                 cursor: pointer;
                 width: calc(100% - 0px);
-                height: initial;
             }
 
             @media (max-width: 600px) {

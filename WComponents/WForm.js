@@ -836,7 +836,7 @@ class WForm extends HTMLElement {
                             tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async () => {
                                 try {
                                     if (withModel) {
-                                        const response = await this.ModelObject?.SaveWithModel(ObjectF);                                        
+                                        const response = await this.ModelObject?.SaveWithModel(ObjectF, this.EditObject != undefined);                                        
                                     } else if (this.ObjectOptions.Url != undefined) {
                                         const response = await WAjaxTools.PostRequest(this.ObjectOptions.Url, ObjectF);
                                     }
