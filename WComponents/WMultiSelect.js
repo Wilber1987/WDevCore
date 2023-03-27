@@ -106,10 +106,8 @@ class MultiSelect extends HTMLElement {
                     }
                     this.DrawLabel();
                 }
-            });
-            if (!this.MultiSelect) {
-                Option.onclick = this.DisplayOptions;
-            }
+            });           
+            Option.onclick = this.DisplayOptions;            
             const SubContainer = WRender.Create({ className: "SubMenu" });
             if (element.SubOptions != undefined && element.SubOptions.__proto__ == Array.prototype) {
                 element.SubMultiSelect = new MultiSelect({

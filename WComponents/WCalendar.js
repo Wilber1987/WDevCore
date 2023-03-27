@@ -272,14 +272,14 @@ class WCalendar extends HTMLElement {
     }
 }
 class DetailDayClass extends HTMLElement {
-    constructor(Props = {}, DateParam, agenda = [],  Calendario = [],  SelectedBlocks = []) {
+    constructor(Props = {}, DateParam, agenda = [], Calendario = [], SelectedBlocks = []) {
         super();
         this.id = "baseDayDetail";
         for (const p in Props) {
             this[p] = Props[p];
         }
         this.className = "DayDetail DivContainer";
-        const ListDays = [ "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        const ListDays = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
         this.append(WRender.createElement(this.Style));
         if (DateParam == null) {
             this.append(WRender.Create({
@@ -319,26 +319,33 @@ class DetailDayClass extends HTMLElement {
             if (DayState == true) {
                 hour.className = "hourDetail hourH";
                 let Reservable = true;
+                let checked = false;
                 Calendario.forEach(reserva => {
                     const fecha1R = new Date(reserva.Fecha_Inicial);
                     const fecha2R = new Date(reserva.Fecha_Final);
-                    if (fecha1.toString() == fecha1R.toString()
-                        && fecha2.toString() == fecha2R.toString()) {
-                        hour.className = "hourDetail hourR";
-                        Reservable = false;
+                    const findSelected = SelectedBlocks?.find(s =>
+                        s.Fecha_Inicial == reserva.Fecha_Inicial && s.Fecha_Final == reserva.Fecha_Final);
+                    if (fecha1.toString() == fecha1R.toString() && fecha2.toString() == fecha2R.toString()) {
+                        if (findSelected == undefined) {
+                            hour.className = "hourDetail hourR";
+                            Reservable = false;
+                        } else {
+                            checked = true;
+                        }
                     }
                 });
                 if (Reservable) {
                     const checkB = WRender.Create({
                         tagName: "input", id: "Checkbox" + element, type: "Checkbox", innerText: `${element}`
                     })
+                    if (checked) {
+                        checkB.checked = checked;
+                    }
                     //Wed Mar 09 2022 15:10:44 GMT-0600
                     hour.append(checkB);
                     checkB.onchange = async (ev) => {
                         if (checkB.checked == false) {
-                            let filtObject = SelectedBlocks.indexOf(
-                                SelectedBlocks.find(a => a.id == element)
-                            );
+                            let filtObject = SelectedBlocks.indexOf(SelectedBlocks.find(a => a.id == element));
                             SelectedBlocks.splice(filtObject, 1);
                             return;
                         }
