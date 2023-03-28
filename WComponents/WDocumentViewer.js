@@ -10,7 +10,6 @@ class DocumentModel {
 class DocumentConfig {
     Dataset = []
 }
-
 class DocumentViewer extends HTMLElement {
     /**
      * 
@@ -21,6 +20,7 @@ class DocumentViewer extends HTMLElement {
         for (const p in Config) {
             this[p] = Config[p];
         }
+        this.attachShadow({ mode: 'open' });
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
         this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.OptionContainer = WRender.Create({ className: "OptionContainer" });
@@ -42,7 +42,7 @@ class DocumentViewer extends HTMLElement {
                 }
             });
         });
-        this.append(this.MainNav, this.TabContainer)
+        this.shadowRoot.append(this.CompStyle,WRender.Create({ className: "document-viewer", children: [this.MainNav, this.TabContainer]}))
     }
     CreateDocument = (element) => {
         if (element.TypeDocuement == "IMG") {
@@ -54,7 +54,18 @@ class DocumentViewer extends HTMLElement {
         }
     }
     CompStyle = css`
-
+    .document-viewer {
+        display: grid;
+        grid-template-columns: 200px calc(100% - 200px)
+    }
+    iframe, img {
+        width: calc(100% - 20px);
+        border-radius: 20px;
+        min-height: 500px;
+        overflow: hidden;
+        box-shadow: 0 0 5px 0 #444;
+        margin: 0px 10px;
+    }
     `
 }
 customElements.define('w-document-viewer', DocumentViewer);

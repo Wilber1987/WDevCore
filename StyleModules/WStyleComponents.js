@@ -247,13 +247,13 @@ const StylesControlsV3 = css`
         background-color: #5995fd;
         border: none;
         outline: none;
-        height: 60px;
+        height: 35px;
         border-radius: 5px;
         color: #fff;
         text-transform: uppercase;
         font-weight: 600;
         margin: 5px;
-        padding: 15px;
+        padding: 10px;
         cursor: pointer;
         transition: 0.5s;
         width: 100%;

@@ -20,7 +20,7 @@ class ControlBuilder {
         });
         return image;
     }
-    static BuildProgressBar(value = 0, total = 100, barColor = "#34495ecc", progressColor = "#2c3e50") {
+    static BuildProgressBar(value = 0, total = 100, barColor = "#737b83cc", progressColor = "#2c3e50") {
         return WRender.CreateStringNode(`<div class="progressDivContainer">        
         <div class="progressDiv">
           <div class="progress" style="width:${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%;"></div>
@@ -31,13 +31,13 @@ class ControlBuilder {
             position: relative; width: 100%;  height: auto;  margin: 10px 0px;
           }          
           .progressDivContainer > .progressDiv{
-            width: 100%;  height: 30px;  background: ${barColor};
+            width: 100%;  height: 15px;  background: ${barColor}; overflow: hidden; border-radius: 15px;
           }          
           .progressDivContainer > .progressDiv > .progress{
-            height: 30px;  background: ${progressColor};
+            height: 15px;  background: ${progressColor}; border-radius: 15px;
           }          
           .progressDivContainer > h3{
-            margin-top: 10px; font-family: sans-serif; color: #2c3e50;
+            margin: 10px 0px; font-size: 16px; font-family: sans-serif; color: #2c3e50;
           }
         </style>
       </div>`);
