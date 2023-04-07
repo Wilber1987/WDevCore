@@ -17,7 +17,7 @@ class PaginatorConfig {
     Options = {
         UserActions: [{
             name: "name",
-            Function: () => { }
+            action: () => { }
         }]
     }
 }

@@ -68,7 +68,7 @@ class Expediente extends HTMLElement {
                         Search: true,
                         UserActions: [{
                             name: "Tratamiento",
-                            Function: async (Param) => {
+                            action: async (Param) => {
                                 //r el clic
                                 var url = "{{URL::action('GpsiSolicitudPsicologoController@ver_documento_sesion',[-1,Session::get('Url_empresa')])}}";
                                 var url = url.replace("-1", Param.id_solicitud_hidden);

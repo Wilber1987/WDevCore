@@ -1,55 +1,52 @@
+//@ts-check
+// @ts-ignore
+import { TableConfig } from "../WModules/CommonModel.js";
 import { WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
-import { WCssClass, css } from "../WModules/WStyledRender.js";
+import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
 import { ModalVericateAction } from "./WForm.js";
 import { WModalForm } from "./WModalForm.js";
 
-class TableConfig {
-    Dataset = [];
-    ModelObject = {};
-    paginate = true;
-    TypeMoney = "Dollar";
-    selectedItems = [];
-    DisplayData = [];
-    maxElementByPage = 10;
-    Options = {
-        UserActions: [{
-            name: "name",
-            Function: () => { }
-        }]
-    }
-}
+
 class WTableComponent extends HTMLElement {
     /**
-     * 
      * @param {TableConfig} Config 
      */
     constructor(Config) {
         super();
         this.TableClass = "WTable WScroll";
-        this.Dataset = [];
         this.selectedItems = [];
         this.ModelObject = {};
         this.paginate = true;
         this.attachShadow({ mode: "open" });
         this.TypeMoney = "Euro";
         this.TableConfig = Config ?? {};
+        this.Dataset = this.TableConfig.Dataset ?? [];
+        this.ThOptions = WRender.Create({ class: "thOptions" });
+        this.Table = WRender.Create({ tagName: "Table", className: this.TableClass, id: "MainTable" + this.id });
+        this.Tfooter = WRender.Create({ class: "tfooter" });
+        this.divTableContainer = WRender.Create({ type: "div", class: "tableContainer", children: [this.Table] });
+        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);
+        /**@type {Number} */
+        this.maxElementByPage = this.TableConfig.maxElementByPage ?? 10;
+        /**@type {Number} */
+        this.numPage = this.Dataset.length / this.maxElementByPage;
+        /**@type {Number} */
+        this.ActualPage = 0;
+        if (this.TableConfig.selectedItems == undefined) {
+            this.selectedItems = [];
+        } else {
+            this.selectedItems = this.TableConfig.selectedItems;
+        }
     }
     connectedCallback() {
         this.Draw();
     }
     Draw = async () => {
         this.DarkMode = this.DarkMode ?? false;
-        if (this.shadowRoot.innerHTML != "") {
-            return;
-        }
-        this.shadowRoot.append(WRender.createElement(this.PaginateTOptionsStyle()));
-        switch (this.TableConfig.StyleType) {
-            default:
-                this.shadowRoot.append(WRender.createElement(this.TableStyle()));
-                break;
-        }
+        this.shadowRoot?.append(this.TableStyle());
+        this.shadowRoot?.append(WRender.createElement(this.PaginateTOptionsStyle()));
         //PAGINACION
         this.append(WRender.createElement({
             type: 'w-style', props: {
@@ -60,61 +57,38 @@ class WTableComponent extends HTMLElement {
                 ]
             }
         }));
-        if (this.TableConfig.maxElementByPage == undefined) {
-            this.maxElementByPage = 10;
-        } else {
-            this.maxElementByPage = this.TableConfig.maxElementByPage;
-        }
+
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi;
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
-        this.DisplayData = this.TableConfig.DisplayData ?? null;
-        //this.TableConfig.MasterDetailTable = true
-        if (this.TableConfig != undefined) {
-            this.Dataset = this.TableConfig.Dataset;
-            if ((this.Dataset == undefined || this.Dataset == null) 
-            && (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined)) {
-                this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
-            }
-            if (this.Dataset == undefined) {
-                this.Dataset = [{ Description: "No Data!!!" }];
-            }
-            if (this.TableConfig?.Options) {
-                this.Options = this.TableConfig?.Options;
-            } else {
-                this.Options = {
-                    Search: true,
-                    Add: true,
-                    Edit: true,
-                    Show: true,
-                };
-            }
-            this.ModelObject = this.TableConfig.ModelObject ?? this.Dataset[0];
-            if (this.TableConfig.selectedItems == undefined) {
-                this.selectedItems = [];
-            } else {
-                this.selectedItems = this.TableConfig.selectedItems;
-            }
-            this.DrawTable();
-            return;
-        } else if (typeof this.TableConfig.Dataset === "undefined") {
-            this.innerHTML = "Defina un Dataset en formato JSON";
-            return;
-        }
-        this.Dataset = this.TableConfig.Dataset;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
         this.Options = this.TableConfig?.Options;
-        if (this.TableConfig.paginate != undefined) {
-            this.paginate = this.TableConfig.paginate;
+        if ((this.Dataset == undefined || this.Dataset == null)
+            && (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined)) {
+            this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
         }
-        if (this.TableConfig.TableClass) {
-            this.TableClass = this.TableConfig.TableClass + " WScroll";
+        if (this.Dataset == undefined) {
+            this.Dataset = [{ Description: "No Data!!!" }];
         }
+        if (this.TableConfig?.Options) {
+            this.Options = this.TableConfig?.Options;
+        } else {
+            /**@type {import("../WModules/CommonModel.js").TableOptions} */
+            this.Options = {
+                Search: true,
+                Add: true,
+                Edit: true,
+                Show: true,
+            };
+        }
+        this.ModelObject = this.TableConfig.ModelObject ?? this.Dataset[0];
+        this.DrawTable();
+        return;
     }
     //BASIC TABLE-----------------------------------------------------------------------
     //#region tabla basica --------------------------------------------------------------
     /**
      * 
-     * @param {Array} Dataset 
+     * @param {Array} [Dataset] 
      */
     DefineModelObject(Dataset = this.Dataset) {
         if (this.TableConfig.ModelObject == undefined) {
@@ -131,101 +105,47 @@ class WTableComponent extends HTMLElement {
      */
     DrawTable(Dataset = this.Dataset) {
         this.DefineModelObject(Dataset);
-        let table = this.shadowRoot.querySelector("#MainTable" + this.id);
-        const TOptions = this.DrawHeadOptions();
-        if (TOptions != null) {
-            this.shadowRoot.append(WRender.createElement(TOptions));
-        }
-        if (typeof table === "undefined" || table == null) {
-            table = { type: "table", props: { class: this.TableClass, id: "MainTable" + this.id }, children: [] };
-            table.children.push(this.DrawTHead());
-            const tbody = this.DrawTBody(Dataset);
-            if (this.paginate == true && Dataset.length > this.maxElementByPage) {
-                tbody.children.forEach(tb => {
-                    table.children.push(tb);
-                });
-            } else {
-                table.children.push(tbody);
-            }
-            let divTableCntainer = { type: "div", props: { class: "tableContainer" }, children: [table] }
-            this.shadowRoot.append(WRender.createElement(divTableCntainer));
-            if (this.paginate == true) {
-                this.shadowRoot.append(WRender.createElement({
-                    type: "div",
-                    props: { class: "tfooter" },
-                    children: this.DrawTFooter(tbody.children)
-                }));
-            }
-        } else {
-            table.style.display = "table";
-            table.innerHTML = "";
-            table.append(WRender.createElement(this.DrawTHead()));
-            const tbody = this.DrawTBody(Dataset);
-            if (this.paginate == true && Dataset.length > this.maxElementByPage) {
-                tbody.children.forEach(tb => {
-                    table.append(WRender.createElement(tb));
-                });
-            } else {
-                table.append(WRender.createElement(tbody));
-            }
-            let footer = this.shadowRoot.querySelector(".tfooter");
-            if (typeof footer !== "undefined" && footer != null) {
-                footer.innerHTML = "";
-                if (this.paginate == true) {
-                    this.DrawTFooter(tbody.children).forEach(element => {
-                        footer.append(WRender.createElement(element));
-                    });
-                }
-            }
+        this.DrawHeadOptions();        
+        this.Table.innerHTML = "";
+        this.Table.append(WRender.createElement(this.DrawTHead()));
+        const tbody = this.DrawTBody(Dataset);
+        tbody.forEach(tb => {
+            this.Table.append(WRender.createElement(tb));
+        });
+        if (this.paginate == true) {
+            this.Tfooter.innerHTML = "";
+            this.DrawTFooter(tbody).forEach(element => {
+                this.Tfooter.append(element);
+            }); 
         }
     }
     DrawHeadOptions() {
-        if (this.shadowRoot.querySelector(".thOptions")) {
-            this.shadowRoot.querySelector(".thOptions").style.display = "flex";
-            return "";
-        }
-        if (this.Options != undefined) {
-            if (this.Options.Search != undefined || this.Options.Add != undefined) {
-                const trOptions = { type: "div", props: { class: "thOptions" }, children: [] }
-                if (this.Options.Search == true) {
-                    const InputOptions = {
-                        type: "input",
-                        props: {
-                            class: "txtControl",
-                            type: "text",
-                            placeholder: "Buscar...",
-                            onchange: async (ev) => {
-                                this.SearchFunction(ev);
-                            }
-                        }
+        this.ThOptions.innerHTML = "";
+        if (this.Options != undefined && (this.Options.Search != undefined || this.Options.Add != undefined)) {
+            if (this.Options.Search == true) {
+                this.ThOptions.append(WRender.Create({
+                    tagName: "input", class: "txtControl", type: "text", placeholder: "Buscar...",
+                    onchange: async (ev) => {
+                        this.SearchFunction(ev);
                     }
-                    trOptions.children.push(InputOptions);
-                }
-                if (this.Options.Add == true) {
-                    const BtnOptions = {
-                        type: "button",
-                        props: {
-                            class: "BtnTableSR",
-                            type: "button",
-                            innerText: "Nuevo",
-                            onclick: async () => {
-                                if (this.Options.AddFunction)
-                                    this.Options.AddFunction();
-                                else this.ModalCRUD();
-                            }
-                        }
-                    }
-                    trOptions.children.push(BtnOptions);
-                }
-                return trOptions;
+                }));
             }
-            return null;
+            if (this.Options.Add == true) {
+                this.ThOptions.append(WRender.Create({
+                    tagName: "button", class: "BtnTableSR", type: "button", innerText: "Nuevo",
+                    onclick: async () => {
+                        if (this.Options?.AddFunction != undefined)
+                            this.Options.AddFunction();
+                        else this.ModalCRUD();
+                    }
+                }))
+            }
+            return this.ThOptions;
         }
         return null;
-    }    
+    }
     DrawTHead = (element = this.ModelObject) => {
         const thead = WRender.Create({ tagName: "thead" });
-        //const element = this.Dataset[0];
         let tr = WRender.Create({ tagName: "tr" })
         for (const prop in element) {
             if (this.IsDrawableRow(element, prop)) {
@@ -240,54 +160,44 @@ class WTableComponent extends HTMLElement {
         }
         thead.append(tr);
         return thead;
-    }    
+    }
+    /**
+     * 
+     * @param {Array} [Dataset] 
+     * @returns {Array<HTMLElement>}
+     */
     DrawTBody = (Dataset = this.Dataset) => {
-        let tbody = { type: "tbody", props: {}, children: [] };
-        if (this.paginate == true && Dataset.length > this.maxElementByPage) {
-            this.numPage = Dataset.length / this.maxElementByPage;
-            if (Dataset.length > 50) {
-                this.numPage = 50 / this.maxElementByPage;
+        /**@type {Array<HTMLElement>} */
+        const tbodys = [];
+        this.numPage = (Dataset.length / this.maxElementByPage) >= 1 ? Dataset.length / this.maxElementByPage : 1;
+        for (let index = 0; index < this.numPage; index++) {
+            let tBodyStyle = "display:none";
+            if (index == 0) {
+                tBodyStyle = "display:content";
             }
-            for (let index = 0; index < this.numPage; index++) {
-                let tBodyStyle = "display:none";
-                if (index == 0) {
-                    //tBodyStyle = "display:table-row-group";
-                    if (this.TableConfig.StyleType != undefined && this.TableConfig.StyleType.includes("Cards")) {
-                        tBodyStyle = "display:flex";
-                    } else if (this.TableConfig.StyleType != undefined && this.TableConfig.StyleType == "Grid") {
-                        tBodyStyle = "display:grid";
-                    } else {
-                        //tBodyStyle = "display:table-row-group";
-                        tBodyStyle = "display:contents";
-                    }
-                }
-                tbody.children.push({ type: "tbody", props: { class: "tbodyChild", style: tBodyStyle }, children: [] });
-            }
-        } else {
-            this.numPage = 1;
+            tbodys.push(WRender.Create({ tagName: "tbody", class: "tbodyChild", style: tBodyStyle }));
         }
         let page = 0;
         Dataset.forEach((element, DatasetIndex) => {
             if (DatasetIndex >= 50) {
-                return;
+                //return;
             }
             let tr = WRender.Create({ tagName: "tr" });
             this.DrawTRow(tr, element);
-            if (this.numPage > 1 && tbody.children[page] &&
-                (this.paginate == true && Dataset.length > this.maxElementByPage)) {
-                tbody.children[page].children.push(tr);
-                if (tbody.children[page].children.length == this.maxElementByPage) {
+            if (tbodys[page] && (this.paginate == true && Dataset.length > this.maxElementByPage)) {
+                tbodys[page].append(tr);
+                if (tbodys[page].children.length == this.maxElementByPage) {
                     page++;
                 }
             } else {
-                tbody.children.push(tr);
+                tbodys[page].append(tr);
             }
         });
-        if (tbody.children.length == 0) {
-            tbody.children.push({ type: "h5", props: { innerText: "No hay elementos que mostrar" } });
+        if (tbodys[0].children.length == 0) {
+            tbodys[page].append(WRender.Create({ type: "h5", innerText: "No hay elementos que mostrar" }));
         }
-        this.shadowRoot.append(WRender.createElement(this.MediaStyleResponsive()));
-        return tbody;
+        this.shadowRoot?.append(WRender.createElement(this.MediaStyleResponsive()));
+        return tbodys;
     }
     DrawTRow = async (tr, element) => {
         tr.innerHTML = "";
@@ -297,24 +207,23 @@ class WTableComponent extends HTMLElement {
             }
         }
         if (this.TrueOptions()) {
-            const Options = { type: "td", props: { class: "tdAction" }, children: [] };
+            const Options = WRender.Create({ tagName: "td", class: "tdAction" });
             this.SelectBTN(element, Options);
             this.ShowBTN(Options, element);
             this.EditBTN(Options, element, tr);
             this.DeleteBTN(Options, element, tr);
-            if (this.Options.UserActions != undefined) {
+            if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
-                    Options.children.push({
+                    Options.append(WRender.Create({
+                        tagName: "input",
+                        className: "BtnTableSR",
                         type: "button",
-                        props: {
-                            class: "BtnTableSR",
-                            type: "button",
-                            innerText: Action.name,
-                            onclick: async (ev) => {
-                                Action.Function(element, ev.target);
-                            }
+                        value: Action.name,
+                        onclick: async (ev) => {
+                            Action.action(element, ev.target);
                         }
-                    })
+
+                    }))
                 });
             }
             tr.append(WRender.createElement(Options));
@@ -344,7 +253,7 @@ class WTableComponent extends HTMLElement {
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
-                    td.append(ControlBuilder.BuildImage(value, this.Config?.ImageUrlPath));
+                    td.append(ControlBuilder.BuildImage(value, this.TableConfig?.ImageUrlPath));
                     tr.append(td);
                     break;
                 case "SELECT":
@@ -397,12 +306,12 @@ class WTableComponent extends HTMLElement {
                 case "OPERATION":
                     break;
                 case "CALENDAR":
-                    const label =  `${element[prop]?.map(object => {
-                        const label = object?.Fecha_Inicial.toDateFormatEs() + " al "+ object?.Fecha_Final.toDateFormatEs() ;
+                    const label = `${element[prop]?.map(object => {
+                        const label = object?.Fecha_Inicial.toDateFormatEs() + " al " + object?.Fecha_Final.toDateFormatEs();
                         return `<label class="labelMultiselect">${label}</label>`;
                     }).join('')}`
                     tr.append(WRender.Create({
-                        tagName: "td", className: "tdAcordeon", innerHTML: label == "undefined" ? "" : label                         
+                        tagName: "td", className: "tdAcordeon", innerHTML: label == "undefined" ? "" : label
                     }));
                     break;
                 case "MASTERDETAIL":
@@ -422,106 +331,95 @@ class WTableComponent extends HTMLElement {
     }
 
     DeleteBTN(Options, element, tr) {
-        if (this.Options.Delete != undefined && this.Options.Delete == true) {
-            Options.children.push({
+        if (this.Options?.Delete != undefined && this.Options.Delete == true) {
+            Options.append(WRender.Create({
+                tagName: "button",
+                children: [{ tagName: 'img', class: "icon", src: WIcons["delete"]  }],
+                class: "BtnTableA",
                 type: "button",
-                children: [{ type: 'img', props: { class: "icon", src: WIcons["delete"] } }],
-                props: {
-                    class: "BtnTableA",
-                    type: "button",
-                    onclick: async () => {
-                        this.shadowRoot.append(ModalVericateAction(() => {
-                            const index = this.Dataset.indexOf(element);
-                            if (WArrayF.FindInArray(element, this.Dataset) == true) {
-                                this.Dataset.splice(index, 1);
-                                //tr.parentNode.removeChild(tr);
-                                this.DrawTable();
-                            } else { console.log("No Object"); }
-                        }, "¿Esta seguro de eliminar este elemento?"));
-                    }
+                onclick: async () => {
+                    this.shadowRoot?.append(ModalVericateAction(() => {
+                        const index = this.Dataset.indexOf(element);
+                        if (WArrayF.FindInArray(element, this.Dataset) == true) {
+                            this.Dataset.splice(index, 1);
+                            //tr.parentNode.removeChild(tr);
+                            this.DrawTable();
+                        } else { console.log("No Object"); }
+                    }, "¿Esta seguro de eliminar este elemento?"));
                 }
-            });
+            }));
         }
     }
 
     EditBTN(Options, element, tr) {
-        if (this.Options.Edit != undefined && this.Options.Edit == true) {
-            Options.children.push({
+        if (this.Options?.Edit != undefined && this.Options.Edit == true) {
+            Options.append(WRender.Create({
+                tagName: "button",
+                children: [{ tagName: 'img',  class: "icon", src: WIcons["edit"]  }],
+                class: "BtnTableS",
                 type: "button",
-                children: [{ type: 'img', props: { class: "icon", src: WIcons["edit"] } }],
-                props: {
-                    class: "BtnTableS",
-                    type: "button",
-                    onclick: async () => { this.ModalCRUD(element, tr); }
-                }
-            });
+                onclick: async () => { this.ModalCRUD(element, tr); }
+            }));
         }
     }
 
     ShowBTN(Options, element) {
-        if (this.Options.Show != undefined && this.Options.Show == true) {
-            Options.children.push({
+        if (this.Options?.Show != undefined && this.Options.Show == true) {
+            Options.append(WRender.Create({
+                tagName: "button",
+                children: [{ tagName: 'img', class: "icon", src: WIcons["show2"] }],
+                class: "BtnTable",
                 type: "button",
-                children: [{ type: 'img', props: { class: "icon", src: WIcons["show2"] } }],
-                props: {
-                    class: "BtnTable",
-                    type: "button",
-                    onclick: async () => {
-                        this.shadowRoot.append(
-                            new WModalForm({
-                                icon: this.TableConfig.icon,
-                                ImageUrlPath: this.TableConfig.ImageUrlPath,
-                                title: "Detalle",
-                                ObjectDetail: element,
-                            }));
-                    }
+                onclick: async () => {
+                    this.shadowRoot?.append(new WModalForm({
+                        icon: this.TableConfig.icon,
+                        ImageUrlPath: this.TableConfig.ImageUrlPath,
+                        title: "Detalle",
+                        ObjectDetail: element,
+                    }));
                 }
-            });
+            }));
         }
     }
 
     SelectBTN(element, Options) {
-        if (this.Options.Select != undefined && this.Options.Select == true) {
+        if (this.Options?.Select != undefined && this.Options.Select == true) {
             let Checked = WArrayF.FindInArray(element, this.selectedItems);
-            Options.children.push({
-                type: "input",
-                props: {
-                    class: "Btn",
-                    type: "checkbox",
-                    innerText: "Select",
-                    checked: Checked,
-                    onclick: async (ev) => {
-                        const control = ev.target;
-                        const index = this.selectedItems.indexOf(element);
-                        if (index == -1 && control.checked == true) {
-                            if (WArrayF.FindInArray(element, this.selectedItems) == false) {
-                                this.selectedItems.push(element);
-                            } else {
-                                console.log("Item Existente");
-                            }
+            Options.append(WRender.Create({
+                tagName: "input",
+                class: "Btn",
+                type: "checkbox",
+                innerText: "Select",
+                checked: Checked,
+                onclick: async (ev) => {
+                    const control = ev.target;
+                    const index = this.selectedItems.indexOf(element);
+                    if (index == -1 && control.checked == true) {
+                        if (WArrayF.FindInArray(element, this.selectedItems) == false) {
+                            this.selectedItems.push(element);
                         } else {
-                            this.selectedItems.splice(index, 1);
+                            console.log("Item Existente");
                         }
+                    } else {
+                        this.selectedItems.splice(index, 1);
                     }
                 }
-            });
+            }));
         }
     }
     ModalCRUD(element, tr) {
-        this.shadowRoot.append(
+        this.shadowRoot?.append(
             new WModalForm({
                 ModelObject: this.ModelObject,
                 AutoSave: false,
                 ParentModel: this.TableConfig.ParentModel,
                 EditObject: element,
-                DisplayData: this.DisplayData,
                 icon: this.TableConfig.icon,
                 ImageUrlPath: this.TableConfig.ImageUrlPath,
                 title: element ? "Editar" : "Nuevo",
                 ValidateFunction: this.TableConfig.ValidateFunction,
-                AddItemsFromApi: this.AddItemsFromApi,
                 ObjectOptions: {
-                    Url: element ? this.Options.UrlUpdate : this.Options.UrlAdd,
+                    Url: element ? this.Options?.UrlUpdate : this.Options?.UrlAdd,
                     AddObject: element ? false : true,
                     SaveFunction: (NewObject) => {
                         if (element == undefined) {
@@ -539,8 +437,8 @@ class WTableComponent extends HTMLElement {
     }
     SearchFunction = async (ev) => {
         if (this.SearchItemsFromApi != undefined) {
-            if (this.SearchItemsFromApi.Function != undefined) {
-                const Dataset = await this.SearchItemsFromApi.Function(ev.target.value);
+            if (this.SearchItemsFromApi.action != undefined) {
+                const Dataset = await this.SearchItemsFromApi.action(ev.target.value);
                 this.DrawTable(Dataset);
             } else {
                 const Dataset = await WAjaxTools.PostRequest(
@@ -562,7 +460,7 @@ class WTableComponent extends HTMLElement {
                     }
                 }
             })
-            if (Dataset.length == 0 && this.Options.UrlSearch != undefined) {
+            if (Dataset.length == 0 && this.Options?.UrlSearch != undefined) {
                 const DataUrlSearch = await WAjaxTools.PostRequest(
                     this.Options.UrlSearch, { Param: ev.target.value }
                 );
@@ -573,11 +471,11 @@ class WTableComponent extends HTMLElement {
         }
     }
     TrueOptions() {
-        return this.Options.Select != undefined ||
-            this.Options.Show != undefined ||
-            this.Options.Edit != undefined ||
-            this.Options.Delete != undefined ||
-            this.Options.UserActions != undefined;
+        return this.Options?.Select != undefined ||
+            this.Options?.Show != undefined ||
+            this.Options?.Edit != undefined ||
+            this.Options?.Delete != undefined ||
+            this.Options?.UserActions != undefined;
     }
 
     isSorteable(element, prop) {
@@ -585,25 +483,22 @@ class WTableComponent extends HTMLElement {
             parseFloat(element[prop].toString().replaceAll("%", "").replaceAll(Money[this.TypeMoney], "")).toString() != "NaN";
     }
 
-    DrawTFooter(tbody) {
+    /**
+     * 
+     * @param {Array<HTMLElement>} tbodys 
+     * @returns {Array<HTMLElement>}
+     */
+    DrawTFooter(tbodys) {
         let tfooter = [];
-        this.ActualPage = 0;
+        const buttons = [];
         const SelectPage = (index) => {
-            let bodys = this.shadowRoot.querySelectorAll("#MainTable" + this.id + " tbody");
-            bodys.forEach((body, indexBody) => {
+            tbodys.forEach((body, indexBody) => {
                 if (indexBody == index) {
-                    if (this.TableConfig.StyleType == "Cards") {
-                        body.style.display = "flex";
-                    } else if (this.TableConfig.StyleType == "Grid") {
-                        body.style.display = "grid";
-                    } else {
-                        body.style.display = "contents";
-                    }
+                    body.style.display = "contents";
                 } else {
                     body.style.display = "none";
                 }
             });
-            let buttons = this.shadowRoot.querySelectorAll(".tfooter a");
             this.ActualPage = index;
             buttons.forEach((button, indexBtn) => {
                 if (indexBtn == index) {
@@ -615,21 +510,18 @@ class WTableComponent extends HTMLElement {
                 }
             });
         }
-        tfooter.push({
-            type: "label",
-            props: {
-                innerText: "<<",
-                class: "pagBTN",
-                onclick: () => {
-                    this.ActualPage = this.ActualPage - 1;
-                    if (this.ActualPage < 0) {
-                        this.ActualPage = tbody.length - 1;
-                    }
-                    SelectPage(this.ActualPage);
+        tfooter.push(WRender.Create({
+            tagName: "label", innerText: "<<",
+            class: "pagBTN",
+            onclick: () => {
+                this.ActualPage = this.ActualPage - 1;
+                if (this.ActualPage < 0) {
+                    this.ActualPage = tbodys.length - 1;
                 }
+                SelectPage(this.ActualPage);
             }
-        });
-        const tfooterNumbers = { type: 'div', props: { class: 'tfooterNumbers' }, children: [] }
+        }));
+        const tfooterNumbers = WRender.Create({ class: 'tfooterNumbers' })
         for (let index = 0; index < this.numPage; index++) {
             let btnClass = "paginateBTN";
             if (index == 0) {
@@ -639,45 +531,34 @@ class WTableComponent extends HTMLElement {
             } else {
                 btnClass = "paginateBTN";
             }
-            tfooterNumbers.children.push({
-                type: "a",
-                props: {
-                    id: "footBtn" + (index + 1),
-                    innerText: index + 1,
-                    class: btnClass,
-                    onclick: () => {
-                        SelectPage(index);
-                    }
-                }
-            });
+            const button = WRender.Create({
+                type: "a", id: "footBtn" + (index + 1),
+                innerText: (index + 1).toString(), class: btnClass,
+                onclick: () => SelectPage(index)
+            })
+            tfooterNumbers.append(button);
+            buttons.push(button);
         }
         tfooter.push(tfooterNumbers);
-        tfooter.push({
-            type: "label",
-            props: {
-                innerText: ">>",
-                class: "pagBTN",
-                onclick: () => {
-                    this.ActualPage = this.ActualPage + 1;
-                    if (this.ActualPage > tbody.length - 1) {
-                        this.ActualPage = 0;
-                    }
-                    SelectPage(this.ActualPage);
+        tfooter.push(WRender.Create({
+            tagName: "label", innerText: ">>", class: "pagBTN",
+            onclick: () => {
+                this.ActualPage = this.ActualPage + 1;
+                if (this.ActualPage > tbodys.length - 1) {
+                    this.ActualPage = 0;
                 }
+                SelectPage(this.ActualPage);
             }
-        });
+        }));
         return tfooter;
     }
     //#endregion fin tabla basica
     //#region ESTILOS-------------------------------------------------------------------------------------------
     MediaStyleResponsive() {
-        if (this.shadowRoot.querySelector("MediaStyleResponsive" + this.id)) {
-            this.removeChild(this.shadowRoot.querySelector("MediaStyleResponsive" + this.id));
-        }
         const ClassList = [];
         let index = 1;
         for (const prop in this.ModelObject) {
-            const flag = WArrayF.checkDisplay(this.DisplayData, prop);
+            const flag = WArrayF.checkDisplay([], prop);
             if (flag) {
                 if (!prop.includes("Photo") &&
                     !prop.includes("img") &&
@@ -693,34 +574,18 @@ class WTableComponent extends HTMLElement {
                 index++;
             }
         }
-        if (this.TableConfig.StyleType != undefined
-            && this.TableConfig.StyleType.includes("Cards")) {
-            return {
-                type: "w-style",
-                props: { ClassList: ClassList }
-            }
-        }
-        return {
-            type: "w-style",
-            props: {
-                id: "MediaStyleResponsive" + this.id,
-                MediaQuery: [{
-                    condicion: "(max-width: 600px)",
-                    ClassList: ClassList
-                }]
-            }
-        }
+        return new WStyledRender({
+            MediaQuery: [{
+                condicion: "(max-width: 600px)",
+                ClassList: ClassList
+            }]
+        })
     }
     TableStyle() {
-        const style = this.shadowRoot.querySelector("#TableStyle" + this.id);
-        if (style) {
-            style.parentNode.removeChild(style);
-        }
-        const WTableStyle = css`
+        return css`
             .tableContainer {
                 overflow: auto;
             }
-
             .WTable {
                 font-family: Verdana, sans-serif;
                 width: 100%;
@@ -732,6 +597,7 @@ class WTableComponent extends HTMLElement {
 
             .WTable th {
                 text-align: left;
+                padding: 10px;
             }
 
             .WTable th label::first-letter{
@@ -862,12 +728,11 @@ class WTableComponent extends HTMLElement {
                 }
             }
         `;
-        return WTableStyle;
     }
     PaginateTOptionsStyle() {
-        const style = this.shadowRoot.querySelector("#PaginateTOptionsStyle" + this.id);
+        const style = this.shadowRoot?.querySelector("#PaginateTOptionsStyle" + this.id);
         if (style) {
-            style.parentNode.removeChild(style);
+            style.parentNode?.removeChild(style);
         }
         const WTableStyle = css`
             .paginateBTN {
@@ -1046,6 +911,8 @@ class WCardTable extends HTMLElement {
     }
     EvalModelPrototype(prop, Model) {
         let value = "";
+        console.log(this.Element, prop, Model);
+        console.log(prop);
         if (this.Element[prop] != null) {
             value = this.Element[prop];
         }
@@ -1093,9 +960,9 @@ class WCardTable extends HTMLElement {
             text-transform: uppercase;
         }
     `
-    IsDrawableProp(element, prop) {            
+    IsDrawableProp(element, prop) {
         if (this.Model == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
-           return true;
+            return true;
         }
         else if ((this.Model[prop]?.type == undefined
             || this.Model[prop]?.type.toUpperCase() == "MASTERDETAIL"

@@ -4,11 +4,20 @@ import { StyleScrolls, StylesControlsV1 } from "../StyleModules/WStyleComponents
 import { WModalForm } from "./WModalForm.js";
 import { WIcons, WIconsPath } from "../WModules/WIcons.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
-class ConfigMS {
-    Dataset = ["Option1", "Option2", "Option3"];
-}
+
+/**
+ * @typedef {Object} ConfigMS 
+ *  * @property {Array} Dataset
+    * @property {Function} [action]
+    * @property {Object} [ModelObject]
+    * @property {Boolean} [MultiSelect]
+**/
 
 class MultiSelect extends HTMLElement {
+    /**
+     * @param {ConfigMS} Config 
+     * @param {HTMLElement} [Style] 
+     */
     constructor(Config = (new ConfigMS()), Style = null) {
         super();
         this.Config = Config;

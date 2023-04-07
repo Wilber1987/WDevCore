@@ -1,204 +1,220 @@
 import { WRender } from "./WComponentsTools.js";
 class CSSProps {
-    "align-content" = null;
-    "align-items" = null;
-    "align-self" = null;
-    "all" = null;
-    "animation" = null;
-    "animation-delay" = null;
-    "animation-direction" = null;
-    "animation-duration" = null;
-    "animation-fill-mode" = null;
-    "animation-iteration-count" = null;
-    "animation-name" = null;
-    "animation-play-state" = null;
-    "animation-timing-function" = null;
-    "caption-side" = null;
-    "caret-color" = null;
-    //"@charset" = null;
-    "clear" = null;
-    "clip" = null;
-    "color" = null;
-    "column-count" = null;
-    "column-fill" = null;
-    "column-gap" = null;
-    "column-rule" = null;
-    "column-rule-color" = null;
-    "column-rule-style" = null;
-    "column-rule-width" = null;
-    "column-span" = null;
-    "column-width" = null;
-    "columns" = null;
-    "content" = null;
-    "counter-increment" = null;
-    "counter-reset" = null;
-    "cursor" = null;
-    "direction" = null;
-    "display" = null;
-    "empty-cells" = null;
-    "filter" = null;
-    "flex" = null;
-    "flex-basis" = null;
-    "flex-direction" = null;
-    "flex-flow" = null;
-    "flex-grow" = null;
-    "flex-shrink" = null;
-    "flex-wrap" = null;
+    "align-content";
+    "align-items";
+    "align-self";
+    "all";
+    "animation";
+    "animation-delay";
+    "animation-direction";
+    "animation-duration";
+    "animation-fill-mode";
+    "animation-iteration-count";
+    "animation-name";
+    "animation-play-state";
+    "animation-timing-function";
+    "caption-side";
+    "caret-color";
+    //"@charset";
+    "clear";
+    "clip";
+    "color";
+    "column-count";
+    "column-fill";
+    "column-gap";
+    "column-rule";
+    "column-rule-color";
+    "column-rule-style";
+    "column-rule-width";
+    "column-span";
+    "column-width";
+    "columns";
+    "content";
+    "counter-increment";
+    "counter-reset";
+    "cursor";
+    "direction";
+    "display";
+    "empty-cells";
+    "filter";
+    "flex";
+    "flex-basis";
+    "flex-direction";
+    "flex-flow";
+    "flex-grow";
+    "flex-shrink";
+    "flex-wrap";
     "float" = "left" || "right" || "commit";
     "font" = typeof "string";
-    //"@font-face" = null;
-    "font-family" = null;
-    "font-feature-settings" = null;
-    //"@font-feature-values" = null;
-    "font-kerning" = null;
-    "font-language-override" = null;
-    "font-size" = null;
-    "font-size-adjust" = null;
-    "font-stretch" = null;
-    "font-style" = null;
-    "font-synthesis" = null;
-    "font-variant" = null;
-    "font-variant-alternates" = null;
-    "font-variant-caps" = null;
-    "font-variant-east-asian" = null;
-    "font-variant-ligatures" = null;
-    "font-variant-numeric" = null;
-    "font-variant-position" = null;
-    "font-weight" = null;
-    "grid" = null;
-    "grid-area" = null;
-    "grid-auto-columns" = null;
-    "grid-auto-flow" = null;
-    "grid-auto-rows" = null;
-    "grid-column" = null;
-    "grid-column-end" = null;
-    "grid-column-gap" = null;
-    "grid-column-start" = null;
-    "grid-gap" = null;
-    "grid-row" = null;
-    "grid-row-end" = null;
-    "grid-row-gap" = null;
-    "grid-row-start" = null;
-    "grid-template" = null;
-    "grid-template-areas" = null;
-    "grid-template-columns" = null;
-    "grid-template-rows" = null;
-    "hanging-punctuation" = null;
-    "height" = null;
-    "hyphens" = null;
-    "image-rendering" = null;
-    //"@import" = null;
-    "isolation" = null;
-    "justify-content" = null;
-    //"@keyframes" = null;
-    "left" = null;
-    "letter-spacing" = null;
-    "line-break" = null;
-    "line-height" = null;
-    "list-style" = null;
-    "list-style-image" = null;
-    "list-style-position" = null;
-    "list-style-type" = null;
-    "margin" = null;
-    "margin-bottom" = null;
-    "margin-left" = null;
-    "margin-right" = null;
-    "margin-top" = null;
-    "max-height" = null;
-    "max-width" = null;
-    //"@media" = null;
-    "min-height" = null;
-    "min-width" = null;
-    "mix-blend-mode" = null;
-    "object-fit" = null;
-    "object-position" = null;
-    "opacity" = null;
-    "order" = null;
-    "orphans" = null;
-    "outline" = null;
-    "outline-color" = null;
-    "outline-offset" = null;
-    "outline-style" = null;
-    "outline-width" = null;
-    "overflow" = null;
-    "overflow-wrap" = null;
-    "overflow-x" = null;
-    "overflow-y" = null;
-    "padding" = null;
-    "padding-bottom" = null;
-    "padding-left" = null;
-    "padding-right" = null;
-    "padding-top" = null;
-    "page-break-after" = null;
-    "page-break-before" = null;
-    "page-break-inside" = null;
-    "perspective" = null;
-    "perspective-origin" = null;
-    "pointer-events" = null;
-    "position" = null;
-    "quotes" = null;
-    "resize" = null;
-    "right" = null;
-    "scroll-behavior" = null;
-    "tab-size" = null;
-    "table-layout" = null;
-    "text-align" = null;
-    "text-align-last" = null;
-    "text-combine-upright" = null;
-    "text-decoration" = null;
-    "text-decoration-color" = null;
-    "text-decoration-line" = null;
-    "text-decoration-style" = null;
-    "text-indent" = null;
-    "text-justify" = null;
-    "text-orientation" = null;
-    "text-overflow" = null;
-    "text-shadow" = null;
-    "text-transform" = null;
-    "text-underline-position" = null;
-    "top" = null;
-    "transform" = null;
-    "transform-origin" = null;
-    "transform-style" = null;
-    "transition" = null;
-    "transition-delay" = null;
-    "transition-duration" = null;
-    "transition-property" = null;
-    "transition-timing-function" = null;
-    "unicode-bidi" = null;
-    "user-select" = null;
-    "vertical-align" = null;
-    "visibility" = null;
-    "white-space" = null;
-    "widows" = null;
-    "width" = null;
-    "word-break" = null;
-    "word-spacing" = null;
-    "word-wrap" = null;
-    "writing-mode" = null;
-    "z-index" = null;
-    "background" = null;
-    "background-color" = null;
-    "background-image" = null;
-    "border" = null;
-    "border-radius" = null;
-    "border-top" = null;
-    "border-right" = null;
-    "border-left" = null;
-    "border-bottom" = null;
+    //"@font-face";
+    "font-family";
+    "font-feature-settings";
+    //"@font-feature-values";
+    "font-kerning";
+    "font-language-override";
+    "font-size";
+    "font-size-adjust";
+    "font-stretch";
+    "font-style";
+    "font-synthesis";
+    "font-variant";
+    "font-variant-alternates";
+    "font-variant-caps";
+    "font-variant-east-asian";
+    "font-variant-ligatures";
+    "font-variant-numeric";
+    "font-variant-position";
+    "font-weight";
+    "grid";
+    "grid-area";
+    "grid-auto-columns";
+    "grid-auto-flow";
+    "grid-auto-rows";
+    "grid-column";
+    "grid-column-end";
+    "grid-column-gap";
+    "grid-column-start";
+    "grid-gap";
+    "grid-row";
+    "grid-row-end";
+    "grid-row-gap";
+    "grid-row-start";
+    "grid-template";
+    "grid-template-areas";
+    "grid-template-columns";
+    "grid-template-rows";
+    "hanging-punctuation";
+    "height";
+    "hyphens";
+    "image-rendering";
+    //"@import";
+    "isolation";
+    "justify-content";
+    //"@keyframes";
+    "left";
+    "letter-spacing";
+    "line-break";
+    "line-height";
+    "list-style";
+    "list-style-image";
+    "list-style-position";
+    "list-style-type";
+    "margin";
+    "margin-bottom";
+    "margin-left";
+    "margin-right";
+    "margin-top";
+    "max-height";
+    "max-width";
+    //"@media";
+    "min-height";
+    "min-width";
+    "mix-blend-mode";
+    "object-fit";
+    "object-position";
+    "opacity";
+    "order";
+    "orphans";
+    "outline";
+    "outline-color";
+    "outline-offset";
+    "outline-style";
+    "outline-width";
+    "overflow";
+    "overflow-wrap";
+    "overflow-x";
+    "overflow-y";
+    "padding";
+    "padding-bottom";
+    "padding-left";
+    "padding-right";
+    "padding-top";
+    "page-break-after";
+    "page-break-before";
+    "page-break-inside";
+    "perspective";
+    "perspective-origin";
+    "pointer-events";
+    "position";
+    "quotes";
+    "resize";
+    "right";
+    "scroll-behavior";
+    "tab-size";
+    "table-layout";
+    "text-align";
+    "text-align-last";
+    "text-combine-upright";
+    "text-decoration";
+    "text-decoration-color";
+    "text-decoration-line";
+    "text-decoration-style";
+    "text-indent";
+    "text-justify";
+    "text-orientation";
+    "text-overflow";
+    "text-shadow";
+    "text-transform";
+    "text-underline-position";
+    "top";
+    "transform";
+    "transform-origin";
+    "transform-style";
+    "transition";
+    "transition-delay";
+    "transition-duration";
+    "transition-property";
+    "transition-timing-function";
+    "unicode-bidi";
+    "user-select";
+    "vertical-align";
+    "visibility";
+    "white-space";
+    "widows";
+    "width";
+    "word-break";
+    "word-spacing";
+    "word-wrap";
+    "writing-mode";
+    "z-index";
+    "background";
+    "background-color";
+    "background-image";
+    "border";
+    "border-radius";
+    "border-top";
+    "border-right";
+    "border-left";
+    "border-bottom";
     "box-shadow" = "";
 }
 class WCssClass {
-    constructor(ClassName, PropsList = (new CSSProps())) {
+    /**
+     * 
+     * @param {String} ClassName 
+     * @param {any} PropsList 
+     */
+    constructor(ClassName, PropsList) {
         this.Name = ClassName;
         this.CSSProps = PropsList;
     }
 }
-class StyleConfig {
-    ClassList = [];
-}
+
+/**
+ * @typedef {Object} MediaQuery 
+ * @property {String} condicion
+ * @property {Array<WCssClass>} [ClassList]
+ * **/
+
+
+/**
+ * @typedef {Object} StyleConfig 
+ * @property {Array<WCssClass>} [ClassList]
+ * @property {Array<MediaQuery>} [action]
+ * **/
+
 class WStyledRender extends HTMLElement {
-    constructor(Config = (new StyleConfig())) {
+    constructor(Config) {
         super();
         for (const p in Config) {
             this[p] = Config[p];
@@ -261,6 +277,11 @@ class WStyledRender extends HTMLElement {
         return bodyStyle;
     }
 }
+/**
+ * 
+ * @param {TemplateStringsArray} body 
+ * @returns 
+ */
 function css(body = "") {
     return WRender.Create({ tagName: "style", innerHTML: body });
 }

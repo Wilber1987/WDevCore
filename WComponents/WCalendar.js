@@ -100,9 +100,9 @@ class WCalendar extends HTMLElement {
                         if (day.className != "CalendarDayDisable") day.className = "CalendarDay";
                     });
                     ev.target.className = "CalendarDayActive";
-                    if (this.Function) {
+                    if (this.action) {
                         if (this.DetailDay) { } else {
-                            const Result = this.Function({
+                            const Result = this.action({
                                 date: this.SelectedDay,
                                 day: date.getDay()
                             });
@@ -430,22 +430,23 @@ class DetailDayClass extends HTMLElement {
         }
     };
 }
-
-
-class CalendarComponentConfig {
-    SelectedBlocks = [];
-    ModelObject = () => { };
-    CalendarFunction = async () => {
-        return {
-            Agenda: [],
-            Calendario: []
-        };
-    };
-    SaveFunction = async () => { };
-    Form = undefined;
+const CalendarFunction = async () => {
+    return { Agenda: [], Calendario: [] }
 }
+/**
+ * @typedef {Object} CalendarComponentConfig
+    * @property {Array} [SelectedBlocks]
+    * @property {Function | Object} [ModelObject]
+    * @property {CalendarFunction} [CalendarFunction]
+    * @property {Function} [SaveFunction] 
+    * @property {HTMLElement} [CalendarFunction]
+ */
+
 class WCalendarComponent extends HTMLElement {
-    constructor(Config = (new CalendarComponentConfig())) {
+    /**
+     * @param {CalendarComponentConfig} Config 
+     */
+    constructor(Config) {
         super();
         for (const p in Config) {
             this[p] = Config[p];
@@ -458,7 +459,7 @@ class WCalendarComponent extends HTMLElement {
     DrawComponent = async () => {
         const calendar = new WCalendar({
             id: "Calendar",
-            Function: async (DateParam) => {
+            action: async (DateParam) => {
                 const IdDetailDay = `DetailDay${DateParam.date}`;
                 const response = await this.CalendarFunction();
                 this.CalendarManager.NavigateFunction(

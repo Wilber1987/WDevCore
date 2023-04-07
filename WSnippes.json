@@ -104,7 +104,7 @@
                 "\tOptions: {",
                     "\t\tSearch: true,  UrlSearch: 'api_route',",
                     "\t\tAdd: true, UrlAdd: 'api_route',", 
-                    "\t\tUserActions: [{ name: 'Log...', Function: (TableElement) => { console.log(TableElement); } }]",
+                    "\t\tUserActions: [{ name: 'Log...', action: (TableElement) => { console.log(TableElement); } }]",
                 "\t}",
             "})"			
 			],
@@ -125,7 +125,7 @@
                     "\t\tDelete: true, UrlDelete: 'api_route',",
                     "\t\tShow: true, ",
                     "\t\tSelect: true,",
-                    "\t\tUserActions: [{ name: 'Log...', Function: (TableElement) => { console.log(TableElement); } }]",
+                    "\t\tUserActions: [{ name: 'Log...', action: (TableElement) => { console.log(TableElement); } }]",
                 "\t}",
             "})"			
 			],

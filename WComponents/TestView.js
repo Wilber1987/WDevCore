@@ -220,8 +220,8 @@ class WTestView extends HTMLElement {
                         return;
                     }
                 }
-                if (this.Config.Function != undefined && this.Config.Function.__proto__ == Function.prototype) {
-                    this.Config.Function(Question);
+                if (this.Config.action != undefined && this.Config.action.__proto__ == Function.prototype) {
+                    this.Config.action(Question);
                 }
             }
         }))

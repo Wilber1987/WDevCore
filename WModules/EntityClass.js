@@ -9,15 +9,32 @@ class EntityClass {
             Update: "Api" + Namespace + "/update" + this.__proto__.constructor.name,
         }
     }   
+    /**
+     * 
+     * @param {String} Param 
+     * @returns {Array}
+     */
     Get = async (Param = "") => {
         let Data = await this.GetData(this.ApiMethods.Get);
         return Data.map(ent => new this.constructor(ent));
     }
+     /**
+     * 
+     * @param {String} paramName 
+     * @param {String} paramValue 
+     * @returns {Array}
+     */
     GetByProps = async (paramName, paramValue) => {
         let Data = await this.GetData();
         Data = Data.filter(ent => ent[paramName].toString().includes(paramValue.toString()));
         return Data.map(ent => new this.constructor(ent));
     }
+      /**
+     * 
+     * @param {String} paramName 
+     * @param {String} paramValue 
+     * @returns {Array}
+     */
     FindByProps = async (paramName, paramValue) => {
         let Data = await this.GetData();
         const FindObject = Data.find(ent => ent[paramName].toString().includes(paramValue.toString()));
@@ -34,6 +51,11 @@ class EntityClass {
         return true;
     }
     /** CORE ########################################################## */
+      /**
+     * 
+     * @param {String} Path 
+     * @returns {Array}
+     */
     GetData = async (Path) => {
         const Dataset = WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, this.replacer(this))
         // let Dataset = await fetch(this.ApiMethods.ApiRoute + this.constructor.name + '.json');

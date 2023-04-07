@@ -1,4 +1,9 @@
 class WOrtograficValidation {
+    /**
+     * 
+     * @param {String} val 
+     * @returns {String}
+     */
     static es = (val = "") => {
         try {
             val = val.toString().replaceAll("_id", "")

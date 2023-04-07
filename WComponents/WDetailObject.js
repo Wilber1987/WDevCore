@@ -168,7 +168,6 @@ class ProfileCard extends HTMLElement {
     constructor(Config = new Config()) {
         super();
         this.Config = Config;
-        console.log(Config);
         this.ObjectDetail = this.Config.ObjectDetail;
         this.ModelObject = this.Config.ModelObject ?? this.ObjectDetail;
         this.container = WRender.Create({ className: "cont" });
@@ -178,8 +177,7 @@ class ProfileCard extends HTMLElement {
     connectedCallback() { }
     DraProfileCard = async (ObjectDetail, Model) => {
         this.container.innerHTML = "";
-        this.container.append(WRender.CreateStringNode("<h3>Datos Generales</h3>"))
-        console.log(Model);
+        this.container.append(WRender.CreateStringNode("<h3>Datos Generales</h3>"));
         for (const prop in Model) {
             if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
                 switch (Model[prop].type.toUpperCase()) {

@@ -1,29 +1,15 @@
 import { WRender, WAjaxTools, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { ModalConfig } from "../WModules/CommonModel.js";
 
-class ModalConfig {
-    ShadowRoot = null;
-    icon = null;
-    title = null;
-    HeadOptions = null;
-    StyleForm = null;
-    ObjectDetail = undefined;
-    EditObject = undefined;
-    UserActions = undefined;
-    ObjectModal = undefined;
-    CloseOption = false;
-    ModelObject = {
-        property: undefined,
-        Operation: {
-            type: "OPERATION", Function: (obj) => {
-                return obj.value1 + obj.value2;
-            }
-        }
-    };
-}
+
 class WModalForm extends HTMLElement {
-    constructor(Config = (new ModalConfig())) {
+    /**
+     * 
+     * @param {ModalConfig} Config 
+     */
+    constructor(Config) {
         super();
         this.ShadowRoot = true;
         this.DataRequire = true;

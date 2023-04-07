@@ -15,7 +15,7 @@ class TableConfig {
     Options = {
         UserActions: [{
             name: "name",
-            Function: () => { }
+            action: () => { }
         }]
     }
 }
@@ -382,7 +382,7 @@ class WTableComponent extends HTMLElement {
                             type: "button",
                             innerText: Action.name,
                             onclick: async (ev) => {
-                                Action.Function(element, ev.target);
+                                Action.action(element, ev.target);
                             }
                         }
                     })
@@ -607,8 +607,8 @@ class WTableComponent extends HTMLElement {
     }
     SearchFunction = async (ev) => {
         if (this.SearchItemsFromApi != undefined) {
-            if (this.SearchItemsFromApi.Function != undefined) {
-                const Dataset = await this.SearchItemsFromApi.Function(ev.target.value);
+            if (this.SearchItemsFromApi.action != undefined) {
+                const Dataset = await this.SearchItemsFromApi.action(ev.target.value);
                 this.DrawTable(Dataset);
             } else {
                 const Dataset = await WAjaxTools.PostRequest(

@@ -215,7 +215,12 @@ class WRender {
 
         }
     }
-    static Create = (Node = (new WNode())) => {
+    /**
+     * 
+     * @param {WNode} Node 
+     * @returns {HTMLElement}
+     */
+    static Create = (Node) => {
         try {
             if (typeof Node === "undefined" || Node == null) {
                 return document.createTextNode("Nodo nulo o indefinido.");
@@ -270,7 +275,11 @@ class WRender {
             return document.createTextNode("Problemas en la construcción del nodo.");
         }
     }
-    static SetStyle = (Node, Style = (new ElementStyle())) => {
+    /**
+     * @param  {HTMLElement} Node
+     * @param  {ElementStyle} Style
+    */
+    static SetStyle = (Node, Style) => {
         for (const styleProp in Style) {
             Node.style[styleProp] = Style[styleProp];
         }
@@ -432,12 +441,12 @@ class ComponentsManager {
 class WArrayF {
     static JSONParse(param) {
         return JSON.parse((param).replace(/&quot;/gi, '"'));
-    } 
+    }
     /**
      * @param {Array} Array Arreglo para ordenar 
      * @param {number} type Valor 1 o 2
      * @returns 
-     */   
+     */
     static orderByDate(Array, type) {
         var meses = [
             "enero", "febrero", "marzo",
@@ -723,6 +732,13 @@ function pad(number) {
     }
     return number;
 }
+/**
+ * @class Date
+ * @memberof Date.prototype
+ * @function
+ * @name toISO
+ * @returns 
+**/
 Date.prototype.toISO = function () {
     return this.getUTCFullYear() +
         '-' + pad(this.getUTCMonth() + 1) +
