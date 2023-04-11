@@ -1,4 +1,110 @@
+//@ts-check
 import { WRender } from "./WComponentsTools.js";
+class WCssClass {
+    /**
+     * 
+     * @param {String} ClassName 
+     * @param {any} PropsList 
+     */
+    constructor(ClassName, PropsList) {
+        this.Name = ClassName;
+        this.CSSProps = PropsList;
+    }
+}
+/**
+ * @typedef {Object} MediaQuery 
+ * @property {String} condicion
+ * @property {Array<WCssClass>} ClassList
+ * **/
+/**
+ * @typedef {Object} KeyFrame 
+ * @property {String} animate
+ * @property {Array<WCssClass>} ClassList
+ * **/
+
+/**
+ * @typedef {Object} StyleConfig 
+ * @property {Array<WCssClass>} ClassList
+ * @property {Array<MediaQuery>} [action]
+ * **/
+
+class WStyledRender extends HTMLElement {
+    constructor(Config) {
+        super();
+        for (const p in Config) {
+            this[p] = Config[p];
+        }
+    }
+    /**@type {Array} */
+    ClassList = new Array();
+    /**@type {Array<MediaQuery>} */
+    MediaQuery = [];
+    /**@type {Array<KeyFrame>} */
+    KeyFrame = [];
+    attributeChangedCallBack() {
+        this.DrawStyle();
+    }
+    connectedCallback() {
+        if (this.innerHTML != "") {
+            return;
+        }
+        this.DrawStyle();
+        this.style.display = "none";
+    }
+    DrawStyle() {
+        let styleFrag = {
+            type: "style",
+            props: {
+                innerHTML: "",
+            }
+        }
+        styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + this.DrawClassList(this.ClassList);
+
+        this.MediaQuery.forEach(MediaQ => {
+            let MediaQuery = `@media ${MediaQ.condicion}{
+                    ${this.DrawClassList(MediaQ.ClassList)}
+                }`;
+            styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + MediaQuery;
+        });
+        this.KeyFrame.forEach(KeyF => {
+            let KeyFrame = `@keyframes ${KeyF.animate} {
+                    ${this.DrawClassList(KeyF.ClassList)}
+                }`;
+            styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + KeyFrame;
+        });
+
+        this.append(WRender.createElement(styleFrag));
+    }
+    DrawClassList(ClassList) {
+        let bodyStyle = "";
+        ClassList.forEach(Class => {
+            let bodyClass = "";
+            if (Class.__proto__ == WCssClass.prototype) {
+                for (const prop in Class.CSSProps) {
+                    let PropValue = Class.CSSProps[prop];
+                    if (typeof PropValue === "number") {
+                        PropValue = PropValue + "px"
+                    }
+                    bodyClass = bodyClass + `${prop}: ${PropValue};`;
+                }
+                bodyClass = `${Class.Name} {${bodyClass}}`;
+                bodyStyle = bodyStyle + bodyClass;
+            }
+        });
+        return bodyStyle;
+    }
+}
+/**
+ * 
+ * @param {TemplateStringsArray} body 
+ * @returns 
+ */
+function css(body) {
+    return WRender.Create({ tagName: "style", innerHTML: body.toString() });
+}
+customElements.define("w-style", WStyledRender);
+export { WCssClass, WStyledRender, css }; 
+
 class CSSProps {
     "align-content";
     "align-items";
@@ -188,102 +294,3 @@ class CSSProps {
     "border-bottom";
     "box-shadow" = "";
 }
-class WCssClass {
-    /**
-     * 
-     * @param {String} ClassName 
-     * @param {any} PropsList 
-     */
-    constructor(ClassName, PropsList) {
-        this.Name = ClassName;
-        this.CSSProps = PropsList;
-    }
-}
-
-/**
- * @typedef {Object} MediaQuery 
- * @property {String} condicion
- * @property {Array<WCssClass>} [ClassList]
- * **/
-
-
-/**
- * @typedef {Object} StyleConfig 
- * @property {Array<WCssClass>} [ClassList]
- * @property {Array<MediaQuery>} [action]
- * **/
-
-class WStyledRender extends HTMLElement {
-    constructor(Config) {
-        super();
-        for (const p in Config) {
-            this[p] = Config[p];
-        }
-    }
-    attributeChangedCallBack() {
-        this.DrawStyle();
-    }
-    connectedCallback() {
-        if (this.innerHTML != "") {
-            return;
-        }
-        this.DrawStyle();
-        this.style.display = "none";
-    }
-    DrawStyle() {
-        let styleFrag = {
-            type: "style",
-            props: {
-                innerHTML: "",
-            },
-        }
-        if (this.ClassList != undefined && this.ClassList.__proto__ == Array.prototype) {
-            styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + this.DrawClassList(this.ClassList);
-        }
-        if (this.MediaQuery != undefined && this.MediaQuery.__proto__ == Array.prototype) {
-            this.MediaQuery.forEach(MediaQ => {
-                let MediaQuery = `@media ${MediaQ.condicion}{
-                    ${this.DrawClassList(MediaQ.ClassList)}
-                }`;
-                styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + MediaQuery;
-            });
-        }
-        if (this.KeyFrame != undefined && this.KeyFrame.__proto__ == Array.prototype) {
-            this.KeyFrame.forEach(KeyF => {
-                let KeyFrame = `@keyframes ${KeyF.animate} {
-                    ${this.DrawClassList(KeyF.ClassList)}
-                }`;
-                styleFrag.props.innerHTML = styleFrag.props.innerHTML + " " + KeyFrame;
-            });
-        }
-        this.append(WRender.createElement(styleFrag));
-    }
-    DrawClassList(ClassList) {
-        let bodyStyle = "";
-        ClassList.forEach(Class => {
-            let bodyClass = "";
-            if (Class.__proto__ == WCssClass.prototype) {
-                for (const prop in Class.CSSProps) {
-                    let PropValue = Class.CSSProps[prop];
-                    if (typeof PropValue === "number") {
-                        PropValue = PropValue + "px"
-                    }
-                    bodyClass = bodyClass + `${prop}: ${PropValue};`;
-                }
-                bodyClass = `${Class.Name} {${bodyClass}}`;
-                bodyStyle = bodyStyle + bodyClass;
-            }
-        });
-        return bodyStyle;
-    }
-}
-/**
- * 
- * @param {TemplateStringsArray} body 
- * @returns 
- */
-function css(body = "") {
-    return WRender.Create({ tagName: "style", innerHTML: body });
-}
-customElements.define("w-style", WStyledRender);
-export { WCssClass, WStyledRender, css }; 
