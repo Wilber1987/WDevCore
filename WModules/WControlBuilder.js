@@ -21,23 +21,23 @@ class ControlBuilder {
         return image;
     }
     static BuildProgressBar(value = 0, total = 100, barColor = "#737b83cc", progressColor = "#2c3e50") {
-        return WRender.CreateStringNode(`<div class="progressDivContainer">        
-        <div class="progressDiv">
+        return WRender.CreateStringNode(`<div class="progressDivContainer">   
+        <h3>${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%</h3>     
+        <div class="progressDiv">        
           <div class="progress" style="width:${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%;"></div>
-        </div>
-        <h3>${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%</h3>
-        <style>
+        </div>       
+        <style>        
           .progressDivContainer{
-            position: relative; width: 100%;  height: auto;  margin: 10px 0px;
+            position: relative; width: 100%;  height: auto;  margin: 10px 0px; display: flex;
           }          
           .progressDivContainer > .progressDiv{
-            width: 100%;  height: 15px;  background: ${barColor}; overflow: hidden; border-radius: 15px;
+            width: 100%;  height: 20px;  background: ${barColor}; overflow: hidden; border-radius: 15px;
           }          
           .progressDivContainer > .progressDiv > .progress{
-            height: 15px;  background: ${progressColor}; border-radius: 15px;
+            height: 20px;  background: ${progressColor}; border-radius: 15px;
           }          
           .progressDivContainer > h3{
-            margin: 10px 0px; font-size: 16px; font-family: sans-serif; color: #2c3e50;
+            margin: 2px 10px; font-size: 16px; font-family: sans-serif; color: #fff; position: absolute; top: 0
           }
         </style>
       </div>`);
