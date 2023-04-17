@@ -312,9 +312,11 @@ class WForm extends HTMLElement {
                     /**@type {EntityClass} */
                     const entity = ModelProperty.ModelObject = ModelProperty.ModelObject();
                     ModelProperty.Dataset = await entity.Get();
-                    if (ObjectF[prop] == null && ModelProperty.require != false && ModelProperty.Dataset.length > 0) {
-                        ObjectF[prop] = ModelProperty.Dataset[0];
-                    }
+                }
+                if (ObjectF[prop] == null && ModelProperty.require != false &&
+                    ModelProperty.Dataset &&
+                    ModelProperty.Dataset?.length > 0) {
+                    ObjectF[prop] = ModelProperty?.Dataset[0];
                 }
                 val = ObjectF[prop];
                 const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop);
