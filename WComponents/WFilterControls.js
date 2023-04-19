@@ -23,87 +23,99 @@ class WFilterOptions extends HTMLElement {
         this.FilterContainer = WRender.Create({ className: "filter-container" });
         /** @type {Array} */
         this.FilterControls = [];
+        this.attachShadow({ mode: "open" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
-        this.shadowRoot?.append(WRender.createElement(this.style));
+        this.shadowRoot?.append(WRender.createElement(this.styles));
         this.shadowRoot?.append(this.FilterContainer);
-        this.attachShadow({ mode: "open" });
+      
         this.DrawFilter();
     }
     connectedCallback() {
     }
-    DrawFilter = async ()=> {
+    DrawFilter = async () => {
         this.FilterContainer.innerHTML = "";
         const ControlOptions = WRender.Create({ class: "OptionContainer" })
         const Model = this.ModelObject ?? this.Config.Dataset[0];
         for (const prop in Model) {
+            const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop).map(s => s[prop]);
             if (!this.isNotDrawable(Model, prop)) {
                 if (Model[prop].__proto__ == Object.prototype) {
-                    if (Model[prop].ModelObject?.__proto__ == Function.prototype ) {
-                        Model[prop] = undefined;
-                        continue;
+                    const filterControl = await this.CreateModelControl(Model, prop, SelectData);
+                    if (filterControl != null) {
+                        ControlOptions.append(WRender.Create({ children: [prop, filterControl]}));
+                        this.FilterControls.push(filterControl);
                     }
-                    const filterControl = await this.CreateModelControl(Model, prop, );
-                    ControlOptions.append(filterControl);
-                    this.FilterControls.push(filterControl);
                 } else {
-                    
+                    const filterControl = await this.CreateWSelect(SelectData, prop); 
+                    ControlOptions.append(WRender.Create({ children: [prop, filterControl]}));
+                    this.FilterControls.push(filterControl);
                 }
-            } 
-            if ((typeof this.Config.Dataset[0][prop] != "number"
-                && !prop.toUpperCase().includes("FECHA")
-                && !prop.toUpperCase().includes("DATE"))
-                || prop.toUpperCase().includes("AÑO")
-                || prop.toUpperCase().includes("YEAR")) {
-                const select = {
-                    type: 'select', props: { id: prop }, children: [
-                        { type: 'option', props: { innerText: 'Seleccione', value: '' } }
-                    ]
-                }
-                const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop);
-                SelectData.forEach(data => {
-                    if (data[prop] != "" && data[prop] != null) {
-                        select.children.push({
-                            type: 'option', props: { innerText: data[prop], value: data[prop] }
-                        });
-                    }
-                });
-                select.props.onchange = async (ev) => {
-
-                }
-                ControlOptions.children.push([WArrayF.Capitalize(prop.replace("_", " ")), select]);
             }
         }
         this.FilterContainer.append(WRender.createElement(ControlOptions));
-
+    }
+    /**
+     * 
+     * @param {Object} Model 
+     * @param {String} prop 
+     * @param {Array} Dataset 
+     * @returns 
+     */
+    CreateModelControl = async (Model, prop, Dataset) => {
+        const ModelProperty = Model[prop];
+        switch (ModelProperty.type?.toUpperCase()) {
+            case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
+                break;
+            case "DATE": case "FECHA": case "HORA": case "PASSWORD":
+                /**TODO */
+                break;
+            case "SELECT":
+                return this.CreateSelect(prop, Dataset);
+            case "WSELECT":    case "MULTISELECT":   case "EMAIL":  case "TEL":  case "URL":         
+                return await this.CreateWSelect( Dataset, prop);   
+            case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW":  case "TEXTAREA":
+               break;
+            case "RADIO": case "CHECKBOX":
+                 /**TODO */
+                break;   
+            case "CALENDAR":
+                /**TODO */
+                break;
+            default:
+                return await this.CreateWSelect( Dataset, prop);  
+        }
+        return null
     }
     isNotDrawable(Model, prop) {
+        if (Model[prop] == null) {
+            return true;
+        }
         return (Model[prop].__proto__ == Object.prototype &&
             (Model[prop].primary || Model[prop].hidden || !Model[prop].type))
             || Model[prop].__proto__ == Function.prototype
             || Model[prop].__proto__.constructor.name == "AsyncFunction";
     }
-    filterFunction = (value) => {
-        // let SelectFlag = false;
-        // this.shadowRoot?.querySelectorAll("#optionsContainter select").forEach(select => {
-        //     if (select.id != ev.target.id) {
-        //         if (select.value != "") {
-        //             SelectFlag = true;
-        //         }
-        //     }
-        // });
+    filterFunction = (propierty) => {
+        const isValuePresent= (object, value, flagObj)=>{
+            if (value == "") {
+                return
+            }
+            if (object[propierty] == value) {
+                if (flagObj) {
+                    flagObj = true;
+                }
+            } else {
+                flagObj = false;
+            }
+        }
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
-            this.FilterControls.forEach(select => {
-                if (select.value == "") {
-                    return
-                }
-                if (obj[select.propierty] == select.value) {
-                    if (flagObj) {
-                        flagObj = true;
-                    }
+            this.FilterControls.forEach(control => {
+                if (this.ModelObject.__proto__ == Object.prototype) {
+
                 } else {
-                    flagObj = false;
+                    isValuePresent(control.value);
                 }
             });
             return flagObj;
@@ -114,8 +126,42 @@ class WFilterOptions extends HTMLElement {
             console.log(DFilt);
         }
     }
+    /**
+     * 
+     * @param {String} prop 
+     * @param {Array} Dataset 
+     * @returns 
+     */
+    CreateSelect(prop, Dataset) {
+        let InputControl = WRender.Create({
+            tagName: "select", className: prop, onchange: this.filterFunction, id: prop,
+            children: Dataset?.map(option => {
+                const OValue = option;
+                const ODisplay = option;
+                const OptionObject = WRender.Create({
+                    tagName: "option", value: OValue, innerText: ODisplay
+                });
+                return OptionObject;
+            })
+        });
+        return InputControl;
+    }
 
-    style = {
+    async CreateWSelect(Dataset, prop) {
+        const { MultiSelect } = await import("./WMultiSelect.js");
+        const InputControl = new MultiSelect({
+            MultiSelect: false,
+            Dataset: Dataset,
+            id: prop,
+            FullDetail: false,
+            action: () => {
+                this.filterFunction();
+            }
+        });
+        return InputControl;
+    }
+
+    styles = {
         type: 'w-style', props: {
             id: '', ClassList: [
                 new WCssClass(`.reportV`, {

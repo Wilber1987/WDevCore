@@ -9,8 +9,10 @@ import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
  * @typedef {Object} ConfigMS 
  *  * @property {Array} Dataset
     * @property {Function} [action]
+    * @property {Function} [id]
     * @property {Object} [ModelObject]
     * @property {Boolean} [MultiSelect]
+    * @property {Boolean} [FullDetail]
 **/
 
 class MultiSelect extends HTMLElement {
@@ -21,6 +23,7 @@ class MultiSelect extends HTMLElement {
     constructor(Config = (new ConfigMS()), Style = null) {
         super();
         this.Config = Config;
+        this.id = Config.id;
         this.Dataset = this.Config.Dataset ?? [];
         this.ModelObject = this.Config.ModelObject ?? undefined;
         this.attachShadow({ mode: 'open' });
@@ -115,8 +118,8 @@ class MultiSelect extends HTMLElement {
                     }
                     this.DrawLabel();
                 }
-            });           
-            Option.onclick = this.DisplayOptions;            
+            });
+            Option.onclick = this.DisplayOptions;
             const SubContainer = WRender.Create({ className: "SubMenu" });
             if (element.SubOptions != undefined && element.SubOptions.__proto__ == Array.prototype) {
                 element.SubMultiSelect = new MultiSelect({
@@ -128,11 +131,15 @@ class MultiSelect extends HTMLElement {
                 element.selectedItems = element.SubMultiSelect.selectedItems;
                 SubContainer.append(element.SubMultiSelect);
             }
-            const Detail = this.FullDetail == true ? this.BuilDetail(element) : "";
-            this.OptionsContainer.append(WRender.Create({
+
+            const Options = WRender.Create({
                 className: "OContainer",
-                children: [OptionLabel, Option, Detail, SubContainer]
-            }));
+                children: [OptionLabel, Option, SubContainer]
+            });
+            this.OptionsContainer.append(Options);
+            if (this.FullDetail) {
+                Options.append(Detail)
+            }
         });
     }
     SetOptions = () => {
