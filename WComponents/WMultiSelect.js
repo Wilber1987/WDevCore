@@ -9,7 +9,7 @@ import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
  * @typedef {Object} ConfigMS 
  *  * @property {Array} Dataset
     * @property {Function} [action]
-    * @property {Function} [id]
+    * @property {String} [id]
     * @property {Object} [ModelObject]
     * @property {Boolean} [MultiSelect]
     * @property {Boolean} [FullDetail]
@@ -67,9 +67,8 @@ class MultiSelect extends HTMLElement {
             this.shadowRoot.append(Style);
         }
         this.shadowRoot.append(this.SetOptions());
-        if (!this.MultiSelect) {
-            this.LabelMultiselect.onclick = this.DisplayOptions;
-        }
+        this.LabelMultiselect.onclick = this.DisplayOptions;
+        
     }
 
     connectedCallback() {
@@ -80,7 +79,7 @@ class MultiSelect extends HTMLElement {
     Draw = (Dataset = this.Dataset) => {
         this.OptionsContainer.innerHTML = "";
         Dataset.forEach((element, index) => {
-            //console.log(element);
+            if (element == null) { return; }
             const OType = this.MultiSelect == true ? "checkbox" : "radio";
             const OptionLabel = WRender.Create({
                 tagName: "label", htmlFor: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
@@ -119,7 +118,9 @@ class MultiSelect extends HTMLElement {
                     this.DrawLabel();
                 }
             });
-            Option.onclick = this.DisplayOptions;
+            if (!this.MultiSelect) {
+                Option.onclick = this.DisplayOptions;
+            }            
             const SubContainer = WRender.Create({ className: "SubMenu" });
             if (element.SubOptions != undefined && element.SubOptions.__proto__ == Array.prototype) {
                 element.SubMultiSelect = new MultiSelect({
@@ -137,8 +138,8 @@ class MultiSelect extends HTMLElement {
                 children: [OptionLabel, Option, SubContainer]
             });
             this.OptionsContainer.append(Options);
-            if (this.FullDetail) {
-                Options.append(Detail)
+            if (this.FullDetail) {                
+                Options.append(this.BuilDetail(element))
             }
         });
     }
@@ -179,6 +180,9 @@ class MultiSelect extends HTMLElement {
         });
     }
     DisplayText(element, index) {
+        if (typeof element === "string") {
+           return element
+        }
         return element.Descripcion ??
             element.descripcion ??
             element.desc ??
@@ -282,10 +286,7 @@ const MainMenu = css`
         min-height: 40px;
         width: calc(100% - 30px);
         overflow-x: auto;
-    }
-    .multi:hover~w-tooltip,
-    w-tooltip:hover,
-    .txtControl:focus~w-tooltip,
+    } 
     .toolActive {
         position: fixed;
         border: solid 1px #9b9b9b;

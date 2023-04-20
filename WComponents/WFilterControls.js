@@ -2,6 +2,7 @@
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
+import { MultiSelect } from "./WMultiSelect.js";
 /**
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset    
@@ -28,7 +29,7 @@ class WFilterOptions extends HTMLElement {
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         this.shadowRoot?.append(WRender.createElement(this.styles));
         this.shadowRoot?.append(this.FilterContainer);
-      
+
         this.DrawFilter();
     }
     connectedCallback() {
@@ -43,12 +44,12 @@ class WFilterOptions extends HTMLElement {
                 if (Model[prop].__proto__ == Object.prototype) {
                     const filterControl = await this.CreateModelControl(Model, prop, SelectData);
                     if (filterControl != null) {
-                        ControlOptions.append(WRender.Create({ children: [prop, filterControl]}));
+                        ControlOptions.append(WRender.Create({ children: [prop, filterControl] }));
                         this.FilterControls.push(filterControl);
                     }
                 } else {
-                    const filterControl = await this.CreateWSelect(SelectData, prop); 
-                    ControlOptions.append(WRender.Create({ children: [prop, filterControl]}));
+                    const filterControl = await this.CreateWSelect(SelectData, prop);
+                    ControlOptions.append(WRender.Create({ children: [prop, filterControl] }));
                     this.FilterControls.push(filterControl);
                 }
             }
@@ -72,18 +73,18 @@ class WFilterOptions extends HTMLElement {
                 break;
             case "SELECT":
                 return this.CreateSelect(prop, Dataset);
-            case "WSELECT":    case "MULTISELECT":   case "EMAIL":  case "TEL":  case "URL":         
-                return await this.CreateWSelect( Dataset, prop);   
-            case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW":  case "TEXTAREA":
-               break;
+            case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
+                return await this.CreateWSelect(Dataset, prop);
+            case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
+                break;
             case "RADIO": case "CHECKBOX":
-                 /**TODO */
-                break;   
+                /**TODO */
+                break;
             case "CALENDAR":
                 /**TODO */
                 break;
             default:
-                return await this.CreateWSelect( Dataset, prop);  
+                return await this.CreateWSelect(Dataset, prop);
         }
         return null
     }
@@ -96,26 +97,61 @@ class WFilterOptions extends HTMLElement {
             || Model[prop].__proto__ == Function.prototype
             || Model[prop].__proto__.constructor.name == "AsyncFunction";
     }
-    filterFunction = (propierty) => {
-        const isValuePresent= (object, value, flagObj)=>{
-            if (value == "") {
-                return
-            }
-            if (object[propierty] == value) {
-                if (flagObj) {
-                    flagObj = true;
-                }
-            } else {
-                flagObj = false;
-            }
-        }
+    filterFunction = () => {
+        // const isValuePresent = (object, value, flagObj) => {
+        //     if (value == "") {
+        //         return
+        //     }
+        //     console.log(propierty, object[propierty], value, object[propierty] == value);
+        //     if (object[propierty] == value) {
+        //         if (flagObj) {
+        //             flagObj = true;
+        //         }
+        //     } else {
+        //         flagObj = false;
+        //     }
+        // }
+       
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
             this.FilterControls.forEach(control => {
-                if (this.ModelObject.__proto__ == Object.prototype) {
-
+                if (this.ModelObject?.__proto__ == Object.prototype) {
+                    const ModelProperty = this.ModelObject[control.id];
+                    switch (ModelProperty.type?.toUpperCase()) {
+                        case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
+                            break;
+                        case "DATE": case "FECHA": case "HORA": case "PASSWORD":
+                            /**TODO */
+                            break;
+                        case "SELECT":
+                            break;
+                        case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
+                            findElement(control);
+                            break;
+                        case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
+                            break;
+                        case "RADIO": case "CHECKBOX":
+                            /**TODO */
+                            break;
+                        case "CALENDAR":
+                            /**TODO */
+                            break;
+                        default:
+                            findElement(control);
+                            break;
+                    }
                 } else {
-                    isValuePresent(control.value);
+                    findElement(control);
+                }
+                /** @param { MultiSelect } multiSelect */
+                function findElement(multiSelect) {
+                    if (multiSelect.selectedItems.length > 0) {
+                        //@ts-ignore
+                        const find = multiSelect.selectedItems.find(x => x == obj[multiSelect.id]);
+                        if (find == undefined) {
+                            flagObj = false;
+                        }
+                    }
                 }
             });
             return flagObj;
@@ -147,10 +183,9 @@ class WFilterOptions extends HTMLElement {
         return InputControl;
     }
 
-    async CreateWSelect(Dataset, prop) {
-        const { MultiSelect } = await import("./WMultiSelect.js");
+    async CreateWSelect(Dataset, prop) {       
         const InputControl = new MultiSelect({
-            MultiSelect: false,
+            //MultiSelect: false,
             Dataset: Dataset,
             id: prop,
             FullDetail: false,
