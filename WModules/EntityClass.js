@@ -16,7 +16,7 @@ class EntityClass {
      */
     Get = async (Param = "") => {
         let Data = await this.GetData(this.ApiMethods.Get);
-        return Data.map(ent => new this.constructor(ent));
+        return Data;
     }
      /**
      * 
@@ -57,10 +57,10 @@ class EntityClass {
      * @returns {Array}
      */
     GetData = async (Path) => {
-        const Dataset = WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, this.replacer(this))
+        const Dataset = await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, this.replacer(this))
         // let Dataset = await fetch(this.ApiMethods.ApiRoute + this.constructor.name + '.json');
         //Dataset = await Dataset.json()
-        return Dataset;
+        return Dataset.map(ent => new this.constructor(ent));;
     }
     SaveWithModel = async (Object, Edit = false) => {
         if (Edit == false) {

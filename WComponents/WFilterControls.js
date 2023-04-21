@@ -37,12 +37,12 @@ class WFilterOptions extends HTMLElement {
     DrawFilter = async () => {
         this.FilterContainer.innerHTML = "";
         const ControlOptions = WRender.Create({ class: "OptionContainer" })
-        const Model = this.ModelObject ?? this.Config.Dataset[0];
-        for (const prop in Model) {
+        this.ModelObject = this.ModelObject ?? this.Config.Dataset[0];
+        for (const prop in this.ModelObject) {
             const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop).map(s => s[prop]);
-            if (!this.isNotDrawable(Model, prop)) {
-                if (Model[prop].__proto__ == Object.prototype) {
-                    const filterControl = await this.CreateModelControl(Model, prop, SelectData);
+            if (!this.isNotDrawable(this.ModelObject, prop)) {
+                if (this.ModelObject[prop].__proto__ == Object.prototype) {
+                    const filterControl = await this.CreateModelControl(this.ModelObject, prop, SelectData);
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({ children: [prop, filterControl] }));
                         this.FilterControls.push(filterControl);
@@ -66,14 +66,14 @@ class WFilterOptions extends HTMLElement {
     CreateModelControl = async (Model, prop, Dataset) => {
         const ModelProperty = Model[prop];
         switch (ModelProperty.type?.toUpperCase()) {
+            case "TEXT":
+                return this.CreateTextControl(prop);
             case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                 break;
             case "DATE": case "FECHA": case "HORA": case "PASSWORD":
                 /**TODO */
                 break;
-            case "SELECT":
-                return this.CreateSelect(prop, Dataset);
-            case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
+            case "SELECT": case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
                 return await this.CreateWSelect(Dataset, prop);
             case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
                 break;
@@ -84,7 +84,8 @@ class WFilterOptions extends HTMLElement {
                 /**TODO */
                 break;
             default:
-                return await this.CreateWSelect(Dataset, prop);
+                //return await this.CreateSelectControl(Dataset, prop);
+                break;
         }
         return null
     }
@@ -111,21 +112,22 @@ class WFilterOptions extends HTMLElement {
         //         flagObj = false;
         //     }
         // }
-       
+
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
             this.FilterControls.forEach(control => {
-                if (this.ModelObject?.__proto__ == Object.prototype) {
+                if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
                     const ModelProperty = this.ModelObject[control.id];
                     switch (ModelProperty.type?.toUpperCase()) {
+                        case "TEXT":
+                            findByValue(control);
+                            break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                             break;
                         case "DATE": case "FECHA": case "HORA": case "PASSWORD":
                             /**TODO */
                             break;
-                        case "SELECT":
-                            break;
-                        case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
+                        case "SELECT": case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
                             findElement(control);
                             break;
                         case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
@@ -153,6 +155,12 @@ class WFilterOptions extends HTMLElement {
                         }
                     }
                 }
+                /** @param { HTMLInputElement } input */
+                function findByValue(input) {
+                    if (!obj[input.id].toUpperCase().includes(input.value.toLocaleUpperCase())) {
+                        flagObj = false;
+                    }
+                }
             });
             return flagObj;
         });
@@ -162,13 +170,14 @@ class WFilterOptions extends HTMLElement {
             console.log(DFilt);
         }
     }
+    /** @param {String} value  */
+
     /**
-     * 
      * @param {String} prop 
      * @param {Array} Dataset 
      * @returns 
      */
-    CreateSelect(prop, Dataset) {
+    CreateSelectControl(prop, Dataset) {
         let InputControl = WRender.Create({
             tagName: "select", className: prop, onchange: this.filterFunction, id: prop,
             children: Dataset?.map(option => {
@@ -182,8 +191,22 @@ class WFilterOptions extends HTMLElement {
         });
         return InputControl;
     }
-
-    async CreateWSelect(Dataset, prop) {       
+    /**
+     * @param {String} prop 
+     * @returns 
+     */
+    CreateTextControl(prop) {
+        let InputControl = WRender.Create({
+            tagName: "input",
+            type: "text",
+            className: prop,
+            id: prop,
+            placeholder: prop,
+            onchange: (ev) => { this.filterFunction() }
+        });
+        return InputControl;
+    }
+    async CreateWSelect(Dataset, prop) {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
             Dataset: Dataset,
@@ -210,7 +233,7 @@ class WFilterOptions extends HTMLElement {
                     display: "block"
                 }), new WCssClass(`.OptionContainer div`, {
                     display: "grid",
-                    "grid-template-rows": "30px 30px",
+                    "grid-template-rows": "30px 40px",
                     //margin: "5px",
                     "font-size": "12px",
                 }), new WCssClass(`.OptionContainer input, .OptionContainer select`, {

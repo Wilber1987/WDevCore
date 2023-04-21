@@ -286,8 +286,17 @@ class WRender {
     }
 
 }
+/**
+ * @typedef {Object} ConfigDOMManager
+     * @property {Boolean} [SPAManage]
+     * @property {HTMLElement} [MainContainer]
+     * @property {String} [ContainerName]
+     * */
 class ComponentsManager {
-    constructor(Config = { SPAManage: false, MainContainer: undefined, ContainerName: undefined }) {
+    /**
+     * @param {ConfigDOMManager} Config 
+     */
+    constructor(Config) {
         this.DomComponents = [];
         this.type = "div";
         this.props = {

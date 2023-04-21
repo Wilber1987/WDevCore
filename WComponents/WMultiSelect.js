@@ -174,6 +174,9 @@ class MultiSelect extends HTMLElement {
                         }
                         this.DrawLabel();
                         this.Draw();
+                        if (this.Config.action) {
+                            this.Config.action(this.selectedItems);
+                        }
                     }
                 }));
             }

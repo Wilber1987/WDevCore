@@ -188,7 +188,6 @@ class WTableDynamicComp extends HTMLElement {
             }, children: [{ type: "label", props: { innerText: "Parametros", class: "titleParam" } }]
         });
         let model = this.Dataset[0];
-        console.log(model);
         let divEvalAttib = WRender.createElement({
             type: "div",
             props: {
