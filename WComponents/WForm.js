@@ -102,12 +102,12 @@ class WForm extends HTMLElement {
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const Form = WRender.Create({ className: 'divForm' });
         for (const prop in Model) {
-            let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
-            ObjectF[prop] = val;
-            Model[prop] = Model[prop] != null ? Model[prop] : "";
+            Model[prop] = Model[prop] != null ? Model[prop] : undefined;
             if (this.isNotDrawable(Model, prop)) {
                 ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;
             } else {
+                let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
+                ObjectF[prop] = val;
                 const onChangeEvent = (ev) => {
                     /**
                      * @type {HTMLInputElement}
@@ -138,7 +138,7 @@ class WForm extends HTMLElement {
                         continue;
                     }
                     ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop)
-                    let InputControl = await this.CreateModelControl(Model, prop, val, ControlContainer, ObjectF, ControlLabel);
+                    let InputControl = await this.CreateModelControl(Model, prop, val, ControlContainer, ObjectF, ControlLabel, onChangeEvent);
                     ControlContainer.append(InputControl);
                 } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
                     let InputControl = this.CreateSelect(Model[prop], prop, ObjectF, onChangeEvent);
@@ -155,8 +155,6 @@ class WForm extends HTMLElement {
                     }
                     ControlContainer.append(InputControl);
                 }
-
-
                 Form.append(ControlContainer);
             }
         }
@@ -259,9 +257,10 @@ class WForm extends HTMLElement {
      * @param {String | undefined} val
      * @param {HTMLElement} ControlContainer
      * @param {Object} ObjectF
+     * @param {Function} ObjectF
      * @param {HTMLLabelElement} ControlLabel
      */
-    async CreateModelControl(Model, prop, val, ControlContainer, ObjectF, ControlLabel) {
+    async CreateModelControl(Model, prop, val, ControlContainer, ObjectF, ControlLabel, onChangeEvent) {
         /**
          * @type {ModelProperty}
          */
@@ -285,15 +284,13 @@ class WForm extends HTMLElement {
                 }
                 ControlContainer.className += " imgPhoto";
                 break;
-            case "DATE": case "FECHA": case "HORA": case "PASSWORD":
+            case "DATE": case "FECHA": case "HORA":
                 let type = "date";
                 //@ts-ignore
                 let date_val = val == "" ? (new Date()).toISO() : ObjectF[prop];
                 if (ModelProperty.type.toUpperCase() == "HORA") {
                     type = "time";
                     date_val = val ?? "08:00";
-                } else if (ModelProperty.type.toUpperCase() == "PASSWORD") {
-                    type = "password";
                 }
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, type: type,
@@ -303,7 +300,7 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
                 break;
             case "SELECT":
-                InputControl = this.CreateSelect(prop, ObjectF, ModelProperty.Dataset);
+                InputControl = this.CreateSelect(prop, ObjectF, ModelProperty.Dataset, onChangeEvent);
                 ObjectF[prop] = InputControl.value;
                 break;
             case "WSELECT":
@@ -345,7 +342,8 @@ class WForm extends HTMLElement {
                     tagName: "input",
                     className: prop, value: val, type: ModelProperty.type,
                     placeholder: "Ejem.: me@email.com",
-                    pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                    pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$",
+                    onchange: onChangeEvent
                 });
                 break;
             case "TEL":
@@ -353,7 +351,8 @@ class WForm extends HTMLElement {
                     tagName: "input",
                     className: prop, value: val, type: ModelProperty.type,
                     placeholder: "Ejem.: +54-88888888",
-                    pattern: "[+]{1}[0-9]{2,3}[-]{1}[0-9]{3,4}[0-9]{4,5}"
+                    pattern: "[+]{1}[0-9]{2,3}[-]{1}[0-9]{3,4}[0-9]{4,5}",
+                    onchange: onChangeEvent
                 });
                 break;
             case "URL":
@@ -361,7 +360,8 @@ class WForm extends HTMLElement {
                     tagName: "input",
                     className: prop, value: val, type: ModelProperty.type,
                     placeholder: "Ejem.: https://site.com",
-                    pattern: "https?://.+"
+                    pattern: "https?://.+",
+                    onchange: onChangeEvent
                 });
                 break;
             case "MASTERDETAIL":
@@ -392,7 +392,8 @@ class WForm extends HTMLElement {
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, value: val, type: ModelProperty.type,
                     style: { display: "none" },
-                    placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop))
+                    placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
+                    onchange: onChangeEvent
                 });
                 const label = WRender.Create({ tagName: 'label', id: "labelFile" + prop, innerText: '' });
                 const content = WRender.Create({
@@ -421,6 +422,7 @@ class WForm extends HTMLElement {
                     id: "ControlValue" + prop,
                     className: prop,
                     value: val,
+                    onchange: onChangeEvent,
                     type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop))
                 });
                 break;
@@ -430,7 +432,8 @@ class WForm extends HTMLElement {
                 ControlContainer.classList.add("tableContainer");
                 ControlContainer.style.height = "auto";
                 InputControl = WRender.Create({
-                    tagName: "textarea", style: { height: "100px", borderRadius: "10px" }, className: prop, value: val
+                    tagName: "textarea", style: { height: "100px", borderRadius: "10px" },
+                    className: prop, value: val, onchange: onChangeEvent
                 });
                 break;
             case "CALENDAR":
@@ -439,12 +442,41 @@ class WForm extends HTMLElement {
                 ControlContainer.style.height = "auto";
                 InputControl = this.createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model);
                 break;
+            case "PASSWORD":
+                ControlContainer.classList.add("tableContainer");
+                val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
+                const placeholderp = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
+                const pass = WRender.Create({
+                    tagName: "input", id: "ControlPass1" + prop, className: prop, value: val,
+                    type: ModelProperty.type, placeholder: placeholderp, onchange: onChangeEvent
+                })
+                const pass2 = WRender.Create({
+                    tagName: "input", id: "ControlPass2" + prop, className: prop, value: val,
+                    type: ModelProperty.type, placeholder: placeholderp, onchange: () => {
+                        // @ts-ignore
+                        if (pass.value != pass2.value) {
+                            this.createAlertToolTip(pass2, `contraseñas no coinciden`);
+                        }
+                    }
+                })
+
+                InputControl = WRender.Create({
+                    class: "password-container",
+                    children: [
+                        WRender.Create({
+                            class: "ModalElement", children: ["Contraseña", pass]
+                        }), WRender.Create({
+                            class: "ModalElement", children: ["Repetir contraseña", pass2]
+                        })
+                    ]
+                });
+                break;
             default:
                 val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
                 const placeholder = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, value: val,
-                    type: ModelProperty.type, placeholder: placeholder
+                    type: ModelProperty.type, placeholder: placeholder, onchange: onChangeEvent
                 });
                 break;
         }
@@ -471,6 +503,7 @@ class WForm extends HTMLElement {
                 }))
             });
         }
+        InputControl.id = "ControlValue" + prop;
         return InputControl;
     }
 
@@ -808,6 +841,7 @@ class WForm extends HTMLElement {
                 return;
             }
         }
+        console.log(ObjectF);
         if (!this.Validate(ObjectF)) {
             return;
         }
@@ -822,18 +856,27 @@ class WForm extends HTMLElement {
         }
     }
     Validate = (ObjectF) => {
+
         if (this.DataRequire == true) {
             for (const prop in ObjectF) {
+                console.log(this.Config.ModelObject[prop]);
                 if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require) {
                     /**
                      * @type {?HTMLInputElement | undefined | any}
                      */
                     const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
-                    if (this.Config.ModelObject[prop]?.type == "MODEL") {
+                    if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
                         if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
                             return false;
                         }
-                    } else if (this.Config.ModelObject[prop]?.type == "MASTERDETAIL") {
+                    }  else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
+                        const passwords = control.querySelectorAll("input");
+                        if (passwords[0].value != passwords[1].value) {
+                            this.createAlertToolTip(passwords[0].value, `Las contraseñas deben ser iguales`);
+                            return false;
+                        }
+                      
+                    } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL") {
                         if (this.Config.ModelObject[prop]?.MaxRequired
                             && ObjectF[prop].length > this.Config.ModelObject[prop]?.MaxRequired) {
                             this.createAlertToolTip(control, `El máximo de registros permitidos es `
@@ -893,7 +936,9 @@ class WForm extends HTMLElement {
                     ModalCheck.close();
                 }
             } catch (error) {
+                ModalCheck.close();
                 console.log(error);
+                this.shadowRoot?.append(ModalMessege(error));
             }
         }
         const ModalCheck = new WModalForm({
@@ -1005,14 +1050,21 @@ class WForm extends HTMLElement {
                 text-align: center;
             }
 
-            .inputTitle {
+            .inputTitle, .password-container label {
                 padding: 2px;
                 display: block;
                 text-align: left;
                 font-weight: bold;
                 margin: 0 0 15px 0;
             }
-            .inputTitle::first-letter {
+            .password-container { 
+                display: grid;
+                gap: 20px;
+                grid-template-columns: calc(50% - 10px) calc(50% - 10px);
+                grid-columns: span 2;
+            }
+            
+            .inputTitle::first-letter, .password-container label {
                 text-transform: capitalize;
             }
 
@@ -1110,7 +1162,7 @@ class WForm extends HTMLElement {
                 align-items: center;
                 border: none;
                 background-color: rgba(0, 0, 0, 0.2);                
-            }
+            }            
 
             .HeaderIcon {
                 height: 50px;

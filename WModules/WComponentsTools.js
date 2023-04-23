@@ -75,8 +75,9 @@ class WAjaxTools {
             return ProcessRequest;
         } catch (error) {
             console.log(error);
+            throw error;
             //if (error == "TypeError: Failed to fetch" ) {
-            return this.LocalData(Url);
+            // return this.LocalData(Url);
             //}
         }
     }
@@ -99,8 +100,10 @@ class WAjaxTools {
         }
     }
     static ProcessRequest = async (response, Url) => {
-        if (response.status == 404 || response.status == 500) {
-            console.log("ocurrio un error: " + response.status);
+        if (response.status == 400 || response.status == 403 || response.status == 404 || response.status == 500) {
+            const messageError = await response.text();            
+            var lineas = messageError.split('\n');
+            throw new Error(this.ProcessError(lineas[0])).message;
             if (typeof response !== "undefined" && typeof response !== "null" && response != "") {
                 return this.LocalData(Url);
             } else {
@@ -113,8 +116,12 @@ class WAjaxTools {
                 return response;
             } catch (error) {
                 console.log(error);
+                throw "ocurrio un error al procesar los datos de la respuesta";
             }
         }
+    }
+    static ProcessError(/**@type {String}*/string) {
+        return string.toUpperCase().replace("SYSTEM.EXCEPTION", "ERROR");
     }
     static LocalData = (Url) => {
         let responseLocal = localStorage.getItem(Url);
@@ -296,7 +303,7 @@ class ComponentsManager {
     /**
      * @param {ConfigDOMManager} Config 
      */
-    constructor(Config) {
+    constructor(Config = {}) {
         this.DomComponents = [];
         this.type = "div";
         this.props = {
