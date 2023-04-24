@@ -133,7 +133,7 @@ class WForm extends HTMLElement {
                 });
                 if (Model[prop].__proto__ == Object.prototype) {
                     if (Model[prop].ModelObject?.__proto__ == Function.prototype && Model[prop].ModelObject()?.constructor?.name == this.Config.ParentModel?.constructor?.name) {
-                        Model[prop] = undefined;
+                        //Model[prop] = undefined;
                         ObjectF[prop] = undefined;
                         continue;
                     }
@@ -161,10 +161,11 @@ class WForm extends HTMLElement {
         return Form;
     }
     isNotDrawable(Model, prop) {
-        return (Model[prop].__proto__ == Object.prototype &&
-            (Model[prop].primary || Model[prop].hidden || !Model[prop].type))
-            || Model[prop].__proto__ == Function.prototype
-            || Model[prop].__proto__.constructor.name == "AsyncFunction";
+        console.log(prop);
+        return (Model[prop]?.__proto__ == Object.prototype &&
+            (Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
+            || Model[prop]?.__proto__ == Function.prototype
+            || Model[prop]?.__proto__.constructor.name == "AsyncFunction";
     }
     /**
     * 
@@ -370,6 +371,7 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
+                    AddItemsFromApi: false,
                     ModelObject: await this.isModelFromFunction(Model, prop),
                     ParentModel: Model,
                     Options: {
@@ -841,7 +843,6 @@ class WForm extends HTMLElement {
                 return;
             }
         }
-        console.log(ObjectF);
         if (!this.Validate(ObjectF)) {
             return;
         }
@@ -859,7 +860,6 @@ class WForm extends HTMLElement {
 
         if (this.DataRequire == true) {
             for (const prop in ObjectF) {
-                console.log(this.Config.ModelObject[prop]);
                 if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require) {
                     /**
                      * @type {?HTMLInputElement | undefined | any}

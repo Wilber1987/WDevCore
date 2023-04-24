@@ -57,14 +57,19 @@ class WTableComponent extends HTMLElement {
                 ]
             }
         }));
-
-        this.AddItemsFromApi = this.TableConfig.AddItemsFromApi;
+        const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
+        const isWithtModel = this.TableConfig.ModelObject.Get != undefined
+        this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
         this.Options = this.TableConfig?.Options;
-        if ((this.Dataset == undefined || this.Dataset == null)
-            && (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined)) {
-            this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
+        if ((this.Dataset == undefined || this.Dataset == null || this.Dataset.length == 0) && this.AddItemsFromApi ) {
+            if (isWithtUrl) {
+                this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
+            }
+            if (isWithtModel) {
+                this.Dataset = await this.TableConfig.ModelObject.Get();
+            }
         }
         if (this.Dataset == undefined) {
             this.Dataset = [{ Description: "No Data!!!" }];
@@ -105,7 +110,7 @@ class WTableComponent extends HTMLElement {
      */
     DrawTable(Dataset = this.Dataset) {
         this.DefineModelObject(Dataset);
-        this.DrawHeadOptions();        
+        this.DrawHeadOptions();
         this.Table.innerHTML = "";
         this.Table.append(WRender.createElement(this.DrawTHead()));
         const tbody = this.DrawTBody(Dataset);
@@ -116,7 +121,7 @@ class WTableComponent extends HTMLElement {
             this.Tfooter.innerHTML = "";
             this.DrawTFooter(tbody).forEach(element => {
                 this.Tfooter.append(element);
-            }); 
+            });
         }
     }
     DrawHeadOptions() {
@@ -334,7 +339,7 @@ class WTableComponent extends HTMLElement {
         if (this.Options?.Delete != undefined && this.Options.Delete == true) {
             Options.append(WRender.Create({
                 tagName: "button",
-                children: [{ tagName: 'img', class: "icon", src: WIcons["delete"]  }],
+                children: [{ tagName: 'img', class: "icon", src: WIcons["delete"] }],
                 class: "BtnTableA",
                 type: "button",
                 onclick: async () => {
@@ -355,7 +360,7 @@ class WTableComponent extends HTMLElement {
         if (this.Options?.Edit != undefined && this.Options.Edit == true) {
             Options.append(WRender.Create({
                 tagName: "button",
-                children: [{ tagName: 'img',  class: "icon", src: WIcons["edit"]  }],
+                children: [{ tagName: 'img', class: "icon", src: WIcons["edit"] }],
                 class: "BtnTableS",
                 type: "button",
                 onclick: async () => { this.ModalCRUD(element, tr); }
@@ -423,9 +428,7 @@ class WTableComponent extends HTMLElement {
                     AddObject: element ? false : true,
                     SaveFunction: (NewObject) => {
                         if (element == undefined) {
-                            if (this.AddItemsFromApi == null) {
-                                this.Dataset.push(NewObject);
-                            }
+                            this.Dataset.push(NewObject);                            
                             this.DrawTable();
                         } else {
                             //this.DrawTRow(tr, element);
@@ -911,8 +914,6 @@ class WCardTable extends HTMLElement {
     }
     EvalModelPrototype(prop, Model) {
         let value = "";
-        console.log(this.Element, prop, Model);
-        console.log(prop);
         if (this.Element[prop] != null) {
             value = this.Element[prop];
         }
