@@ -54,7 +54,7 @@ class WForm extends HTMLElement {
                 Url: undefined
             };
         }
-        this.FormObject = this.Config.EditObject ?? {};
+        this.FormObject =  this.FormObject ?? this.Config.EditObject ?? {};
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const ObjectProxy = this.CreateProxy(Model);
         this.DivForm.append(await this.CrudForm(ObjectProxy, this.Config.ObjectOptions));
@@ -161,7 +161,6 @@ class WForm extends HTMLElement {
         return Form;
     }
     isNotDrawable(Model, prop) {
-        console.log(prop);
         return (Model[prop]?.__proto__ == Object.prototype &&
             (Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
             || Model[prop]?.__proto__ == Function.prototype
@@ -268,6 +267,7 @@ class WForm extends HTMLElement {
         const ModelProperty = Model[prop];
         let InputControl;
         ModelProperty.require = ModelProperty.require ?? true;
+        const actionFunction = ModelProperty.action ?? null;
         switch (ModelProperty.type?.toUpperCase()) {
             case "TITLE":
                 ModelProperty.require = false;
@@ -306,9 +306,10 @@ class WForm extends HTMLElement {
                 break;
             case "WSELECT":
                 ObjectF[prop] = ObjectF[prop].__proto__ == Object.prototype ? ObjectF[prop] : null;
-                if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
+                if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {                    
+                    ModelProperty.ModelObject = await this.isModelFromFunction(Model, prop);
                     /**@type {EntityClass} */
-                    const entity = ModelProperty.ModelObject = ModelProperty.ModelObject();
+                    const entity = ModelProperty.ModelObject;                    
                     ModelProperty.Dataset = await entity.Get();
                 }
                 if (ObjectF[prop] == null && ModelProperty.require != false &&
@@ -318,20 +319,20 @@ class WForm extends HTMLElement {
                 }
                 val = ObjectF[prop];
                 const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop);
-                InputControl = await this.CreateWSelect(InputControl, DataseFilter, prop, ObjectF);
+                InputControl = await this.CreateWSelect(InputControl, DataseFilter, prop, ObjectF, Model);
                 this.FindObjectMultiselect(val, InputControl);
                 break;
             case "MULTISELECT":
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
-                    ModelProperty.ModelObject = ModelProperty.ModelObject();
+                    ModelProperty.ModelObject = await this.isModelFromFunction(Model, prop);
                     ModelProperty.Dataset = await ModelProperty.ModelObject.Get();
-                }
+                }                
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = new MultiSelect({
                     action: (selecteds) => {
                         if (ModelProperty.action) {
-                            ModelProperty.action(selecteds, ControlLabel, InputControl)
+                            ModelProperty.action(ObjectF, this, InputControl, prop)
                         }
                     }, Dataset: Datasetilt, ModelObject: ModelProperty.ModelObject
                 });
@@ -477,8 +478,13 @@ class WForm extends HTMLElement {
                 val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
                 const placeholder = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 InputControl = WRender.Create({
-                    tagName: "input", className: prop, value: val,
-                    type: ModelProperty.type, placeholder: placeholder, onchange: onChangeEvent
+                    tagName: "input",
+                    className: prop,
+                    value: val,
+                    type: ModelProperty.type,
+                    placeholder: placeholder,
+                    onchange: onChangeEvent,
+                    disabled: ModelProperty.type.toUpperCase() == "OPERATION"
                 });
                 break;
         }
@@ -500,12 +506,16 @@ class WForm extends HTMLElement {
                     innerText: action.name,
                     onclick: async () => {
                         console.log(true);
-                        action.action(ObjectF, prop, Model, this);
+                        action.action(ObjectF, this, InputControl, prop);
                     }
                 }))
             });
         }
         InputControl.id = "ControlValue" + prop;
+        if (actionFunction != null) {
+            InputControl.addEventListener("change", () => { actionFunction(ObjectF, this, InputControl, prop) });
+        }
+
         return InputControl;
     }
 
@@ -514,7 +524,10 @@ class WForm extends HTMLElement {
      * @param {string} prop
      */
     isModelFromFunction(Model, prop) {
-        return Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject;
+        if (Model[prop].ModelObject.__proto__ == Function.prototype) {
+             Model[prop].ModelObject = Model[prop].ModelObject();
+        }       
+        return Model[prop].ModelObject;
     }
     createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
         InputControl = new WCalendarComponent({
@@ -683,7 +696,7 @@ class WForm extends HTMLElement {
         }
     }
 
-    async CreateWSelect(InputControl, Dataset, prop, ObjectF) {
+    async CreateWSelect(InputControl, Dataset, prop, ObjectF, Model) {
         const { MultiSelect } = await import("./WMultiSelect.js");
         InputControl = new MultiSelect({
             MultiSelect: false,
@@ -692,6 +705,13 @@ class WForm extends HTMLElement {
             action: (ItemSelects) => {
                 ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_
                     ?? ItemSelects[0][this.findKey(ItemSelects[0])] ?? ItemSelects[0];
+                /**
+                * @type {ModelProperty}
+                */
+                const ModelProperty = Model[prop];
+                if (ModelProperty.action) {
+                    ModelProperty.action(ObjectF, this, InputControl, prop)
+                }
             }
         });
         return InputControl;
@@ -869,13 +889,13 @@ class WForm extends HTMLElement {
                         if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
                             return false;
                         }
-                    }  else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
+                    } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
                         const passwords = control.querySelectorAll("input");
                         if (passwords[0].value != passwords[1].value) {
                             this.createAlertToolTip(passwords[0].value, `Las contraseñas deben ser iguales`);
                             return false;
                         }
-                      
+
                     } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL") {
                         if (this.Config.ModelObject[prop]?.MaxRequired
                             && ObjectF[prop].length > this.Config.ModelObject[prop]?.MaxRequired) {

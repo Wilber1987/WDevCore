@@ -416,7 +416,7 @@ class WTableComponent extends HTMLElement {
         this.shadowRoot?.append(
             new WModalForm({
                 ModelObject: this.ModelObject,
-                AutoSave: false,
+                AutoSave: this.TableConfig.AutoSave ?? false,
                 ParentModel: this.TableConfig.ParentModel,
                 EditObject: element,
                 icon: this.TableConfig.icon,

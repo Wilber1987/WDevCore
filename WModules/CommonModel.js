@@ -10,6 +10,7 @@
      * @property {Boolean} [selected]
      * @property {Boolean} [checked]
      * @property {Boolean} [multiple]
+     * @property {Boolean} [disabled]
      * @property {String} [src]
      * @property {String} [innerText]     
      * @property {String | Number} [value]
@@ -56,20 +57,19 @@ class WNode {
 function ModelFunction() { }
 /**
  * @typedef {Object} ModelProperty 
-    * @property {String} type -  TEXT | NUMBER | DATE | MODEL | MASTERDETAIL | SELECT | 
+    * @property {String} type -  TEXT | NUMBER | DATE | MODEL | MASTERDETAIL | SELECT | OPERATION (requiere un action para funcionar)
     * @property {Boolean} [hidden]
     * @property {Boolean} [require]
     * @property {String} [label]
     * @property {Array} [fileType]
-    * @property {Array} [ControlAction]
+    * @property {Array} [ControlAction] botones adicionales que se le agregan al control
     * @property {String} [pattern]
     * @property {String} [defaultValue]
     * @property {String} [placeholder]
     * @property {String} [fieldRequire]
     * @property {Object | EntityClass | ModelFunction} [ModelObject]
     * @property {Array} [Dataset]
-    * @property {Function} [Operation] (obj) => {  }
-    * @property {Function} [action] (obj) => {  }
+    * @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
     * @property {Function} [CalendarFunction] (obj) => {  }
 **/
 class ModelProperty { }
@@ -515,6 +515,7 @@ class ElementStyle {
     * @property {Boolean} [DarkMode]
     * @property {Boolean} [paginate]
     * @property {Boolean} [AddItemsFromApi]
+    * @property {Boolean} [AutoSave]
     * @property {SearchItemsFromApi} [SearchItemsFromApi]
     * @property {String} [TypeMoney] 
     * @property {Number} [maxElementByPage] 
