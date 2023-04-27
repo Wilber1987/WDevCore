@@ -290,8 +290,7 @@ const MainMenu = css`
         width: calc(100% - 30px);
         overflow-x: auto;
     } 
-    .toolActive {
-        position: fixed;
+    .toolActive {       
         border: solid 1px #9b9b9b;
         max-height: 600px;
     }
