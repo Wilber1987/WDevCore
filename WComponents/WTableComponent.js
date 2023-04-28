@@ -63,7 +63,7 @@ class WTableComponent extends HTMLElement {
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
         this.Options = this.TableConfig?.Options;
-        if ((this.Dataset == undefined || this.Dataset == null || this.Dataset.length == 0) && this.AddItemsFromApi ) {
+        if ((this.Dataset == undefined || this.Dataset == null || this.Dataset.length == 0) && this.AddItemsFromApi) {
             if (isWithtUrl) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             }
@@ -125,7 +125,7 @@ class WTableComponent extends HTMLElement {
         }
     }
     DrawHeadOptions() {
-        this.ThOptions.innerHTML = "";
+        if (this.ThOptions.innerHTML != "") return;
         if (this.Options != undefined && (this.Options.Search != undefined || this.Options.Add != undefined)) {
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
@@ -219,6 +219,9 @@ class WTableComponent extends HTMLElement {
             this.DeleteBTN(Options, element, tr);
             if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
+                    if (Action == null ) {
+                        return;
+                    }
                     Options.append(WRender.Create({
                         tagName: "input",
                         className: "BtnTableSR",
@@ -428,7 +431,7 @@ class WTableComponent extends HTMLElement {
                     AddObject: element ? false : true,
                     SaveFunction: (NewObject) => {
                         if (element == undefined) {
-                            this.Dataset.push(NewObject);                            
+                            this.Dataset.push(NewObject);
                             this.DrawTable();
                         } else {
                             //this.DrawTRow(tr, element);
@@ -450,19 +453,7 @@ class WTableComponent extends HTMLElement {
                 this.DrawTable(Dataset.data);
             }
         } else {
-            const Dataset = this.Dataset.filter((element) => {
-                for (const prop in element) {
-                    try {
-                        if (element[prop] != null) {
-                            if (element[prop].toString().includes(ev.target.value)) {
-                                return element;
-                            }
-                        }
-                    } catch (error) {
-                        console.log(element);
-                    }
-                }
-            })
+            const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value)
             if (Dataset.length == 0 && this.Options?.UrlSearch != undefined) {
                 const DataUrlSearch = await WAjaxTools.PostRequest(
                     this.Options.UrlSearch, { Param: ev.target.value }

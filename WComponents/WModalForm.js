@@ -115,7 +115,8 @@ class WModalForm extends HTMLElement {
                 }
                 this.close();
             }
-            this.Modal.children.push({ class: "ModalContent", children: [new WForm(this.Config)] });
+            this.Form = new WForm(this.Config);
+            this.Modal.children.push({ class: "ModalContent", children: [this.Form] });
         }
         if (this.ShadowRoot) {
             this.shadowRoot.append(WRender.Create(this.Modal));
@@ -138,10 +139,7 @@ class WModalForm extends HTMLElement {
                 class: 'BtnClose', //class: 'Btn',
                 type: "button",
                 onclick: () => {
-                    ComponentsManager.modalFunction(this);
-                    setTimeout(() => {
-                        this.parentNode.removeChild(this);
-                    }, 1000);
+                   this.close();
                 }, innerText: 'x'
             }
             //children: ['◄ Back']
@@ -159,6 +157,10 @@ class WModalForm extends HTMLElement {
         return WRender.createElement(Section);
     }
     close = () => {
+        console.log(this.Form);
+        if (this.Form) {
+            this.Form.RollBack();
+        }
         ComponentsManager.modalFunction(this);
         setTimeout(() => {
             this.parentNode.removeChild(this);

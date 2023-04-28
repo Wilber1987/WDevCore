@@ -665,16 +665,49 @@ class WArrayF {
         return Dataset.filter((element) => {
             for (const prop in element) {
                 try {
-                    if (element[prop] != null) {
-                        if (element[prop].toString().toUpperCase().includes(param.toUpperCase())) {
-                            return element;
-                        }
+                    if (this.evalValue(element[prop], param) != null) {
+                        return element;
                     }
                 } catch (error) {
                     console.log(element);
                 }
             }
         });
+    }
+    static evalValue = (element, param)=>{
+        if (element != null) {
+            if (element.__proto__ == Object.prototype) {
+                for (const objectProto in element) {
+                    if (element[objectProto] != null) {
+                        if (element[objectProto].toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
+                            return element;
+                        }
+                    }
+                }
+            }else  if (element.__proto__ == Array.prototype) {
+                const find = element.find(item => {
+                    if (item != null) {
+                        if (item.__proto__ == Object.prototype) {
+                            for (const objectProto in item) {
+                                if (item[objectProto] != null) {
+                                    if (item[objectProto].toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        } else if (item.toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
+                            return true;
+                        }
+                    }                                    
+                });
+                if (find) {
+                    return element;
+                }
+            } else if (element.toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
+                return element;
+            } 
+        }
+        return null
     }
     //STRINGS
     static Capitalize(str) {

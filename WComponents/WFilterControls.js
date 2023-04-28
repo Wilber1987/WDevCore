@@ -66,14 +66,17 @@ class WFilterOptions extends HTMLElement {
     CreateModelControl = async (Model, prop, Dataset) => {
         const ModelProperty = Model[prop];
         switch (ModelProperty.type?.toUpperCase()) {
-            case "TEXT":
+            case "TEXT": case "EMAIL":
                 return this.CreateTextControl(prop);
             case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                 break;
             case "DATE": case "FECHA": case "HORA": case "PASSWORD":
                 /**TODO */
                 break;
-            case "SELECT": case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
+            case "SELECT":
+                return this.CreateSelectControl(prop, Dataset);
+            case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
+                console.log(Dataset);
                 return await this.CreateWSelect(Dataset, prop);
             case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
                 break;
@@ -99,19 +102,6 @@ class WFilterOptions extends HTMLElement {
             || Model[prop].__proto__.constructor.name == "AsyncFunction";
     }
     filterFunction = () => {
-        // const isValuePresent = (object, value, flagObj) => {
-        //     if (value == "") {
-        //         return
-        //     }
-        //     console.log(propierty, object[propierty], value, object[propierty] == value);
-        //     if (object[propierty] == value) {
-        //         if (flagObj) {
-        //             flagObj = true;
-        //         }
-        //     } else {
-        //         flagObj = false;
-        //     }
-        // }
 
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
@@ -119,7 +109,7 @@ class WFilterOptions extends HTMLElement {
                 if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
                     const ModelProperty = this.ModelObject[control.id];
                     switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT":
+                        case "TEXT": case "SELECT": case "EMAIL":
                             findByValue(control);
                             break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
@@ -127,7 +117,7 @@ class WFilterOptions extends HTMLElement {
                         case "DATE": case "FECHA": case "HORA": case "PASSWORD":
                             /**TODO */
                             break;
-                        case "SELECT": case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
+                        case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
                             findElement(control);
                             break;
                         case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
@@ -148,8 +138,15 @@ class WFilterOptions extends HTMLElement {
                 /** @param { MultiSelect } multiSelect */
                 function findElement(multiSelect) {
                     if (multiSelect.selectedItems.length > 0) {
+
                         //@ts-ignore
-                        const find = multiSelect.selectedItems.find(x => x == obj[multiSelect.id]);
+                        const find = obj[multiSelect.id]?.__proto__ == Object.prototype ?
+                            //@ts-ignore
+                            multiSelect.selectedItems.find(x => x == WArrayF.compareObj(x, obj[multiSelect.id])) :
+                            //@ts-ignore
+                            multiSelect.selectedItems.find(x => x == obj[multiSelect.id]);
+                        console.log(multiSelect.id, find);
+                        console.log(multiSelect.selectedItems);
                         if (find == undefined) {
                             flagObj = false;
                         }
@@ -157,7 +154,7 @@ class WFilterOptions extends HTMLElement {
                 }
                 /** @param { HTMLInputElement } input */
                 function findByValue(input) {
-                    if (!obj[input.id].toUpperCase().includes(input.value.toLocaleUpperCase())) {
+                    if (WArrayF.evalValue(obj[input.id], input.value.toUpperCase()) == null) {
                         flagObj = false;
                     }
                 }
@@ -211,7 +208,7 @@ class WFilterOptions extends HTMLElement {
             //MultiSelect: false,
             Dataset: Dataset,
             id: prop,
-            FullDetail: false,
+            FullDetail: true,
             action: () => {
                 this.filterFunction();
             }

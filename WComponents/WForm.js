@@ -35,16 +35,18 @@ class WForm extends HTMLElement {
         this.StyleForm = this.Config.StyleForm;
         this.limit = 2;
         this.DivColumns = this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
-
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
         this.shadowRoot?.append(this.DivForm);
         this.DrawComponent();
+        for (const prop in this.FormObject) {
+           this.#OriginalObject[prop] = this.FormObject[prop];
+        }
         this.ObjectProxy = this.ObjectProxy ?? undefined;
     }
-
+    #OriginalObject = {};
     DrawComponent = async () => {
         this.DarkMode = this.DarkMode ?? false;
         this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
@@ -158,6 +160,7 @@ class WForm extends HTMLElement {
                 Form.append(ControlContainer);
             }
         }
+
         return Form;
     }
     isNotDrawable(Model, prop) {
@@ -877,7 +880,10 @@ class WForm extends HTMLElement {
         }
     }
     Validate = (ObjectF) => {
-
+        if(WArrayF.compareObj(ObjectF, this.#OriginalObject)) {
+            this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
+            return;
+        }
         if (this.DataRequire == true) {
             for (const prop in ObjectF) {
                 if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require) {
@@ -891,8 +897,12 @@ class WForm extends HTMLElement {
                         }
                     } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
                         const passwords = control.querySelectorAll("input");
+                        if (passwords[0].value == null || passwords[0].value == "") {
+                            this.createAlertToolTip(passwords[0], WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ` es requerido`);
+                            return false;
+                        }
                         if (passwords[0].value != passwords[1].value) {
-                            this.createAlertToolTip(passwords[0].value, `Las contraseñas deben ser iguales`);
+                            this.createAlertToolTip(passwords[0], `Las contraseñas deben ser iguales`);
                             return false;
                         }
 
@@ -924,6 +934,12 @@ class WForm extends HTMLElement {
             }
         }
         return true;
+    }
+
+    RollBack() {
+        for (const prop in this.#OriginalObject) {
+            this.FormObject[prop] = this.#OriginalObject[prop];
+        }
     }
     createAlertToolTip(control, message) {
         if (!control.parentNode.querySelector(".ToolTip")) {
