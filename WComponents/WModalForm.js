@@ -157,7 +157,6 @@ class WModalForm extends HTMLElement {
         return WRender.createElement(Section);
     }
     close = () => {
-        console.log(this.Form);
         if (this.Form) {
             this.Form.RollBack();
         }
@@ -180,14 +179,14 @@ class WModalForm extends HTMLElement {
                         "margin-top": this.StyleForm == "FullScreen" ? 0 : 30,
                         "background-color": this.DarkMode ? "#444444" : "#fff",
                         "width": this.WidthContainer,
-                        "max-height": "calc(100vh - 120px)",
+                       // "max-height": "calc(100vh - 120px)",
                         //"overflow-y": "auto",
-                        "min-height": this.StyleForm == "FullScreen" ? "100vh" : 200,
+                       // "min-height": this.StyleForm == "FullScreen" ? "100vh" : 200,
                         "border-radius": "0.3cm",
                         "position": "relative",
                         "box-shadow": "0 0px 3px 0px #000",
-                        padding: "0 0 10px 0"
-
+                        padding: "0 0 10px 0",
+                        height: "fit-content"
                     }), new WCssClass(" .ContainerFormWModal h2", {
                         "padding": "10px",
                         "margin": "0px",
@@ -200,7 +199,7 @@ class WModalForm extends HTMLElement {
                         "text-align": "center",
                         font: "400 13.3333px !important"
                     }), new WCssClass(`.ModalContent`, {
-                        "overflow-y": "auto",
+                        //"overflow-y": "auto",
                         display: "block",
                         padding: 30
                     }),

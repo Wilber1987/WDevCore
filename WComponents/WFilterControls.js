@@ -1,5 +1,6 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { EntityClass } from "../WModules/EntityClass.js";
 import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
@@ -66,7 +67,7 @@ class WFilterOptions extends HTMLElement {
     CreateModelControl = async (Model, prop, Dataset) => {
         const ModelProperty = Model[prop];
         switch (ModelProperty.type?.toUpperCase()) {
-            case "TEXT": case "EMAIL":
+            case "TEXT": case "EMAIL": case "EMAIL": case "TEL": case "URL":
                 return this.CreateTextControl(prop);
             case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                 break;
@@ -75,9 +76,14 @@ class WFilterOptions extends HTMLElement {
                 break;
             case "SELECT":
                 return this.CreateSelectControl(prop, Dataset);
-            case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
-                console.log(Dataset);
-                return await this.CreateWSelect(Dataset, prop);
+            case "WSELECT": case "MULTISELECT":
+                if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
+                    ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
+                    /**@type {EntityClass} */
+                    const entity = ModelProperty.ModelObject;
+                    ModelProperty.Dataset = await entity.Get();
+                }
+                return await this.CreateWSelect(ModelProperty.Dataset, prop);
             case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
                 break;
             case "RADIO": case "CHECKBOX":
@@ -101,6 +107,7 @@ class WFilterOptions extends HTMLElement {
             || Model[prop].__proto__ == Function.prototype
             || Model[prop].__proto__.constructor.name == "AsyncFunction";
     }
+
     filterFunction = () => {
 
         const DFilt = this.Config.Dataset.filter(obj => {
@@ -109,16 +116,20 @@ class WFilterOptions extends HTMLElement {
                 if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
                     const ModelProperty = this.ModelObject[control.id];
                     switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT": case "SELECT": case "EMAIL":
-                            findByValue(control);
+                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL":
+                            if (control.value != null && control.value != undefined && control.value != "") {
+                                findByValue(control);
+                            }
                             break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                             break;
                         case "DATE": case "FECHA": case "HORA": case "PASSWORD":
                             /**TODO */
                             break;
-                        case "WSELECT": case "MULTISELECT": case "EMAIL": case "TEL": case "URL":
-                            findElement(control);
+                        case "WSELECT": case "MULTISELECT":
+                            if (control.selectedItems.length > 0) {
+                                findElement(control);
+                            }
                             break;
                         case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
                             break;
@@ -129,7 +140,6 @@ class WFilterOptions extends HTMLElement {
                             /**TODO */
                             break;
                         default:
-                            findElement(control);
                             break;
                     }
                 } else {
@@ -138,15 +148,15 @@ class WFilterOptions extends HTMLElement {
                 /** @param { MultiSelect } multiSelect */
                 function findElement(multiSelect) {
                     if (multiSelect.selectedItems.length > 0) {
-
-                        //@ts-ignore
-                        const find = obj[multiSelect.id]?.__proto__ == Object.prototype ?
-                            //@ts-ignore
-                            multiSelect.selectedItems.find(x => x == WArrayF.compareObj(x, obj[multiSelect.id])) :
-                            //@ts-ignore
-                            multiSelect.selectedItems.find(x => x == obj[multiSelect.id]);
-                        console.log(multiSelect.id, find);
-                        console.log(multiSelect.selectedItems);
+                        let find;
+                        //@ts-ignore  
+                        const objectlement = obj[multiSelect.id];
+                        if (objectlement?.__proto__ == Object.prototype)
+                            find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
+                        else if (objectlement?.__proto__ == Array.prototype)
+                            find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
+                        else
+                            find = multiSelect.selectedItems.find(x => x == objectlement);
                         if (find == undefined) {
                             flagObj = false;
                         }
@@ -154,10 +164,20 @@ class WFilterOptions extends HTMLElement {
                 }
                 /** @param { HTMLInputElement } input */
                 function findByValue(input) {
-                    if (WArrayF.evalValue(obj[input.id], input.value.toUpperCase()) == null) {
-                        flagObj = false;
+                    if (!flagObj) {
+                        return;
                     }
+                    if (obj[input.id] == null || obj[input.id] == undefined) {
+                        flagObj = false;
+                        return undefined;
+                    }
+                    if (obj[input.id] != null && WArrayF.evalValue(obj[input.id], input.value.toUpperCase()) == null) {
+                        flagObj = false;
+                        return undefined;
+                    }
+                    return obj[input.id]
                 }
+
             });
             return flagObj;
         });
@@ -234,10 +254,8 @@ class WFilterOptions extends HTMLElement {
                     //margin: "5px",
                     "font-size": "12px",
                 }), new WCssClass(`.OptionContainer input, .OptionContainer select`, {
-                    "grid-row": "2/3",
                     margin: "0px",
-                    padding: "5px 10px",
-                    "border": "2px solid #e1d4d4"
+                    padding: "5px 10px"
                 }), new WCssClass(`.BtnSuccess`, {
                     "font-weight": "bold",
                     "border": "none",

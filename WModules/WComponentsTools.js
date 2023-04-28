@@ -1,4 +1,5 @@
 import { ElementStyle, WNode } from "./CommonModel.js";
+import { EntityClass } from "./EntityClass.js";
 import { WSecurity } from "./WSecurity.js";
 function type(value) {
     var r;
@@ -101,7 +102,7 @@ class WAjaxTools {
     }
     static ProcessRequest = async (response, Url) => {
         if (response.status == 400 || response.status == 403 || response.status == 404 || response.status == 500) {
-            const messageError = await response.text();            
+            const messageError = await response.text();
             var lineas = messageError.split('\n');
             throw new Error(this.ProcessError(lineas[0])).message;
             if (typeof response !== "undefined" && typeof response !== "null" && response != "") {
@@ -674,40 +675,61 @@ class WArrayF {
             }
         });
     }
-    static evalValue = (element, param)=>{
-        if (element != null) {
-            if (element.__proto__ == Object.prototype) {
-                for (const objectProto in element) {
-                    if (element[objectProto] != null) {
-                        if (element[objectProto].toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
-                            return element;
+    static evalValue = (element, param) => {
+        const evalF = (parametro, objetoEvaluado) => {            
+            if (parametro.__proto__ == Object.prototype || parametro.__proto__.__proto__ == EntityClass.prototype) { 
+                if (this.compareObj(objetoEvaluado, parametro)) return objetoEvaluado;
+            } else if (parametro.__proto__ == Array.prototype) {               
+                const find = parametro.find(x => WArrayF.compareObj(objetoEvaluado, x));
+                if (find == undefined) {
+                    flagObj = false;
+                }
+            } else {
+                for (const objectProto in objetoEvaluado) {
+                    if (objetoEvaluado[objectProto] != null) {
+                        if (objetoEvaluado[objectProto].toString().toUpperCase().startsWith(parametro.toString().toUpperCase())) {
+                            return objetoEvaluado;
                         }
                     }
                 }
-            }else  if (element.__proto__ == Array.prototype) {
+            }
+            return undefined
+        }
+        if (element != null) {
+            if (element.__proto__ == Object.prototype) {
+                if (evalF(param, element)) {
+                    return element
+                }
+            } else if (element.__proto__ == Array.prototype) {
                 const find = element.find(item => {
                     if (item != null) {
                         if (item.__proto__ == Object.prototype) {
-                            for (const objectProto in item) {
-                                if (item[objectProto] != null) {
-                                    if (item[objectProto].toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
-                                        return true;
-                                    }
-                                }
+                            if (evalF(param, item)) {
+                                return true
                             }
                         } else if (item.toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
                             return true;
                         }
-                    }                                    
+                    }
                 });
                 if (find) {
                     return element;
                 }
             } else if (element.toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
                 return element;
-            } 
+            }
         }
         return null
+    }
+    /**
+    * @param {Object} Model
+    * @param {string} prop
+    */
+    static isModelFromFunction(Model, prop) {
+        if (Model[prop].ModelObject.__proto__ == Function.prototype) {
+            Model[prop].ModelObject = Model[prop].ModelObject();
+        }
+        return Model[prop].ModelObject;
     }
     //STRINGS
     static Capitalize(str) {

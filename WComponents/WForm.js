@@ -310,7 +310,7 @@ class WForm extends HTMLElement {
             case "WSELECT":
                 ObjectF[prop] = ObjectF[prop].__proto__ == Object.prototype ? ObjectF[prop] : null;
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {                    
-                    ModelProperty.ModelObject = await this.isModelFromFunction(Model, prop);
+                    ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     /**@type {EntityClass} */
                     const entity = ModelProperty.ModelObject;                    
                     ModelProperty.Dataset = await entity.Get();
@@ -327,7 +327,7 @@ class WForm extends HTMLElement {
                 break;
             case "MULTISELECT":
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
-                    ModelProperty.ModelObject = await this.isModelFromFunction(Model, prop);
+                    ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     ModelProperty.Dataset = await ModelProperty.ModelObject.Get();
                 }                
                 const { MultiSelect } = await import("./WMultiSelect.js");
@@ -376,7 +376,7 @@ class WForm extends HTMLElement {
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
                     AddItemsFromApi: false,
-                    ModelObject: await this.isModelFromFunction(Model, prop),
+                    ModelObject: await WArrayF.isModelFromFunction(Model, prop),
                     ParentModel: Model,
                     Options: {
                         Add: true, Edit: true, Delete: true, Search: true
@@ -390,7 +390,7 @@ class WForm extends HTMLElement {
                 InputControl = new WForm({
                     StyleForm: this.StyleForm,
                     EditObject: ObjectF[prop],
-                    ModelObject: await this.isModelFromFunction(Model, prop),
+                    ModelObject: await WArrayF.isModelFromFunction(Model, prop),
                     Options: false
                 });
                 break;
@@ -520,18 +520,7 @@ class WForm extends HTMLElement {
         }
 
         return InputControl;
-    }
-
-    /**
-     * @param {Object} Model
-     * @param {string} prop
-     */
-    isModelFromFunction(Model, prop) {
-        if (Model[prop].ModelObject.__proto__ == Function.prototype) {
-             Model[prop].ModelObject = Model[prop].ModelObject();
-        }       
-        return Model[prop].ModelObject;
-    }
+    }   
     createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
         InputControl = new WCalendarComponent({
             CalendarFunction: Model[prop].CalendarFunction,
@@ -1028,7 +1017,6 @@ class WForm extends HTMLElement {
                 grid-template-rows: auto;
                 height: calc(100% - 70px);
                 gap: 20px;
-                margin: 20px;
             }
             .divForm .imageGridForm {
                 grid-row: span 3;
@@ -1091,7 +1079,7 @@ class WForm extends HTMLElement {
                 display: block;
                 text-align: left;
                 font-weight: bold;
-                margin: 0 0 15px 0;
+                margin: 0 0 10px 0;
             }
             .password-container { 
                 display: grid;
@@ -1172,7 +1160,7 @@ class WForm extends HTMLElement {
                 cursor: crosshair;
             }
             .ModalElement {
-                padding: 10px 0px;
+                padding: 0px;
                 border-radius: 5px;
                 position: relative;
             }

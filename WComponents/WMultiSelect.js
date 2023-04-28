@@ -138,7 +138,7 @@ class MultiSelect extends HTMLElement {
                 children: [OptionLabel, Option, SubContainer]
             });
             this.OptionsContainer.append(Options);
-            if (this.FullDetail) {                
+            if (this.FullDetail) {       
                 Options.append(this.BuilDetail(element))
             }
         });
@@ -248,8 +248,7 @@ class WToolTip extends HTMLElement {
                 transition: all .1s;
                 max-height: 0px;
                 background-color: #fff;
-                overflow: hidden;    
-                width: 400px;           
+                overflow: hidden;               
             }
             w-tooltip.active {
                 max-height: 600px;
