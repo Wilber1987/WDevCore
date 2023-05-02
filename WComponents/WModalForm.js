@@ -113,7 +113,7 @@ class WModalForm extends HTMLElement {
                         this.ObjectOptions.SaveFunction(ObjectF);
                     }
                 }
-                this.close();
+                this.close(false);
             }
             this.Form = new WForm(this.Config);
             this.Modal.children.push({ class: "ModalContent", children: [this.Form] });
@@ -139,7 +139,7 @@ class WModalForm extends HTMLElement {
                 class: 'BtnClose', //class: 'Btn',
                 type: "button",
                 onclick: () => {
-                   this.close();
+                   this.close(true);
                 }, innerText: 'x'
             }
             //children: ['◄ Back']
@@ -156,8 +156,8 @@ class WModalForm extends HTMLElement {
         }       
         return WRender.createElement(Section);
     }
-    close = () => {
-        if (this.Form) {
+    close = (RollBack = true) => {
+        if (this.Form && RollBack) {
             this.Form.RollBack();
         }
         ComponentsManager.modalFunction(this);

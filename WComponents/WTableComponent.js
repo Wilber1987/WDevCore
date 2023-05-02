@@ -171,7 +171,7 @@ class WTableComponent extends HTMLElement {
      * @param {Array} [Dataset] 
      * @returns {Array<HTMLElement>}
      */
-    DrawTBody = (Dataset = this.Dataset) => {
+    DrawTBody = (Dataset = this.Dataset) => {        
         /**@type {Array<HTMLElement>} */
         const tbodys = [];
         this.numPage = (Dataset.length / this.maxElementByPage) >= 1 ? Dataset.length / this.maxElementByPage : 1;

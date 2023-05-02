@@ -44,6 +44,7 @@ class WForm extends HTMLElement {
         for (const prop in this.FormObject) {
            this.#OriginalObject[prop] = this.FormObject[prop];
         }
+        this.ExistChange = false;
         this.ObjectProxy = this.ObjectProxy ?? undefined;
     }
     #OriginalObject = {};
@@ -66,9 +67,10 @@ class WForm extends HTMLElement {
     }
     CreateProxy(Model) {
         const ObjHandler = {
-            get: function (target, property) {
+            get:  (target, property) => {
                 return target[property];
-            }, set: function (target, property, value, receiver) {
+            }, set:  (target, property, value, receiver) => {
+                this.ExistChange = true;
                 target[property] = value;
                 for (const prop in Model) {
                     if (Model[prop]?.__proto__ == Object.prototype) {
@@ -869,7 +871,7 @@ class WForm extends HTMLElement {
         }
     }
     Validate = (ObjectF) => {
-        if(WArrayF.compareObj(ObjectF, this.#OriginalObject)) {
+        if(!this.ExistChange) {
             this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
             return;
         }
@@ -896,14 +898,18 @@ class WForm extends HTMLElement {
                         }
 
                     } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL") {
+                        if (this.Config.ModelObject[prop].require == true) {
+                            this.Config.ModelObject[prop].MinimunRequired = this.Config.ModelObject[prop]?.MinimunRequired ?? 1;
+                        }                        
                         if (this.Config.ModelObject[prop]?.MaxRequired
                             && ObjectF[prop].length > this.Config.ModelObject[prop]?.MaxRequired) {
                             this.createAlertToolTip(control, `El máximo de registros permitidos es `
                                 + this.Config.ModelObject[prop]?.MaxRequired);
                             return false;
                         }
+
                         if (this.Config.ModelObject[prop]?.MinimunRequired
-                            || ObjectF[prop].length < this.Config.ModelObject[prop]?.MinimunRequired) {
+                            && ObjectF[prop].length < this.Config.ModelObject[prop]?.MinimunRequired) {
                             this.createAlertToolTip(control, `El mínimo de registros permitidos es `
                                 + this.Config.ModelObject[prop]?.MinimunRequired);
                             return false;
@@ -1258,7 +1264,8 @@ class WForm extends HTMLElement {
                 new WCssClass(`.divForm`, {
                     "grid-template-columns": this.DivColumns
                 }), new WCssClass(` .divForm .imageGridForm,  .divForm .tableContainer, .imgPhoto`, {
-                    "grid-column": `span  ${this.limit}`
+                    "grid-column": `span  ${this.limit}`,
+                    "padding-bottom": 10
                 })
             ]
         })
