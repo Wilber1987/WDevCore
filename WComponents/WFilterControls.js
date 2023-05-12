@@ -2,7 +2,8 @@
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { EntityClass } from "../WModules/EntityClass.js";
 import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
-import { WCssClass } from "../WModules/WStyledRender.js";
+import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
+import { WCssClass, css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
 /**
  * @typedef {Object} FilterConfig 
@@ -30,7 +31,6 @@ class WFilterOptions extends HTMLElement {
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         this.shadowRoot?.append(WRender.createElement(this.styles));
         this.shadowRoot?.append(this.FilterContainer);
-
         this.DrawFilter();
     }
     connectedCallback() {
@@ -38,6 +38,23 @@ class WFilterOptions extends HTMLElement {
     DrawFilter = async () => {
         this.FilterContainer.innerHTML = "";
         const ControlOptions = WRender.Create({ class: "OptionContainer" })
+        this.FilterContainer.append(WRender.Create({
+            class: "options", children: [
+                { tagName: "label", innerText: "Filtros" },
+                {//display
+                    tagName: 'input', style: 'transform: rotate(0deg)', class: 'BtnDinamictT', value: '>', onclick: async (ev) => {
+                        if (ControlOptions.className == "OptionContainer") {
+                            ev.target.style["transform"] = "rotate(90deg)";
+                            ControlOptions.className = "OptionContainer OptionContainerActive";
+                        } else {
+                            ev.target.style["transform"] = "rotate(0deg)";
+                            ControlOptions.className = "OptionContainer";
+                        }
+                    }
+
+                }
+            ]
+        }));
         this.ModelObject = this.ModelObject ?? this.Config.Dataset[0];
         for (const prop in this.ModelObject) {
             const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop).map(s => s[prop]);
@@ -45,12 +62,15 @@ class WFilterOptions extends HTMLElement {
                 if (this.ModelObject[prop].__proto__ == Object.prototype) {
                     const filterControl = await this.CreateModelControl(this.ModelObject, prop, SelectData);
                     if (filterControl != null) {
-                        ControlOptions.append(WRender.Create({ children: [prop, filterControl] }));
+                        ControlOptions.append(WRender.Create({
+                            className: this.ModelObject[prop].type.toUpperCase() == "DATE" ? "date-control-container" : "",
+                            children: [WOrtograficValidation.es(prop), filterControl]
+                        }));
                         this.FilterControls.push(filterControl);
                     }
                 } else {
                     const filterControl = await this.CreateWSelect(SelectData, prop);
-                    ControlOptions.append(WRender.Create({ children: [prop, filterControl] }));
+                    ControlOptions.append(WRender.Create({ children: [WOrtograficValidation.es(prop), filterControl] }));
                     this.FilterControls.push(filterControl);
                 }
             }
@@ -73,7 +93,7 @@ class WFilterOptions extends HTMLElement {
                 break;
             case "DATE": case "FECHA": case "HORA": case "PASSWORD":
                 /**TODO */
-                break;
+                return this.CreateDateControl(prop);
             case "SELECT":
                 return this.CreateSelectControl(prop, Dataset);
             case "WSELECT": case "MULTISELECT":
@@ -109,7 +129,6 @@ class WFilterOptions extends HTMLElement {
     }
 
     filterFunction = () => {
-
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
             this.FilterControls.forEach(control => {
@@ -125,6 +144,8 @@ class WFilterOptions extends HTMLElement {
                             break;
                         case "DATE": case "FECHA": case "HORA": case "PASSWORD":
                             /**TODO */
+                            const inputs = control.querySelectorAll("input");
+                            findElementByDate(inputs[0].value, inputs[1].value);
                             break;
                         case "WSELECT": case "MULTISELECT":
                             if (control.selectedItems.length > 0) {
@@ -178,6 +199,19 @@ class WFilterOptions extends HTMLElement {
                     return obj[input.id]
                 }
 
+                function findElementByDate(firstDate, secondDate) {
+                    if (firstDate != "" && new Date(obj[control.id]) < new Date(firstDate + "T00:00:00")) {
+                        flagObj = false;
+                        return undefined;
+                    }
+
+                    if (secondDate != "" && new Date(obj[control.id]) > new Date(secondDate + "T00:00:00")) {
+                        flagObj = false;
+                        return undefined;
+                    }
+                    return obj[control.id]
+                }
+
             });
             return flagObj;
         });
@@ -195,17 +229,20 @@ class WFilterOptions extends HTMLElement {
      * @returns 
      */
     CreateSelectControl(prop, Dataset) {
+        const options = Dataset?.map(option => {
+            const OValue = option;
+            const ODisplay = option;
+            const OptionObject = WRender.Create({
+                tagName: "option", value: OValue, innerText: ODisplay
+            });
+            return OptionObject;
+        })
+        options.unshift(WRender.Create({ tagName: "option", value: "", innerText: "Seleccionar" }));
         let InputControl = WRender.Create({
             tagName: "select", className: prop, onchange: this.filterFunction, id: prop,
-            children: Dataset?.map(option => {
-                const OValue = option;
-                const ODisplay = option;
-                const OptionObject = WRender.Create({
-                    tagName: "option", value: OValue, innerText: ODisplay
-                });
-                return OptionObject;
-            })
+            children: options
         });
+
         return InputControl;
     }
     /**
@@ -223,6 +260,33 @@ class WFilterOptions extends HTMLElement {
         });
         return InputControl;
     }
+    /**
+     * @param {String} prop 
+     * @returns 
+     */
+    CreateDateControl(prop) {
+        let InputControl = WRender.Create({
+            id: prop,
+            class: "date-control", children: [
+                {
+                    tagName: "input",
+                    type: "date",
+                    className: prop + " firstDate",
+                    id: prop + "first",
+                    placeholder: prop,
+                    onchange: (ev) => { this.filterFunction() }
+                }, {
+                    tagName: "input",
+                    type: "date",
+                    className: prop + " secondDate",
+                    id: prop + "second",
+                    placeholder: prop,
+                    onchange: (ev) => { this.filterFunction() }
+                }
+            ]
+        });
+        return InputControl;
+    }
     async CreateWSelect(Dataset, prop) {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
@@ -236,54 +300,121 @@ class WFilterOptions extends HTMLElement {
         return InputControl;
     }
 
-    styles = {
-        type: 'w-style', props: {
-            id: '', ClassList: [
-                new WCssClass(`.reportV`, {
-                    margin: '10px',
-                }), new WCssClass(`.OptionContainer`, {
-                    display: "grid",
-                    "grid-template-columns": "50% 50%",
-                    "grid-gap": 10
-                }), new WCssClass(`.OptionContainer label`, {
-                    padding: 10,
-                    display: "block"
-                }), new WCssClass(`.OptionContainer div`, {
-                    display: "grid",
-                    "grid-template-rows": "30px 40px",
-                    //margin: "5px",
-                    "font-size": "12px",
-                }), new WCssClass(`.OptionContainer input, .OptionContainer select`, {
-                    margin: "0px",
-                    padding: "5px 10px"
-                }), new WCssClass(`.BtnSuccess`, {
-                    "font-weight": "bold",
-                    "border": "none",
-                    "padding": "10px",
-                    "text-align": "center",
-                    "display": "inline-block",
-                    "min-width": "100px",
-                    "cursor": "pointer",
-                    "background-color": "#09f",
-                    "color": "#fff",
-                    "border-right": "rgb(3, 106, 175) 5px solid",
-                }),
-            ], MediaQuery: [{
-                condicion: '(max-width: 600px)',
-                ClassList: [new WCssClass(`.OptionContainer`, {
-                    display: "flex",
-                    "flex-direction": "column",
-                }), new WCssClass(`.OptionContainer div`, {
-                    display: "grid",
-                    "grid-template-rows": "30px 30px",
-                    "grid-template-columns": "auto",
-                    //margin: "5px",
-                    "font-size": "12px",
-                }),]
-            },
-            ]
+    styles = css`
+        .reportV {
+            margin: 10px;
         }
-    };
+
+        .filter-container {    
+            margin-top:10px;        
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            border: 2px solid #e4e4e4;
+            border-radius: 10px;
+        }
+
+        .OptionContainer {
+            display: grid;
+            width: 100%;
+            grid-template-columns: 32% 32% 32%;
+            grid-gap: 15px;
+            padding: 0px 5px;
+            overflow: hidden;
+            max-height: 0px;
+            transition: all 0.3s;
+        }
+
+        .OptionContainerActive {
+            overflow: inherit;
+            max-height: inherit;
+            padding: 10px  5px;
+        }
+
+        .OptionContainer label {
+            padding: 10px;
+            display: block;
+        }
+
+        .BtnDinamictT {
+            font-weight: bold;
+            border: none;
+            padding: 5px;
+            margin: 5px;
+            outline: none;
+            text-align: center;
+            display: inline-block;
+            font-size: 12px;
+            cursor: pointer;
+            background-color: #4894aa;
+            color: #fff;
+            border-radius: 0.2cm;
+            width: 15px;
+            height: 15px;
+            background-color:#4894aa;
+            font-family: monospace;
+        }
+
+        .OptionContainer div {
+            display: grid;
+            grid-template-rows: 30px 40px;
+            font-size: 12px;
+        }
+
+        .OptionContainer input,
+        .OptionContainer select {
+            margin: 0px;
+            padding: 5px 10px;
+        }
+
+        .date-control-container {
+            grid-column: span 2;
+        }
+        .date-control {
+            display: flex !important;
+            gap: 15px;
+        }
+
+        .BtnSuccess {
+            font-weight: bold;
+            border: none;
+            padding: 10px;
+            text-align: center;
+            display: inline-block;
+            min-width: 100px;
+            cursor: pointer;
+            background-color: #09f;
+            color: #fff;
+            border-right: rgb(3, 106, 175) 5px solid;
+        }
+
+        input.firstDate,
+        input.secondDate {
+            padding-left: 10px;
+        }
+        input.firstDate::before {
+            content: "Desde: ";
+        }
+        input.secondDate::before {
+            content: "Hasta: ";
+        }
+
+        @media (max-width: 600px) {
+            .OptionContainer {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .OptionContainer div {
+                display: grid;
+                grid-template-rows: 30px 30px;
+                grid-template-columns: auto;
+                font-size: 12px;
+            }
+        }
+    `
 }
 customElements.define("w-filter-option", WFilterOptions);
 export { WFilterOptions }

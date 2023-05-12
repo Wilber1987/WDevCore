@@ -56,7 +56,9 @@ class WOrtograficValidation {
         { error: ["CODIGO"], value: "código" },
         { error: ["TITULO"], value: "título" },
         { error: ["GENERO"], value: "género" },
-        { error: ["DNI"], value: "DNI" },
+        { error: ["DNI"], value: "DNI" }, 
+        { error: ["DESCRIPCION"], value: "descripción" }, 
+        { error: ["TRANSACCION", "Transaccion"], value: "transacción" },
     ]
 }
 export { WOrtograficValidation }

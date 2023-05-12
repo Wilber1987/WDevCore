@@ -316,7 +316,7 @@ const MainMenu = css`
     }
     .OptionsContainer {
         max-height: 500px;
-        overflow-y: auto;
+        overflow-y: auto; overflow-y: overlay;
         transition: all .1s;
         width: 100%;
         background: #fff;

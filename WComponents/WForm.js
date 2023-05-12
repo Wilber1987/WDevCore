@@ -41,9 +41,6 @@ class WForm extends HTMLElement {
         this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
         this.shadowRoot?.append(this.DivForm);
         this.DrawComponent();
-        for (const prop in this.FormObject) {
-           this.#OriginalObject[prop] = this.FormObject[prop];
-        }
         this.ExistChange = false;
         this.ObjectProxy = this.ObjectProxy ?? undefined;
     }
@@ -57,19 +54,20 @@ class WForm extends HTMLElement {
                 Url: undefined
             };
         }
-        this.FormObject =  this.FormObject ?? this.Config.EditObject ?? {};
+        this.FormObject = this.FormObject ?? this.Config.EditObject ?? {};
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const ObjectProxy = this.CreateProxy(Model);
         this.DivForm.append(await this.CrudForm(ObjectProxy, this.Config.ObjectOptions));
         if (this.Options == true) {
             this.DivForm.append(await this.SaveOptions(ObjectProxy));
         }
+        this.CreateOriginalObject();
     }
     CreateProxy(Model) {
         const ObjHandler = {
-            get:  (target, property) => {
+            get: (target, property) => {
                 return target[property];
-            }, set:  (target, property, value, receiver) => {
+            }, set: (target, property, value, receiver) => {
                 this.ExistChange = true;
                 target[property] = value;
                 for (const prop in Model) {
@@ -84,6 +82,16 @@ class WForm extends HTMLElement {
         };
         const ObjectProxy = new Proxy(this.FormObject, ObjHandler);
         return ObjectProxy;
+    }
+    CreateOriginalObject = (OriginalObject = this.#OriginalObject, FormObject = this.FormObject) => {
+        for (const prop in FormObject) {
+            if (FormObject[prop]?.__proto__ == Object.prototype || FormObject[prop]?.__proto__ == EntityClass.prototype) {
+                OriginalObject[prop] = this.CreateOriginalObject({}, FormObject[prop])
+            } else {
+                OriginalObject[prop] = FormObject[prop];
+            }
+        }
+        return OriginalObject;
     }
 
     /**
@@ -311,10 +319,10 @@ class WForm extends HTMLElement {
                 break;
             case "WSELECT":
                 ObjectF[prop] = ObjectF[prop].__proto__ == Object.prototype ? ObjectF[prop] : null;
-                if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {                    
+                if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
                     ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     /**@type {EntityClass} */
-                    const entity = ModelProperty.ModelObject;                    
+                    const entity = ModelProperty.ModelObject;
                     ModelProperty.Dataset = await entity.Get();
                 }
                 if (ObjectF[prop] == null && ModelProperty.require != false &&
@@ -331,7 +339,7 @@ class WForm extends HTMLElement {
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
                     ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     ModelProperty.Dataset = await ModelProperty.ModelObject.Get();
-                }                
+                }
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = new MultiSelect({
@@ -522,7 +530,7 @@ class WForm extends HTMLElement {
         }
 
         return InputControl;
-    }   
+    }
     createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
         InputControl = new WCalendarComponent({
             CalendarFunction: Model[prop].CalendarFunction,
@@ -870,11 +878,7 @@ class WForm extends HTMLElement {
             this.Config.SaveFunction(ObjectF);
         }
     }
-    Validate = (ObjectF) => {
-        if(!this.ExistChange) {
-            this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
-            return;
-        }
+    Validate = (ObjectF) => {        
         if (this.DataRequire == true) {
             for (const prop in ObjectF) {
                 if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require) {
@@ -900,7 +904,7 @@ class WForm extends HTMLElement {
                     } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL") {
                         if (this.Config.ModelObject[prop].require == true) {
                             this.Config.ModelObject[prop].MinimunRequired = this.Config.ModelObject[prop]?.MinimunRequired ?? 1;
-                        }                        
+                        }
                         if (this.Config.ModelObject[prop]?.MaxRequired
                             && ObjectF[prop].length > this.Config.ModelObject[prop]?.MaxRequired) {
                             this.createAlertToolTip(control, `El máximo de registros permitidos es `
@@ -927,6 +931,10 @@ class WForm extends HTMLElement {
                     }
                 }
             }
+        }
+        if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
+            this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
+            return false;
         }
         return true;
     }
@@ -1152,7 +1160,7 @@ class WForm extends HTMLElement {
                 padding: 5px 15px;
                 border-radius: 0.3cm;
                 left: 10px;
-                bottom: -10px;
+                bottom: -20px;
                 font-size: 10px;
                 font-weight: 500;
                 color: rgb(227, 0, 0);
@@ -1176,7 +1184,7 @@ class WForm extends HTMLElement {
                 padding: 10px;
                 border-radius: 5px;
                 overflow: hidden;
-                overflow-y: auto;
+                overflow-y: auto; overflow-y: overlay;
                 max-height: 300px;
                 margin: 5px;
             }
@@ -1203,7 +1211,7 @@ class WForm extends HTMLElement {
 
             .ObjectModalContainer {
                 overflow: hidden;
-                overflow-y: auto;
+                overflow-y: auto; overflow-y: overlay;
                 max-height: calc(100vh - 120px);
                 margin: 10px;
             }

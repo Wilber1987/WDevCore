@@ -177,7 +177,7 @@ w-multi-select .MultiGroupSelect {
     overflow-x: hidden;
     width: calc(100% - 2px);
     transition: all 0.8s;
-    overflow-y: scroll;
+    overflow-y: scroll; overflow-y: overlay;
     z-index: 2;
     background-color: #fff;
     border-radius: 0.2cm;
@@ -214,7 +214,7 @@ w-multi-select  .DisplaySelectGroup .LabelAutoselect input[type="checkbox"]:chec
 
 w-multi-select .MultiGroupSelect:hover {     
     max-height: 400px; 
-    overflow-y: scroll;  
+    overflow-y: scroll; overflow-y: overlay;  
     box-shadow: 0 0 10px rgb(119, 119, 119);
 }
 w-multi-select .DisplaySelectGroup{

@@ -5,6 +5,8 @@ const StyleScrolls = css`
      *::-webkit-scrollbar {
         width: 20px;
         height: 20px;
+        position: absolute;
+        left: 0;
     }
 
     *::-webkit-scrollbar-track {
@@ -12,7 +14,7 @@ const StyleScrolls = css`
     }
 
     *::-webkit-scrollbar-thumb {
-        background-color: #8f8f8f;
+        background-color: rgba(0,0,0,.2);
         border-radius: 20px;
         border: 6px solid transparent;
         background-clip: content-box;

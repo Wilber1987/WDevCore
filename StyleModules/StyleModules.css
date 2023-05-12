@@ -149,7 +149,7 @@
     transition: all linear 1s;
     box-shadow: 0 0px 1px 0px #000;
     z-index: 200 !important;
-    overflow-y: auto;
+    overflow-y: auto; overflow-y: overlay;
     padding-bottom: 50px;   
 }
 
@@ -161,7 +161,7 @@
     background-color: #fff;
     width: 70%;
     max-height: 800px;
-    overflow-y: auto;
+    overflow-y: auto; overflow-y: overlay;
     padding: 20px;
     min-height: 200px;
     border-radius: 5px;
@@ -230,7 +230,7 @@
     transition: all 1s ease 0s;    
 }
 .WScroll{
-    overflow-y: auto;
+    overflow-y: auto; overflow-y: overlay;
 }
 .WScroll::-webkit-scrollbar-thumb {
     background: #ccc;
