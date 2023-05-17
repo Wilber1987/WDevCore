@@ -63,24 +63,31 @@ class WForm extends HTMLElement {
         }
         this.CreateOriginalObject();
     }
-    CreateProxy(Model) {
+    CreateProxy(Model, FormObject = this.FormObject) {
         const ObjHandler = {
             get: (target, property) => {
                 return target[property];
             }, set: (target, property, value, receiver) => {
                 this.ExistChange = true;
                 target[property] = value;
+                if (target.__proto__ == Array.prototype) {
+                    console.log(target);
+                }
                 for (const prop in Model) {
                     if (Model[prop]?.__proto__ == Object.prototype) {
-                        if (Model[prop].type?.toUpperCase() == "OPERATION") {
-                            target[prop] = Model[prop].action(target);
+                        if (Model[prop].type?.toUpperCase() == "OPERATION") {                           
+                            target[prop] = Model[prop].action(this.FormObject, this);
+                            const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
+                            if (control) {
+                                control.innerHTML = target[prop];
+                            }
                         }
                     }
                 }
                 return true;
             }
         };
-        const ObjectProxy = new Proxy(this.FormObject, ObjHandler);
+        const ObjectProxy = new Proxy(FormObject, ObjHandler);
         return ObjectProxy;
     }
     CreateOriginalObject = (OriginalObject = this.#OriginalObject, FormObject = this.FormObject) => {
@@ -317,6 +324,14 @@ class WForm extends HTMLElement {
                 InputControl = this.CreateSelect(prop, ObjectF, ModelProperty.Dataset, onChangeEvent);
                 ObjectF[prop] = InputControl.value;
                 break;
+            case "OPERATION":
+                val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
+                InputControl = WRender.Create({
+                    tagName: "label",
+                    className: prop + " input",
+                    innerText: val
+                });
+                break;
             case "WSELECT":
                 ObjectF[prop] = ObjectF[prop].__proto__ == Object.prototype ? ObjectF[prop] : null;
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
@@ -380,13 +395,16 @@ class WForm extends HTMLElement {
                 });
                 break;
             case "MASTERDETAIL":
+                const masterDetailModel = await WArrayF.isModelFromFunction(Model, prop);
                 ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
-                ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
+                ObjectF[prop] = ObjectF[prop] != "" ? this.CreateProxy(Model, ObjectF[prop]) :
+                    this.CreateProxy(Model, []);
+
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
                     AddItemsFromApi: false,
-                    ModelObject: await WArrayF.isModelFromFunction(Model, prop),
+                    ModelObject: masterDetailModel,
                     ParentModel: Model,
                     Options: {
                         Add: true, Edit: true, Delete: true, Search: true
@@ -878,7 +896,7 @@ class WForm extends HTMLElement {
             this.Config.SaveFunction(ObjectF);
         }
     }
-    Validate = (ObjectF) => {        
+    Validate = (ObjectF) => {
         if (this.DataRequire == true) {
             for (const prop in ObjectF) {
                 if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require) {

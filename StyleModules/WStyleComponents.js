@@ -205,6 +205,7 @@ const StylesControlsV2 = css`
     input[type=time],
     input[type=tel],
     input[type=url],
+    .input,
     w-multi-select,
     select,
     textarea,
@@ -223,6 +224,7 @@ const StylesControlsV2 = css`
         cursor: pointer;
         height: 40px;
         box-shadow: 0 0 5px #c1c1c1;
+        display: block;
     }
 
     w-multi-select{

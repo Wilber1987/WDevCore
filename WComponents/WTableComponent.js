@@ -311,8 +311,6 @@ class WTableComponent extends HTMLElement {
                         ]
                     }));
                     break;
-                case "OPERATION":
-                    break;
                 case "CALENDAR":
                     const label = `${element[prop]?.map(object => {
                         const label = object?.Fecha_Inicial.toDateFormatEs() + " al " + object?.Fecha_Final.toDateFormatEs();

@@ -57,16 +57,19 @@ class WNode {
 function ModelFunction() { }
 /**
  * @typedef {Object} ModelProperty 
-    * @property {String} type -  TEXT | NUMBER | DATE | MODEL | MASTERDETAIL | SELECT | OPERATION (requiere un action para funcionar)
+    * @property {String} type - RADIO | DRAW | PASSWORD |
+    CHECKBOX | TEXT | IMG | NUMBER | DATE | EMAIL | FILE | 
+    TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | 
+    CALENDAR | OPERATION (requiere un action para funcionar)
     * @property {Boolean} [hidden]
     * @property {Boolean} [require]
     * @property {String} [label]
     * @property {Array} [fileType]
-    * @property {Array} [ControlAction] botones adicionales que se le agregan al control
+    * @property {Array} [ControlAction] botones adicionales que se le agregan al control 
     * @property {String} [pattern]
     * @property {String} [defaultValue]
     * @property {String} [placeholder]
-    * @property {String} [fieldRequire]
+    * @property {String} [fieldRequire] CAMBIA UN ESTADO DE UNA PROPIEDAD A REQUERIDO
     * @property {Object | EntityClass | ModelFunction} [ModelObject]
     * @property {Array} [Dataset]
     * @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
