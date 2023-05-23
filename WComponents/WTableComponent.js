@@ -154,7 +154,10 @@ class WTableComponent extends HTMLElement {
         let tr = WRender.Create({ tagName: "tr" })
         for (const prop in element) {
             if (this.IsDrawableRow(element, prop)) {
-                const th = WRender.Create({ tagName: "th", innerHTML: WOrtograficValidation.es(prop) });
+                const th = WRender.Create({
+                    tagName: "th", innerHTML: this.ModelObject[prop]?.label ?
+                        WOrtograficValidation.es(this.ModelObject[prop]?.label) : WOrtograficValidation.es(prop)
+                });
                 tr.append(th);
             }
         }
@@ -171,7 +174,7 @@ class WTableComponent extends HTMLElement {
      * @param {Array} [Dataset] 
      * @returns {Array<HTMLElement>}
      */
-    DrawTBody = (Dataset = this.Dataset) => {        
+    DrawTBody = (Dataset = this.Dataset) => {
         /**@type {Array<HTMLElement>} */
         const tbodys = [];
         this.numPage = (Dataset.length / this.maxElementByPage) >= 1 ? Dataset.length / this.maxElementByPage : 1;
@@ -219,7 +222,7 @@ class WTableComponent extends HTMLElement {
             this.DeleteBTN(Options, element, tr);
             if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
-                    if (Action == null ) {
+                    if (Action == null) {
                         return;
                     }
                     Options.append(WRender.Create({
