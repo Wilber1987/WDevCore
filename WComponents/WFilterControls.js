@@ -58,7 +58,7 @@ class WFilterOptions extends HTMLElement {
         this.ModelObject = this.ModelObject ?? this.Config.Dataset[0];
         for (const prop in this.ModelObject) {
             const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop).map(s => s[prop]);
-            if (!this.isNotDrawable(this.ModelObject, prop)) {
+            if (this.isDrawable(this.ModelObject, prop)) {
                 if (this.ModelObject[prop].__proto__ == Object.prototype) {
                     const filterControl = await this.CreateModelControl(this.ModelObject, prop, SelectData);
                     if (filterControl != null) {
@@ -121,14 +121,14 @@ class WFilterOptions extends HTMLElement {
         }
         return null
     }
-    isNotDrawable(Model, prop) {
+    isDrawable(Model, prop) {
         if (Model[prop] == null || prop == "FilterData") {
-            return true;
+            return false;
         }
-        return (Model[prop].__proto__ == Object.prototype &&
-            (Model[prop].primary || Model[prop].hidden || !Model[prop].type))
-            || Model[prop].__proto__ == Function.prototype
-            || Model[prop].__proto__.constructor.name == "AsyncFunction";
+        return (Model[prop].__proto__ = Object.prototype &&
+            (!Model[prop].primary || !Model[prop].hidden || !Model[prop].type))
+            && Model[prop].__proto__ != Function.prototype
+            && Model[prop].__proto__.constructor.name != "AsyncFunction";
     }
 
     filterFunction = async () => {
@@ -321,7 +321,7 @@ class WFilterOptions extends HTMLElement {
             type: "text",
             className: prop,
             id: prop,
-            placeholder: prop,
+            placeholder: WOrtograficValidation.es(prop),
             onchange: (ev) => { this.filterFunction() }
         });
         return InputControl;
@@ -360,16 +360,16 @@ class WFilterOptions extends HTMLElement {
                 {
                     tagName: "input",
                     type: "number",
-                    className: prop + " firstDate",
+                    className: prop + " firstNumber",
                     id: prop + "first",
-                    placeholder: prop,
+                    placeholder: WOrtograficValidation.es(prop),
                     onchange: (ev) => { this.filterFunction() }
                 }, {
                     tagName: "input",
                     type: "number",
-                    className: prop + " secondDate",
+                    className: prop + " secondNumber",
                     id: prop + "second",
-                    placeholder: prop,
+                    placeholder: WOrtograficValidation.es(prop),
                     onchange: (ev) => { this.filterFunction() }
                 }
             ]
@@ -403,12 +403,13 @@ class WFilterOptions extends HTMLElement {
             flex-direction: column;
             border: 2px solid #e4e4e4;
             border-radius: 10px;
+            container-type: inline-size;
         }
 
         .OptionContainer {
             display: grid;
             width: 100%;
-            grid-template-columns: 32% 32% 32%;
+            grid-template-columns: repeat(4,calc(25% - 12px));
             grid-gap: 15px;
             padding: 0px 5px;
             overflow: hidden;
@@ -489,6 +490,16 @@ class WFilterOptions extends HTMLElement {
         input.secondDate::before {
             content: "Hasta: ";
         }
+        .firstNumber,
+        .secondNumber {
+            padding-left: 10px;
+        }
+        .firstNumber::before {
+            content: "Desde: ";
+        }
+        .secondNumber::before {
+            content: "Hasta: ";
+        }
 
         @media (max-width: 600px) {
             .OptionContainer {
@@ -501,6 +512,11 @@ class WFilterOptions extends HTMLElement {
                 grid-template-rows: 30px 30px;
                 grid-template-columns: auto;
                 font-size: 12px;
+            }
+        }
+        @container (max-width: 700px) {
+            .OptionContainer {
+                grid-template-columns: repeat(2,calc(50% - 12px));
             }
         }
     `

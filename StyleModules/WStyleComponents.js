@@ -218,7 +218,7 @@ const StylesControlsV2 = css`
         border: none;
         line-height: 1;
         font-weight: 600 !important;
-        font-size: 1.1rem !important;
+        font-size: 14px !important;
         color: #333 !important;
         box-sizing: border-box;
         cursor: pointer;
