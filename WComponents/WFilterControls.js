@@ -91,7 +91,7 @@ class WFilterOptions extends HTMLElement {
                 return this.CreateTextControl(prop);
             case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                 break;
-            case "DATE": case "FECHA": case "HORA": case "PASSWORD":
+            case "DATE": case "FECHA": case "HORA":
                 /**TODO */
                 return this.CreateDateControl(prop);
             case "SELECT":
@@ -104,7 +104,7 @@ class WFilterOptions extends HTMLElement {
                     ModelProperty.Dataset = await entity.Get();
                 }
                 return await this.CreateWSelect(ModelProperty.Dataset, prop);
-            case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
+            case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA": case "PASSWORD":
                 break;
             case "RADIO": case "CHECKBOX":
                 /**TODO */
@@ -128,7 +128,54 @@ class WFilterOptions extends HTMLElement {
             || Model[prop].__proto__.constructor.name == "AsyncFunction";
     }
 
-    filterFunction = () => {
+    filterFunction = async () => {
+        if (this.ModelObject.Get) {
+            this.FilterControls.forEach(control => {
+                if (this.ModelObject[control.id]) {
+                    let values;
+                    let filterType;
+                    const ModelProperty = this.ModelObject[control.id];
+                    switch (ModelProperty.type?.toUpperCase()) {
+                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL":
+                            if (control.value != null && control.value != undefined && control.value != "") {
+                                filterType = "LIKE"
+                                values = [control.value];
+                            }
+                            break;
+                        case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
+                            break;
+                        case "DATE": case "FECHA": case "HORA":
+                            /**TODO */
+                            filterType = "BETWEEN"
+                            const inputs = control.querySelectorAll("input");
+                            values = [inputs[0].value, inputs[1].value];
+                            break;
+                        case "WSELECT": case "MULTISELECT":
+                            if (control.selectedItems.length > 0) {
+                                // findElement(control);
+                            }
+                            break;
+                        case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA": case "PASSWORD":
+                            break;
+                        case "RADIO": case "CHECKBOX":
+                            /**TODO */
+                            break;
+                        case "CALENDAR":
+                            /**TODO */
+                            break;
+                        default:
+                            break;
+                    }
+                    this.ModelObject.FilterData = [];
+                    this.ModelObject.FilterData.push({
+                        PropName: control.id,
+                        FilterType: filterType,
+                        Values: values
+                    })
+                }
+            });
+            this.Config.Dataset = await this.ModelObject.Get();
+        }
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
             this.FilterControls.forEach(control => {
@@ -140,9 +187,9 @@ class WFilterOptions extends HTMLElement {
                                 findByValue(control);
                             }
                             break;
-                        case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
+                        case "TITLE": case "IMG": case "IMAGE": case "IMAGES": case "HORA": case "PASSWORD":
                             break;
-                        case "DATE": case "FECHA": case "HORA": case "PASSWORD":
+                        case "DATE": case "FECHA":
                             /**TODO */
                             const inputs = control.querySelectorAll("input");
                             findElementByDate(inputs[0].value, inputs[1].value);

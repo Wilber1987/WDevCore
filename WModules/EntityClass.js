@@ -1,14 +1,16 @@
 import { WAjaxTools } from "./WComponentsTools.js";
 
 class EntityClass {
-    constructor(props, Namespace) {       
+    constructor(props, Namespace) {
         this.ApiMethods = {
             ApiRoute: window.origin + "/api/",
             Get: "Api" + Namespace + "/get" + this.__proto__.constructor.name,
             Set: "Api" + Namespace + "/save" + this.__proto__.constructor.name,
             Update: "Api" + Namespace + "/update" + this.__proto__.constructor.name,
         }
-    }   
+    }
+    /**@type {Array<FilterData>} */
+    FilterData = []
     /**
      * 
      * @param {String} Param 
@@ -18,23 +20,23 @@ class EntityClass {
         let Data = await this.GetData(this.ApiMethods.Get);
         return Data;
     }
-     /**
-     * 
-     * @param {String} paramName 
-     * @param {String} paramValue 
-     * @returns {Array}
-     */
+    /**
+    * 
+    * @param {String} paramName 
+    * @param {String} paramValue 
+    * @returns {Array}
+    */
     GetByProps = async (paramName, paramValue) => {
         let Data = await this.GetData();
         Data = Data.filter(ent => ent[paramName].toString().includes(paramValue.toString()));
         return Data.map(ent => new this.constructor(ent));
     }
-      /**
-     * 
-     * @param {String} paramName 
-     * @param {String} paramValue 
-     * @returns {Array}
-     */
+    /**
+   * 
+   * @param {String} paramName 
+   * @param {String} paramValue 
+   * @returns {Array}
+   */
     FindByProps = async (paramName, paramValue) => {
         let Data = await this.GetData();
         const FindObject = Data.find(ent => ent[paramName].toString().includes(paramValue.toString()));
@@ -51,11 +53,11 @@ class EntityClass {
         return true;
     }
     /** CORE ########################################################## */
-      /**
-     * 
-     * @param {String} Path 
-     * @returns {Array}
-     */
+    /**
+   * 
+   * @param {String} Path 
+   * @returns {Array}
+   */
     GetData = async (Path) => {
         const Dataset = await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, this.replacer(this))
         // let Dataset = await fetch(this.ApiMethods.ApiRoute + this.constructor.name + '.json');
@@ -65,9 +67,9 @@ class EntityClass {
     SaveWithModel = async (Object, Edit = false) => {
         if (Edit == false) {
             await this.SaveData(this.ApiMethods.Set, Object);
-        }else {
+        } else {
             await this.SaveData(this.ApiMethods.Update, Object);
-        }         
+        }
         return true;
     }
     SaveData = async (Path, Data) => {
@@ -87,7 +89,7 @@ class EntityClass {
                 prop == "SaveData" ||
                 value[prop] == null ||
                 value[prop] == undefined ||
-                (value[prop]?.__proto__ == Object.prototype && value[prop].type) ) {
+                (value[prop]?.__proto__ == Object.prototype && value[prop].type)) {
                 continue;
             }
             replacerElement[prop] = value[prop]

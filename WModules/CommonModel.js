@@ -558,6 +558,13 @@ class ModalConfig {
     //     }
     // };
 }
+/**
+ * @typedef {Object} FilterData 
+ *  * @property {String} [PropName]
+    * @property {String} [FilterType]
+    * @property {Array<any>} [Values]
+**/
+class FilterData {}
 
 export {
     WNode,
@@ -566,5 +573,6 @@ export {
     ModelFunction,
     ModelProperty,
     TableConfig,
-    ModalConfig
+    ModalConfig,
+    FilterData
 }
