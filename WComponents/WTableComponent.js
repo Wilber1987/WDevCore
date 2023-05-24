@@ -66,8 +66,7 @@ class WTableComponent extends HTMLElement {
         if ((this.Dataset == undefined || this.Dataset == null || this.Dataset.length == 0) && this.AddItemsFromApi) {
             if (isWithtUrl) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
-            }
-            if (isWithtModel) {
+            } else if (isWithtModel) {
                 this.Dataset = await this.TableConfig.ModelObject.Get();
             }
         }

@@ -63,7 +63,8 @@ class WFilterOptions extends HTMLElement {
                     const filterControl = await this.CreateModelControl(this.ModelObject, prop, SelectData);
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({
-                            className: this.ModelObject[prop].type.toUpperCase() == "DATE" ? "date-control-container" : "",
+                            className: this.ModelObject[prop].type.toUpperCase() == "DATE"
+                                || this.ModelObject[prop].type.toUpperCase() == "NUMBER" ? "multi-control-container" : "",
                             children: [WOrtograficValidation.es(prop), filterControl]
                         }));
                         this.FilterControls.push(filterControl);
@@ -94,6 +95,8 @@ class WFilterOptions extends HTMLElement {
             case "DATE": case "FECHA": case "HORA":
                 /**TODO */
                 return this.CreateDateControl(prop);
+            case "NUMBER":
+                return this.CreateNumberControl(prop);
             case "SELECT":
                 return this.CreateSelectControl(prop, Dataset);
             case "WSELECT": case "MULTISELECT":
@@ -119,7 +122,7 @@ class WFilterOptions extends HTMLElement {
         return null
     }
     isNotDrawable(Model, prop) {
-        if (Model[prop] == null) {
+        if (Model[prop] == null || prop == "FilterData") {
             return true;
         }
         return (Model[prop].__proto__ == Object.prototype &&
@@ -130,6 +133,7 @@ class WFilterOptions extends HTMLElement {
 
     filterFunction = async () => {
         if (this.ModelObject.Get) {
+            this.ModelObject.FilterData = [];
             this.FilterControls.forEach(control => {
                 if (this.ModelObject[control.id]) {
                     let values;
@@ -144,11 +148,22 @@ class WFilterOptions extends HTMLElement {
                             break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                             break;
-                        case "DATE": case "FECHA": case "HORA":
+                        case "DATE": case "FECHA": case "HORA": case "NUMBER":
                             /**TODO */
                             filterType = "BETWEEN"
                             const inputs = control.querySelectorAll("input");
-                            values = [inputs[0].value, inputs[1].value];
+                          
+                            if (inputs[0].value != '' || inputs[1].value != '' ) {
+                                values = []                     
+                                if (inputs[0].value != '') {
+                                    values.push(inputs[0].value)
+                                } else {
+                                    values.push(null)
+                                }
+                                if (inputs[1].value != '') {
+                                    values.push(inputs[1].value)
+                                }
+                            }
                             break;
                         case "WSELECT": case "MULTISELECT":
                             if (control.selectedItems.length > 0) {
@@ -166,7 +181,11 @@ class WFilterOptions extends HTMLElement {
                         default:
                             break;
                     }
-                    this.ModelObject.FilterData = [];
+                    console.log({
+                        PropName: control.id,
+                        FilterType: filterType,
+                        Values: values
+                    });
                     this.ModelObject.FilterData.push({
                         PropName: control.id,
                         FilterType: filterType,
@@ -189,7 +208,7 @@ class WFilterOptions extends HTMLElement {
                             break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES": case "HORA": case "PASSWORD":
                             break;
-                        case "DATE": case "FECHA":
+                        case "DATE": case "FECHA": case "HORA": case "NUMBER":
                             /**TODO */
                             const inputs = control.querySelectorAll("input");
                             findElementByDate(inputs[0].value, inputs[1].value);
@@ -314,7 +333,7 @@ class WFilterOptions extends HTMLElement {
     CreateDateControl(prop) {
         let InputControl = WRender.Create({
             id: prop,
-            class: "date-control", children: [
+            class: "multi-control", children: [
                 {
                     tagName: "input",
                     type: "date",
@@ -325,6 +344,29 @@ class WFilterOptions extends HTMLElement {
                 }, {
                     tagName: "input",
                     type: "date",
+                    className: prop + " secondDate",
+                    id: prop + "second",
+                    placeholder: prop,
+                    onchange: (ev) => { this.filterFunction() }
+                }
+            ]
+        });
+        return InputControl;
+    }
+    CreateNumberControl(prop) {
+        let InputControl = WRender.Create({
+            id: prop,
+            class: "multi-control", children: [
+                {
+                    tagName: "input",
+                    type: "number",
+                    className: prop + " firstDate",
+                    id: prop + "first",
+                    placeholder: prop,
+                    onchange: (ev) => { this.filterFunction() }
+                }, {
+                    tagName: "input",
+                    type: "number",
                     className: prop + " secondDate",
                     id: prop + "second",
                     placeholder: prop,
@@ -416,10 +458,10 @@ class WFilterOptions extends HTMLElement {
             padding: 5px 10px;
         }
 
-        .date-control-container {
+        .multi-control-container {
             grid-column: span 2;
         }
-        .date-control {
+        .multi-control {
             display: flex !important;
             gap: 15px;
         }
