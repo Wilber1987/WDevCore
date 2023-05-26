@@ -379,7 +379,6 @@ const MainMenu = css`
         margin-right: 10px;
         background: #000;
         clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
-        ;
         transition: all 0.1s;
     }
     .spanActive {

@@ -75,7 +75,7 @@ class WForm extends HTMLElement {
                 }
                 for (const prop in Model) {
                     if (Model[prop]?.__proto__ == Object.prototype) {
-                        if (Model[prop].type?.toUpperCase() == "OPERATION") {                           
+                        if (Model[prop].type?.toUpperCase() == "OPERATION") {
                             target[prop] = Model[prop].action(this.FormObject, this);
                             const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
                             if (control) {
@@ -276,9 +276,9 @@ class WForm extends HTMLElement {
      * @param {String} prop
      * @param {String | undefined} val
      * @param {HTMLElement} ControlContainer
-     * @param {Object} ObjectF
-     * @param {Function} ObjectF
+     * @param {Object} ObjectF     
      * @param {HTMLLabelElement} ControlLabel
+     * @param {Function} onChangeEvent
      */
     async CreateModelControl(Model, prop, val, ControlContainer, ObjectF, ControlLabel, onChangeEvent) {
         /**
@@ -315,7 +315,8 @@ class WForm extends HTMLElement {
                 }
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, type: type,
-                    placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop))
+                    placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
+                    disabled: ModelProperty.disabled
                 });
                 //@ts-ignore
                 ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
@@ -373,7 +374,8 @@ class WForm extends HTMLElement {
                     className: prop, value: val, type: ModelProperty.type,
                     placeholder: "Ejem.: me@email.com",
                     pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$",
-                    onchange: onChangeEvent
+                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    disabled: ModelProperty.disabled
                 });
                 break;
             case "TEL":
@@ -382,7 +384,8 @@ class WForm extends HTMLElement {
                     className: prop, value: val, type: ModelProperty.type,
                     placeholder: "Ejem.: +54-88888888",
                     pattern: "[+]{1}[0-9]{2,3}[-]{1}[0-9]{3,4}[0-9]{4,5}",
-                    onchange: onChangeEvent
+                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    disabled: ModelProperty.disabled
                 });
                 break;
             case "URL":
@@ -391,7 +394,8 @@ class WForm extends HTMLElement {
                     className: prop, value: val, type: ModelProperty.type,
                     placeholder: "Ejem.: https://site.com",
                     pattern: "https?://.+",
-                    onchange: onChangeEvent
+                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    disabled: ModelProperty.disabled
                 });
                 break;
             case "MASTERDETAIL":
@@ -427,7 +431,8 @@ class WForm extends HTMLElement {
                     tagName: "input", className: prop, value: val, type: ModelProperty.type,
                     style: { display: "none" },
                     placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
-                    onchange: onChangeEvent
+                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    disabled: ModelProperty.disabled
                 });
                 const label = WRender.Create({ tagName: 'label', id: "labelFile" + prop, innerText: '' });
                 const content = WRender.Create({
@@ -438,7 +443,8 @@ class WForm extends HTMLElement {
                             innerText: "Seleccionar archivo",
                             htmlFor: "ControlValue" + prop, children: [
                                 WRender.Create({ tagName: 'img', src: WIcons.upload, class: 'labelIcon' })
-                            ]
+                            ],
+                            disabled: ModelProperty.disabled
                         }), label
                     ]
                 })
@@ -456,8 +462,9 @@ class WForm extends HTMLElement {
                     id: "ControlValue" + prop,
                     className: prop,
                     value: val,
-                    onchange: onChangeEvent,
-                    type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop))
+                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
+                    disabled: ModelProperty.disabled
                 });
                 break;
             case "DRAW":
@@ -467,7 +474,8 @@ class WForm extends HTMLElement {
                 ControlContainer.style.height = "auto";
                 InputControl = WRender.Create({
                     tagName: "textarea", style: { height: "100px", borderRadius: "10px" },
-                    className: prop, value: val, onchange: onChangeEvent
+                    className: prop, value: val, onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    disabled: ModelProperty.disabled
                 });
                 break;
             case "CALENDAR":
@@ -514,8 +522,8 @@ class WForm extends HTMLElement {
                     value: val,
                     type: ModelProperty.type,
                     placeholder: placeholder,
-                    onchange: onChangeEvent,
-                    disabled: ModelProperty.type.toUpperCase() == "OPERATION"
+                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    disabled: ModelProperty.disabled
                 });
                 break;
         }

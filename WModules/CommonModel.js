@@ -63,6 +63,7 @@ function ModelFunction() { }
     CALENDAR | OPERATION (requiere un action para funcionar)
     * @property {Boolean} [hidden]
     * @property {Boolean} [require]
+    * @property {Boolean} [disabled]
     * @property {String} [label]
     * @property {Array} [fileType]
     * @property {Array} [ControlAction] botones adicionales que se le agregan al control 
