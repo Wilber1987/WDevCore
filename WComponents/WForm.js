@@ -184,7 +184,7 @@ class WForm extends HTMLElement {
         return (Model[prop]?.__proto__ == Object.prototype &&
             (Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
             || Model[prop]?.__proto__ == Function.prototype
-            || Model[prop]?.__proto__.constructor.name == "AsyncFunction";
+            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData";
     }
     /**
     * 
