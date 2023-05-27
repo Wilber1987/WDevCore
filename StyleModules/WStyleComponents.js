@@ -226,7 +226,11 @@ const StylesControlsV2 = css`
         box-shadow: 0 0 5px #c1c1c1;
         display: block;
     }
-
+    input:disabled {
+        background-color: #e3e3e3 !important;
+        color: #6a6a6a !important;
+        pointer-events: none;
+    }
     w-multi-select{
         padding: 0px;
     }

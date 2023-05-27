@@ -37,15 +37,17 @@ class WAppNavigator extends HTMLElement {
         }
     }
     ActiveMenu = (ev) => {
-        this.shadowRoot.querySelectorAll(".elementNavActive").forEach(elementNavActive => {
-            elementNavActive.className = "elementNav";
+        var navs = this.parentNode.querySelectorAll("w-app-navigator");
+        navs.forEach(nav => {
+            nav.shadowRoot.querySelectorAll(".elementNavActive").forEach(elementNavActive => {
+                elementNavActive.className = "elementNav";
+            });
         });
-        // this.shadowRoot.querySelectorAll("h4.elementNavActive").forEach(elementNavActive => {
-        //     elementNavActive.className = "elementNavMedia";
-        // });
-        ev.className = "elementNavActive";
-        if (this.NavStyle != "tab") {
-            this.shadowRoot.querySelector("#MainNav").className = "navInactive";
+        if (ev) {
+            ev.className = "elementNavActive";
+            if (this.NavStyle != "tab") {
+                this.shadowRoot.querySelector("#MainNav").className = "navInactive";
+            }
         }
     }
     DrawAppNavigator() {
@@ -81,13 +83,13 @@ class WAppNavigator extends HTMLElement {
             this.shadowRoot.appendChild(WRender.createElement(header));
         }
         const Nav = { type: "nav", props: { id: "MainNav", className: this.NavStyle }, children: [] };
-        this.Elements.forEach((element, Index) => {            
+        this.Elements.forEach((element, Index) => {
             const elementNav = WRender.createElement({
                 type: "a",
                 props: { class: "elementNav" },
 
             });
-           
+
             elementNav.append(element.name)
             if (element.icon) {
                 elementNav.append(WRender.createElement({
@@ -136,7 +138,7 @@ class WAppNavigator extends HTMLElement {
                 SubNav.children.push({
                     type: "a",
                     props: {
-                        innerText: SubElement.name, 
+                        innerText: SubElement.name,
                         onclick: async (ev) => {
                             if (SubElement.action != undefined) {
                                 SubElement.action(ev);
@@ -197,16 +199,18 @@ class WAppNavigator extends HTMLElement {
                     }), new WCssClass(`.elementNav`, {
                         "text-decoration": "none",
                         color: this.DarkMode ? "#d3d3d3" : "#444444",
-                        padding: "10px",
+                        padding: 8,
                         "border": "solid 1px rgb(0,0,0,0)",
                         "border-bottom": `solid 2px rgba(0,0,0,0)`,
                         transition: "all 0.6s",
                         display: "flex", "align-items": "center",
-                        cursor: "pointer"
+                        cursor: "pointer",
+                        "font-size": 12
                     }), new WCssClass(`.elementNavActive`, {
                         "text-decoration": "none",
                         color: this.DarkMode ? "#4da6ff" : "#444444",
-                        padding: "10px",
+                        padding: "8px",
+                        "font-size": 12,
                         "border": "solid 1px rgb(0,0,0,0)",
                         "border-bottom": "solid 2px #4da6ff",
                         transition: "all 0.6s",
