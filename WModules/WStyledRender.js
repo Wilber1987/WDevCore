@@ -97,9 +97,10 @@ class WStyledRender extends HTMLElement {
 /**
  * 
  * @param {TemplateStringsArray} body 
- * @returns 
+ * @returns {HTMLStyleElement}
  */
-function css(body) {
+function css(body) {    
+    // @ts-ignore
     return WRender.Create({ tagName: "style", innerHTML: body.toString() });
 }
 customElements.define("w-style", WStyledRender);

@@ -34,11 +34,14 @@ class WForm extends HTMLElement {
         this.DataRequire = this.DataRequire ?? true;
         this.StyleForm = this.Config.StyleForm;
         this.limit = 2;
-        this.DivColumns = this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
+        this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px) calc(50% - 10px)";
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
+        if (this.Config.CustomStyle) {
+            this.shadowRoot?.append(this.Config.CustomStyle);
+        }
         this.shadowRoot?.append(this.DivForm);
         this.DrawComponent();
         this.ExistChange = false;
@@ -126,7 +129,7 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;
             } else {
                 let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
-                ObjectF[prop] = val;
+                //ObjectF[prop] = val;
                 const onChangeEvent = (ev) => {
                     /**
                      * @type {HTMLInputElement}
@@ -288,6 +291,7 @@ class WForm extends HTMLElement {
         let InputControl;
         ModelProperty.require = ModelProperty.require ?? true;
         const actionFunction = ModelProperty.action ?? null;
+        ObjectF[prop] = ObjectF[prop] ?? ModelProperty.defaultValue; 
         switch (ModelProperty.type?.toUpperCase()) {
             case "TITLE":
                 ModelProperty.require = false;
@@ -333,7 +337,7 @@ class WForm extends HTMLElement {
                 });
                 break;
             case "WSELECT":
-                ObjectF[prop] = ObjectF[prop].__proto__ == Object.prototype ? ObjectF[prop] : null;
+                ObjectF[prop] = ObjectF[prop]?.__proto__ == Object.prototype ? ObjectF[prop] : null;
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
                     ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     /**@type {EntityClass} */
@@ -507,6 +511,7 @@ class WForm extends HTMLElement {
                 break;
             default:
                 val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
+                console.log( ModelProperty.defaultValue, val);
                 const placeholder = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 InputControl = WRender.Create({
                     tagName: "input",

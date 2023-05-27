@@ -53,6 +53,7 @@ class WOrtograficValidation {
         { error: ["TELEFONO"], value: "teléfono" },
         { error: ["DNI"], value: "DNI" },
         { error: ["DIRECCION"], value: "dirección" },
+        { error: ["VALORACION"], value: "valoración" },
         { error: ["CODIGO"], value: "código" },
         { error: ["TITULO"], value: "título" },
         { error: ["GENERO"], value: "género" },

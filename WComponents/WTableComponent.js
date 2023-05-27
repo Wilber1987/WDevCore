@@ -18,7 +18,7 @@ class WTableComponent extends HTMLElement {
         this.TableClass = "WTable WScroll";
         this.selectedItems = [];
         this.ModelObject = {};
-        this.paginate = true;
+        this.paginate = Config.paginate ?? true;
         this.attachShadow({ mode: "open" });
         this.TypeMoney = "Euro";
         this.TableConfig = Config ?? {};
@@ -190,7 +190,7 @@ class WTableComponent extends HTMLElement {
                 //return;
             }
             let tr = WRender.Create({ tagName: "tr" });
-            this.DrawTRow(tr, element);
+            this.DrawTRow(tr, element, DatasetIndex);
             if (tbodys[page] && (this.paginate == true && Dataset.length > this.maxElementByPage)) {
                 tbodys[page].append(tr);
                 if (tbodys[page].children.length == this.maxElementByPage) {
@@ -206,16 +206,16 @@ class WTableComponent extends HTMLElement {
         this.shadowRoot?.append(WRender.createElement(this.MediaStyleResponsive()));
         return tbodys;
     }
-    DrawTRow = async (tr, element) => {
+    DrawTRow = async (tr, element, index) => {
         tr.innerHTML = "";
         for (const prop in this.ModelObject) {
             if (this.IsDrawableRow(element, prop)) {
-                await this.EvalModelPrototype(this.ModelObject, prop, tr, element);
+                await this.EvalModelPrototype(this.ModelObject, prop, tr, element, index);
             }
         }
         if (this.TrueOptions()) {
             const Options = WRender.Create({ tagName: "td", class: "tdAction" });
-            this.SelectBTN(element, Options);
+            this.SelectBTN(element, Options, index);
             this.ShowBTN(Options, element);
             this.EditBTN(Options, element, tr);
             this.DeleteBTN(Options, element, tr);
@@ -257,7 +257,7 @@ class WTableComponent extends HTMLElement {
         return true;
     }
 
-    async EvalModelPrototype(Model, prop, tr, element) {
+    async EvalModelPrototype(Model, prop, tr, element, index) {
         let value = element[prop] != null && element[prop] != undefined ? element[prop] : "";
         let td = WRender.Create({ tagName: "td" });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
@@ -329,7 +329,11 @@ class WTableComponent extends HTMLElement {
                     tr.append(td);
                     break;
                 default:
-                    td.append(WOrtograficValidation.es(value));
+                    td.append(WRender.Create({
+                        tagName: "label", htmlFor: "select" + index,
+                        style: this.Options?.Select ? "cursor: pointer" : undefined,
+                        innerText: WOrtograficValidation.es(value)
+                    }));
                     tr.append(td);
                     break;
             }
@@ -390,20 +394,25 @@ class WTableComponent extends HTMLElement {
         }
     }
 
-    SelectBTN(element, Options) {
+    SelectBTN(element, Options, index) {
         if (this.Options?.Select != undefined && this.Options.Select == true) {
             let Checked = WArrayF.FindInArray(element, this.selectedItems);
             Options.append(WRender.Create({
                 tagName: "input",
                 class: "Btn",
-                type: "checkbox",
+                id: "select" + index,
+                type: this.Options.MultiSelect ? "checkbox" : "radio",
                 innerText: "Select",
+                name: "selectGrup",
                 checked: Checked,
                 onclick: async (ev) => {
                     const control = ev.target;
                     const index = this.selectedItems.indexOf(element);
                     if (index == -1 && control.checked == true) {
                         if (WArrayF.FindInArray(element, this.selectedItems) == false) {
+                            if (control.tagName == "radio") {
+                                this.selectedItems = [];
+                            }
                             this.selectedItems.push(element);
                         } else {
                             console.log("Item Existente");

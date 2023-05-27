@@ -6,6 +6,7 @@
      * @property {ElementStyle | String} [style]
      * @property {String} [className]
      * @property {String} [class]
+     * @property {String} [name]
      * @property {String} [htmlFor]
      * @property {Boolean} [selected]
      * @property {Boolean} [checked]
@@ -93,6 +94,7 @@ class ModelProperty { }
     * @property {String} [ImageUrlPath]
     * @property {Function} [SaveFunction]
     * @property {Function} [ValidateFunction]
+    * @property {HTMLStyleElement} [CustomStyle]
  **/
 class FormConfig { };
 
@@ -498,6 +500,7 @@ class ElementStyle {
     * @property {Boolean} [Add]
     * @property {Boolean} [Search]
     * @property {Boolean} [Select]
+    * @property {Boolean} [MultiSelect] funciona solo cuando select esta habilitado
     * @property {Array<Actions>} [UserActions]
     * @property {String} [UrlUpdate]
     * @property {String} [UrlAdd]
