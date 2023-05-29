@@ -62,7 +62,8 @@ function ModelFunction() { }
     CHECKBOX | TEXT | IMG | NUMBER | DATE | EMAIL | FILE | 
     TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | 
     CALENDAR | OPERATION (requiere un action para funcionar)
-    * @property {Boolean} [hidden]
+    * @property {Boolean} [hidden] desabilita la propiedad y la oculta
+    * @property {Boolean} [hiddenInTable] oculta en la tabla
     * @property {Boolean} [require]
     * @property {Boolean} [disabled]
     * @property {String} [label]
@@ -88,6 +89,7 @@ class ModelProperty { }
     * @property {Boolean} [DarkMode]
     * @property {Boolean} [AutoSave]
     * @property {Boolean} [DataRequire]
+    * @property {String} [id] 
     * @property {String} [StyleForm] - columnX1 | columnX3 | columnX3   
     * @property {String} [DivColumns] - columnX1 | columnX3 | columnX3  
     * @property {Boolean} [Options]
@@ -95,6 +97,7 @@ class ModelProperty { }
     * @property {String} [ImageUrlPath]
     * @property {Function} [SaveFunction]
     * @property {Function} [ValidateFunction]
+    * @property {Function} [ProxyAction]
     * @property {HTMLStyleElement} [CustomStyle]
  **/
 class FormConfig { };
@@ -501,6 +504,7 @@ class ElementStyle {
     * @property {Boolean} [Add]
     * @property {Boolean} [Search]
     * @property {Boolean} [Select]
+    * @property {Function} [SelectAction] requiere select en true
     * @property {Boolean} [MultiSelect] funciona solo cuando select esta habilitado
     * @property {Array<Actions>} [UserActions]
     * @property {String} [UrlUpdate]
@@ -528,6 +532,7 @@ class ElementStyle {
     * @property {Number} [maxElementByPage] 
     * @property {TableOptions} [Options]
     * @property {String} [ImageUrlPath]
+    * @property {String} [id]
     * @property {Function} [SaveFunction]
     * @property {String} [icon]   
     * @property {Function} [ValidateFunction]

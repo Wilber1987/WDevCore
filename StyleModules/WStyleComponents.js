@@ -213,16 +213,15 @@ const StylesControlsV2 = css`
         width: 100%;
         background-color: #f0f0f0 !important;
         border-radius: 55px;
-        padding: 10px 15px;
+        padding: 7px 10px;
         outline: none;
         border: none;
         line-height: 1;
         font-weight: 600 !important;
-        font-size: 14px !important;
+        font-size: 12px !important;
         color: #333 !important;
         box-sizing: border-box;
         cursor: pointer;
-        height: 40px;
         box-shadow: 0 0 5px #c1c1c1;
         display: block;
     }
@@ -255,6 +254,7 @@ const StylesControlsV3 = css`
         background-color: #5995fd;
         border: none;
         outline: none;
+        font-size: 12px;
         height: 35px;
         border-radius: 5px;
         color: #fff;

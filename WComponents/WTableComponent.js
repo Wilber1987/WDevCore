@@ -15,6 +15,9 @@ class WTableComponent extends HTMLElement {
      */
     constructor(Config) {
         super();
+        for (const p in Config) {
+            this[p] = Config[p];
+        }
         this.TableClass = "WTable WScroll";
         this.selectedItems = [];
         this.ModelObject = {};
@@ -63,7 +66,7 @@ class WTableComponent extends HTMLElement {
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
         this.Options = this.TableConfig?.Options;
-        if ((this.Dataset == undefined || this.Dataset == null || this.Dataset.length == 0) && this.AddItemsFromApi) {
+        if ((this.Dataset == undefined || this.Dataset == null ) && this.AddItemsFromApi) {
             if (isWithtUrl) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             } else if (isWithtModel) {
@@ -128,7 +131,8 @@ class WTableComponent extends HTMLElement {
         if (this.Options != undefined && (this.Options.Search != undefined || this.Options.Add != undefined)) {
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
-                    tagName: "input", class: "txtControl", type: "text", placeholder: "Buscar...",
+                    tagName: "input", class: "txtControl", type: "text",
+                    placeholder: "Buscar...", style: "margin: 10px 0px",
                     onchange: async (ev) => {
                         this.SearchFunction(ev);
                     }
@@ -136,7 +140,8 @@ class WTableComponent extends HTMLElement {
             }
             if (this.Options.Add == true) {
                 this.ThOptions.append(WRender.Create({
-                    tagName: "button", class: "BtnTableSR", type: "button", innerText: "Nuevo",
+                    tagName: "button", class: "BtnTableSR",
+                    type: "button", innerText: "Nuevo", style: "margin: 10px 0px",
                     onclick: async () => {
                         if (this.Options?.AddFunction != undefined)
                             this.Options.AddFunction();
@@ -331,7 +336,7 @@ class WTableComponent extends HTMLElement {
                 default:
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
-                        style: this.Options?.Select ? "cursor: pointer" : undefined,
+                        style: this.Options?.Select ? "cursor: pointer" : "",
                         innerText: WOrtograficValidation.es(value)
                     }));
                     tr.append(td);
@@ -405,12 +410,12 @@ class WTableComponent extends HTMLElement {
                 innerText: "Select",
                 name: "selectGrup",
                 checked: Checked,
-                onclick: async (ev) => {
+                onchange: async (ev) => {
                     const control = ev.target;
                     const index = this.selectedItems.indexOf(element);
                     if (index == -1 && control.checked == true) {
                         if (WArrayF.FindInArray(element, this.selectedItems) == false) {
-                            if (control.tagName == "radio") {
+                            if (control.type == "radio") {
                                 this.selectedItems = [];
                             }
                             this.selectedItems.push(element);
@@ -419,6 +424,9 @@ class WTableComponent extends HTMLElement {
                         }
                     } else {
                         this.selectedItems.splice(index, 1);
+                    }
+                    if (this.Options?.SelectAction != undefined) {
+                        this.Options.SelectAction(element, ev.target);
                     }
                 }
             }));
@@ -593,7 +601,7 @@ class WTableComponent extends HTMLElement {
                 font-family: Verdana, sans-serif;
                 width: 100%;
                 border-collapse: collapse;
-                font-size: 12px;
+                font-size: 10px;
                 border: 1px rgba(10, 10, 10, 0.2) solid;
                 position: relative;
             }
@@ -601,6 +609,7 @@ class WTableComponent extends HTMLElement {
             .WTable th {
                 text-align: left;
                 padding: 10px;
+                text-transform: capitalize;
             }
 
             .WTable th label::first-letter{
@@ -656,7 +665,6 @@ class WTableComponent extends HTMLElement {
             .thOptions {
                 display: flex;
                 overflow: hidden;
-                padding: 10px 0px;
                 justify-content: space-between;
             }
 

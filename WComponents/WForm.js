@@ -50,7 +50,7 @@ class WForm extends HTMLElement {
     #OriginalObject = {};
     DrawComponent = async () => {
         this.DarkMode = this.DarkMode ?? false;
-        this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
+
         if (this.Config.ObjectOptions == undefined) {
             this.Config.ObjectOptions = {
                 AddObject: false,
@@ -60,6 +60,7 @@ class WForm extends HTMLElement {
         this.FormObject = this.FormObject ?? this.Config.EditObject ?? {};
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const ObjectProxy = this.CreateProxy(Model);
+        this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
         this.DivForm.append(await this.CrudForm(ObjectProxy, this.Config.ObjectOptions));
         if (this.Options == true) {
             this.DivForm.append(await this.SaveOptions(ObjectProxy));
@@ -76,22 +77,28 @@ class WForm extends HTMLElement {
                 if (target.__proto__ == Array.prototype) {
                     console.log(target);
                 }
-                for (const prop in Model) {
-                    if (Model[prop]?.__proto__ == Object.prototype) {
-                        if (Model[prop].type?.toUpperCase() == "OPERATION") {
-                            target[prop] = Model[prop].action(this.FormObject, this);
-                            const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
-                            if (control) {
-                                control.innerHTML = target[prop];
-                            }
-                        }
-                    }
+                this.SetOperationValues(Model, target)
+                if (this.Config.ProxyAction != undefined) {
+                    this.Config.ProxyAction(this)
                 }
                 return true;
             }
         };
         const ObjectProxy = new Proxy(FormObject, ObjHandler);
         return ObjectProxy;
+    }
+    SetOperationValues = (Model = this.Config.ModelObject, target = this.FormObject) => {
+        for (const prop in Model) {
+            if (Model[prop]?.__proto__ == Object.prototype) {
+                if (Model[prop].type?.toUpperCase() == "OPERATION") {
+                    target[prop] = Model[prop].action(this.FormObject, this);
+                    const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
+                    if (control) {
+                        control.innerHTML = target[prop];
+                    }
+                }
+            }
+        }
     }
     CreateOriginalObject = (OriginalObject = this.#OriginalObject, FormObject = this.FormObject) => {
         for (const prop in FormObject) {
@@ -291,7 +298,7 @@ class WForm extends HTMLElement {
         let InputControl;
         ModelProperty.require = ModelProperty.require ?? true;
         const actionFunction = ModelProperty.action ?? null;
-        ObjectF[prop] = ObjectF[prop] ?? ModelProperty.defaultValue; 
+        ObjectF[prop] = ObjectF[prop] ?? ModelProperty.defaultValue;
         switch (ModelProperty.type?.toUpperCase()) {
             case "TITLE":
                 ModelProperty.require = false;
@@ -474,10 +481,10 @@ class WForm extends HTMLElement {
             case "DRAW":
                 InputControl = this.createDrawComponent(InputControl, prop, ControlContainer, ObjectF); break;
             case "TEXTAREA":
-                ControlContainer.classList.add("tableContainer");
+                ControlContainer.classList.add("textAreaContainer");
                 ControlContainer.style.height = "auto";
                 InputControl = WRender.Create({
-                    tagName: "textarea", style: { height: "100px", borderRadius: "10px" },
+                    tagName: "textarea", style: { height: "calc(100% - 12px)", borderRadius: "10px" },
                     className: prop, value: val, onchange: ModelProperty.disabled ? undefined : onChangeEvent,
                     disabled: ModelProperty.disabled
                 });
@@ -519,7 +526,6 @@ class WForm extends HTMLElement {
                 break;
             default:
                 val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
-                console.log( ModelProperty.defaultValue, val);
                 const placeholder = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 InputControl = WRender.Create({
                     tagName: "input",
@@ -549,7 +555,6 @@ class WForm extends HTMLElement {
                     },
                     innerText: action.name,
                     onclick: async () => {
-                        console.log(true);
                         action.action(ObjectF, this, InputControl, prop);
                     }
                 }))
@@ -909,7 +914,7 @@ class WForm extends HTMLElement {
             this.Config.SaveFunction(ObjectF);
         }
     }
-    Validate = (ObjectF) => {
+    Validate = (ObjectF = this.FormObject) => {
         if (this.DataRequire == true) {
             for (const prop in ObjectF) {
                 if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require) {
@@ -1070,6 +1075,10 @@ class WForm extends HTMLElement {
             .divForm .tableContainer {
                 grid-row: span 4;
             }
+            .divForm .textAreaContainer {
+                grid-row: span 2;
+
+            }
             input:-internal-autofill-selected {
                 appearance: menulist-button;
                 background-color: none !important;
@@ -1125,6 +1134,7 @@ class WForm extends HTMLElement {
                 text-align: left;
                 font-weight: bold;
                 margin: 0 0 10px 0;
+                font-size: 12px;
             }
             .password-container { 
                 display: grid;
@@ -1191,7 +1201,7 @@ class WForm extends HTMLElement {
                 padding: 5px 15px;
                 border-radius: 0.3cm;
                 left: 10px;
-                bottom: -20px;
+                bottom: -10px;
                 font-size: 10px;
                 font-weight: 500;
                 color: rgb(227, 0, 0);
@@ -1302,7 +1312,8 @@ class WForm extends HTMLElement {
             ClassList: [
                 new WCssClass(`.divForm`, {
                     "grid-template-columns": this.DivColumns
-                }), new WCssClass(` .divForm .imageGridForm,  .divForm .tableContainer, .imgPhoto`, {
+                }), new WCssClass(` .divForm .imageGridForm, .divForm .tableContainer,
+                 .divForm .textAreaContainer, .imgPhoto`, {
                     "grid-column": `span  ${this.limit}`,
                     "padding-bottom": 10
                 })

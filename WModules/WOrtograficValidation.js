@@ -57,8 +57,11 @@ class WOrtograficValidation {
         { error: ["CODIGO"], value: "código" },
         { error: ["TITULO"], value: "título" },
         { error: ["GENERO"], value: "género" },
-        { error: ["DESCRIPCION"], value: "descripción" }, 
+        { error: ["DESCRIPCION"], value: "descripción" },
+        { error: ["EMPENO"], value: "empeño" }, 
         { error: ["TRANSACCION", "Transaccion"], value: "transacción" },
+        { error: ["CORDOBAS", "CORDOBA"], value: "C$" },
+        { error: ["DOLARES", "DOLAR"], value: "$" },
     ]
 }
 export { WOrtograficValidation }
