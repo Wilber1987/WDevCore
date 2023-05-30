@@ -9,6 +9,7 @@ import { MultiSelect } from "./WMultiSelect.js";
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset    
     * @property {Function} FilterFunction
+    * @property {Boolean} Display
     *  @property {Object} [ModelObject]
 **/
 
@@ -23,6 +24,7 @@ class WFilterOptions extends HTMLElement {
         this.Dataset = Config.Dataset;
         this.FilterFunction = Config.FilterFunction;
         this.ModelObject = Config.ModelObject;
+        this.Display = Config.Display;
         this.FilterContainer = WRender.Create({ className: "filter-container" });
         /** @type {Array} */
         this.FilterControls = [];
@@ -37,7 +39,7 @@ class WFilterOptions extends HTMLElement {
     }
     DrawFilter = async () => {
         this.FilterContainer.innerHTML = "";
-        const ControlOptions = WRender.Create({ class: "OptionContainer" })
+        const ControlOptions = WRender.Create({ class: "OptionContainer " + (this.Display ? "OptionContainerActive" : "")})
         this.FilterContainer.append(WRender.Create({
             class: "options", children: [
                 { tagName: "label", innerText: "Filtros" },
@@ -125,8 +127,8 @@ class WFilterOptions extends HTMLElement {
         if (Model[prop] == null || prop == "FilterData") {
             return false;
         }
-        return (Model[prop].__proto__ = Object.prototype &&
-            (!Model[prop].primary || !Model[prop].hidden || !Model[prop].type))
+        return (Model[prop].__proto__ = Object.prototype && Model[prop].type && 
+            (!Model[prop].primary && !Model[prop].hidden && !Model[prop].hiddenFilter))
             && Model[prop].__proto__ != Function.prototype
             && Model[prop].__proto__.constructor.name != "AsyncFunction";
     }
