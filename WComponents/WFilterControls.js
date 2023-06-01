@@ -9,7 +9,7 @@ import { MultiSelect } from "./WMultiSelect.js";
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset    
     * @property {Function} FilterFunction
-    * @property {Boolean} Display
+    * @property {Boolean} [Display]
     *  @property {Object} [ModelObject]
 **/
 

@@ -66,7 +66,7 @@ class WTableComponent extends HTMLElement {
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
         this.Options = this.TableConfig?.Options;
-        if ((this.Dataset == undefined || this.Dataset == null ) && this.AddItemsFromApi) {
+        if ((this.Dataset == undefined || this.Dataset == null) && this.AddItemsFromApi) {
             if (isWithtUrl) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             } else if (isWithtModel) {
@@ -244,6 +244,21 @@ class WTableComponent extends HTMLElement {
             tr.append(WRender.createElement(Options));
         }
     }
+    SetOperationValues = (Model = this.TableConfig.ModelObject, Dataset = this.Dataset) => {
+        this.Dataset.forEach((target, index) => {
+            for (const prop in Model) {
+                if (Model[prop]?.__proto__ == Object.prototype) {
+                    if (Model[prop].type?.toUpperCase() == "OPERATION") {
+                       // target[prop] = Model[prop].action(target, this);
+                        const control = this.shadowRoot?.querySelector("#td_" + prop + "_" + index);
+                        if (control) {
+                            control.innerHTML = Model[prop].action(target, this);
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     IsDrawableRow(element, prop) {
         if (this.TableConfig.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
@@ -264,7 +279,7 @@ class WTableComponent extends HTMLElement {
 
     async EvalModelPrototype(Model, prop, tr, element, index) {
         let value = element[prop] != null && element[prop] != undefined ? element[prop] : "";
-        let td = WRender.Create({ tagName: "td" });
+        let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index  , class: "td_" + prop });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
@@ -331,6 +346,10 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "DATE": case "FECHA":
                     td.append(value.toString().toDateFormatEs());
+                    tr.append(td);
+                    break;
+                case "OPERATION":
+                    td.append(Model[prop].action(element));
                     tr.append(td);
                     break;
                 default:

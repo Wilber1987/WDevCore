@@ -1140,7 +1140,7 @@ class WForm extends HTMLElement {
                 display: grid;
                 gap: 20px;
                 grid-template-columns: calc(50% - 10px) calc(50% - 10px);
-                grid-columns: span 2;
+                grid-column: span 2;
             }
             
             .inputTitle::first-letter, .password-container label {
