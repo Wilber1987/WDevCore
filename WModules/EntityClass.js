@@ -44,13 +44,20 @@ class EntityClass {
             return (new this.constructor(FindObject));
         }
     }
+    /**
+     * 
+     * @returns {Object}
+     */
     Save = async () => {
-        await this.SaveData(this.ApiMethods.Set, this);
-        return true;
+        return await this.SaveData(this.ApiMethods.Set, this);
     }
+    /**
+     * 
+     * @returns {ResponseServices}
+     */
     Update = async () => {
-        await this.SaveData(this.ApiMethods.Update, this);
-        return true;
+        return await this.SaveData(this.ApiMethods.Update, this);
+        
     }
     /** CORE ########################################################## */
     /**
