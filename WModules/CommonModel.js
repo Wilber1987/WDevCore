@@ -55,6 +55,12 @@ class WNode {
     * @property {String} [Url]
     * @property {Function} [SaveFunction]
 **/
+/**
+ * @typedef {Object} ResponseServices 
+ *  * @property {int} [status]
+    * @property {String} [message]
+**/
+class ResponseServices {}
 function ModelFunction() { }
 /**
  * @typedef {Object} ModelProperty 
