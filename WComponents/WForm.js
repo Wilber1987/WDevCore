@@ -327,7 +327,9 @@ class WForm extends HTMLElement {
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, type: type,
                     placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
-                    disabled: ModelProperty.disabled
+                    disabled: ModelProperty.disabled,
+                    min: ModelProperty.min,
+                    max: ModelProperty.max,
                 });
                 //@ts-ignore
                 ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
@@ -532,6 +534,8 @@ class WForm extends HTMLElement {
                     className: prop,
                     value: val,
                     type: ModelProperty.type,
+                    min: ModelProperty.min,
+                    max: ModelProperty.max,
                     placeholder: placeholder,
                     onchange: ModelProperty.disabled ? undefined : onChangeEvent,
                     disabled: ModelProperty.disabled
