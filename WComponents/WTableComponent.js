@@ -348,8 +348,8 @@ class WTableComponent extends HTMLElement {
                     td.append(value.toString().toDateFormatEs());
                     tr.append(td);
                     break;
-                case "OPERATION":
-                    td.append(Model[prop].action(element));
+                case "OPERATION":                    
+                    td.append(element[prop] != null || element[prop] != undefined ? value.toString() : Model[prop].action(element));
                     tr.append(td);
                     break;
                 default:
