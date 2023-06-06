@@ -451,7 +451,7 @@ class WFilterOptions extends HTMLElement {
 
         .OptionContainer div {
             display: grid;
-            grid-template-rows: 30px 40px;
+            grid-template-rows: 30px auto;
             font-size: 12px;
         }
 
