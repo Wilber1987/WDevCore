@@ -133,7 +133,9 @@ class WForm extends HTMLElement {
         for (const prop in Model) {
             Model[prop] = Model[prop] != null ? Model[prop] : undefined;
             if (this.isNotDrawable(Model, prop)) {
-                ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;
+                if (!this.isMethod(Model, prop)) {
+                    ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;    
+                }                
             } else {
                 let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
                 //ObjectF[prop] = val;
@@ -195,6 +197,10 @@ class WForm extends HTMLElement {
             (Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
             || Model[prop]?.__proto__ == Function.prototype
             || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData";
+    }
+    isMethod(Model, prop) {
+        return Model[prop]?.__proto__ == Function.prototype
+            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "ApiMethods" || prop == "FilterData";
     }
     /**
     * 
