@@ -2,17 +2,24 @@ import { WSecurity } from "../WModules/WSecurity.js";
 import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { WIcons } from "../WModules/WIcons.js";
-class NavConfig {
-    Inicialize = false;
-    alignItems = "flex-end";
-    DisplayMode = "right";
-    Elements = null;
-    DarkMode = false;
-    Direction = "row";
-    NavStyle = "nav";
-}
+
+
+/**
+ * @typedef {Object} NavConfig 
+ *  * @property {Boolean} [Inicialize] 
+    * @property {String} [alignItems] flex-end
+    * @property {String} [DisplayMode] right
+    * @property {Array} [Elements]
+    * @property {Boolean} [DarkMode]
+    * @property {String} [Direction] row | column
+    * @property {String} [NavStyle] nav | tab
+**/
 class WAppNavigator extends HTMLElement {
-    constructor(Config = (new NavConfig())) {
+    /**
+     * 
+     * @param {NavConfig} Config 
+     */
+    constructor(Config) {
         super();
         this.attachShadow({ mode: "open" });
         this.Config = Config;

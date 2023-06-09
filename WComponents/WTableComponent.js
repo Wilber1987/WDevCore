@@ -236,6 +236,9 @@ class WTableComponent extends HTMLElement {
                         value: Action.name,
                         onclick: async (ev) => {
                             Action.action(element, ev.target);
+                            if (this.Options?.DeleteAction) {
+                                this.Options?.DeleteAction(element)
+                            }
                         }
 
                     }))

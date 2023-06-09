@@ -609,6 +609,12 @@ class WArrayF {
         }
         return Maxvalue;
     }
+    /**
+     * 
+     * @param {*} DataArry 
+     * @param {*} EvalValue 
+     * @returns {Number}
+     */
     static SumValAtt(DataArry, EvalValue) {//retorna la suma 
         var Maxvalue = 0;
         for (let index = 0; index < DataArry.length; index++) {
@@ -676,10 +682,10 @@ class WArrayF {
         });
     }
     static evalValue = (element, param) => {
-        const evalF = (parametro, objetoEvaluado) => {            
-            if (parametro.__proto__ == Object.prototype || parametro.__proto__.__proto__ == EntityClass.prototype) { 
+        const evalF = (parametro, objetoEvaluado) => {
+            if (parametro.__proto__ == Object.prototype || parametro.__proto__.__proto__ == EntityClass.prototype) {
                 if (this.compareObj(objetoEvaluado, parametro)) return objetoEvaluado;
-            } else if (parametro.__proto__ == Array.prototype) {               
+            } else if (parametro.__proto__ == Array.prototype) {
                 const find = parametro.find(x => WArrayF.compareObj(objetoEvaluado, x));
                 if (find == undefined) {
                     flagObj = false;
@@ -819,6 +825,16 @@ Date.prototype.toISO = function () {
       ':' + pad(this.getUTCSeconds()) +
       '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
       'Z' */;
+};
+/**
+ * 
+ * @param {Integer} month 
+ * @returns {Date}
+ */
+Date.prototype.addMonth = function (month) {
+    return new Date(this.getUTCFullYear() +
+        '-' + (pad(this.getUTCMonth() + 1) + month) +
+        '-' + pad(this.getUTCDate()));
 };
 String.prototype.toDateFormatEs = function () {
     if (this == null || this == undefined || this == "") return "";

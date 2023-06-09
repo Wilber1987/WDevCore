@@ -316,7 +316,9 @@ class ElementStyle {
  *  * @property {Boolean} [AddObject]
     * @property {Boolean} [Show]
     * @property {Boolean} [Edit]
+    * @property {Function} [EditAction] requiere Edit en true, recibe como parametro el elemnto
     * @property {Boolean} [Delete]
+    * @property {Function} [DeleteAction] requiere Delete en true, recibe como parametro el elemnto
     * @property {Boolean} [Add]
     * @property {Boolean} [Search]
     * @property {Boolean} [Select]
@@ -352,7 +354,7 @@ class ElementStyle {
     * @property {Function} [SaveFunction]
     * @property {String} [icon]   
     * @property {Function} [ValidateFunction]
-    * @property {HTMLStyleElement} [CustomStyle]
+    * @property {HTMLStyleElement} [CustomStyle] 
  **/
 class TableConfig { };
 /**
@@ -373,6 +375,7 @@ class TableConfig { };
     * @property {Function} [ValidateFunction]
     * @property {Object | WNode | Node} [ObjectModal]
     * @property {Boolean} [CloseOption]
+    * @property {Function} [ProxyAction]
  **/
 class ModalConfig {
     // ModelObject = {
