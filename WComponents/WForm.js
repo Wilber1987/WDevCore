@@ -46,11 +46,11 @@ class WForm extends HTMLElement {
         this.DrawComponent();
         this.ExistChange = false;
         this.ObjectProxy = this.ObjectProxy ?? undefined;
+        this.CreateOriginalObject();
     }
     #OriginalObject = {};
     DrawComponent = async () => {
         this.DarkMode = this.DarkMode ?? false;
-
         if (this.Config.ObjectOptions == undefined) {
             this.Config.ObjectOptions = {
                 AddObject: false,
@@ -65,7 +65,6 @@ class WForm extends HTMLElement {
         if (this.Options == true) {
             this.DivForm.append(await this.SaveOptions(ObjectProxy));
         }
-        this.CreateOriginalObject();
     }
     CreateProxy(Model, FormObject = this.FormObject) {
         const ObjHandler = {
@@ -134,8 +133,8 @@ class WForm extends HTMLElement {
             Model[prop] = Model[prop] != null ? Model[prop] : undefined;
             if (this.isNotDrawable(Model, prop)) {
                 if (!this.isMethod(Model, prop)) {
-                    ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;    
-                }                
+                    ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;
+                }
             } else {
                 let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
                 //ObjectF[prop] = val;
@@ -978,6 +977,7 @@ class WForm extends HTMLElement {
                 }
             }
         }
+        console.log(JSON.stringify(this.#OriginalObject), JSON.stringify(ObjectF));
         if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
             this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
             return false;

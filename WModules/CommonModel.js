@@ -13,7 +13,9 @@
      * @property {Boolean} [multiple]
      * @property {Boolean} [disabled]
      * @property {String} [src]
-     * @property {String} [innerText]     
+     * @property {String} [innerText]    
+     * @property {String | Number} [min]
+     * @property {String | Number} [max]   
      * @property {String | Number} [value]
      * @property {String} [innerHTML]
      * @property {String} [placeholder]
@@ -78,6 +80,8 @@ function ModelFunction() { }
     * @property {String} [pattern]
     * @property {String} [defaultValue]
     * @property {String} [placeholder]
+    * @property {String | Number} [min] para rangos de tipo number y date
+    * @property {String | Number} [max] para rangos de tipo number y date
     * @property {String} [fieldRequire] CAMBIA UN ESTADO DE UNA PROPIEDAD A REQUERIDO
     * @property {Object | EntityClass | ModelFunction} [ModelObject]
     * @property {Array} [Dataset]

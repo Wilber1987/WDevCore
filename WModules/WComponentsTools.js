@@ -828,14 +828,35 @@ Date.prototype.toISO = function () {
 };
 /**
  * 
+ * @param {Integer} days 
+ * @returns {Date}
+ */
+Date.prototype.addDays = function (days) {
+    return this.setDate(this.getDate() + days);
+};
+/**
+ * 
+ * @param {Integer} days 
+ * @returns {Date}
+ */
+Date.prototype.subtractDays = function (days) {
+    return this.setDate(this.getDate() - days);
+};
+/**
+ * 
  * @param {Integer} month 
  * @returns {Date}
  */
-Date.prototype.addMonth = function (month) {
-    return new Date(this.getUTCFullYear() +
-        '-' + (pad(this.getUTCMonth() + 1) + month) +
-        '-' + pad(this.getUTCDate()));
-};
+Date.prototype.modifyMonth = function(meses) {  
+    const fecha = new Date(this.toString()); //¡se hace esto para no modificar la fecha original!
+    const mes = fecha.getMonth();
+    fecha.setMonth(fecha.getMonth() + meses);
+    while (fecha.getMonth() === mes) {
+        fecha.setDate(fecha.getDate() - 1);
+    }
+    return fecha;
+}
+
 String.prototype.toDateFormatEs = function () {
     if (this == null || this == undefined || this == "") return "";
     const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -846,10 +867,16 @@ String.prototype.toDateFormatEs = function () {
         + ' de ' + meses[fecha.getMonth()]
         + ' de ' + fecha.getUTCFullYear();
 };
+
+
+
 String.prototype.toDateTimeFormatEs = function () {
     const fecha = new Date(this);
     return this.toDateFormatEs() + ' hora ' + pad(fecha.getUTCHours()) + ':' + pad(fecha.getUTCMinutes());
 };
+
+
+
 /**
  * @param {ElementStyle} Style Estilos del HTMLElement
  */
