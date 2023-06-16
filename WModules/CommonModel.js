@@ -367,7 +367,7 @@ class TableConfig { };
     * @property {String} [icon]
     * @property {String} [title]  
     * @property {Boolean} [HeadOptions]    
-    * @property {String} [StyleForm]   
+    * @property {String} [StyleForm]   columnX1 | columnX3 | columnX3
     * @property {String} [ImageUrlPath] 
     * @property {Object} [ModelObject]
     * @property {Object} [ObjectDetail]

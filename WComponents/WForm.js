@@ -254,7 +254,7 @@ class WForm extends HTMLElement {
                 }
             }
         } else if (targetControl?.type == "checkbox" || targetControl?.type == "radio") {
-            ObjectF[prop] = targetControl?.checked;
+            ObjectF[prop] = targetControl?.value;
         } else {
             ObjectF[prop] = targetControl?.value;
             if (targetControl?.pattern) {
@@ -400,8 +400,9 @@ class WForm extends HTMLElement {
                 InputControl = WRender.Create({
                     tagName: "input",
                     className: prop, value: val, type: ModelProperty.type,
-                    placeholder: "Ejem.: +54-88888888",
-                    pattern: "[+]{1}[0-9]{2,3}[-]{1}[0-9]{3,4}[0-9]{4,5}",
+                    placeholder: "Ejem.: 88888888",
+                    //pattern: "[+]{1}[0-9]{2,3}[-]{1}[0-9]{3,4}[0-9]{4,5}",
+                    pattern: "[0-9]{4}[0-9]{4}",
                     onchange: ModelProperty.disabled ? undefined : onChangeEvent,
                     disabled: ModelProperty.disabled
                 });
@@ -476,7 +477,7 @@ class WForm extends HTMLElement {
                 ControlLabel.htmlFor = "ControlValue" + prop;
                 ControlLabel.className += " radioCheckedLabel";
                 InputControl = WRender.Create({
-                    className: "radio-grup-container",
+                    className: "radio-group-container",
                     id: "ControlValue" + prop,
                     children: ModelProperty.Dataset?.map(radioElement => {
                         return WRender.Create({
@@ -488,7 +489,8 @@ class WForm extends HTMLElement {
                                     id: radioElement + "Radio" + prop,
                                     className: prop,
                                     name: prop,
-                                    value: val,
+                                    checked: val == radioElement,
+                                    value: radioElement,
                                     onchange: ModelProperty.disabled ? undefined : onChangeEvent,
                                     type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
                                     disabled: ModelProperty.disabled
@@ -507,6 +509,7 @@ class WForm extends HTMLElement {
                     id: "ControlValue" + prop,
                     className: prop,
                     value: val,
+                    checked: val != null || val != undefined,
                     onchange: ModelProperty.disabled ? undefined : onChangeEvent,
                     type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
                     disabled: ModelProperty.disabled
@@ -1328,6 +1331,61 @@ class WForm extends HTMLElement {
                 width: 16px;
                 filter: invert(1);
                 margin-left: 10px;
+            }
+
+            .radio-group-container {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+
+            .radio-group-container label {
+                cursor: pointer;
+            }
+
+            .radio-element {
+                display: flex;
+                flex-direction: row-reverse;
+                margin: 5px;
+                align-items: center;
+            }
+            .radio-element input {
+                margin: 0px;
+                margin-right: 10px;
+            }
+
+            input[type=radio] {
+                cursor: pointer;
+                appearance: none;
+                background-color: #fff;
+                border-radius: 50%;
+                font: inherit;
+                color: currentColor;
+                width: 1.15em;
+                height: 1.15em;
+                border: 0.15em solid #999;
+                display: grid;
+                place-content: center;
+            }
+
+            input[type=radio]::before {
+                content: "";
+                width: 0.65em;
+                height: 0.65em;
+                transform: scale(0);
+                transition: 120ms transform ease-in-out;
+                box-shadow: inset 1em 1em var(--form-control-color);
+                transform-origin: bottom left;
+                clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            }
+
+            input[type=radio]:checked::before {
+                content: " ";
+                background-color: cornflowerblue;
+                transform: scale(1);
             }
 
             @media (max-width: 800px) {
