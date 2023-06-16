@@ -253,7 +253,7 @@ class WForm extends HTMLElement {
                     }, 1000);
                 }
             }
-        } else if (targetControl?.type == "radio" || targetControl?.type == "checkbox") {
+        } else if (targetControl?.type == "checkbox" || targetControl?.type == "radio") {
             ObjectF[prop] = targetControl?.checked;
         } else {
             ObjectF[prop] = targetControl?.value;
@@ -471,7 +471,34 @@ class WForm extends HTMLElement {
                 // @ts-ignore
                 if (ModelProperty.fileType) InputControl.accept = ModelProperty.fileType.map(x => "." + x).join(",")
                 break;
-            case "RADIO": case "CHECKBOX":
+            case "RADIO":
+                //ControlContainer.className += " radioCheckedControl";
+                ControlLabel.htmlFor = "ControlValue" + prop;
+                ControlLabel.className += " radioCheckedLabel";
+                InputControl = WRender.Create({
+                    className: "radio-grup-container",
+                    id: "ControlValue" + prop,
+                    children: ModelProperty.Dataset?.map(radioElement => {
+                        return WRender.Create({
+                            className: "radio-element", children: [
+                                {
+                                    tagName: 'label', htmlFor: radioElement + "Radio" + prop, innerText: radioElement
+                                }, {
+                                    tagName: "input",
+                                    id: radioElement + "Radio" + prop,
+                                    className: prop,
+                                    name: prop,
+                                    value: val,
+                                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                                    type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
+                                    disabled: ModelProperty.disabled
+                                }
+                            ]
+                        })
+                    })
+                });
+                break;
+            case "CHECKBOX":
                 ControlContainer.className += " radioCheckedControl";
                 ControlLabel.htmlFor = "ControlValue" + prop;
                 ControlLabel.className += " radioCheckedLabel";
@@ -971,6 +998,15 @@ class WForm extends HTMLElement {
                         let regex = new RegExp(control.pattern);
                         if (!regex.test(ObjectF[prop])) {
                             this.createAlertToolTip(control, `Ingresar formato correcto: ${control.placeholder}`);
+                            return false;
+                        }
+                    } else if (control != null && control.type?.toString().toUpperCase() == "NUMBER") {
+                        if (parseFloat(control.value) < parseFloat(control.min)) {
+                            this.createAlertToolTip(control, `El valor mínimo permitido es: ${control.min}`);
+                            return false;
+                        }
+                        if (parseFloat(control.value) > parseFloat(control.max)) {
+                            this.createAlertToolTip(control, `El valor máximo permitido es: ${control.max}`);
                             return false;
                         }
                     }

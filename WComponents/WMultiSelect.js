@@ -247,6 +247,7 @@ class WToolTip extends HTMLElement {
                 box-shadow: 0 0 5px rgb(0 0 0 / 50%);
                 transition: all .1s;
                 max-height: 0px;
+                min-width: 400px;
                 background-color: #fff;
                 overflow: hidden;               
             }
@@ -277,7 +278,6 @@ const MainMenu = css`
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        min-height: 40px;
         cursor: pointer;
         height: 100%;
     }
@@ -285,7 +285,7 @@ const MainMenu = css`
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        min-height: 40px;
+        min-height: 33px;
         width: calc(100% - 30px);
         overflow-x: auto;
     } 

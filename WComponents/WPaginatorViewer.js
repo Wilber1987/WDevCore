@@ -112,7 +112,10 @@ class WPaginatorViewer extends HTMLElement {
 
         });
         if (pages.length == 0) {
-            pages.push(WRender.Create({ tagName: "h5", innerText: "No hay elementos que mostrar" }));
+            pages.push(WRender.Create({ 
+                type: "h5", style: { padding: "20px" },
+                innerText: "No hay elementos que mostrar"
+            }));
         }
         return pages;
     }
@@ -254,7 +257,6 @@ class WPaginatorViewer extends HTMLElement {
                 border-collapse: collapse;
                 font-size: 12px;
                 border: 1px rgba(10, 10, 10, 0.2) solid;
-                position: relative;
             }
 
             .WTable th {

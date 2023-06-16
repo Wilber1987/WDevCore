@@ -206,7 +206,10 @@ class WTableComponent extends HTMLElement {
             }
         });
         if (tbodys[0].children.length == 0) {
-            tbodys[page].append(WRender.Create({ type: "h5", innerText: "No hay elementos que mostrar" }));
+            tbodys[page].append(WRender.Create({
+                type: "h5", style: { padding: "20px" },
+                innerText: "No hay elementos que mostrar"
+            }));
         }
         this.shadowRoot?.append(WRender.createElement(this.MediaStyleResponsive()));
         return tbodys;
@@ -252,7 +255,7 @@ class WTableComponent extends HTMLElement {
             for (const prop in Model) {
                 if (Model[prop]?.__proto__ == Object.prototype) {
                     if (Model[prop].type?.toUpperCase() == "OPERATION") {
-                       // target[prop] = Model[prop].action(target, this);
+                        // target[prop] = Model[prop].action(target, this);
                         const control = this.shadowRoot?.querySelector("#td_" + prop + "_" + index);
                         if (control) {
                             control.innerHTML = Model[prop].action(target, this);
@@ -282,7 +285,7 @@ class WTableComponent extends HTMLElement {
 
     async EvalModelPrototype(Model, prop, tr, element, index) {
         let value = element[prop] != null && element[prop] != undefined ? element[prop] : "";
-        let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index  , class: "td_" + prop });
+        let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index, class: "td_" + prop });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":
@@ -351,7 +354,7 @@ class WTableComponent extends HTMLElement {
                     td.append(value.toString().toDateFormatEs());
                     tr.append(td);
                     break;
-                case "OPERATION":                    
+                case "OPERATION":
                     td.append(element[prop] != null || element[prop] != undefined ? value.toString() : Model[prop].action(element));
                     tr.append(td);
                     break;
@@ -625,7 +628,6 @@ class WTableComponent extends HTMLElement {
                 border-collapse: collapse;
                 font-size: 10px;
                 border: 1px rgba(10, 10, 10, 0.2) solid;
-                position: relative;
             }
 
             .WTable th {

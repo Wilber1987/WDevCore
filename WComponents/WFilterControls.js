@@ -90,7 +90,7 @@ class WFilterOptions extends HTMLElement {
     CreateModelControl = async (Model, prop, Dataset) => {
         const ModelProperty = Model[prop];
         switch (ModelProperty.type?.toUpperCase()) {
-            case "TEXT": case "EMAIL": case "EMAIL": case "TEL": case "URL":
+            case "TEXT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
                 return this.CreateTextControl(prop);
             case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                 break;
@@ -142,7 +142,7 @@ class WFilterOptions extends HTMLElement {
                     let filterType;
                     const ModelProperty = this.ModelObject[control.id];
                     switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL":
+                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
                             if (control.value != null && control.value != undefined && control.value != "") {
                                 filterType = "LIKE"
                                 values = [control.value];
@@ -458,7 +458,7 @@ class WFilterOptions extends HTMLElement {
         .OptionContainer input,
         .OptionContainer select {
             margin: 0px;
-            padding: 5px 10px;
+            padding: 10px;
         }
 
         .multi-control-container {

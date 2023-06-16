@@ -213,7 +213,7 @@ const StylesControlsV2 = css`
         width: 100%;
         background-color: #f0f0f0 !important;
         border-radius: 55px;
-        padding: 7px 10px;
+        padding: 10px;
         outline: none;
         border: none;
         line-height: 1;
