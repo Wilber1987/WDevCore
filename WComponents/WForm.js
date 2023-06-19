@@ -781,7 +781,7 @@ class WForm extends HTMLElement {
             ModelObject: this.Config.ModelObject[prop].ModelObject,
             action: (ItemSelects) => {
                 ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_
-                    ?? ItemSelects[0][this.findKey(ItemSelects[0])] ?? ItemSelects[0];
+                    ?? ItemSelects[0];
                 /**
                 * @type {ModelProperty}
                 */
@@ -1016,7 +1016,7 @@ class WForm extends HTMLElement {
                 }
             }
         }
-        console.log(JSON.stringify(this.#OriginalObject), JSON.stringify(ObjectF));
+        //console.log(JSON.stringify(this.#OriginalObject), JSON.stringify(ObjectF));
         if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
             this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
             return false;

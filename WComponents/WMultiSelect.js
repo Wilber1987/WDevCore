@@ -247,7 +247,6 @@ class WToolTip extends HTMLElement {
                 box-shadow: 0 0 5px rgb(0 0 0 / 50%);
                 transition: all .1s;
                 max-height: 0px;
-                min-width: 400px;
                 background-color: #fff;
                 overflow: hidden;               
             }
