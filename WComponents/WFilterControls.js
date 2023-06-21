@@ -30,7 +30,7 @@ class WFilterOptions extends HTMLElement {
         this.FilterControls = [];
         this.attachShadow({ mode: "open" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
-        this.shadowRoot?.append(StylesControlsV2.cloneNode(true);
+        this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         this.shadowRoot?.append(WRender.createElement(this.styles));
         this.shadowRoot?.append(this.FilterContainer);
         this.DrawFilter();
