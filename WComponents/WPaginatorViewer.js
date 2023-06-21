@@ -45,7 +45,7 @@ class WPaginatorViewer extends HTMLElement {
         if (this.innerHTML != "") {
             return;
         }
-        this.append(WRender.createElement(this.PaginateTOptionsStyle()), StylesControlsV2.cloneNode(true));
+        this.append(WRender.createElement(this.PaginateTOptionsStyle()), StylesControlsV2.cloneNode(true);
         this.append(WRender.createElement(this.PaginatorStyle()));
         this.container = WRender.Create({ class: "paginator-container", id: "MainBody" });
         this.append(WRender.createElement(this.DrawHeadOptions()))

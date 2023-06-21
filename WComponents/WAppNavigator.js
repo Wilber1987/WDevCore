@@ -257,11 +257,13 @@ class WAppNavigator extends HTMLElement {
                         "padding-left": "10px",
                         "max-height": "1000px",
                         display: "flex",
-                        "flex-direction": "column"
+                        "flex-direction": "column",
+                        margin: "10px 0px"
                     }), new WCssClass(`.DisplayMenu a`, {
                         "text-decoration": "none",
                         color: "#8e8e8e",
                         padding: 10,
+                        "font-size": 12,
                         "margin-bottom": 10,
                         "border-radius": 5,
                         "background-color": this.DarkMode ? "rgb(0,0,0,50%)" : "rgb(0,0,0,10%)",
