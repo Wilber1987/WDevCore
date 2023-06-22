@@ -239,9 +239,6 @@ class WTableComponent extends HTMLElement {
                         value: Action.name,
                         onclick: async (ev) => {
                             Action.action(element, ev.target);
-                            if (this.Options?.DeleteAction) {
-                                this.Options?.DeleteAction(element)
-                            }
                         }
 
                     }))
@@ -384,7 +381,10 @@ class WTableComponent extends HTMLElement {
                         const index = this.Dataset.indexOf(element);
                         if (WArrayF.FindInArray(element, this.Dataset) == true) {
                             this.Dataset.splice(index, 1);
-                            //tr.parentNode.removeChild(tr);
+                            //tr.parentNode.removeChild(tr);                                                  
+                            if (this.Options?.DeleteAction) {
+                                this.Options?.DeleteAction(element)
+                            }
                             this.DrawTable();
                         } else { console.log("No Object"); }
                     }, "¿Esta seguro de eliminar este elemento?"));
@@ -712,6 +712,37 @@ class WTableComponent extends HTMLElement {
                 cursor: pointer;
                 width: calc(100% - 0px);
                 height: initial;
+            }
+
+            input[type=radio] {
+                cursor: pointer;
+                appearance: none;
+                background-color: #fff;
+                border-radius: 50%;
+                font: inherit;
+                color: currentColor;
+                width: 15px;
+                height: 15px;
+                border: 0.15em solid #999;
+                display: grid;
+                place-content: center;
+            }
+
+            input[type=radio]::before {
+                content: "";
+                width: 10px;
+                height: 10px;
+                transform: scale(0);
+                transition: 120ms transform ease-in-out;
+                box-shadow: inset 1em 1em var(--form-control-color);
+                transform-origin: bottom left;
+                clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            }
+
+            input[type=radio]:checked::before {
+                content: " ";
+                background-color: cornflowerblue;
+                transform: scale(1);
             }
 
             @media (max-width: 600px) {

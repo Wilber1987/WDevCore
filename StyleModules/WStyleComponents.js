@@ -249,13 +249,15 @@ const StylesControlsV3 = css`
     .Block-Primary,
     .Block-Success,
     .Block-Secundary,
-    .Block-Basic {
+    .Block-Tertiary,
+    .Block-Fourth,
+    .Block-Fifth ,
+    .Block-Basic  {
         min-width: 100px;
         background-color: #5995fd;
         border: none;
         outline: none;
-        font-size: 12px;
-        height: 35px;
+        font-size: 11px;
         border-radius: 5px;
         color: #fff;
         text-transform: uppercase;
@@ -268,26 +270,40 @@ const StylesControlsV3 = css`
         max-width: 250px;
         text-align: left;
     }
-
-    .Block-Primary {
-        color: #fff;
-        background-color: #007bff;
-    }
-
-    .Block-Alert {
-        color: #fff;
-        background-color: #dc3545;
-    }
-
     .Block-Success {
         color: #fff;
         background-color: #28a745;
+    }
+
+    .Block-Primary {
+        color: #fff;
+        background-color: #094d95;
     }
 
     .Block-Secundary {
         color: #fff;
         background-color: #17a2b8;
     }  
+
+    .Block-Tertiary {
+        color: #fff;
+        background-color: rgb(156, 39, 176);
+    } 
+
+    .Block-Fourth {
+        color: #fff;
+        background-color: rgb(0, 191, 165);
+    } 
+
+    .Block-Fifth {
+        color: #fff;
+        background-color: rgb(249, 115, 22);
+    } 
+
+    .Block-Alert {
+        color: #fff;
+        background-color: #dc3545;
+    }
 `
 const basicButtons = css`      
         .btn {
@@ -329,4 +345,4 @@ const basicButtons = css`
 `
 //#endregion  #################################################################################################
 
-export { StyleScrolls, StylesControlsV1, StylesControlsV2 , StylesControlsV3, basicButtons }
+export { StyleScrolls, StylesControlsV1, StylesControlsV2, StylesControlsV3, basicButtons }

@@ -77,6 +77,10 @@ class WForm extends HTMLElement {
                     console.log(target);
                 }
                 this.SetOperationValues(Model, target)
+                const control = this.shadowRoot?.querySelector("#ControlValue" + property);
+                if (control) {
+                    control.value = target[property];
+                }
                 if (this.Config.ProxyAction != undefined) {
                     this.Config.ProxyAction(this)
                 }
