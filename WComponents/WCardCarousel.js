@@ -138,7 +138,7 @@ class WCard extends HTMLElement {
         //console.log( element.picture);
         const Figure = WRender.createElement({
             type: 'img',
-            props: { class: 'fotoColaborador', src: (url != undefined ? url + "/" : cadenaB64) + element.picture }
+            props: { class: 'fotoColaborador', src:  element.picture }
         });
         this.ActionFunction = ActionFunction;
         switch (CardType) {

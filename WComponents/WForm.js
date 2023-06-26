@@ -433,6 +433,7 @@ class WForm extends HTMLElement {
                     AddItemsFromApi: false,
                     ModelObject: masterDetailModel,
                     ParentModel: Model,
+                    ImageUrlPath: this.Config.ImageUrlPath,
                     Options: {
                         Add: true, Edit: true, Delete: true, Search: true
                     }
