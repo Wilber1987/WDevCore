@@ -82,6 +82,8 @@ const StylesControlsV1 = {
                 "box-sizing": "border-box",
                 "border-radius": 10,
                 cursor: "pointer"
+            }), new WCssClass(`input[type=color]`, {
+                padding: 5
             }), new WCssClass(`input:active, input:focus, select:active, select:focus`, {
                 "border-bottom": "2px solid #0099cc",
                 outline: "none",
@@ -224,6 +226,9 @@ const StylesControlsV2 = css`
         cursor: pointer;
         box-shadow: 0 0 5px #c1c1c1;
         display: block;
+    }
+    input[type=color] {
+        padding: 5px;
     }
     input:disabled {
         background-color: #e3e3e3 !important;

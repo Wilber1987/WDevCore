@@ -462,6 +462,7 @@ class WCalendarComponent extends HTMLElement {
             action: async (DateParam) => {
                 const IdDetailDay = `DetailDay${DateParam.date}`;
                 const response = await this.CalendarFunction();
+                
                 this.CalendarManager.NavigateFunction(
                     IdDetailDay,
                     new DetailDayClass({

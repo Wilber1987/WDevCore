@@ -62,7 +62,7 @@ class WNode {
  *  * @property {int} [status]
     * @property {String} [message]
 **/
-class ResponseServices {}
+class ResponseServices { }
 function ModelFunction() { }
 /**
  * @typedef {Object} ModelProperty 
@@ -84,9 +84,12 @@ function ModelFunction() { }
     * @property {String | Number} [max] para rangos de tipo number y date
     * @property {String} [fieldRequire] CAMBIA UN ESTADO DE UNA PROPIEDAD A REQUERIDO
     * @property {Object | EntityClass | ModelFunction} [ModelObject]
+    * @property { EntityClass | ModelFunction} [EntityModel]
     * @property {Array} [Dataset]
     * @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
     * @property {Function} [CalendarFunction] (obj) => {  }
+    * @property {String} [SelfChargeDataset] Si es un WSELECT con el valor de esta propiedad puede usar datos para llenar el desplegable a partir de la entidad padre, es funcional para relaciones recursivas dentro de un master detail
+
 **/
 class ModelProperty { }
 /**
@@ -94,8 +97,10 @@ class ModelProperty { }
  *  * @property {Object} [ObjectDetail]
     * @property {Object} [EditObject]
     * @property {Object} [ParentModel]
+    * @property {Object} [ParentEntity]
     * @property {Object} [UserActions]
-    * @property {Object} [ModelObject]    
+    * @property {Object} [ModelObject]
+    * @property {Object} [EntityModel]     
     * @property {Boolean} [DarkMode]
     * @property {Boolean} [AutoSave]
     * @property {Boolean} [DataRequire]
@@ -109,7 +114,7 @@ class ModelProperty { }
     * @property {Function} [ValidateFunction]
     * @property {Function} [ProxyAction]
     * @property {HTMLStyleElement} [CustomStyle]
- **/
+    **/
 class FormConfig { };
 
 /**
@@ -308,7 +313,7 @@ class FormConfig { };
      * @property {?String | undefined} [gridGap]
      */
 class ElementStyle {
-    
+
 }
 /**
  * @typedef {Object} Actions 
@@ -331,6 +336,7 @@ class ElementStyle {
     * @property {Array<Actions>} [UserActions]
     * @property {String} [UrlUpdate]
     * @property {String} [UrlAdd]
+    * @property {String} [UrlDelete]
     * @property {String} [UrlSearch]
     * @property {Function} [AddFunction]
 **/
@@ -341,10 +347,12 @@ class ElementStyle {
  * **/
 /**
  * @typedef {Object} TableConfig 
- *  * @property {Array} Dataset
+ *  * @property {Array} [Dataset]
     * @property {Array} [selectedItems]
     * @property {Object} [ModelObject]  
-    * @property {Object} [ParentModel]    
+    * @property {Object} [EntityModel] 
+    * @property {Object} [ParentModel]  
+    * @property {Object} [ParentEntity]
     * @property {Boolean} [DarkMode]
     * @property {Boolean} [paginate]
     * @property {Boolean} [AddItemsFromApi]
@@ -369,15 +377,17 @@ class TableConfig { };
     * @property {Boolean} [HeadOptions]    
     * @property {String} [StyleForm]   columnX1 | columnX3 | columnX3
     * @property {String} [ImageUrlPath] 
-    * @property {Object} [ModelObject]
+    * @property {Object} [ModelObject] 
+    * @property {Object} [EntityModel] 
     * @property {Object} [ObjectDetail]
     * @property {Object} [EditObject] 
-    * @property {Object} [ParentModel]     
+    * @property {Object} [ParentModel]  
+    * @property {Object} [ParentEntity]   
     * @property {Array} [UserActions] 
-    * @property {ObjectOptions} [ObjectOptions]
+    * @property {ObjectOptions} [ObjectOptions] //recibe las opcions del formulario incluido el SaveFunction si esque existiera alguna
     * @property {Boolean} [AutoSave]
     * @property {Function} [ValidateFunction]
-    * @property {Object | WNode | Node} [ObjectModal]
+    * @property {Object | WNode | Node} [ObjectModal] nodo o componente html que se dibujara dentro del modal
     * @property {Boolean} [CloseOption]
     * @property {Function} [ProxyAction]
  **/
@@ -397,7 +407,7 @@ class ModalConfig {
     * @property {String} [FilterType]
     * @property {Array<any>} [Values]
 **/
-class FilterData {}
+class FilterData { }
 
 export {
     WNode,

@@ -5,7 +5,6 @@ import { ComponentsManager, WAjaxTools, WArrayF, WRender } from "./WComponentsTo
 class WSecurity {
     constructor() {
         WSecurity.Authenticate = true;
-        console.log(WSecurity.UserData);
         WAjaxTools.PostRequest(WSecurity.urlVerification).then((result) => {
             if (result == false) {
                 console.log("no auth");
@@ -25,7 +24,7 @@ class WSecurity {
     static urlLogOut = WSecurity.Path + "/api/Security/LogOut";
 
     static UserData = localStorage.getItem(WSecurity.urlLogIn) != null ?
-        localStorage.getItem(WSecurity.urlLogIn) : {
+        JSON.parse(localStorage.getItem(WSecurity.urlLogIn)) : {
             success: false,
             mail: "null",
             nickname: "null",
@@ -49,10 +48,10 @@ class WSecurity {
             //this.UserData = result;
             window.location = url ?? WSecurity.urlHomeView;
         } else if (result != false || result.success == false) {
-           alert( result?.message)
+            alert(result?.message)
             console.log("Fail to login");
         } else {
-           alert("ERROR")
+            alert("ERROR")
             console.log("Fail to login");
         }
     }

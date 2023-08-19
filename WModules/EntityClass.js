@@ -7,12 +7,12 @@ class EntityClass {
             Get: "Api" + Namespace + "/get" + this.__proto__.constructor.name,
             Set: "Api" + Namespace + "/save" + this.__proto__.constructor.name,
             Update: "Api" + Namespace + "/update" + this.__proto__.constructor.name,
+            Delete: "Api" + Namespace + "/delete" + this.__proto__.constructor.name
         }
     }
     /**@type {Array<FilterData>} */
     FilterData = []
     /**
-     * 
      * @param {String} Param 
      * @returns {Array}
      */
@@ -21,7 +21,6 @@ class EntityClass {
         return Data;
     }
     /**
-    * 
     * @param {String} paramName 
     * @param {String} paramValue 
     * @returns {Array}
@@ -52,12 +51,19 @@ class EntityClass {
         return await this.SaveData(this.ApiMethods.Set, this);
     }
     /**
-     * 
      * @returns {ResponseServices}
      */
     Update = async () => {
         return await this.SaveData(this.ApiMethods.Update, this);
         
+    }
+     /**
+     * @param {String} Param 
+     * @returns {Array}
+     */
+    Delete = async (Param = "") => {
+        let Data = await this.GetData(this.ApiMethods.Delete);
+        return Data;
     }
     /** CORE ########################################################## */
     /**
@@ -69,6 +75,9 @@ class EntityClass {
         const Dataset = await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, this.replacer(this))
         // let Dataset = await fetch(this.ApiMethods.ApiRoute + this.constructor.name + '.json');
         //Dataset = await Dataset.json()
+        if (Dataset.__proto__ == Object.prototype) {
+            return Dataset;
+        }
         return Dataset.map(ent => new this.constructor(ent));;
     }
     SaveWithModel = async (Object, Edit = false) => {

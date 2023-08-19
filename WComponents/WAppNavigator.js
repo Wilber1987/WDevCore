@@ -26,19 +26,13 @@ class WAppNavigator extends HTMLElement {
         for (const p in Config) {
             this[p] = Config[p];
         }
+        this.DrawAppNavigator();
+        this.Elements = this.Elements ?? [];
     }
     attributeChangedCallBack() {
         this.DrawAppNavigator();
     }
     connectedCallback() {
-        if (this.shadowRoot.innerHTML != "") {
-            return;
-        }
-        if (this.id == undefined) {
-            const Rand = Math.random();
-            this.id = "Menu" + Rand;
-        }
-        this.DrawAppNavigator();
         if (this.Inicialize == true && this.InitialNav != undefined) {
             this.InitialNav();
         }
@@ -58,6 +52,12 @@ class WAppNavigator extends HTMLElement {
         }
     }
     DrawAppNavigator() {
+        this.shadowRoot.innerHTML = "";
+        if (this.id == undefined) {
+            const Rand = Math.random();
+            this.id = "Menu" + Rand;
+        }
+
         this.DarkMode = this.DarkMode ?? false;
         this.DisplayMode = this.DisplayMode ?? "left";
         this.shadowRoot.append(WRender.createElement(this.Style()));
@@ -93,8 +93,7 @@ class WAppNavigator extends HTMLElement {
         this.Elements.forEach((element, Index) => {
             const elementNav = WRender.createElement({
                 type: "a",
-                props: { class: "elementNav" },
-
+                props: { class: "elementNav" }
             });
 
             elementNav.append(element.name)
@@ -133,34 +132,31 @@ class WAppNavigator extends HTMLElement {
     }
     AddSubNav(Index, element, elementNav, Nav) {
         const SubMenuId = "SubMenu" + Index + this.id;
-        const SubNav = {
-            type: "section",
-            props: {
-                id: SubMenuId, href: element.url, className: "UnDisplayMenu"
-            },
-            children: []
-        };
+        const SubNav = WRender.Create({
+            tagName: "section",
+            id: SubMenuId, href: element.url, className: "UnDisplayMenu"
+        });
         if (element.SubNav.Elements != undefined) {
             element.SubNav.Elements.forEach(SubElement => {
-                SubNav.children.push({
-                    type: "a",
-                    props: {
-                        innerText: SubElement.name,
-                        onclick: async (ev) => {
-                            if (SubElement.action != undefined) {
-                                SubElement.action(ev);
-                            }
+                SubNav.append(WRender.Create({
+                    tagName: "a",
+                    innerText: SubElement.name,
+                    onclick: async (ev) => {
+                        if (SubElement.action != undefined) {
+                            SubElement.action(ev);
                         }
                     }
-                });
+
+                }));
             });
             elementNav.onclick = (ev) => {
                 this.ActiveMenu(ev);
                 const MenuSelected = this.shadowRoot.querySelector("#" + SubMenuId);
-                if (MenuSelected.className == "UnDisplayMenu") {
-                    MenuSelected.className = "DisplayMenu";
+                if (MenuSelected.className.includes("UnDisplayMenu")) {
+                    //console.log(this.NavStyle == "tab", this.NavStyle == "tab" ? "DisplayMenu tabSubMenu" : "DisplayMenu");
+                    MenuSelected.className = this.Direction != "column" ? "DisplayMenu AbsoluteDisplay" : "DisplayMenu";
                 } else {
-                    MenuSelected.className = "UnDisplayMenu";
+                    MenuSelected.className = this.Direction != "column" ? "UnDisplayMenu AbsoluteDisplay" : "UnDisplayMenu";
                 }
             };
             Nav.children.push(SubNav);
@@ -188,6 +184,7 @@ class WAppNavigator extends HTMLElement {
                         transition: "all 1s",
                         "justify-content": this.alignItems,
                         "flex-wrap": "wrap",
+                        position: "relative"
                     }), new WCssClass(`.tab`, {
                         display: "flex",
                         "flex-direction": navDirection,
@@ -212,7 +209,8 @@ class WAppNavigator extends HTMLElement {
                         transition: "all 0.6s",
                         display: "flex", "align-items": "center",
                         cursor: "pointer",
-                        "font-size": 12
+                        "font-size": 12,
+                        position: "relative"
                     }), new WCssClass(`.elementNavActive`, {
                         "text-decoration": "none",
                         color: this.DarkMode ? "#4da6ff" : "#444444",
@@ -249,17 +247,27 @@ class WAppNavigator extends HTMLElement {
                         cursor: "pointer"
                     }),
                     //Estilos de submenu
-                    new WCssClass(` .UnDisplayMenu`, {
-                        overflow: "hidden",
-                        "max-height": "0px",
-                    }), new WCssClass(` .DisplayMenu`, {
+                    new WCssClass(` .DisplayMenu`, {
                         overflow: "hidden",
                         "padding-left": "10px",
                         "max-height": "1000px",
                         display: "flex",
                         "flex-direction": "column",
                         margin: "10px 0px"
-                    }), new WCssClass(`.DisplayMenu a`, {
+                    }), new WCssClass(` .AbsoluteDisplay`, {
+                        position: "absolute",
+                        top:"+40px",
+                        left: 0,
+                        "background-color": "#fff",
+                        padding: 12,
+                        "box-shadow": "0 0 5px 0 #888",
+                        "border-radius": 15
+                    }),  new WCssClass(` .UnDisplayMenu`, {
+                        overflow: "hidden",
+                        "max-height": "0px",                        
+                        padding: 0,
+                        "box-shadow": "none"
+                    }),new WCssClass(`.DisplayMenu a`, {
                         "text-decoration": "none",
                         color: "#8e8e8e",
                         padding: 10,
@@ -310,7 +318,8 @@ class WAppNavigator extends HTMLElement {
                             "flex-direction": "column",
                             "justify-content": "initial",
                             "padding-top": 20,
-                            right: this.DisplayMode == "left" ? "inherit" : "0",
+                            right: this.DisplayMode == "left" ? "inherit" : "0"
+
                         }), new WCssClass(`.navInactive, .nav`, {
                             opacity: "0",
                             "pointer-events": "none",

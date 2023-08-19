@@ -113,7 +113,7 @@ class WAjaxTools {
         } else {
             try {
                 response = await response.json(response);
-                //localStorage.setItem(Url, JSON.stringify(response));
+                localStorage.setItem(Url, JSON.stringify(response));
                 return response;
             } catch (error) {
                 console.log(error);
@@ -132,7 +132,22 @@ class WAjaxTools {
         return {};
     }
 }
+/**
+ * 
+ * @param {TemplateStringsArray} body 
+ * @returns {HTMLElement}
+ */
+function html(body) {
+    // @ts-ignore
+    return WRender.CreateStringNode(body);
+}
+export {html}
 class WRender {
+    /**
+     * 
+     * @param {*} string 
+     * @returns {HTMLElement}
+     */
     static CreateStringNode = (string) => {
         let node = document.createRange().createContextualFragment(string);
         return node.childNodes[0];
@@ -410,17 +425,28 @@ class ComponentsManager {
     }
     static modalFunction(ventanaM) {
         if (ventanaM.style.opacity == 0) {
-            ventanaM.style.transition = "all ease 1s";
+            // WRender.SetStyle(ventanaM, {
+            //     //transform: "translateY(-100%)",
+            //     transition: "all ease 0.3s",
+            //     display: "block"
+            // });
+            // setTimeout(() => {
+            //     WRender.SetStyle(ventanaM, {
+            //         //transform: "translateY(0%)",
+            //         opacity: 1
+            //     });
+            // }, 100);
+            ventanaM.style.transition = "all ease 0.5s";
             ventanaM.style.display = "block";
             setTimeout(() => {
                 ventanaM.style.opacity = 1;
             }, 100);
         } else {
-            ventanaM.style.transition = "all ease 1s";
+            ventanaM.style.transition = "all ease 0.5s";
             ventanaM.style.opacity = 0;
             setTimeout(() => {
                 ventanaM.style.display = "none";
-            }, 1000);
+            }, 500);
         }
     }
     static DisplayUniqAcorden(elementId) {
@@ -584,7 +610,7 @@ class WArrayF {
         return DataArraySR;
     }
     static MaxValue(Data, MaxParam) {
-        var Maxvalue = 0;
+        var Maxvalue = Data[0][MaxParam];
         for (let index = 0; index < Data.length; index++) {
             if (parseInt(Data[index][MaxParam]) > Maxvalue) {
                 Maxvalue = Data[index][MaxParam];
@@ -596,6 +622,24 @@ class WArrayF {
         var MinValue = Data[0][MaxParam];
         for (let index = 0; index < Data.length; index++) {
             if (parseInt(Data[index][MaxParam]) < MinValue) {
+                MinValue = Data[index][MaxParam];
+            }
+        }
+        return MinValue;
+    }
+    static MaxDateValue(Data, MaxParam) {
+        var Maxvalue = new Date(Data[0][MaxParam]);
+        for (let index = 0; index < Data.length; index++) {
+            if (new Date((Data[index][MaxParam]) > Maxvalue)) {
+                Maxvalue = Data[index][MaxParam];
+            }
+        }
+        return Maxvalue;
+    }
+    static MinDateValue(Data, MaxParam) {
+        var MinValue = new Date(Data[0][MaxParam]);
+        for (let index = 0; index < Data.length; index++) {
+            if (new Date(Data[index][MaxParam]) < MinValue) {
                 MinValue = Data[index][MaxParam];
             }
         }
@@ -867,6 +911,15 @@ String.prototype.toDateFormatEs = function () {
         + ' de ' + meses[fecha.getMonth()]
         + ' de ' + fecha.getUTCFullYear();
 };
+
+String.prototype.getMonthFormatEs = function () {
+    if (this == null || this == undefined || this == "") return "";
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const dias_semana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const fecha = new Date(this);
+    return  meses[fecha.getMonth()];
+};
+
 
 
 

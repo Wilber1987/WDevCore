@@ -5,6 +5,7 @@ import { WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
+import { WDetailObject } from "./WDetailObject.js";
 import { ModalVericateAction } from "./WForm.js";
 import { WModalForm } from "./WModalForm.js";
 
@@ -61,16 +62,17 @@ class WTableComponent extends HTMLElement {
             }
         }));
         const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
-        const isWithtModel = this.TableConfig.ModelObject.Get != undefined
+        const isWithtModel = this.TableConfig.ModelObject?.Get != undefined
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
         this.Options = this.TableConfig?.Options;
-        if ((this.Dataset == undefined || this.Dataset == null) && this.AddItemsFromApi) {
+        if ((this.Dataset.length == 0 || this.Dataset == undefined || this.Dataset == null) && this.AddItemsFromApi) {
             if (isWithtUrl) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             } else if (isWithtModel) {
-                this.Dataset = await this.TableConfig.ModelObject.Get();
+                const model = this.TableConfig.EntityModel ?? this.TableConfig.ModelObject;
+                this.Dataset = await model.Get();
             }
         }
         if (this.Dataset == undefined) {
@@ -94,7 +96,6 @@ class WTableComponent extends HTMLElement {
     //BASIC TABLE-----------------------------------------------------------------------
     //#region tabla basica --------------------------------------------------------------
     /**
-     * 
      * @param {Array} [Dataset] 
      */
     DefineModelObject(Dataset = this.Dataset) {
@@ -107,7 +108,6 @@ class WTableComponent extends HTMLElement {
         }
     }
     /**
-     * 
      * @param {Array} Dataset 
      */
     DrawTable(Dataset = this.Dataset) {
@@ -281,6 +281,7 @@ class WTableComponent extends HTMLElement {
     }
 
     async EvalModelPrototype(Model, prop, tr, element, index) {
+
         let value = element[prop] != null && element[prop] != undefined ? element[prop] : "";
         let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index, class: "td_" + prop });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
@@ -323,11 +324,11 @@ class WTableComponent extends HTMLElement {
                 case "COLOR":
                     td.append(WRender.Create({
                         style: {
-                            background: value, width: "30px", height: "30px",
+                            background: (value == "" ? "#000" : value), width: "30px", height: "30px",
                             borderRadius: "50%", boxShadow: "0 0 3px 0 #888", margin: "auto"
                         }
                     }))
-                    tr.append();
+                    tr.append(td);
                     break;
                 case "MODEL": case "WSELECT":
                     tr.append(WRender.Create({
@@ -369,7 +370,7 @@ class WTableComponent extends HTMLElement {
         }
     }
 
-    DeleteBTN(Options, element, tr) {
+    DeleteBTN = (Options, element, tr) => {
         if (this.Options?.Delete != undefined && this.Options.Delete == true) {
             Options.append(WRender.Create({
                 tagName: "button",
@@ -384,6 +385,11 @@ class WTableComponent extends HTMLElement {
                             //tr.parentNode.removeChild(tr);                                                  
                             if (this.Options?.DeleteAction) {
                                 this.Options?.DeleteAction(element)
+                            }
+                            if (this.Options?.UrlDelete) {
+                                WAjaxTools.PostRequest(this.Options?.UrlDelete, element);
+                            } else if (element.Delete) {
+                                element.Delete();
                             }
                             this.DrawTable();
                         } else { console.log("No Object"); }
@@ -417,7 +423,7 @@ class WTableComponent extends HTMLElement {
                         icon: this.TableConfig.icon,
                         ImageUrlPath: this.TableConfig.ImageUrlPath,
                         title: "Detalle",
-                        ObjectDetail: element,
+                        ObjectModal: new WDetailObject({ ObjectDetail: element, ModelObject: this.ModelObject }),
                     }));
                 }
             }));
@@ -461,8 +467,10 @@ class WTableComponent extends HTMLElement {
         this.shadowRoot?.append(
             new WModalForm({
                 ModelObject: this.ModelObject,
+                EntityModel: this.TableConfig.EntityModel,
                 AutoSave: this.TableConfig.AutoSave ?? false,
                 ParentModel: this.TableConfig.ParentModel,
+                ParentEntity: this.TableConfig.ParentEntity,
                 EditObject: element,
                 icon: this.TableConfig.icon,
                 ImageUrlPath: this.TableConfig.ImageUrlPath,

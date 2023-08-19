@@ -99,12 +99,21 @@ class WStyledRender extends HTMLElement {
  * @param {TemplateStringsArray} body 
  * @returns {HTMLStyleElement}
  */
-function css(body) {    
+function css(body) {
     // @ts-ignore
     return WRender.Create({ tagName: "style", innerHTML: body.toString() });
 }
+/**
+ * 
+ * @param {TemplateStringsArray} body 
+ * @returns {HTMLElement}
+ */
+function html(body) {
+    // @ts-ignore
+    return WRender.CreateStringNode(body.toString());
+}
 customElements.define("w-style", WStyledRender);
-export { WCssClass, WStyledRender, css }; 
+export { WCssClass, WStyledRender, css };
 
 class CSSProps {
     "align-content";

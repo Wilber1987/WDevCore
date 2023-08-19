@@ -19,7 +19,7 @@ class WDetailObject extends HTMLElement {
         this.ObjectDetail = this.Config.ObjectDetail;
         this.ModelObject = this.Config.ModelObject ?? this.ObjectDetail;
         this.ProfileContainer = WRender.createElement({ type: 'div', props: { class: 'ProfileContainer' } });
-        this.SetImage(this.ObjectDetail, this.ModelObject)
+        //this.SetImage(this.ObjectDetail, this.ModelObject)
         this.ProfileContainer.append(new ProfileCard(this.Config));
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
         this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
@@ -49,14 +49,14 @@ class WDetailObject extends HTMLElement {
         this.ComponentTab = new WAppNavigator({
             NavStyle: "tab", id: "GuidesNav", title: "Menu", Inicialize: true, Elements: this.TabElements(this.ObjectDetail, this.ModelObject)
         });
-        const BtnReturn = WRender.Create({
-            className: "GroupConfig", children: [{
-                tagName: 'input', type: 'button', className: 'BtnSuccess BtnReturn', value: 'Regresar', onclick: async () => {
-                    this.Config.DOMManager.Back();
-                }
-            }]
-        })
-        this.shadowRoot.append(BtnReturn, WRender.createElement(this.styleComponent), this.ProfileContainer, this.ComponentTab, this.TabContainer);
+        // const BtnReturn = WRender.Create({
+        //     className: "GroupConfig", children: [{
+        //         tagName: 'input', type: 'button', className: 'BtnSuccess BtnReturn', value: 'Regresar', onclick: async () => {
+        //             this.Config.DOMManager.Back();
+        //         }
+        //     }]
+        // })
+        this.shadowRoot.append(WRender.createElement(this.styleComponent), this.ProfileContainer, this.ComponentTab, this.TabContainer);
     }
     SetImage = (ObjectDetail, Model) => {
         const ImageCards = WRender.createElement({ type: 'div', props: { class: 'ImageCards' } });
@@ -84,6 +84,7 @@ class WDetailObject extends HTMLElement {
                             action: async (ev) => {
                                 this.TabManager.NavigateFunction(prop, new WTableComponent({
                                     Options: { Search: true },
+                                    ImageUrlPath:  this.Config.ImageUrlPath,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
                                 }));
@@ -102,13 +103,13 @@ class WDetailObject extends HTMLElement {
             ClassList: [
                 new WCssClass(`.ProfileContainer`, {
                     display: 'grid',
-                    "grid-template-columns": "270px auto",
+                    "grid-template-columns": "auto auto",
                     "border-bottom": "solid 2px #bbbec1",
                     "padding-bottom": 10,
                     "margin-bottom": 20,
                 }), new WCssClass(`.DataContainer`, {
                     display: 'flex',
-                    "flex-direction": "column",
+                    //"flex-direction": "column",
                     padding: "5px"
                 }), new WCssClass(` h3`, {
                     margin: "5px 10px",
@@ -150,6 +151,8 @@ class WDetailObject extends HTMLElement {
                     "border-radius": 10,
                     overflow: "hidden",
                     "box-shadow": "0 0 5px 0 #999"
+                }), new WCssClass(`.DataContainer label:first-letter`, {
+                    "text-transform": "uppercase",
                 })
             ], MediaQuery: [{
                 condicion: "(max-width: 800px)",
@@ -184,14 +187,14 @@ class ProfileCard extends HTMLElement {
                     case "TEXT": "NUMBER"
                         this.container.append(WRender.Create({
                             tagName: 'div', class: 'DataContainer', children: [
-                                prop + ": " + ObjectDetail[prop],
+                                WOrtograficValidation.es(prop) + ": " + ObjectDetail[prop] ?? "",
                             ]
                         }));
                         break;
                     case "DATE": "FECHA"
                         this.container.append(WRender.Create({
                             tagName: 'div', class: 'DataContainer', children: [
-                                prop + ": " + ObjectDetail[prop].toDateFormatEs(),
+                                WOrtograficValidation.es(prop) + ": " + ObjectDetail[prop]?.toDateFormatEs() ?? "",
                             ]
                         }));
                         break;

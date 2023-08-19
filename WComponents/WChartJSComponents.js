@@ -1,5 +1,5 @@
 import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
-import { WCssClass } from "../WModules/WStyledRender.js";
+import { css, WCssClass } from "../WModules/WStyledRender.js";
 
 class ChartConfig {
     TypeChart = 0;
@@ -10,7 +10,7 @@ class ChartConfig {
     EvalValue = "value";
     groupParams = [];
 }
-const ColorsList = ["#5995fd", "#dc3545", "#28a745", "#17a2b8", "#6e1515", "#156e49", "#1c4786"];
+const ColorsList = ["#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4", "#00bff3", "#e63da4", "#6a549f"];
 class ColumChart extends HTMLElement {
     constructor(ChartInstance = (new ChartConfig())) {
         super();
@@ -181,7 +181,7 @@ class ColumChart extends HTMLElement {
         if (this.ChartInstance.TypeChart == "Line") {
             WRender.SetStyle(Bars, {
                 margin: "0px 10px",
-                //opacity: 0
+                opacity: 0
             });
         }
         return Bars;
@@ -518,7 +518,7 @@ const WChartStyle = (ChartInstance) => {
                     "white-space": "nowrap",
                     "max-height": 450,
                     position: "relative"
-                }),new WCssClass(".WChartContainer h3", {
+                }), new WCssClass(".WChartContainer h3", {
                     color: "#444",
                     "font-size": " 18px",
                     "padding-bottom": 10,
@@ -547,10 +547,10 @@ const WChartStyle = (ChartInstance) => {
                 }), new WCssClass(".SectionBars", {
                     "display": " flex",
                     "align-items": " flex-end",
-                    "overflow-y": " hidden",
+                    //"overflow-y": " hidden",
                     "position": " relative",
                     "overflow-x": " scroll",
-                    //padding: 10,
+                    "padding-top": 5,
                     "padding-left": 40,
                     "min-height": 150,
                     //margin: "0px auto"
@@ -603,9 +603,8 @@ const WChartStyle = (ChartInstance) => {
                     "display": " block",
                     "font-size": " 8px",
                     "margin-top": " 5px",
-                    "font-weight": " bold",
                     "overflow": " hidden",
-                    "text-overflow": "hidden",
+                    "color": "#fff",
                     padding: 0
                 }), new WCssClass(".BackGrounLineX ", {
                     "display": " flex",
@@ -771,6 +770,210 @@ const WChartStyle = (ChartInstance) => {
     };
 }
 
+class GanttChart extends HTMLElement {
+    constructor(Config = {}) {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.Config = Config;
+        this.Dataset = Config.Dataset;
+        this.groupParams = this.Config.groupParams ?? [];
+        this.EvalValue = this.Config.EvalValue ?? null;
+        this.AttNameEval = this.Config.AttNameEval ?? null;
+        this.TimeLine = WRender.Create({ className: "TimeLine" });
+        this.TaskContainer = WRender.Create({ className: "TaskContainer" });
+        this.ChartContainer = WRender.Create({ className: "ChartContainer", children: [this.TimeLine, this.TaskContainer] });
+        this.shadowRoot.append(this.CustomStyle, this.ChartContainer);
+        WRender.SetStyle(this, {
+            overflowX: "auto",
+            overflowY: "auto",
+            width: "100%",
+        })
+        this.DrawComponent();
+
+    }
+    connectedCallback() { 
+        this.Animate();
+    }
+    DrawComponent = async () => {
+        this.TimeLine.innerHTML = "";
+      console.log(this.Dataset)
+        const min = WArrayF.MinDateValue(this.Dataset, "Fecha_Inicio");
+        const max = WArrayF.MaxDateValue(this.Dataset, "Fecha_Finalizacion");
+        console.log(min);
+        console.log(max);        
+        const inicio = new Date(min);
+        const fin = new Date(max);
+        const UN_DIA_EN_MILISEGUNDOS = 1000 * 60 * 60 * 24;
+        const INTERVALO = UN_DIA_EN_MILISEGUNDOS //* 7; // Cada semana
+        const formateadorFecha = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', });
+
+        for (let i = inicio; i <= fin; i = new Date(i.getTime() + INTERVALO)) {
+            //console.log(formateadorFecha.format(i));
+            this.TimeLine.append(WRender.Create({
+                id: i.toLocaleDateString(),
+                class: "TimeLineBlock",
+                innerText: formateadorFecha.format(i)
+            }))
+        }
+        this.TaskContainer.innerHTML = "";
+        this.Dataset.forEach(task => {
+            const taskDiv = WRender.Create({
+                className: "taskBlock",
+                name: new Date(task.Fecha_Inicio).toLocaleDateString()
+                    + "-" + new Date(task.Fecha_Finalizacion).toLocaleDateString(),
+                innerText: task.Titulo + " #" + task.Id_Tarea
+            })
+            this.TaskContainer.append(taskDiv)
+        });
+
+    }
+    Animate = () => {
+        const days = this.TimeLine.querySelectorAll(".TimeLineBlock");
+        const task = this.TaskContainer.querySelectorAll(".taskBlock");
+        const daysArray = [...days];
+        console.log(daysArray);
+        task.forEach(el => {
+            //const duration = el.dataset.duration.split("-");
+            const duration = el.name.split("-");
+            const startDay = duration[0];
+            const endDay = duration[1];
+            let left = 0,
+                width = 0;
+
+            if (startDay.endsWith("½")) {
+                const filteredArray = daysArray.filter(day => day.id == startDay.slice(0, -1));
+                left = filteredArray[0].offsetLeft + filteredArray[0].offsetWidth / 2;
+            } else {
+                const filteredArray = daysArray.filter(day => day.id == startDay);
+                console.log(filteredArray);
+                console.log(startDay);
+                left = filteredArray[0].offsetLeft;
+            }
+
+            if (endDay.endsWith("½")) {
+                const filteredArray = daysArray.filter(day => day.id == endDay.slice(0, -1));
+                width = filteredArray[0].offsetLeft + filteredArray[0].offsetWidth / 2 - left;
+            } else {
+                const filteredArray = daysArray.filter(day => day.id == endDay);
+                console.log(endDay);
+                width = filteredArray[0].offsetLeft + filteredArray[0].offsetWidth - left;
+            }
+
+            // apply css
+            el.style.left = `${left}px`;
+            el.style.width = `${width}px`;
+            //if (e.type == "load") {
+                el.style.backgroundColor = GenerateColor();
+                el.style.opacity = 1;
+            //}
+        });
+    }
+    CustomStyle = css`
+        :root {
+            --white: #fff;
+            --divider: lightgrey;
+            --body: #f5f7f8;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            background: var(--body);
+            font-size: 16px;
+            font-family: sans-serif;
+            padding-top: 40px;
+        }
+
+        .chart-wrapper {
+            max-width: 1150px;
+            padding: 0 10px;
+            margin: 0 auto;
+        }
+
+        /* CHART-VALUES
+        –––––––––––––––––––––––––––––––––––––––––––––––––– */
+        .ChartContainer {
+            width: 100%;
+            overflow: auto;
+        }
+        .TimeLine {
+            position: relative;
+            display: flex;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+
+        .TimeLineBlock {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .TimeLineBlock:not(:last-child) {
+            position: relative;
+        }
+
+        .TimeLineBlock:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            height: 510px;
+            border-right: 1px solid lightgrey;
+            width: 1px;
+        }
+
+
+        /* CHART-BARS
+        –––––––––––––––––––––––––––––––––––––––––––––––––– */
+        .taskBlock {
+            position: relative;
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-radius: 20px;
+            padding: 10px 20px;
+            width: 0;
+            opacity: 0;
+            transition: all 0.65s linear 0.2s;
+        }
+
+        @media screen and (max-width: 600px) {
+            .taskBlock {
+                padding: 10px;
+            }
+        }
+
+
+        /* FOOTER
+        –––––––––––––––––––––––––––––––––––––––––––––––––– */
+        .page-footer {
+            font-size: 0.85rem;
+            padding: 10px;
+            text-align: right;
+            color: var(--black);
+        }
+
+        .page-footer span {
+            color: #e31b23;
+        }
+    `
+}
 customElements.define("w-radial-chart", RadialChart);
 customElements.define("w-colum-chart", ColumChart);
-export { RadialChart, ColumChart }
+customElements.define("w-gantt-chart", GanttChart);
+export { RadialChart, ColumChart, GanttChart }

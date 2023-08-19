@@ -29,7 +29,7 @@ class WModalForm extends HTMLElement {
             this.DivColumns = this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
         } else {
             this.WidthContainer = "60%";
-            this.DivColumns = this.Config.DivColumns = "calc(50%) calc(50%)";
+            this.DivColumns = this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
         }
     }
     attributeChangedCallBack() {
@@ -62,7 +62,7 @@ class WModalForm extends HTMLElement {
                         "top": "0px !important",
                         "left": "0px !important",
                         "bottom": "0px !important",
-                        "transition": "all linear 1s",
+                        "transition": "all 0.3s",
                         "box-shadow": "0 0px 1px 0px #000",
                         "z-index": "20000 !important",
                         "overflow-y": "auto",
@@ -139,7 +139,7 @@ class WModalForm extends HTMLElement {
                 class: 'BtnClose', //class: 'Btn',
                 type: "button",
                 onclick: () => {
-                   this.close(true);
+                    this.close(true);
                 }, innerText: 'x'
             }
             //children: ['◄ Back']
@@ -152,8 +152,8 @@ class WModalForm extends HTMLElement {
             ]
         };
         if (this.CloseOption != false) {
-             Section.children.push(InputClose)
-        }       
+            Section.children.push(InputClose)
+        }
         return WRender.createElement(Section);
     }
     close = (RollBack = true) => {
@@ -163,7 +163,7 @@ class WModalForm extends HTMLElement {
         ComponentsManager.modalFunction(this);
         setTimeout(() => {
             this.parentNode.removeChild(this);
-        }, 1000);
+        }, 500);
     }
     //STYLES----------------------------------------------------------------->
     FormStyle = () => {
@@ -179,9 +179,9 @@ class WModalForm extends HTMLElement {
                         "margin-top": this.StyleForm == "FullScreen" ? 0 : 30,
                         "background-color": this.DarkMode ? "#444444" : "#fff",
                         "width": this.WidthContainer,
-                       // "max-height": "calc(100vh - 120px)",
+                        // "max-height": "calc(100vh - 120px)",
                         //"overflow-y": "auto",
-                       // "min-height": this.StyleForm == "FullScreen" ? "100vh" : 200,
+                        // "min-height": this.StyleForm == "FullScreen" ? "100vh" : 200,
                         "border-radius": "0.3cm",
                         "position": "relative",
                         "box-shadow": "0 0px 3px 0px #000",
@@ -246,7 +246,8 @@ class WModalForm extends HTMLElement {
                         width: "90%",
                         margin: "auto",
                         "margin-bottom": 20,
-                        "text-align": "center"
+                        "text-align": "center",
+                        padding: 5
                     }),
                 ], MediaQuery: [{
                     condicion: "(max-width: 1200px)",
@@ -344,7 +345,7 @@ class WSimpleModalForm extends HTMLElement {
             bottom: 0;
             left: 0;
             background-color: rgba(0, 0, 0, .5);
-            z-index: 100;
+            z-index: 20000 !important;
             opacity: 0;
             transition: all 0.3s;
         }

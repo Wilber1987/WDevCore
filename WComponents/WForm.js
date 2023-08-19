@@ -73,9 +73,6 @@ class WForm extends HTMLElement {
             }, set: (target, property, value, receiver) => {
                 this.ExistChange = true;
                 target[property] = value;
-                if (target.__proto__ == Array.prototype) {
-                    console.log(target);
-                }
                 this.SetOperationValues(Model, target)
                 const control = this.shadowRoot?.querySelector("#ControlValue" + property);
                 if (control) {
@@ -134,63 +131,75 @@ class WForm extends HTMLElement {
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const Form = WRender.Create({ className: 'divForm' });
         for (const prop in Model) {
-            Model[prop] = Model[prop] != null ? Model[prop] : undefined;
-            if (this.isNotDrawable(Model, prop)) {
-                if (!this.isMethod(Model, prop)) {
-                    ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;
-                }
-            } else {
-                let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
-                //ObjectF[prop] = val;
-                const onChangeEvent = (ev) => {
-                    /**
-                     * @type {HTMLInputElement}
-                     */
-                    const targetControl = ev.target
-                    /**
-                    * @type {HTMLInputElement}
-                    */
-                    const currentTarget = ev.currentTarget
-
-                    this.onChange(targetControl, currentTarget, ObjectF, prop, Model);
-                }
-                /**
-                 * @type {HTMLLabelElement}
-                 */
-                // @ts-ignore
-                const ControlLabel = WRender.Create({
-                    tagName: "label", class: "inputTitle label_" + prop,
-                    innerText: WOrtograficValidation.es(prop)
-                });
-                const ControlContainer = WRender.Create({
-                    class: "ModalElement", children: [ControlLabel]
-                });
-                if (Model[prop].__proto__ == Object.prototype) {
-                    if (Model[prop].ModelObject?.__proto__ == Function.prototype && Model[prop].ModelObject()?.constructor?.name == this.Config.ParentModel?.constructor?.name) {
-                        //Model[prop] = undefined;
-                        ObjectF[prop] = undefined;
-                        continue;
+            try {
+                Model[prop] = Model[prop] != null ? Model[prop] : undefined;
+                if (this.isNotDrawable(Model, prop)) {
+                    if (!this.isMethod(Model, prop)) {
+                        ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;
                     }
-                    ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop)
-                    let InputControl = await this.CreateModelControl(Model, prop, val, ControlContainer, ObjectF, ControlLabel, onChangeEvent);
-                    ControlContainer.append(InputControl);
-                } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
-                    let InputControl = this.CreateSelect(Model[prop], prop, ObjectF, onChangeEvent);
-                    ObjectF[prop] = InputControl.value;
-                    ControlContainer.append(InputControl);
                 } else {
-                    let InputControl = WRender.Create({ tagName: "input", id: "ControlValue" + prop, className: prop, value: val, type: "text", onchange: onChangeEvent });
-                    if (typeof Model[prop] === "string" && Model[prop].length >= 50) {
-                        InputControl = WRender.Create({ tagName: "textarea", className: prop });
-                    } else if (parseFloat(Model[prop]).toString() != "NaN") {
-                        InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "number", placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
-                    } else {
-                        InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text", placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
+                    let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
+                    //ObjectF[prop] = val;
+                    const onChangeEvent = (ev) => {
+                        /**
+                         * @type {HTMLInputElement}
+                         */
+                        const targetControl = ev.target
+                        /**
+                        * @type {HTMLInputElement}
+                        */
+                        const currentTarget = ev.currentTarget
+
+                        this.onChange(targetControl, currentTarget, ObjectF, prop, Model);
                     }
-                    ControlContainer.append(InputControl);
+                    /**
+                     * @type {HTMLLabelElement}
+                     */
+                    // @ts-ignore
+                    const ControlLabel = WRender.Create({
+                        tagName: "label", class: "inputTitle label_" + prop,
+                        innerText: WOrtograficValidation.es(prop)
+                    });
+                    const ControlContainer = WRender.Create({
+                        class: "ModalElement", children: [ControlLabel]
+                    });
+                    if (Model[prop].__proto__ == Object.prototype) {
+                        if (Model[prop].ModelObject?.__proto__ == Function.prototype
+                            && Model[prop].ModelObject()?.constructor?.name == this.Config.ParentModel?.constructor?.name) {
+                            //Model[prop] = undefined;
+                            ObjectF[prop] = undefined;
+                            continue;
+                        }
+                        ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop)
+                        let InputControl = await this.CreateModelControl(Model, prop, val, ControlContainer, ObjectF, ControlLabel, onChangeEvent);
+                        ControlContainer.append(InputControl);
+                    } else if (Model[prop] != null && Model[prop].__proto__ == Array.prototype) {
+                        let InputControl = this.CreateSelect(Model[prop], prop, ObjectF, onChangeEvent);
+                        ObjectF[prop] = InputControl.value;
+                        ControlContainer.append(InputControl);
+                    } else {
+                        let InputControl = WRender.Create({ tagName: "input", id: "ControlValue" + prop, className: prop, value: val, type: "text", onchange: onChangeEvent });
+                        if (typeof Model[prop] === "string" && Model[prop].length >= 50) {
+                            InputControl = WRender.Create({ tagName: "textarea", className: prop });
+                        } else if (parseFloat(Model[prop]).toString() != "NaN") {
+                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "number", placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
+                        } else {
+                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text", placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
+                        }
+                        ControlContainer.append(InputControl);
+                    }
+                    Form.append(ControlContainer);
                 }
-                Form.append(ControlContainer);
+
+            } catch (error) {
+                console.log(Model);
+                console.log(Model[prop]);
+                console.log(prop);
+                console.log(ObjectF[prop]);
+                console.log(error);
+                throw "Error in create CrudForm";
             }
+
         }
 
         return Form;
@@ -360,8 +369,12 @@ class WForm extends HTMLElement {
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
                     ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     /**@type {EntityClass} */
-                    const entity = ModelProperty.ModelObject;
-                    ModelProperty.Dataset = await entity.Get();
+                    const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
+                    if (this.Config.ParentEntity != undefined && ModelProperty.SelfChargeDataset) {
+                        ModelProperty.Dataset = this.Config.ParentEntity[ModelProperty.SelfChargeDataset] ?? [];
+                    } else {
+                        ModelProperty.Dataset = await entity.Get();
+                    }
                 }
                 if (ObjectF[prop] == null && ModelProperty.require != false &&
                     ModelProperty.Dataset &&
@@ -425,14 +438,15 @@ class WForm extends HTMLElement {
                 const masterDetailModel = await WArrayF.isModelFromFunction(Model, prop);
                 ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
-                ObjectF[prop] = ObjectF[prop] != "" ? this.CreateProxy(Model, ObjectF[prop]) :
+                ObjectF[prop] = ObjectF[prop] != "" && ObjectF[prop] != undefined ?
+                    this.CreateProxy(Model, ObjectF[prop]) :
                     this.CreateProxy(Model, []);
-
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
                     AddItemsFromApi: false,
                     ModelObject: masterDetailModel,
                     ParentModel: Model,
+                    ParentEntity: ObjectF,
                     ImageUrlPath: this.Config.ImageUrlPath,
                     Options: {
                         Add: true, Edit: true, Delete: true, Search: true
@@ -532,7 +546,7 @@ class WForm extends HTMLElement {
                 });
                 break;
             case "CALENDAR":
-                ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : [];
+                ObjectF[prop] = ObjectF[prop]?.__proto__ == Array.prototype ? ObjectF[prop] : [];
                 ControlContainer.classList.add("tableContainer");
                 ControlContainer.style.height = "auto";
                 InputControl = this.createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model);
@@ -1023,8 +1037,8 @@ class WForm extends HTMLElement {
         }
         //console.log(JSON.stringify(this.#OriginalObject), JSON.stringify(ObjectF));
         if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
-            this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
-            return false;
+           //this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
+            //return false;
         }
         return true;
     }
@@ -1061,9 +1075,8 @@ class WForm extends HTMLElement {
                     this.Config.SaveFunction(ObjectF);
                 } else if (this.Config.ObjectOptions?.SaveFunction != undefined) {
                     this.Config.ObjectOptions?.SaveFunction(ObjectF);
-                } else {
-                    ModalCheck.close();
-                }
+                } 
+                ModalCheck.close();                
             } catch (error) {
                 ModalCheck.close();
                 console.log(error);
@@ -1233,7 +1246,6 @@ class WForm extends HTMLElement {
                 width: 0.65em;
                 height: 0.65em;
                 transform: scale(0);
-                transition: 120ms transform ease-in-out;
                 box-shadow: inset 1em 1em var(--form-control-color);
                 transform-origin: bottom left;
                 clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
@@ -1381,7 +1393,6 @@ class WForm extends HTMLElement {
                 width: 0.65em;
                 height: 0.65em;
                 transform: scale(0);
-                transition: 120ms transform ease-in-out;
                 box-shadow: inset 1em 1em var(--form-control-color);
                 transform-origin: bottom left;
                 clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);

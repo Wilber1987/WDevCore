@@ -10,7 +10,8 @@ import { MultiSelect } from "./WMultiSelect.js";
  *  * @property {Array} Dataset    
     * @property {Function} FilterFunction
     * @property {Boolean} [Display]
-    *  @property {Object} [ModelObject]
+    * @property {Object} [ModelObject]
+    * @property {Object} [EntityModel]
 **/
 
 class WFilterOptions extends HTMLElement {
@@ -24,6 +25,7 @@ class WFilterOptions extends HTMLElement {
         this.Dataset = Config.Dataset;
         this.FilterFunction = Config.FilterFunction;
         this.ModelObject = Config.ModelObject;
+        this.EntityModel = Config.EntityModel;
         this.Display = Config.Display;
         this.FilterContainer = WRender.Create({ className: "filter-container" });
         /** @type {Array} */
@@ -39,7 +41,7 @@ class WFilterOptions extends HTMLElement {
     }
     DrawFilter = async () => {
         this.FilterContainer.innerHTML = "";
-        const ControlOptions = WRender.Create({ class: "OptionContainer " + (this.Display ? "OptionContainerActive" : "")})
+        const ControlOptions = WRender.Create({ class: "OptionContainer " + (this.Display ? "OptionContainerActive" : "") })
         this.FilterContainer.append(WRender.Create({
             class: "options", children: [
                 { tagName: "label", innerText: "Filtros" },
@@ -105,7 +107,7 @@ class WFilterOptions extends HTMLElement {
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
                     ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     /**@type {EntityClass} */
-                    const entity = ModelProperty.ModelObject;
+                    const entity =  ModelProperty.EntityModel ?? ModelProperty.ModelObject;
                     ModelProperty.Dataset = await entity.Get();
                 }
                 return await this.CreateWSelect(ModelProperty.Dataset, prop);
@@ -127,14 +129,15 @@ class WFilterOptions extends HTMLElement {
         if (Model[prop] == null || prop == "FilterData") {
             return false;
         }
-        return (Model[prop].__proto__ = Object.prototype && Model[prop].type && 
+        return (Model[prop].__proto__ = Object.prototype && Model[prop].type &&
             (!Model[prop].primary && !Model[prop].hidden && !Model[prop].hiddenFilter))
             && Model[prop].__proto__ != Function.prototype
             && Model[prop].__proto__.constructor.name != "AsyncFunction";
     }
 
     filterFunction = async () => {
-        if (this.ModelObject.Get) {
+        const Model = this.EntityModel ?? this.ModelObject;
+        if (Model.Get) {
             this.ModelObject.FilterData = [];
             this.FilterControls.forEach(control => {
                 if (this.ModelObject[control.id]) {
@@ -154,9 +157,9 @@ class WFilterOptions extends HTMLElement {
                             /**TODO */
                             filterType = "BETWEEN"
                             const inputs = control.querySelectorAll("input");
-                          
-                            if (inputs[0].value != '' || inputs[1].value != '' ) {
-                                values = []                     
+
+                            if (inputs[0].value != '' || inputs[1].value != '') {
+                                values = []
                                 if (inputs[0].value != '') {
                                     values.push(inputs[0].value)
                                 } else {
@@ -195,7 +198,7 @@ class WFilterOptions extends HTMLElement {
                     })
                 }
             });
-            this.Config.Dataset = await this.ModelObject.Get();
+            this.Config.Dataset = await Model.Get();
         }
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
@@ -423,6 +426,7 @@ class WFilterOptions extends HTMLElement {
             overflow: inherit;
             max-height: inherit;
             padding: 10px  5px;
+            transition: all 0.3s;
         }
 
         .OptionContainer label {
