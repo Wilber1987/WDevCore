@@ -432,7 +432,6 @@ class WPaginatorViewer extends HTMLElement {
             .tfooter {
                 display: flex;
                 border: 1px rgba(10, 10, 10, 0.2) solid;
-                border-top: none;
                 justify-content: flex-end;
                 padding-left: 20px;
                 padding-right: 20px;

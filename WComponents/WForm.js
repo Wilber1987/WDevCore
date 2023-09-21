@@ -57,6 +57,7 @@ class WForm extends HTMLElement {
                 Url: undefined
             };
         }
+        console.log(this.FormObject);
         this.FormObject = this.FormObject ?? this.Config.EditObject ?? {};
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const ObjectProxy = this.CreateProxy(Model);
@@ -75,7 +76,8 @@ class WForm extends HTMLElement {
                 target[property] = value;
                 this.SetOperationValues(Model, target)
                 const control = this.shadowRoot?.querySelector("#ControlValue" + property);
-                if (control) {
+                if (Model[property].type.toUpperCase() != "IMG" && control) {
+                    // @ts-ignore
                     control.value = target[property];
                 }
                 if (this.Config.ProxyAction != undefined) {
@@ -257,16 +259,19 @@ class WForm extends HTMLElement {
                     }
                     await this.SelectedFile(targetControl?.files[0]);
                     setTimeout(() => {
-                        ObjectF[prop] = base64Type + photoB64.toString();
-                        console.log("#imgControl" + prop, this.shadowRoot?.querySelector("#imgControl" + prop));
+                        //console.log(photoB64, base64Type);
+                        ObjectF[prop] = photoB64.toString();
+                        //console.log("#imgControl" + prop, this.shadowRoot?.querySelector("#imgControl" + prop));                        
                         if (this.shadowRoot?.querySelector("#imgControl" + prop) != null) {
                             // @ts-ignore
-                            this.shadowRoot.querySelector("#imgControl" + prop).src = ObjectF[prop];
+                            this.shadowRoot.querySelector("#imgControl" + prop).src = base64Type + photoB64.toString();
                         }
                     }, 1000);
                 }
             }
-        } else if (targetControl?.type == "checkbox" || targetControl?.type == "radio") {
+        } else if (targetControl?.type == "checkbox") {
+            ObjectF[prop] = targetControl?.checked;
+        } else if (targetControl?.type == "radio") {
             ObjectF[prop] = targetControl?.value;
         } else {
             ObjectF[prop] = targetControl?.value;
@@ -328,13 +333,13 @@ class WForm extends HTMLElement {
                 break;
             case "IMG": case "IMAGE": case "IMAGES":
                 const Multiple = ModelProperty.type.toUpperCase() == "IMAGES" ? true : false;
-                InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple);
+                InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple, onChangeEvent);
                 if (Multiple) {
                     ObjectF[prop] = ImageArray;
                 }
                 ControlContainer.className += " imgPhoto";
                 break;
-            case "DATE": case "FECHA": case "HORA":
+            case "DATE": case "FECHA":
                 let type = "date";
                 //@ts-ignore
                 let date_val = val == "" ? (new Date()).toISO() : ObjectF[prop];
@@ -348,9 +353,24 @@ class WForm extends HTMLElement {
                     disabled: ModelProperty.disabled,
                     min: ModelProperty.min,
                     max: ModelProperty.max,
+                    onchange: onChangeEvent
                 });
                 //@ts-ignore
                 ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
+                break;
+            case "HORA":
+                //@ts-ignore
+                let time_val = val == "" ? "08:00" : ObjectF[prop];
+                InputControl = WRender.Create({
+                    tagName: "input", className: prop, type: "time",
+                    placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
+                    disabled: ModelProperty.disabled,
+                    min: ModelProperty.min,
+                    max: ModelProperty.max,
+                    onchange: onChangeEvent
+                });
+                //@ts-ignore
+                ObjectF[prop] = InputControl.value = time_val;
                 break;
             case "SELECT":
                 InputControl = this.CreateSelect(prop, ObjectF, ModelProperty.Dataset, onChangeEvent);
@@ -370,13 +390,16 @@ class WForm extends HTMLElement {
                     ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     /**@type {EntityClass} */
                     const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
-                    if (this.Config.ParentEntity != undefined && ModelProperty.SelfChargeDataset) {
-                        ModelProperty.Dataset = this.Config.ParentEntity[ModelProperty.SelfChargeDataset] ?? [];
-                    } else {
-                        ModelProperty.Dataset = await entity.Get();
+                    if (ModelProperty.Dataset == undefined) {
+                        if (this.Config.ParentEntity != undefined && ModelProperty.SelfChargeDataset) {
+                            ModelProperty.Dataset = this.Config.ParentEntity[ModelProperty.SelfChargeDataset] ?? [];
+                        } else {
+                            ModelProperty.Dataset = await entity.Get();
+                        }
                     }
+
                 }
-                if (ObjectF[prop] == null && ModelProperty.require != false &&
+                if ((ObjectF[prop] == null || ObjectF[prop] == undefined) && ModelProperty.require != false &&
                     ModelProperty.Dataset &&
                     ModelProperty.Dataset?.length > 0) {
                     ObjectF[prop] = ModelProperty?.Dataset[0];
@@ -456,7 +479,10 @@ class WForm extends HTMLElement {
             case "MODEL":
                 ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
-                ObjectF[prop] = ObjectF[prop] != "" ? ObjectF[prop] : {};
+                ObjectF[prop] = ObjectF[prop] == ""
+                    || ObjectF[prop] == undefined
+                    || ObjectF[prop] == null
+                    ? {} : ObjectF[prop];
                 InputControl = new WForm({
                     StyleForm: this.StyleForm,
                     EditObject: ObjectF[prop],
@@ -498,7 +524,11 @@ class WForm extends HTMLElement {
                 InputControl = WRender.Create({
                     className: "radio-group-container",
                     id: "ControlValue" + prop,
-                    children: ModelProperty.Dataset?.map(radioElement => {
+                    children: ModelProperty.Dataset?.map((radioElement, index) => {
+                        if ((val == null || val == "" || val == undefined) && index == 0) {
+                            val = radioElement;
+                            ObjectF[prop] = val;
+                        }
                         return WRender.Create({
                             className: "radio-element", children: [
                                 {
@@ -633,12 +663,22 @@ class WForm extends HTMLElement {
         return InputControl;
     }
     createDrawComponent(InputControl, prop, ControlContainer, ObjectF) {
+        ObjectF[prop]
+        var imgBase64 = ObjectF[prop];
         InputControl = WRender.Create({
             tagName: "canvas",
             id: "ControlValue" + prop,
             className: prop + " draw-canvas"
         });
+        var img = new Image();
         var ctx = InputControl.getContext("2d");
+        if (ObjectF[prop] = !undefined && ObjectF[prop] != null) {
+            img.src = imgBase64;
+            img.onload = function () {
+                // Dibuja la imagen en el canvas
+                ctx.drawImage(img, 0, 0);
+            };
+        }
         const baseData = InputControl.toDataURL();
         ControlContainer.className += " DrawControlContainer"
         ControlContainer.append(
@@ -865,10 +905,11 @@ class WForm extends HTMLElement {
      * @param {HTMLElement} ControlContainer
      * @param {string} prop
      * @param {boolean} Multiple
+     * @param {Function} onChange
      */
-    CreateImageControl(InputValue, ControlContainer, prop, Multiple) {
+    CreateImageControl(InputValue, ControlContainer, prop, Multiple, onChange) {
         const InputControl = WRender.Create({
-            tagName: "input", className: prop, multiple: Multiple, type: "file", style: {
+            tagName: "input", className: prop, onchange: onChange, multiple: Multiple, type: "file", style: {
                 display: "none"
             }
         });
@@ -897,7 +938,7 @@ class WForm extends HTMLElement {
                 cadenaB64 = "data:image/png;base64,";
             } else if (this.ImageUrlPath != undefined && InputValue
                 && InputValue.__proto__ != Object.prototype
-                && typeof this.ImageUrlPath === "string"
+                && typeof this.ImageUrlPath === "string" && this.ImageUrlPath != ""
                 && !base64regex.test(InputValue.replace("data:image/png;base64,", ""))) {
                 cadenaB64 = this.ImageUrlPath + "/";
             }
@@ -905,7 +946,7 @@ class WForm extends HTMLElement {
                 tagName: "img",
                 src: cadenaB64 + InputValue,
                 class: "imgPhotoWModal",
-                id: "imgControl" + prop + this.id,
+                id: "imgControl" + prop,
             }));
         }
         ControlContainer.append(WRender.Create({
@@ -929,8 +970,13 @@ class WForm extends HTMLElement {
                 class: 'Btn',
                 type: "button",
                 innerText: 'CONFIRMAR',
-                onclick: async () => {
-                    await this.Save(ObjectF);
+                onclick: async (ev) => {
+                    try {
+                        ev.target.enabled = false
+                        await this.Save(ObjectF);
+                    } catch (error) {
+                        ev.target.enabled = true
+                    }
                 }
             });
             DivOptions.append(InputSave);
@@ -943,7 +989,12 @@ class WForm extends HTMLElement {
                     type: "button",
                     innerText: Action.name,
                     onclick: async (ev) => {
-                        Action.action(ev.target);
+                        try {
+                            ev.target.enabled = false
+                            Action.action(ev.target);
+                        } catch (error) {
+                            ev.target.enabled = true
+                        }
                     }
                 }));
             });
@@ -995,7 +1046,10 @@ class WForm extends HTMLElement {
                             return false;
                         }
 
-                    } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL") {
+                    } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+                        || this.Config.ModelObject[prop]?.type.toUpperCase() == "CALENDAR") {
+                        console.log(this.Config.ModelObject[prop].require == true);
+                        console.log(ObjectF[prop]);
                         if (this.Config.ModelObject[prop].require == true) {
                             this.Config.ModelObject[prop].MinimunRequired = this.Config.ModelObject[prop]?.MinimunRequired ?? 1;
                         }
@@ -1037,7 +1091,7 @@ class WForm extends HTMLElement {
         }
         //console.log(JSON.stringify(this.#OriginalObject), JSON.stringify(ObjectF));
         if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
-           //this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
+            //this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
             //return false;
         }
         return true;
@@ -1068,15 +1122,18 @@ class WForm extends HTMLElement {
             try {
                 if (withModel) {
                     const response = await this.Config.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
+                    this.ExecuteSaveFunction(ObjectF, response);
                 } else if (this.Config.ObjectOptions?.Url != undefined) {
                     const response = await WAjaxTools.PostRequest(this.Config.ObjectOptions?.Url, ObjectF);
+                    this.ExecuteSaveFunction(ObjectF, response);
                 }
-                if (this.Config.SaveFunction != undefined) {
-                    this.Config.SaveFunction(ObjectF);
-                } else if (this.Config.ObjectOptions?.SaveFunction != undefined) {
-                    this.Config.ObjectOptions?.SaveFunction(ObjectF);
-                } 
-                ModalCheck.close();                
+                ModalCheck.close();
+                // if (this.Config.SaveFunction != undefined) {
+                //     console.log("HEARE");
+                //     this.Config.SaveFunction(ObjectF);
+                // } else if (this.Config.ObjectOptions?.SaveFunction != undefined) {
+                //     this.Config.ObjectOptions?.SaveFunction(ObjectF);
+                // }
             } catch (error) {
                 ModalCheck.close();
                 console.log(error);
@@ -1090,7 +1147,8 @@ class WForm extends HTMLElement {
                     {
                         style: { textAlign: "center" },
                         children: [{
-                            tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async () => {
+                            tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async (ev) => {
+                                ev.target.enabled = false;
                                 modalCheckFunction();
                             }
                         }, {
@@ -1104,6 +1162,14 @@ class WForm extends HTMLElement {
         });
         return ModalCheck;
     }
+    ExecuteSaveFunction(ObjectF, response) {
+        if (this.Config.SaveFunction != undefined) {
+            this.Config.SaveFunction(ObjectF, response);
+        } else if (this.Config.ObjectOptions?.SaveFunction != undefined) {
+            this.Config.ObjectOptions?.SaveFunction(ObjectF, response);
+        }
+    }
+
     async SelectedFile(value, multiple = false) {
         if (multiple) {
             for (const file in value) {
@@ -1424,8 +1490,7 @@ class WForm extends HTMLElement {
                 }
 
                 .imgPhoto {
-                    grid-row: 1/3;
-                    grid-column: 1/2;
+                    grid-column: span 1 !important;
                 }
             }`;
         const wstyle = new WStyledRender({

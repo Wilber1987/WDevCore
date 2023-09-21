@@ -27,6 +27,10 @@ class ColumChart extends HTMLElement {
     }
     connectedCallback() {
         //console.log("conected");
+        if (this.Dataset == null || this.Dataset ==  undefined || this.Dataset.length == 0) {
+            this.shadowRoot.innerHTML = "No hay datos que mostar";
+            return;
+        }
         this.shadowRoot.innerHTML = "";
         this.MainChart.children = [];
         this.GroupsData = [];
@@ -779,49 +783,62 @@ class GanttChart extends HTMLElement {
         this.groupParams = this.Config.groupParams ?? [];
         this.EvalValue = this.Config.EvalValue ?? null;
         this.AttNameEval = this.Config.AttNameEval ?? null;
+        this.Task = WRender.Create({ className: "Task" });
         this.TimeLine = WRender.Create({ className: "TimeLine" });
         this.TaskContainer = WRender.Create({ className: "TaskContainer" });
-        this.ChartContainer = WRender.Create({ className: "ChartContainer", children: [this.TimeLine, this.TaskContainer] });
+        this.ChartContainer = WRender.Create({ className: "ChartContainer", children: [this.TimeLine, this.Task, this.TaskContainer] });
         this.shadowRoot.append(this.CustomStyle, this.ChartContainer);
         WRender.SetStyle(this, {
             overflowX: "auto",
             overflowY: "auto",
             width: "100%",
         })
+        this.listOfAllDaysSpanish_mini = [
+            'DOM', 'LUN', 'MAR', 'MI', 'JUE', 'VIE', 'SAB'
+        ];
         this.DrawComponent();
 
     }
-    connectedCallback() { 
+    connectedCallback() {
         this.Animate();
     }
     DrawComponent = async () => {
+        this.Task.innerHTML = "";
         this.TimeLine.innerHTML = "";
-      console.log(this.Dataset)
+        if (this.Dataset == undefined || this.Dataset == null || this.Dataset.length == 0) {
+            this.TimeLine.innerHTML = "NO DATA";
+            return;
+        }
         const min = WArrayF.MinDateValue(this.Dataset, "Fecha_Inicio");
         const max = WArrayF.MaxDateValue(this.Dataset, "Fecha_Finalizacion");
-        console.log(min);
-        console.log(max);        
-        const inicio = new Date(min);
-        const fin = new Date(max);
+        //console.log(min, max);
+
         const UN_DIA_EN_MILISEGUNDOS = 1000 * 60 * 60 * 24;
         const INTERVALO = UN_DIA_EN_MILISEGUNDOS //* 7; // Cada semana
         const formateadorFecha = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', });
+        const inicio = new Date(min);
+        const fin = new Date(max.getTime() + INTERVALO);
 
         for (let i = inicio; i <= fin; i = new Date(i.getTime() + INTERVALO)) {
-            //console.log(formateadorFecha.format(i));
+           // console.log(formateadorFecha.format(i));
             this.TimeLine.append(WRender.Create({
                 id: i.toLocaleDateString(),
                 class: "TimeLineBlock",
-                innerText: formateadorFecha.format(i)
+                children: [ i.toISO(), this.listOfAllDaysSpanish_mini[i.getDay()]] //formateadorFecha.format(i)
             }))
         }
         this.TaskContainer.innerHTML = "";
         this.Dataset.forEach(task => {
+            const taskDetail = WRender.Create({
+                className: "taskDetail",
+                innerText: "#" + task.Id_Tarea + " " +task.Titulo
+            })
+            this.Task.append(taskDetail)
             const taskDiv = WRender.Create({
                 className: "taskBlock",
                 name: new Date(task.Fecha_Inicio).toLocaleDateString()
                     + "-" + new Date(task.Fecha_Finalizacion).toLocaleDateString(),
-                innerText: task.Titulo + " #" + task.Id_Tarea
+                innerText: task.Estado
             })
             this.TaskContainer.append(taskDiv)
         });
@@ -831,7 +848,7 @@ class GanttChart extends HTMLElement {
         const days = this.TimeLine.querySelectorAll(".TimeLineBlock");
         const task = this.TaskContainer.querySelectorAll(".taskBlock");
         const daysArray = [...days];
-        console.log(daysArray);
+        //console.log(daysArray);
         task.forEach(el => {
             //const duration = el.dataset.duration.split("-");
             const duration = el.name.split("-");
@@ -845,8 +862,8 @@ class GanttChart extends HTMLElement {
                 left = filteredArray[0].offsetLeft + filteredArray[0].offsetWidth / 2;
             } else {
                 const filteredArray = daysArray.filter(day => day.id == startDay);
-                console.log(filteredArray);
-                console.log(startDay);
+                //console.log(filteredArray);
+                //console.log(startDay);
                 left = filteredArray[0].offsetLeft;
             }
 
@@ -855,7 +872,7 @@ class GanttChart extends HTMLElement {
                 width = filteredArray[0].offsetLeft + filteredArray[0].offsetWidth / 2 - left;
             } else {
                 const filteredArray = daysArray.filter(day => day.id == endDay);
-                console.log(endDay);
+                //console.log(endDay);
                 width = filteredArray[0].offsetLeft + filteredArray[0].offsetWidth - left;
             }
 
@@ -863,8 +880,8 @@ class GanttChart extends HTMLElement {
             el.style.left = `${left}px`;
             el.style.width = `${width}px`;
             //if (e.type == "load") {
-                el.style.backgroundColor = GenerateColor();
-                el.style.opacity = 1;
+            el.style.backgroundColor = el.innerHTML.includes("Finalizado") ? "#28a745" : "#2c3e50";
+            el.style.opacity = 1;
             //}
         });
     }
@@ -902,26 +919,59 @@ class GanttChart extends HTMLElement {
             padding: 0 10px;
             margin: 0 auto;
         }
+        .Task , .TaskContainer {
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: flex-end;
+        }
+        .taskDetail {
+            position: relative;
+            color: #fff;
+            background-color: #028abc;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            overflow: hidden;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: lowercase;
+            padding: 5px 20px;
+            transition: all 0.65s linear 0.2s;
+        }
+        .taskDetail::first-letter {
+            text-transform: uppercase;
+         }        
 
         /* CHART-VALUES
         –––––––––––––––––––––––––––––––––––––––––––––––––– */
         .ChartContainer {
             width: 100%;
             overflow: auto;
+            display: grid;
+            grid-template-columns: 180px calc(100% - 200px);
+            grid-template-rows: 50px auto;
+            gap: 10px;
+            min-height: 500px;
         }
         .TimeLine {
+            grid-column: 2/3;
             position: relative;
             display: flex;
             margin-bottom: 20px;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 14px;
         }
         
 
         .TimeLineBlock {
+            display: flex;
             flex: 1;
+            grid-column: 2/3;
             min-width: 80px;
+            font-size: 12px;
             text-align: center;
+            flex-direction: column;
         }
 
         .TimeLineBlock:not(:last-child) {
@@ -940,13 +990,14 @@ class GanttChart extends HTMLElement {
 
         /* CHART-BARS
         –––––––––––––––––––––––––––––––––––––––––––––––––– */
+        
         .taskBlock {
             position: relative;
             color: #fff;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-size: 16px;
-            border-radius: 20px;
-            padding: 10px 20px;
+            border-radius: 5px;
+            padding: 5px 20px;
             width: 0;
             opacity: 0;
             transition: all 0.65s linear 0.2s;

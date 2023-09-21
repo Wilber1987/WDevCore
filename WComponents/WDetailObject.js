@@ -19,7 +19,7 @@ class WDetailObject extends HTMLElement {
         this.ObjectDetail = this.Config.ObjectDetail;
         this.ModelObject = this.Config.ModelObject ?? this.ObjectDetail;
         this.ProfileContainer = WRender.createElement({ type: 'div', props: { class: 'ProfileContainer' } });
-        //this.SetImage(this.ObjectDetail, this.ModelObject)
+        this.SetImage(this.ObjectDetail, this.ModelObject)
         this.ProfileContainer.append(new ProfileCard(this.Config));
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
         this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
@@ -59,11 +59,13 @@ class WDetailObject extends HTMLElement {
         this.shadowRoot.append(WRender.createElement(this.styleComponent), this.ProfileContainer, this.ComponentTab, this.TabContainer);
     }
     SetImage = (ObjectDetail, Model) => {
+        let isImg = false;
         const ImageCards = WRender.createElement({ type: 'div', props: { class: 'ImageCards' } });
         for (const prop in Model) {
             if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
                 switch (Model[prop].type.toUpperCase()) {
                     case "IMG":
+                        isImg = true;
                         ImageCards.append(ControlBuilder.BuildImage(ObjectDetail[prop], this.Config.ImageUrlPath))
                         break;
                     default:
@@ -71,7 +73,9 @@ class WDetailObject extends HTMLElement {
                 }
             }
         }
-        this.ProfileContainer.append(ImageCards);
+        if (isImg) {
+            this.ProfileContainer.append(ImageCards);
+        }
     }
     TabElements = (ObjectDetail, Model) => {
         const tabElements = [];
@@ -84,7 +88,7 @@ class WDetailObject extends HTMLElement {
                             action: async (ev) => {
                                 this.TabManager.NavigateFunction(prop, new WTableComponent({
                                     Options: { Search: true },
-                                    ImageUrlPath:  this.Config.ImageUrlPath,
+                                    ImageUrlPath: this.Config.ImageUrlPath,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
                                 }));
@@ -98,73 +102,98 @@ class WDetailObject extends HTMLElement {
         }
         return tabElements;
     }
-    styleComponent = {
-        type: 'w-style', props: {
-            ClassList: [
-                new WCssClass(`.ProfileContainer`, {
-                    display: 'grid',
-                    "grid-template-columns": "auto auto",
-                    "border-bottom": "solid 2px #bbbec1",
-                    "padding-bottom": 10,
-                    "margin-bottom": 20,
-                }), new WCssClass(`.DataContainer`, {
-                    display: 'flex',
-                    //"flex-direction": "column",
-                    padding: "5px"
-                }), new WCssClass(` h3`, {
-                    margin: "5px 10px",
-                    color: "#09315f"
-                }), new WCssClass(`.DataContainer label`, {
-                    margin: "5px 10px",
-                }), new WCssClass(`.divIdiomas`, {
-                    display: 'flex',
-                    "flex-wrap": "wrap"
-                }), new WCssClass(`.divIdiomas label`, {
-                    padding: 8,
-                    margin: "5px 2px",
-                    "background-color": "#5964a7",
-                    color: "#fff",
-                    "font-weight": "bold",
-                    "border-radius": "0.4cm",
-                    "font-size": 12
-                }), new WCssClass(`.divRedes img`, {
-                    height: 35,
-                    width: 35,
-                    "margin-right": 10
-                }), new WCssClass(`.divRedes div`, {
-                    display: "flex",
-                    "align-items": "center",
-                    "justify-content": "left",
-                    margin: 5
-                }), new WCssClass(`.divRedes a`, {
-                    "text-decoration": "none",
-                    "font-weight": "bold",
-                    color: "#09f"
-                }), new WCssClass(`.ImageCards img`, {
-                    width: "90%",
-                    height: "auto",
-                    margin: "auto",
-                    "justify-self": "center",
-                    display: "block",
-                    "object-fit": "cover",
-                    color: "#09f",
-                    "border-radius": 10,
-                    overflow: "hidden",
-                    "box-shadow": "0 0 5px 0 #999"
-                }), new WCssClass(`.DataContainer label:first-letter`, {
-                    "text-transform": "uppercase",
-                })
-            ], MediaQuery: [{
-                condicion: "(max-width: 800px)",
-                ClassList: [
-                    new WCssClass(`.ProfileContainer`, {
-                        display: 'grid',
-                        "grid-template-columns": "100%"
-                    })
-                ]
-            }]
+    styleComponent = css`
+        .ProfileContainer {
+            display: flex;
+            grid-template-columns: auto auto;
+            border-bottom: solid 2px #bbbec1;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
-    };
+
+        .DataContainer {
+            display: flex;
+            padding: 5px;
+        }
+
+        h3 {
+            margin: 5px 10px;
+            color: #09315f;
+        }
+
+        .DataContainer label {
+            margin: 5px 10px;
+        }
+
+        .divIdiomas {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .divIdiomas label {
+            padding: 8px;
+            margin: 5px 2px;
+            background-color: #5964a7;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 0.4cm;
+            font-size: 12px;
+        }
+
+        .divRedes img {
+            height: 35px;
+            width: 35px;
+            margin-right: 10px;
+        }
+
+        .divRedes div {
+            display: flex;
+            align-items: center;
+            justify-content: left;
+            margin: 5px;
+        }
+
+        .divRedes a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #09f;
+        }
+        .ImageCards {
+            max-width: 300px;
+        }
+
+        .ImageCards img {
+            width: 90%;
+            max-width: 300px;
+            height: auto;
+            margin: auto;
+            justify-self: center;
+            display: block;
+            object-fit: cover;
+            color: #09f;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 5px 0 #999;
+            margin-bottom: 30px;
+        }
+
+        .DataContainer label:first-letter {
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 800px) {
+            .ImageCards {
+                max-width: 300px;
+                height: auto;
+                margin: auto;
+            }
+            .ProfileContainer {
+                text-align: center;
+                display: grid;
+                grid-template-columns: 100%;
+            }
+        }
+    `
 }
 
 class ProfileCard extends HTMLElement {
@@ -182,19 +211,20 @@ class ProfileCard extends HTMLElement {
         this.container.innerHTML = "";
         this.container.append(WRender.CreateStringNode("<h3>Datos Generales</h3>"));
         for (const prop in Model) {
+            ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop]
             if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
                 switch (Model[prop].type.toUpperCase()) {
                     case "TEXT": "NUMBER"
                         this.container.append(WRender.Create({
                             tagName: 'div', class: 'DataContainer', children: [
-                                WOrtograficValidation.es(prop) + ": " + ObjectDetail[prop] ?? "",
+                                (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": " + ObjectDetail[prop] ?? "",
                             ]
                         }));
                         break;
                     case "DATE": "FECHA"
                         this.container.append(WRender.Create({
                             tagName: 'div', class: 'DataContainer', children: [
-                                WOrtograficValidation.es(prop) + ": " + ObjectDetail[prop]?.toDateFormatEs() ?? "",
+                                (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": " + ObjectDetail[prop]?.toDateFormatEs() ?? "",
                             ]
                         }));
                         break;

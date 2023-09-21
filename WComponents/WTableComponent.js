@@ -431,7 +431,8 @@ class WTableComponent extends HTMLElement {
     }
 
     SelectBTN(element, Options, index) {
-        if (this.Options?.Select != undefined && this.Options.Select == true) {
+        if ((this.Options?.Select != undefined && this.Options.Select == true)
+            || (this.Options?.MultiSelect != undefined && this.Options.MultiSelect == true)) {
             let Checked = WArrayF.FindInArray(element, this.selectedItems);
             Options.append(WRender.Create({
                 tagName: "input",
@@ -515,7 +516,8 @@ class WTableComponent extends HTMLElement {
         }
     }
     TrueOptions() {
-        return this.Options?.Select != undefined ||
+        return this.Options?.MultiSelect != undefined ||
+            this.Options?.Select != undefined ||
             this.Options?.Show != undefined ||
             this.Options?.Edit != undefined ||
             this.Options?.Delete != undefined ||

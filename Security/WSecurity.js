@@ -1,4 +1,4 @@
-import { ComponentsManager, WAjaxTools, WArrayF, WRender } from "./WComponentsTools.js";
+import { ComponentsManager, WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 //import { WModalForm } from "../WComponents/WModalForm.js";
 // import "../WComponents/WLoginTemplate.js";
 
@@ -20,6 +20,7 @@ class WSecurity {
     //API
     static urlVerification = WSecurity.Path + "/api/Security/Verification";
     static urlLogIn = WSecurity.Path + "/api/Security/Login";
+    static urlRecovery = WSecurity.Path + "/api/Security/RecoveryPassword";
     static urlRegister = WSecurity.Path + "/api/Security/Register";
     static urlLogOut = WSecurity.Path + "/api/Security/LogOut";
 
@@ -53,6 +54,16 @@ class WSecurity {
         } else {
             alert("ERROR")
             console.log("Fail to login");
+        }
+    }
+    static RecoveryPassword = async (UserData, url) => {
+        const result = await WAjaxTools.PostRequest(WSecurity.urlRecovery, UserData)
+        console.log(result);
+        if (result == true || result.success == true) {
+            alert("Contraseña enviada.");
+        } else {
+            alert("ERROR")
+            console.log("Fail to recover");
         }
     }
     static LogOut = async () => {

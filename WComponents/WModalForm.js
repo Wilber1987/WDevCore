@@ -107,10 +107,10 @@ class WModalForm extends HTMLElement {
             this.Modal.children.push({ class: "ObjectModalContainer", children: [modalOb] });
         } else if (this.ObjectDetail || this.ModelObject || this.EditObject) { // MUESTRA EL DETALLE DE UN OBJETO EN UNA LISTA
             const { WForm } = await import("./WForm.js");
-            this.Config.SaveFunction = (ObjectF) => {
+            this.Config.SaveFunction = (ObjectF, response) => {
                 if (this.ObjectOptions != undefined) {  /**TODO REVISAR */
                     if (this.ObjectOptions.SaveFunction != undefined) {
-                        this.ObjectOptions.SaveFunction(ObjectF);
+                        this.ObjectOptions.SaveFunction(ObjectF,response);
                     }
                 }
                 this.close(false);
@@ -239,8 +239,8 @@ class WModalForm extends HTMLElement {
                         "position": "relative",
                         "left": "-10px;",
                     }), new WCssClass(`.ObjectModalContainer`, {
-                        overflow: "hidden",
-                        "overflow-y": 'auto',
+                       // overflow: "hidden",
+                       // "overflow-y": 'auto',
                         "max-height": "calc(100vh - 120px)",
                         height: "100%",
                         width: "90%",
@@ -321,7 +321,6 @@ class WSimpleModalForm extends HTMLElement {
             class: 'BtnClose', //class: 'Btn',
             onclick: this.close
         });
-        console.log(this.title);
         const Section = WRender.Create({
             className: "ModalHeader",
             innerHTML: this.title

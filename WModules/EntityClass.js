@@ -54,8 +54,7 @@ class EntityClass {
      * @returns {ResponseServices}
      */
     Update = async () => {
-        return await this.SaveData(this.ApiMethods.Update, this);
-        
+        return await this.SaveData(this.ApiMethods.Update, this);        
     }
      /**
      * @param {String} Param 
@@ -78,15 +77,14 @@ class EntityClass {
         if (Dataset.__proto__ == Object.prototype) {
             return Dataset;
         }
-        return Dataset.map(ent => new this.constructor(ent));;
+        return Dataset.map(ent => new this.constructor(ent));
     }
     SaveWithModel = async (Object, Edit = false) => {
         if (Edit == false) {
-            await this.SaveData(this.ApiMethods.Set, Object);
+          return  await this.SaveData(this.ApiMethods.Set, Object);
         } else {
-            await this.SaveData(this.ApiMethods.Update, Object);
-        }
-        return true;
+           return await this.SaveData(this.ApiMethods.Update, Object);
+        }        
     }
     SaveData = async (Path, Data) => {
         return await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, Data)
