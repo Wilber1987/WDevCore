@@ -4,10 +4,10 @@ class EntityClass {
     constructor(props, Namespace) {
         this.ApiMethods = {
             ApiRoute: window.origin + "/api/",
-            Get: "Api" + Namespace + "/get" + this.__proto__.constructor.name,
-            Set: "Api" + Namespace + "/save" + this.__proto__.constructor.name,
-            Update: "Api" + Namespace + "/update" + this.__proto__.constructor.name,
-            Delete: "Api" + Namespace + "/delete" + this.__proto__.constructor.name
+            Get: "Api" + Namespace + "/get" + this.__proto__.constructor.name.replace("_ModelComponent", ""),
+            Set: "Api" + Namespace + "/save" + this.__proto__.constructor.name.replace("_ModelComponent", ""),
+            Update: "Api" + Namespace + "/update" + this.__proto__.constructor.name.replace("_ModelComponent", ""),
+            Delete: "Api" + Namespace + "/delete" + this.__proto__.constructor.name.replace("_ModelComponent", "")
         }
     }
     /**@type {Array<FilterData>} */

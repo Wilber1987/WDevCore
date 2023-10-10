@@ -43,9 +43,10 @@ class WTableComponent extends HTMLElement {
         } else {
             this.selectedItems = this.TableConfig.selectedItems;
         }
+        this.Draw();
     }
     connectedCallback() {
-        this.Draw();
+      
     }
     Draw = async () => {
         this.DarkMode = this.DarkMode ?? false;
@@ -66,7 +67,7 @@ class WTableComponent extends HTMLElement {
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
-        this.Options = this.TableConfig?.Options;
+        this.Options = this.TableConfig?.Options;        
         if ((this.Dataset.length == 0 || this.Dataset == undefined || this.Dataset == null) && this.AddItemsFromApi) {
             if (isWithtUrl) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
@@ -112,6 +113,7 @@ class WTableComponent extends HTMLElement {
      */
     DrawTable(Dataset = this.Dataset) {
         this.DefineModelObject(Dataset);
+        console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
         this.Table.innerHTML = "";
         this.Table.append(WRender.createElement(this.DrawTHead()));
@@ -215,7 +217,7 @@ class WTableComponent extends HTMLElement {
         return tbodys;
     }
     DrawTRow = async (tr, element, index) => {
-        tr.innerHTML = "";
+        tr.innerHTML = "";       
         for (const prop in this.ModelObject) {
             if (this.IsDrawableRow(element, prop)) {
                 await this.EvalModelPrototype(this.ModelObject, prop, tr, element, index);

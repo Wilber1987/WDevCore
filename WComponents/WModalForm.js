@@ -28,7 +28,7 @@ class WModalForm extends HTMLElement {
             this.WidthContainer = "100%";
             this.DivColumns = this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
         } else {
-            this.WidthContainer = "60%";
+            this.WidthContainer = "80%";
             this.DivColumns = this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
         }
     }
@@ -186,7 +186,7 @@ class WModalForm extends HTMLElement {
                         "position": "relative",
                         "box-shadow": "0 0px 3px 0px #000",
                         padding: "0 0 10px 0",
-                        height: "fit-content"
+                        height: "calc(100% - 50px)"//"fit-content"
                     }), new WCssClass(" .ContainerFormWModal h2", {
                         "padding": "10px",
                         "margin": "0px",
@@ -247,7 +247,8 @@ class WModalForm extends HTMLElement {
                         margin: "auto",
                         "margin-bottom": 20,
                         "text-align": "center",
-                        padding: 5
+                        padding: 5,
+                        "overflow-y": "auto" 
                     }),
                 ], MediaQuery: [{
                     condicion: "(max-width: 1200px)",

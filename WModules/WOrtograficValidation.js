@@ -68,7 +68,8 @@ class WOrtograficValidation {
         { error: ["CLASIFICACION"], value: "clasificación" },
         { error: ["INTERES"], value: "interés" },
         { error: ["APELLIDIO"], value: "apellido" },  
-        { error: ["FECHANAC"], value: "fecha de nacimiento" },      
+        { error: ["FECHANAC"], value: "fecha de nacimiento" },    
+        { error: ["EMPENO"], value: "empeño" },    
 
     ]
 }

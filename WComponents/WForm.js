@@ -57,7 +57,7 @@ class WForm extends HTMLElement {
                 Url: undefined
             };
         }
-        console.log(this.FormObject);
+        //console.log(this.FormObject);
         this.FormObject = this.FormObject ?? this.Config.EditObject ?? {};
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const ObjectProxy = this.CreateProxy(Model);
@@ -550,6 +550,7 @@ class WForm extends HTMLElement {
                 });
                 break;
             case "CHECKBOX":
+                ObjectF[prop] = typeof val === "boolean" ? val : false;
                 ControlContainer.className += " radioCheckedControl";
                 ControlLabel.htmlFor = "ControlValue" + prop;
                 ControlLabel.className += " radioCheckedLabel";
@@ -557,8 +558,9 @@ class WForm extends HTMLElement {
                     tagName: "input",
                     id: "ControlValue" + prop,
                     className: prop,
-                    value: val,
-                    checked: val != null || val != undefined,
+                    value: ObjectF[prop],
+                    // @ts-ignore
+                    checked: typeof val === "boolean" ? val : false,
                     onchange: ModelProperty.disabled ? undefined : onChangeEvent,
                     type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
                     disabled: ModelProperty.disabled
@@ -1002,6 +1004,7 @@ class WForm extends HTMLElement {
         return DivOptions;
     }
     Save = async (ObjectF = this.FormObject) => {
+        console.log(ObjectF);
         if (this.Config.ValidateFunction != undefined &&
             typeof this.Config.ValidateFunction === "function") {
             const response = this.Config.ValidateFunction(ObjectF);
@@ -1048,8 +1051,6 @@ class WForm extends HTMLElement {
 
                     } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
                         || this.Config.ModelObject[prop]?.type.toUpperCase() == "CALENDAR") {
-                        console.log(this.Config.ModelObject[prop].require == true);
-                        console.log(ObjectF[prop]);
                         if (this.Config.ModelObject[prop].require == true) {
                             this.Config.ModelObject[prop].MinimunRequired = this.Config.ModelObject[prop]?.MinimunRequired ?? 1;
                         }

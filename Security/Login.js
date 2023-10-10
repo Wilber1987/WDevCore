@@ -13,8 +13,8 @@ const OnLoad = async () => {
             WRender.Create({ tagName: "style", innerHTML: '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");' }),
             WRender.createElement(StylesControlsV2),
             WRender.Create(MasterStyle),
-            { tagName: 'img', src: "/Media/Image/logo.png", class: 'className' },
-            { tagName: 'h3', innerText: "Mesa de ayuda", class: 'className' },
+            { tagName: 'img', src: "/Media/img/logo.png", class: 'className' },
+            { tagName: 'h3', innerText: "Inicio de sesión", class: 'className' },
             {
                 children: ["Correo", {
                     tagName: 'input', type: 'text', placeholder: 'Correo', onchange: (ev) => {

@@ -79,10 +79,12 @@ class WDetailObject extends HTMLElement {
     }
     TabElements = (ObjectDetail, Model) => {
         const tabElements = [];
-        for (const prop in Model) {
+        for (const prop in Model) {          
             if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
                 switch (Model[prop].type.toUpperCase()) {
                     case "MASTERDETAIL":
+                        console.log(prop);
+                        console.log(Model[prop].ModelObject());
                         tabElements.push({
                             name: WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
@@ -109,11 +111,14 @@ class WDetailObject extends HTMLElement {
             border-bottom: solid 2px #bbbec1;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            overflow-y: auto;
         }
 
         .DataContainer {
             display: flex;
             padding: 5px;
+            text-align: left;
+            justify-content: space-between;
         }
 
         h3 {
@@ -180,6 +185,23 @@ class WDetailObject extends HTMLElement {
         .DataContainer label:first-letter {
             text-transform: uppercase;
         }
+        w-detail-card {
+            width: 100%;
+        }
+
+        .cont {
+            font-size: 12px;
+            display: grid;
+            grid-template-columns: 33% 33% 33%;            
+        }    
+        .cont h3 {
+            grid-column: span 3;
+            width: 100%;
+        }  
+        .cont .label-value {
+            border-bottom: 2px #09f solid;
+            text-align: right;
+        }
 
         @media (max-width: 800px) {
             .ImageCards {
@@ -208,29 +230,51 @@ class ProfileCard extends HTMLElement {
     }
     connectedCallback() { }
     DraProfileCard = async (ObjectDetail, Model) => {
+        console.log(ObjectDetail);
+        console.log(Model);
         this.container.innerHTML = "";
         this.container.append(WRender.CreateStringNode("<h3>Datos Generales</h3>"));
         for (const prop in Model) {
-            ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop]
-            if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
-                switch (Model[prop].type.toUpperCase()) {
-                    case "TEXT": "NUMBER"
-                        this.container.append(WRender.Create({
-                            tagName: 'div', class: 'DataContainer', children: [
-                                (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": " + ObjectDetail[prop] ?? "",
-                            ]
-                        }));
-                        break;
-                    case "DATE": "FECHA"
-                        this.container.append(WRender.Create({
-                            tagName: 'div', class: 'DataContainer', children: [
-                                (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": " + ObjectDetail[prop]?.toDateFormatEs() ?? "",
-                            ]
-                        }));
-                        break;
-                    default:
-                        break;
-                }
+            try {
+                this.createPropDetail(ObjectDetail, prop, Model);
+            } catch (error) {
+                console.log(error);
+                console.log(prop);
+                console.log(ObjectDetail[prop]);
+            }
+        }
+    }
+
+    createPropDetail(ObjectDetail, prop, Model) {
+        ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop];
+        if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
+            switch (Model[prop].type.toUpperCase()) {
+                case "TEXT":
+                    this.container.append(WRender.Create({
+                        tagName: 'div', class: 'DataContainer', children: [
+                            (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
+                            { tagName: 'label', className: "label-value", innerText: WOrtograficValidation.es(ObjectDetail[prop] ?? "") }
+                        ]
+                    }));
+                    break;
+                case "NUMBER":
+                    this.container.append(WRender.Create({
+                        tagName: 'div', class: 'DataContainer', children: [
+                            (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
+                            { tagName: 'label', className: "label-value", innerText: (typeof ObjectDetail[prop] === "number" ? ObjectDetail[prop].toFixed(2) : "") }
+                        ]
+                    }));
+                    break;
+                case "DATE": case "FECHA":
+                    this.container.append(WRender.Create({
+                        tagName: 'div', class: 'DataContainer', children: [
+                            (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
+                            { tagName: 'label', className: "label-value", innerText: ObjectDetail[prop]?.toDateFormatEs() ?? "" }
+                        ]
+                    }));
+                    break;
+                default:
+                    break;
             }
         }
     }
