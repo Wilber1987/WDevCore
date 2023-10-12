@@ -79,20 +79,30 @@ class WDetailObject extends HTMLElement {
     }
     TabElements = (ObjectDetail, Model) => {
         const tabElements = [];
-        for (const prop in Model) {          
+        for (const prop in Model) {
             if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
                 switch (Model[prop].type.toUpperCase()) {
                     case "MASTERDETAIL":
-                        console.log(prop);
-                        console.log(Model[prop].ModelObject());
                         tabElements.push({
-                            name: WOrtograficValidation.es(prop), url: "#",
+                            name:  Model[prop].label ??  WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
                                 this.TabManager.NavigateFunction(prop, new WTableComponent({
                                     Options: { Search: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
+                                }));
+                            }
+                        });
+                        break;
+                    case "MODEL":
+                        tabElements.push({
+                            name:   Model[prop].label ??  WOrtograficValidation.es(prop), url: "#",
+                            action: async (ev) => {
+                                this.TabManager.NavigateFunction(prop, new ProfileCard({                                    
+                                    ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
+                                    ObjectDetail: ObjectDetail[prop]
+                                    
                                 }));
                             }
                         });
@@ -112,23 +122,13 @@ class WDetailObject extends HTMLElement {
             padding-bottom: 10px;
             margin-bottom: 20px;
             overflow-y: auto;
-        }
-
-        .DataContainer {
-            display: flex;
-            padding: 5px;
-            text-align: left;
-            justify-content: space-between;
-        }
+        }       
 
         h3 {
             margin: 5px 10px;
             color: #09315f;
         }
 
-        .DataContainer label {
-            margin: 5px 10px;
-        }
 
         .divIdiomas {
             display: flex;
@@ -192,18 +192,40 @@ class WDetailObject extends HTMLElement {
         .cont {
             font-size: 12px;
             display: grid;
-            grid-template-columns: 33% 33% 33%;            
+            grid-template-columns: 33% 33% 33%;         
+            overflow-x: hidden;
+            border-radius: 20px;
+            border: solid 2px #cfcfcf;   
+            padding: 10px;
+            margin: 10px 0px;
         }    
         .cont h3 {
             grid-column: span 3;
             width: 100%;
         }  
-        .cont .label-value {
-            border-bottom: 2px #09f solid;
-            text-align: right;
+        .DataContainer label {
+            font-size:12px;
+        }
+        .cont .label-value {          
+            width: 100%;
+            margin-bottom: 5px;
+            font-size:15px;
+            font-weight: bold;
+        }
+
+        .DataContainer {
+            display: flex;
+            padding: 5px;
+            text-align: left;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            height: 36px;
         }
 
         @media (max-width: 800px) {
+            .cont {               
+                grid-template-columns: 50% 50%;     
+            }    
             .ImageCards {
                 max-width: 300px;
                 height: auto;
@@ -230,8 +252,6 @@ class ProfileCard extends HTMLElement {
     }
     connectedCallback() { }
     DraProfileCard = async (ObjectDetail, Model) => {
-        console.log(ObjectDetail);
-        console.log(Model);
         this.container.innerHTML = "";
         this.container.append(WRender.CreateStringNode("<h3>Datos Generales</h3>"));
         for (const prop in Model) {
