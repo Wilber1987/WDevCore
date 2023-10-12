@@ -678,10 +678,10 @@ class WArrayF {
     static SumValAtt(DataArry, EvalValue) {//retorna la suma 
         var Maxvalue = 0;
         for (let index = 0; index < DataArry.length; index++) {
-            if (typeof DataArry[index][EvalValue] === "number" || parseFloat(DataArry[index][EvalValue]) != "NaN") {
+            if (typeof DataArry[index][EvalValue] === "number" || parseFloat(DataArry[index][EvalValue]).toString() != "NaN") {
                 Maxvalue = Maxvalue + parseFloat(DataArry[index][EvalValue]);
             } else {
-                Maxvalue = "Error!";
+                console.log("ERROR: ", EvalValue, DataArry[index][EvalValue]);
                 break;
             }
         }
