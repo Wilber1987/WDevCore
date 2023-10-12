@@ -130,7 +130,7 @@ class WFilterOptions extends HTMLElement {
             return false;
         }
         return (Model[prop].__proto__ = Object.prototype && Model[prop].type &&
-            (!Model[prop].primary && !Model[prop].hidden && !Model[prop].hiddenFilter))
+            (!Model[prop].hidden && !Model[prop].hiddenFilter))
             && Model[prop].__proto__ != Function.prototype
             && Model[prop].__proto__.constructor.name != "AsyncFunction";
     }

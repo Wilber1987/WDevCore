@@ -186,7 +186,7 @@ class WModalForm extends HTMLElement {
                         "position": "relative",
                         "box-shadow": "0 0px 3px 0px #000",
                         padding: "0 0 10px 0",
-                        height: "calc(100% - 50px)"//"fit-content"
+                        //height: "calc(100% - 50px)"//"fit-content"
                     }), new WCssClass(" .ContainerFormWModal h2", {
                         "padding": "10px",
                         "margin": "0px",

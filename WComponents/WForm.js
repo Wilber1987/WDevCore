@@ -328,7 +328,7 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = undefined;
                 ControlLabel.className += " formHeader";
                 ControlLabel.innerHTML = ModelProperty.label ?? "";
-                ControlContainer.classList.add("tableContainer");
+                ControlContainer.classList.add("titleContainer");
                 InputControl = WRender.CreateStringNode("<span/>");
                 break;
             case "IMG": case "IMAGE": case "IMAGES":
@@ -1200,7 +1200,7 @@ class WForm extends HTMLElement {
                 display: grid;
                 grid-template-rows: auto;
                 height: calc(100% - 70px);
-                gap: 20px;
+                gap: 15px;
             }
             .divForm .imageGridForm {
                 grid-row: span 3;
@@ -1499,7 +1499,7 @@ class WForm extends HTMLElement {
                 new WCssClass(`.divForm`, {
                     "grid-template-columns": this.DivColumns
                 }), new WCssClass(` .divForm .imageGridForm, .divForm .tableContainer,
-                 .divForm .textAreaContainer, .imgPhoto`, {
+                 .divForm .textAreaContainer, .divForm .titleContainer, .imgPhoto`, {
                     "grid-column": `span  ${this.limit}`,
                     "padding-bottom": 10
                 })

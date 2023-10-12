@@ -194,9 +194,9 @@ class WDetailObject extends HTMLElement {
             display: grid;
             grid-template-columns: 33% 33% 33%;         
             overflow-x: hidden;
-            border-radius: 20px;
-            border: solid 2px #cfcfcf;   
+            border-radius: 20px;            
             padding: 10px;
+            gap:10px;
             margin: 10px 0px;
         }    
         .cont h3 {
@@ -220,6 +220,13 @@ class WDetailObject extends HTMLElement {
             justify-content: space-between;
             flex-wrap: wrap;
             height: 36px;
+            overflow: hidden;
+            border-right: 8px solid #d9d9d9;
+            border-radius: 8px;
+            transition: all .5s;
+        }
+        .DataContainer:hover {           
+            border-right: 8px solid #575757;
         }
 
         @media (max-width: 800px) {
@@ -256,6 +263,9 @@ class ProfileCard extends HTMLElement {
         this.container.append(WRender.CreateStringNode("<h3>Datos Generales</h3>"));
         for (const prop in Model) {
             try {
+                if (ObjectDetail[prop] == undefined || ObjectDetail[prop] == null || this.isNotDrawable(Model, prop)) {
+                    continue;
+                }
                 this.createPropDetail(ObjectDetail, prop, Model);
             } catch (error) {
                 console.log(error);
@@ -264,9 +274,15 @@ class ProfileCard extends HTMLElement {
             }
         }
     }
+    isNotDrawable(Model, prop) {
+        return (Model[prop]?.__proto__ == Object.prototype &&
+            (Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
+            || Model[prop]?.__proto__ == Function.prototype
+            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData";
+    }
 
     createPropDetail(ObjectDetail, prop, Model) {
-        ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop];
+        ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop];       
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "TEXT":
