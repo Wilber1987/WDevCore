@@ -119,7 +119,7 @@ class MultiSelect extends HTMLElement {
             });
             if (!this.MultiSelect) {
                 Option.onclick = this.DisplayOptions;
-            }            
+            }
             const SubContainer = WRender.Create({ className: "SubMenu" });
             if (element.SubOptions != undefined && element.SubOptions.__proto__ == Array.prototype) {
                 element.SubMultiSelect = new MultiSelect({
@@ -137,7 +137,7 @@ class MultiSelect extends HTMLElement {
                 children: [OptionLabel, Option, SubContainer]
             });
             this.OptionsContainer.append(Options);
-            if (this.FullDetail) {       
+            if (this.FullDetail) {
                 Options.append(this.BuilDetail(element))
             }
         });
@@ -151,7 +151,10 @@ class MultiSelect extends HTMLElement {
     }
     DrawLabel = () => {
         this.LabelMultiselect.querySelector(".selecteds").innerHTML =
-            this.MultiSelect ? "Seleccionados: " : "Seleccionar";
+            this.selectedItems.length == 0 ? "Seleccionar: " : "";
+        let sum = 0;
+        let add = 0;
+        let labelsWidth = 0;
         this.selectedItems.forEach((element, index) => {
             if (!this.MultiSelect) {
                 this.LabelMultiselect.querySelector(".selecteds").innerHTML = "";
@@ -160,7 +163,7 @@ class MultiSelect extends HTMLElement {
                 tagName: "label",
                 innerText: this.DisplayText(element, index),
             });
-            this.LabelMultiselect.querySelector(".selecteds").append(LabelM);
+
             if (this.MultiSelect == true) {
                 LabelM.append(WRender.Create({
                     tagName: "button", innerText: "x", onclick: () => {
@@ -179,13 +182,32 @@ class MultiSelect extends HTMLElement {
                     }
                 }));
             }
+            console.log(labelsWidth);
+            const selectedsContainer = this.LabelMultiselect.querySelector(".selecteds");
+            if (sum == 0) {
+                selectedsContainer.append(LabelM);
+                labelsWidth = labelsWidth + LabelM.offsetWidth;
+                add++;
+            }
+            console.log(labelsWidth + 100);
+            if (selectedsContainer.offsetWidth <= labelsWidth + 100) {
+                sum++;
+            }
+            console.log(selectedsContainer.offsetWidth, labelsWidth);
+
         });
+        if (this.selectedItems.length - add > 0) {
+            this.LabelMultiselect.querySelector(".selecteds").append(WRender.Create({
+                tagName: "label",
+                innerText: "+" + (this.selectedItems.length - add).toString()
+            }))
+        }
     }
     DisplayText(element, index) {
         if (typeof element === "string") {
-           return element
+            return element
         }
-        return  element.tipo ?? element.Descripcion ??
+        return element.tipo ?? element.Descripcion ??
             element.descripcion ??
             element.desc ??
             element.name ??
@@ -279,10 +301,11 @@ const MainMenu = css`
         align-items: center;
         cursor: pointer;
         height: 100%;
+        height: 34px;
     }
     .LabelMultiselect .selecteds {       
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
         min-height: 33px;
         width: calc(100% - 30px);
@@ -297,20 +320,21 @@ const MainMenu = css`
         max-height: 0px !important;
     }
     .LabelMultiselect label {
-        padding: 5px 10px;
+        padding: 5px;
         border-radius: 0.3cm;
-        background-color: #009f97;
-        color: #fff;
+        background-color: #009f97;  color: #fff;margin: 3px;  
         font-size: 12px;
-        overflow: hidden;
-        margin: 3px;
+        align-items: center;
+        overflow: hidden;        
         text-transform: uppercase;
+        line-height: 18px;
+        display: flex;
     }
     .LabelMultiselect label button {
-        padding: 0px 5px;
         border: none;
-        margin-left: 10px;
+        margin-left: 3px;
         cursor: pointer;
+        font-weight: bold;
         border-left: solid 2px #062e2c;
         background: none;
     }

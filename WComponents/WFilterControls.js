@@ -186,11 +186,11 @@ class WFilterOptions extends HTMLElement {
                         default:
                             break;
                     }
-                    console.log({
+                    /*console.log({
                         PropName: control.id,
                         FilterType: filterType,
                         Values: values
-                    });
+                    });*/
                     this.ModelObject.FilterData.push({
                         PropName: control.id,
                         FilterType: filterType,

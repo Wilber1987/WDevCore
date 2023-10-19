@@ -113,7 +113,7 @@ class WTableComponent extends HTMLElement {
      */
     DrawTable(Dataset = this.Dataset) {
         this.DefineModelObject(Dataset);
-        console.log(this.ModelObject, this.Dataset);
+        //console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
         this.Table.innerHTML = "";
         this.Table.append(WRender.createElement(this.DrawTHead()));
