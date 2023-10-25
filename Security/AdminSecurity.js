@@ -63,6 +63,11 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
                             name: "Editar roles", action: async (object) => {
                                 Main.append(await ChangeRoles(object));
                             }
+                        } : null,
+                        TabName == "Usuarios" ? {
+                            name: "Editar datos", action: async (object) => {
+                                Main.append(await ChangeDatos(object, mainComponent));
+                            }
                         } : null
                     ]
                 }
@@ -83,8 +88,27 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
         }
     };
 }
+const ChangeDatos = async (/**@type {Security_Users} */ object, /**@type {WTableComponent} */ table) => {
+    const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});
+    return new WModalForm({
+        title: "EDITAR",
+        EditObject: object,
+        ModelObject: new Security_Users({
+            Password: { type: "password", hidden: true },
+            Security_Users_Roles: { type: "text", hidden: true }
+        }),
+        StyleForm: "ColumnX1",
+        ObjectOptions: {
+            Url: "../api/ApiEntitySECURITY/saveSecurity_Users", SaveFunction: async () => {
+                let response = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Users", {});
+                table.Dataset = response;
+                table.DrawTable();
+            }
+        }
+    })
+}
 const ChangeRoles = async (/**@type {Security_Users} */ object) => {
-    const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});   
+    const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});
     return new WModalForm({
         title: "CAMBIO DE CONTRASEÑA",
         EditObject: { Id_User: object.Id_User, Security_Users_Roles: object.Security_Users_Roles },
