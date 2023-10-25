@@ -100,6 +100,7 @@ class WCalendar extends HTMLElement {
                         if (day.className != "CalendarDayDisable") day.className = "CalendarDay";
                     });
                     ev.target.className = "CalendarDayActive";
+                    console.log(date);
                     if (this.action) {
                         if (this.DetailDay) { } else {
                             const Result = this.action({
@@ -279,7 +280,7 @@ class DetailDayClass extends HTMLElement {
             this[p] = Props[p];
         }
         this.className = "DayDetail DivContainer";
-        const ListDays = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        const ListDays = ["Domingo","Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
         this.append(WRender.createElement(this.Style));
         if (DateParam == null) {
             this.append(WRender.Create({
@@ -289,6 +290,7 @@ class DetailDayClass extends HTMLElement {
             }));
             return;
         }
+        console.log(DateParam);
         this.append(WRender.Create({
             class: "DayContent",
             children: [

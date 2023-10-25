@@ -462,8 +462,8 @@ class WForm extends HTMLElement {
                 ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
                 ObjectF[prop] = ObjectF[prop] != "" && ObjectF[prop] != undefined ?
-                    this.CreateProxy(Model, ObjectF[prop]) :
-                    this.CreateProxy(Model, []);
+                ObjectF[prop]:// this.CreateProxy(Model, ObjectF[prop]) :
+                   [];// this.CreateProxy(Model, []);
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
                     AddItemsFromApi: false,
