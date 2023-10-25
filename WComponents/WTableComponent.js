@@ -37,7 +37,7 @@ class WTableComponent extends HTMLElement {
         /**@type {Number} */
         this.numPage = this.Dataset.length / this.maxElementByPage;
         /**@type {Number} */
-        this.ActualPage = 0;
+        this.ActualPage = 1;
         if (this.TableConfig.selectedItems == undefined) {
             this.selectedItems = [];
         } else {
@@ -46,7 +46,7 @@ class WTableComponent extends HTMLElement {
         this.Draw();
     }
     connectedCallback() {
-      
+
     }
     Draw = async () => {
         this.DarkMode = this.DarkMode ?? false;
@@ -67,7 +67,7 @@ class WTableComponent extends HTMLElement {
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
-        this.Options = this.TableConfig?.Options;        
+        this.Options = this.TableConfig?.Options;
         if ((this.Dataset.length == 0 || this.Dataset == undefined || this.Dataset == null) && this.AddItemsFromApi) {
             if (isWithtUrl) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
@@ -118,12 +118,13 @@ class WTableComponent extends HTMLElement {
         this.Table.innerHTML = "";
         this.Table.append(WRender.createElement(this.DrawTHead()));
         const tbody = this.DrawTBody(Dataset);
-        tbody.forEach(tb => {
+        this.Table.append(tbody);
+        /*tbody.forEach(tb => {
             this.Table.append(WRender.createElement(tb));
-        });
+        });*/
         if (this.paginate == true) {
             this.Tfooter.innerHTML = "";
-            this.DrawTFooter(tbody).forEach(element => {
+            this.DrawTFooter(Dataset).forEach(element => {
                 this.Tfooter.append(element);
             });
         }
@@ -178,13 +179,13 @@ class WTableComponent extends HTMLElement {
     /**
      * 
      * @param {Array} [Dataset] 
-     * @returns {Array<HTMLElement>}
+     * @returns {HTMLElement}
      */
     DrawTBody = (Dataset = this.Dataset) => {
-        /**@type {Array<HTMLElement>} */
-        const tbodys = [];
-        this.numPage = (Dataset.length / this.maxElementByPage) >= 1 ? Dataset.length / this.maxElementByPage : 1;
-        for (let index = 0; index < this.numPage; index++) {
+        ///**@type {Array<HTMLElement>} */
+        //const tbodys = [];
+      
+        /*for (let index = 0; index < this.numPage; index++) {
             let tBodyStyle = "display:none";
             if (index == 0) {
                 tBodyStyle = "display:content";
@@ -206,18 +207,27 @@ class WTableComponent extends HTMLElement {
             } else {
                 tbodys[page].append(tr);
             }
-        });
-        if (tbodys[0].children.length == 0) {
-            tbodys[page].append(WRender.Create({
+        });*/ 
+        let tbody = WRender.Create({ tagName: "tbody" });
+        Dataset.slice((this.ActualPage - 1) * this.maxElementByPage,
+            this.ActualPage * this.maxElementByPage)
+            .forEach((element, DatasetIndex) => {
+                let tr = WRender.Create({ tagName: "tr" });
+                this.DrawTRow(tr, element);
+                tbody.append(tr);
+            });
+
+        if (tbody.children.length == 0) {
+            tbody.append(WRender.Create({
                 type: "h5", style: { padding: "20px" },
                 innerText: "No hay elementos que mostrar"
             }));
         }
         this.shadowRoot?.append(WRender.createElement(this.MediaStyleResponsive()));
-        return tbodys;
+        return tbody;
     }
     DrawTRow = async (tr, element, index) => {
-        tr.innerHTML = "";       
+        tr.innerHTML = "";
         for (const prop in this.ModelObject) {
             if (this.IsDrawableRow(element, prop)) {
                 await this.EvalModelPrototype(this.ModelObject, prop, tr, element, index);
@@ -533,23 +543,24 @@ class WTableComponent extends HTMLElement {
 
     /**
      * 
-     * @param {Array<HTMLElement>} tbodys 
+     * @param {Array} Dataset 
      * @returns {Array<HTMLElement>}
      */
-    DrawTFooter(tbodys) {
+    DrawTFooter(Dataset) {
+        this.numPage = (Dataset.length / this.maxElementByPage) >= 1 ? Math.round(Dataset.length / this.maxElementByPage) : 1;
         let tfooter = [];
         const buttons = [];
-        const SelectPage = (index) => {
-            tbodys.forEach((body, indexBody) => {
-                if (indexBody == index) {
-                    body.style.display = "contents";
-                } else {
-                    body.style.display = "none";
-                }
-            });
+        const SelectPage = (index) => {           
+            // tbodys.forEach((body, indexBody) => {
+            //     if (indexBody == index) {
+            //         body.style.display = "contents";
+            //     } else {
+            //         body.style.display = "none";
+            //     }
+            // });
             this.ActualPage = index;
             buttons.forEach((button, indexBtn) => {
-                if (indexBtn == index) {
+                if (indexBtn + 1 == index) {
                     button.className = "paginateBTN paginateBTNActive";
                 } else if (index > 8 && indexBtn < (index - 7)) {
                     button.className = "paginateBTN paginateBTNHidden";
@@ -557,14 +568,18 @@ class WTableComponent extends HTMLElement {
                     button.className = "paginateBTN";
                 }
             });
+            console.log(this.ActualPage);
+            this.Table?.querySelector("tbody")?.remove();
+            const tbody = this.DrawTBody(Dataset);
+            this.Table.append(tbody);
         }
         tfooter.push(WRender.Create({
             tagName: "label", innerText: "<<",
             class: "pagBTN",
             onclick: () => {
                 this.ActualPage = this.ActualPage - 1;
-                if (this.ActualPage < 0) {
-                    this.ActualPage = tbodys.length - 1;
+                if (this.ActualPage <= 0) {
+                    this.ActualPage = this.numPage;
                 }
                 SelectPage(this.ActualPage);
             }
@@ -582,7 +597,7 @@ class WTableComponent extends HTMLElement {
             const button = WRender.Create({
                 type: "a", id: "footBtn" + (index + 1),
                 innerText: (index + 1).toString(), class: btnClass,
-                onclick: () => SelectPage(index)
+                onclick: () => SelectPage(index + 1)
             })
             tfooterNumbers.append(button);
             buttons.push(button);
@@ -592,8 +607,8 @@ class WTableComponent extends HTMLElement {
             tagName: "label", innerText: ">>", class: "pagBTN",
             onclick: () => {
                 this.ActualPage = this.ActualPage + 1;
-                if (this.ActualPage > tbodys.length - 1) {
-                    this.ActualPage = 0;
+                if (this.ActualPage > this.numPage) {
+                    this.ActualPage = 1;
                 }
                 SelectPage(this.ActualPage);
             }

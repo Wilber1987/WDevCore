@@ -34,7 +34,7 @@ class WTableComponent extends HTMLElement {
     connectedCallback() {
         this.Draw();
     }
-    Draw = async ()=>{
+    Draw = async () => {
         this.DarkMode = this.DarkMode ?? false;
         if (this.shadowRoot.innerHTML != "") {
             return;
@@ -68,7 +68,7 @@ class WTableComponent extends HTMLElement {
             this.Dataset = this.TableConfig.Dataset;
             if (this.TableConfig.Options.UrlSearch != null || this.TableConfig.Options.UrlSearch != undefined) {
                 this.Dataset = await WAjaxTools.PostRequest(this.TableConfig.Options.UrlSearch);
-            }            
+            }
             if (this.Dataset == undefined) {
                 this.Dataset = [{ Description: "No Data!!!" }];
             }
@@ -273,7 +273,7 @@ class WTableComponent extends HTMLElement {
         thead.children.push(tr);
         return thead;
     }
-     DrawTRow = async(tr, element) => {
+    DrawTRow = async (tr, element) => {
         tr.innerHTML = "";
         for (const prop in this.ModelObject) {
             if (WArrayF.checkDisplay(this.DisplayData, prop, this.ModelObject)) {
@@ -315,11 +315,11 @@ class WTableComponent extends HTMLElement {
                                 new WCardTable(element[prop], Model[prop].ModelObject, this.TableConfig)
                             ]
                         }));
-                    }  else if (IsOperation) {
+                    } else if (IsOperation) {
                         tr.append(WRender.createElement({
                             type: "td", props: {
                                 style: "text-align: right",
-                                innerHTML: `${Money[this.TypeMoney]} ${  Model[prop].action(element)}`
+                                innerHTML: `${Money[this.TypeMoney]} ${Model[prop].action(element)}`
                             }
                         }));
                     } else if (this.IsMoney(prop)) {
@@ -392,8 +392,8 @@ class WTableComponent extends HTMLElement {
         }
     }
     DrawTBody = (Dataset = this.Dataset) => {
-        let tbody = { type: "tbody", props: {}, children: [] };
-        if (this.paginate == true && Dataset.length > this.maxElementByPage) {
+        let tbody = WRender.Create({ tagName: "tbody" });
+        /*if (this.paginate == true && Dataset.length > this.maxElementByPage) {
             this.numPage = Dataset.length / this.maxElementByPage;
             if (Dataset.length > 50) {
                 this.numPage = 50 / this.maxElementByPage;
@@ -415,26 +415,20 @@ class WTableComponent extends HTMLElement {
             }
         } else {
             this.numPage = 1;
-        }
+        }*/
         let page = 0;
-        Dataset.forEach((element, DatasetIndex) => {
-            if (DatasetIndex >= 50) {
-                return;
-            }
-            let tr = WRender.Create({ tagName: "tr" });
-            this.DrawTRow(tr, element);
-            if (this.numPage > 1 && tbody.children[page] &&
-                (this.paginate == true && Dataset.length > this.maxElementByPage)) {
-                tbody.children[page].children.push(tr);
-                if (tbody.children[page].children.length == this.maxElementByPage) {
-                    page++;
-                }
-            } else {
+        Dataset.slice((this.page_number - 1) * this.maxElementByPage,
+            this.page_number * this.maxElementByPage)
+            .forEach((element, DatasetIndex) => {
+                /*if (DatasetIndex >= 50) {
+                    return;
+                }*/
+                let tr = WRender.Create({ tagName: "tr" });
+                this.DrawTRow(tr, element);
                 tbody.children.push(tr);
-            }
-        });
+            });
         if (tbody.children.length == 0) {
-            tbody.children.push({ type: "h5", props: { innerText: "No hay elementos que mostrar" } });
+            tbody.append(WRender.Create({ tagName: "h5", innerText: "No hay elementos que mostrar"  }));
         }
         this.shadowRoot.append(WRender.createElement(this.MediaStyleResponsive()));
         return tbody;
@@ -580,7 +574,7 @@ class WTableComponent extends HTMLElement {
         this.shadowRoot.append(
             new WModalForm({
                 ModelObject: this.ModelObject,
-                ParentModel: this.TableConfig.ParentModel , 
+                ParentModel: this.TableConfig.ParentModel,
                 EditObject: element,
                 DisplayData: this.DisplayData,
                 icon: this.TableConfig.icon,
@@ -650,7 +644,7 @@ class WTableComponent extends HTMLElement {
 
     isSorteable(element, prop) {
         return element[prop] != null &&
-        parseFloat(element[prop].toString().replaceAll("%", "").replaceAll(Money[this.TypeMoney], "")).toString() != "NaN";
+            parseFloat(element[prop].toString().replaceAll("%", "").replaceAll(Money[this.TypeMoney], "")).toString() != "NaN";
     }
 
     IsMoney(prop) {
@@ -667,7 +661,7 @@ class WTableComponent extends HTMLElement {
     }
 
     IsNumber(element, prop) {
-        return  element[prop] != null &&
+        return element[prop] != null &&
             parseFloat(element[prop]).toString() != "NaN";
 
     }

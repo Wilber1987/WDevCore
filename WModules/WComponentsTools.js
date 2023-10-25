@@ -119,7 +119,8 @@ class WAjaxTools {
                 return response;
             } catch (error) {
                 console.log(error);
-                throw "ocurrio un error al procesar los datos de la respuesta";
+                console.log("ocurrio un error al procesar los datos de la respuesta"); 
+                return response;
             }
         }
     }
