@@ -323,10 +323,10 @@ class DetailDayClass extends HTMLElement {
                 let Reservable = true;
                 let checked = false;
                 Calendario.forEach(reserva => {
-                    const fecha1R = new Date(reserva.Fecha_Inicial);
+                    const fecha1R = new Date(reserva.Fecha_Inicio);
                     const fecha2R = new Date(reserva.Fecha_Final);
                     const findSelected = SelectedBlocks?.find(s =>
-                        s.Fecha_Inicial == reserva.Fecha_Inicial && s.Fecha_Final == reserva.Fecha_Final);
+                        s.Fecha_Inicio == reserva.Fecha_Inicio && s.Fecha_Final == reserva.Fecha_Final);
                     if (fecha1.toString() == fecha1R.toString() && fecha2.toString() == fecha2R.toString()) {
                         if (findSelected == undefined) {
                             hour.className = "hourDetail hourR";
@@ -353,7 +353,7 @@ class DetailDayClass extends HTMLElement {
                         }
                         const dataPost = {
                             id: `${DateParam.date} ${element}`,
-                            Fecha_Inicial: `${DateParam.date}T${element}:00.000Z`,
+                            Fecha_Inicio: `${DateParam.date}T${element}:00.000Z`,
                             Fecha_Final: `${DateParam.date}T${element.replace(":00", ":59")}:00.000Z`
                         }
                         SelectedBlocks.push(dataPost);

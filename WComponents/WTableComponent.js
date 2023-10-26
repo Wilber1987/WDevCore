@@ -352,7 +352,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "CALENDAR":
                     const label = `${element[prop]?.map(object => {
-                        const label = object?.Fecha_Inicial.toDateFormatEs() + " al " + object?.Fecha_Final.toDateFormatEs();
+                        const label = object?.Fecha_Inicio.toDateFormatEs() + " al " + object?.Fecha_Final.toDateFormatEs();
                         return `<label class="labelMultiselect">${label}</label>`;
                     }).join('')}`
                     tr.append(WRender.Create({

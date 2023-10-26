@@ -27,7 +27,7 @@ class ColumChart extends HTMLElement {
     }
     connectedCallback() {
         //console.log("conected");
-        if (this.Dataset == null || this.Dataset ==  undefined || this.Dataset.length == 0) {
+        if (this.ChartInstance.Dataset == null || this.ChartInstance.Dataset ==  undefined || this.ChartInstance.Dataset.length == 0) {
             this.shadowRoot.innerHTML = "No hay datos que mostar";
             return;
         }
@@ -74,7 +74,7 @@ class ColumChart extends HTMLElement {
             SectionBars.append(this.DrawLineChart(this.EvalArray, this.ChartInstance.Colors, ChartFragment));
         }
     }
-    _AddSectionBars(Dataset = this.Dataset) {
+    _AddSectionBars(Dataset = this.Dataset) {        
         this.groupParams.forEach(groupParam => {
             let object = {};
             object[groupParam] = "";

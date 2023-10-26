@@ -10,6 +10,7 @@ import { MultiSelect } from "./WMultiSelect.js";
  *  * @property {Array} Dataset    
     * @property {Function} FilterFunction
     * @property {Boolean} [Display]
+    * @property {Boolean} [AutoFilter]
     * @property {Object} [ModelObject]
     * @property {Object} [EntityModel]
 **/
@@ -137,7 +138,7 @@ class WFilterOptions extends HTMLElement {
 
     filterFunction = async () => {
         const Model = this.EntityModel ?? this.ModelObject;
-        if (Model.Get) {
+        if (Model.Get || this.Config.AutoFilter == false) {
             this.ModelObject.FilterData = [];
             this.FilterControls.forEach(control => {
                 if (this.ModelObject[control.id]) {
@@ -198,8 +199,13 @@ class WFilterOptions extends HTMLElement {
                     })
                 }
             });
+            if (this.Config.AutoFilter == false) {
+                this.Config.FilterFunction(Model.FilterData);
+                return;
+            }
             this.Config.Dataset = await Model.Get();
         }
+        
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
             this.FilterControls.forEach(control => {
