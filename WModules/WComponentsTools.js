@@ -119,7 +119,7 @@ class WAjaxTools {
                 return response;
             } catch (error) {
                 console.log(error);
-                console.log("ocurrio un error al procesar los datos de la respuesta"); 
+                console.log("ocurrio un error al procesar los datos de la respuesta");
                 return response;
             }
         }
@@ -497,6 +497,7 @@ class ComponentsManager {
     }
 }
 class WArrayF {
+
     static JSONParse(param) {
         return JSON.parse((param).replace(/&quot;/gi, '"'));
     }
@@ -824,6 +825,30 @@ class WArrayF {
             }
         }
         return flag;
+    }
+    /**
+     * @param {Array} Array Arreglo para ordenar 
+     * @returns {Object}
+     */
+    static Consolidado(Array) {
+        const consolidado = {};
+        for (const prop in Array[0]) {
+            if (typeof Array[0][prop] === "number") {
+                const suma = this.SumValAtt(Array, prop);
+                consolidado[prop] = {
+                    Type: "NUMBER",
+                    Suma: suma,
+                    Average: suma / Array.length,
+                    Max: this.MaxValue(Array, prop),
+                    Min: this.MinValue(Array, prop)
+                }
+            } else {
+                consolidado[prop] = {
+                    Type: "TEXT"
+                }
+            }
+        }
+        return consolidado;
     }
     static replacer(value) {
         const replacerElement = {};
