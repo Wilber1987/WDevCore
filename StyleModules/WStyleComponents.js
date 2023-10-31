@@ -93,14 +93,14 @@ const StylesControlsV1 = {
 }
 const StylesControlsV2 = css`
     .Btn-Mini, .Btn-Mini-Alert, .Btn-Mini-Success {
-        width: 100px;
         background-color: #1c4786;
         border: none;
         outline: none;
         border-radius: 10px;
         color: #fff;
         font-weight: 600;
-        margin: 0px 5px;
+        margin: 0px;
+        margin-right: 5px;
         cursor: pointer;
         transition: 0.5s;
         font-size: 11px;

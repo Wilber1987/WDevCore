@@ -36,17 +36,34 @@ class WReportComponent extends HTMLElement {
     }
     CreateTable(data, page) {
         const container = WRender.Create({ className: "container " + (page ? "pageA4" : "") });
-        if(page){
+        if (page) {
             container.append(this.CustomStyle)
         }
         const divHeader = WRender.Create({ className: "report-title" });
         const divFooter = WRender.Create({ className: "report-footer" });
         container.append(divHeader);
          /**@type {Object}*/const consolidado = WArrayF.Consolidado(data);
-        data.forEach((dato, index) => {
+       
+        data = data.map(d => WArrayF.replacer(d));
+        data?.forEach((dato, index) => {
             const div = WRender.Create({ className: "report-container" });
             if (dato.__proto__ == Object.prototype) {
                 for (const prop in dato) {
+                    if ((prop == "get" || prop == "set") ||
+                        prop == "ApiMethods" ||
+                        prop == "FilterData" ||
+                        prop == "Get" ||
+                        prop == "GetByProps" ||
+                        prop == "FindByProps" ||
+                        prop == "Save" ||
+                        prop == "Update" ||
+                        prop == "GetData" ||
+                        prop == "SaveData" ||
+                        dato[prop] == null ||
+                        dato[prop] == undefined ||
+                        dato[prop].__proto__.constructor.name == "AsyncFunction") {
+                        continue;
+                    }
                     let header;
                     let footer;
                     if (index == 0) {
@@ -85,9 +102,9 @@ class WReportComponent extends HTMLElement {
             return WRender.Create({ className: "row-string", innerHTML: dato[prop] });
         } else if (typeof dato[prop] == "number") {
             return WRender.Create({ className: "row-number", innerHTML: dato[prop].toFixed(2) });
-        } else if (dato[prop].__proto__ == Object.prototype) {
-            return this.BuildRow(dato[prop]);
-        } else if (dato[prop].__proto__ == Array.prototype) {
+        } else if (dato[prop]?.__proto__ == Object.prototype) {
+            return this.BuildRow(WArrayF.replacer((dato[prop])));
+        } else if (dato[prop]?.__proto__ == Array.prototype) {
             if (titleHeader != undefined) titleHeader.style.flex = 8;
             if (footer != undefined) footer.style.flex = 8;
             return this.CreateTable(dato[prop]);
@@ -117,8 +134,8 @@ class WReportComponent extends HTMLElement {
         this.OptionContainer.append(WRender.Create({
             tagName: 'button', className: 'Block-Primary', innerText: 'Imprimir',
             onclick: async () => {
-                const ventimp =  window.open(' ', 'popimpr');
-                ventimp?.document.write( this.MainContainer.querySelector(".pageA4")?.innerHTML ?? "no data" );
+                const ventimp = window.open(' ', 'popimpr');
+                ventimp?.document.write(this.MainContainer.querySelector(".pageA4")?.innerHTML ?? "no data");
                 ventimp?.document.close();
                 ventimp?.print();
                 ventimp?.close();

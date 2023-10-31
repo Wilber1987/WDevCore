@@ -851,10 +851,14 @@ class WArrayF {
         return consolidado;
     }
     static replacer(value) {
+        if (value == null) {
+            return null;
+        }
         const replacerElement = {};
         for (const prop in value) {
             if ((prop == "get" && prop == "set") ||
                 prop == "ApiMethods" ||
+                prop == "FilterData" ||
                 prop == "Get" ||
                 prop == "GetByProps" ||
                 prop == "FindByProps" ||

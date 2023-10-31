@@ -112,7 +112,7 @@ class WTableComponent extends HTMLElement {
      * @param {Array} Dataset 
      */
     DrawTable(Dataset = this.Dataset) {
-        console.log(this.Dataset);
+        //console.log(this.Dataset);
         this.DefineModelObject(Dataset);
         //console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
