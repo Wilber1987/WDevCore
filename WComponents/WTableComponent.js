@@ -100,6 +100,7 @@ class WTableComponent extends HTMLElement {
      * @param {Array} [Dataset] 
      */
     DefineModelObject(Dataset = this.Dataset) {
+        //console.log(Dataset);
         if (this.TableConfig.ModelObject == undefined) {
             for (const prop in Dataset[0]) {
                 this.ModelObject[prop] = Dataset[0][prop];
@@ -185,7 +186,7 @@ class WTableComponent extends HTMLElement {
     DrawTBody = (Dataset = this.Dataset) => {
         ///**@type {Array<HTMLElement>} */
         //const tbodys = [];
-      
+
         /*for (let index = 0; index < this.numPage; index++) {
             let tBodyStyle = "display:none";
             if (index == 0) {
@@ -208,7 +209,7 @@ class WTableComponent extends HTMLElement {
             } else {
                 tbodys[page].append(tr);
             }
-        });*/ 
+        });*/
         let tbody = WRender.Create({ tagName: "tbody" });
         Dataset.slice((this.ActualPage - 1) * this.maxElementByPage,
             this.ActualPage * this.maxElementByPage)
@@ -242,7 +243,8 @@ class WTableComponent extends HTMLElement {
             this.DeleteBTN(Options, element, tr);
             if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
-                    if (Action == null) {
+                    if (Action == null || (Action.rendered != undefined && Action.rendered(element) == true)) {
+                        console.log();
                         return;
                     }
                     Options.append(WRender.Create({
@@ -551,7 +553,7 @@ class WTableComponent extends HTMLElement {
         this.numPage = (Dataset.length / this.maxElementByPage) >= 1 ? Math.round(Dataset.length / this.maxElementByPage) : 1;
         let tfooter = [];
         const buttons = [];
-        const SelectPage = (index) => {           
+        const SelectPage = (index) => {
             // tbodys.forEach((body, indexBody) => {
             //     if (indexBody == index) {
             //         body.style.display = "contents";

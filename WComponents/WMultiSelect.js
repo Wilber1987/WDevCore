@@ -185,18 +185,18 @@ class MultiSelect extends HTMLElement {
                     }
                 }));
             }
-            console.log(labelsWidth);
+            //console.log(labelsWidth);
             const selectedsContainer = this.LabelMultiselect.querySelector(".selecteds");
             if (sum == 0) {
                 selectedsContainer.append(LabelM);
                 labelsWidth = labelsWidth + LabelM.offsetWidth;
                 add++;
             }
-            console.log(labelsWidth + 100);
+            //console.log(labelsWidth + 100);
             if (selectedsContainer.offsetWidth <= labelsWidth + 100) {
                 sum++;
             }
-            console.log(selectedsContainer.offsetWidth, labelsWidth);
+            //console.log(selectedsContainer.offsetWidth, labelsWidth);
 
         });
         if (this.selectedItems.length - add > 0) {
