@@ -415,7 +415,7 @@ class WTableComponent extends HTMLElement {
     }
 
     EditBTN(Options, element, tr) {
-        if (this.Options?.Edit != undefined && this.Options.Edit == true) {
+        if (this.Options?.Edit != undefined && this.Options.Edit == true && element.isEditable != false) {
             Options.append(WRender.Create({
                 tagName: "button",
                 children: [{ tagName: 'img', class: "icon", src: WIcons["edit"] }],
