@@ -7,7 +7,6 @@ class ChartConfig {
     Colors = [];
     percentCalc = true
     AttNameEval = "series";
-    AttNameEval = "series";
     EvalValue = "value";
     groupParams = [];
 }
