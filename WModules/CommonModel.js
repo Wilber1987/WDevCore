@@ -325,7 +325,9 @@ class ElementStyle {
  * @typedef {Object} TableOptions 
  *  * @property {Boolean} [AddObject]
     * @property {Boolean} [Show]
+    * @property {Boolean} [Filter]
     * @property {Boolean} [Edit]
+    * @property {Boolean} [FilterDisplay]
     * @property {Function} [EditAction] requiere Edit en true, recibe como parametro el elemnto
     * @property {Boolean} [Delete]
     * @property {Function} [DeleteAction] requiere Delete en true, recibe como parametro el elemnto
@@ -351,6 +353,7 @@ class ElementStyle {
  *  * @property {Array} [Dataset]
     * @property {Array} [selectedItems]
     * @property {Object} [ModelObject]  
+    * @property {Object} [FilterModelObject]      
     * @property {Object} [EntityModel] 
     * @property {Object} [ParentModel]  
     * @property {Object} [ParentEntity]

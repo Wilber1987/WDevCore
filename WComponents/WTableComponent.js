@@ -6,6 +6,7 @@ import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
 import { WDetailObject } from "./WDetailObject.js";
+import { WFilterOptions } from "./WFilterControls.js";
 import { ModalVericateAction } from "./WForm.js";
 import { WModalForm } from "./WModalForm.js";
 
@@ -32,6 +33,14 @@ class WTableComponent extends HTMLElement {
         this.Tfooter = WRender.Create({ class: "tfooter" });
         this.divTableContainer = WRender.Create({ type: "div", class: "tableContainer", children: [this.Table] });
         this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);
+        this.FilterOptions = new WFilterOptions({
+            Dataset:  this.Dataset,
+            ModelObject: Config.FilterModelObject ?? Config.ModelObject,
+            Display: Config.Options?.FilterDisplay ?? false,
+            FilterFunction: (DFilt) => {
+                this.DrawTable(DFilt);
+            }
+        });
         /**@type {Number} */
         this.maxElementByPage = this.TableConfig.maxElementByPage ?? 10;
         /**@type {Number} */
@@ -133,7 +142,10 @@ class WTableComponent extends HTMLElement {
     }
     DrawHeadOptions() {
         if (this.ThOptions.innerHTML != "") return;
-        if (this.Options != undefined && (this.Options.Search != undefined || this.Options.Add != undefined)) {
+        if (this.Options != undefined && (this.Options.Search == true 
+            || this.Options.Add == true 
+            || this.Options.Filter == true)) {
+            
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
                     tagName: "input", class: "txtControl", type: "text",
@@ -141,7 +153,10 @@ class WTableComponent extends HTMLElement {
                     onchange: async (ev) => {
                         this.SearchFunction(ev);
                     }
-                }));
+                }));                
+            }
+            if (this.Options.Filter == true) { 
+                this.ThOptions.append(this.FilterOptions)
             }
             if (this.Options.Add == true) {
                 this.ThOptions.append(WRender.Create({
@@ -717,11 +732,13 @@ class WTableComponent extends HTMLElement {
                 justify-content: flex-start;
             }
             .thOptions {
-                display: flex;
-                overflow: hidden;
+                display: grid;
+                grid-template-columns: calc(100% - 150px)  150px; 
                 justify-content: space-between;
             }
-
+            .thOptions w-filter-option {
+                grid-column: span 2;
+            }
             input[type=text],
             input[type=string],
             input[type=number],
