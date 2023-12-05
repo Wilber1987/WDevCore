@@ -76,6 +76,7 @@ class WForm extends HTMLElement {
                 target[property] = value;
                 this.SetOperationValues(Model, target)
                 const control = this.shadowRoot?.querySelector("#ControlValue" + property);
+                //console.log(property, Model[property]);
                 if (Model[property].type.toUpperCase() != "IMG" && control) {
                     // @ts-ignore
                     control.value = target[property];
@@ -165,8 +166,8 @@ class WForm extends HTMLElement {
                     const ControlContainer = WRender.Create({
                         class: "ModalElement", children: [ControlLabel]
                     });
-                    if (Model[prop].__proto__ == Object.prototype) {
-                        if (Model[prop].ModelObject?.__proto__ == Function.prototype
+                    if (Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
+                        if (Model[prop] != undefined && Model[prop].ModelObject?.__proto__ == Function.prototype
                             && Model[prop].ModelObject()?.constructor?.name == this.Config.ParentModel?.constructor?.name) {
                             //Model[prop] = undefined;
                             ObjectF[prop] = undefined;
@@ -462,8 +463,8 @@ class WForm extends HTMLElement {
                 ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
                 ObjectF[prop] = ObjectF[prop] != "" && ObjectF[prop] != undefined ?
-                ObjectF[prop]:// this.CreateProxy(Model, ObjectF[prop]) :
-                   [];// this.CreateProxy(Model, []);
+                    ObjectF[prop] :// this.CreateProxy(Model, ObjectF[prop]) :
+                    [];// this.CreateProxy(Model, []);
                 InputControl = new WTableComponent({
                     Dataset: ObjectF[prop],
                     AddItemsFromApi: false,
@@ -821,7 +822,7 @@ class WForm extends HTMLElement {
                     InputControl.selectedItems.push(FindItem);
                 }
             });
-        } else if (val != null && val != undefined && WArrayF.replacer(val).__proto__ == Object.prototype) {
+        } else if (val != null && val != undefined && WArrayF.replacer(val)?.__proto__ == Object.prototype) {
             const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, val));
             if (FindItem) {
                 InputControl.selectedItems.push(FindItem);
