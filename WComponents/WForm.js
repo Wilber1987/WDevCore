@@ -344,16 +344,20 @@ class WForm extends HTMLElement {
                 let type = "date";
                 //@ts-ignore
                 let date_val = val == "" ? (new Date()).toISO() : ObjectF[prop];
+                let defaulMin = '1900-01-01';
+                let defaulMax = '3000-01-01';
                 if (ModelProperty.type.toUpperCase() == "HORA") {
                     type = "time";
                     date_val = val ?? "08:00";
+                    defaulMin = '00:00';
+                    defaulMax = '23:59';
                 }
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, type: type,
                     placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
                     disabled: ModelProperty.disabled,
-                    min: ModelProperty.min,
-                    max: ModelProperty.max,
+                    min: ModelProperty.min ?? defaulMin,
+                    max: ModelProperty.max ?? defaulMax,
                     onchange: onChangeEvent
                 });
                 //@ts-ignore
@@ -1084,6 +1088,15 @@ class WForm extends HTMLElement {
                             return false;
                         }
                         if (parseFloat(control.value) > parseFloat(control.max)) {
+                            this.createAlertToolTip(control, `El valor máximo permitido es: ${control.max}`);
+                            return false;
+                        }
+                    } else if (control != null && control.type?.toString().toUpperCase() == "DATE") {
+                        if (new Date(control.value) < new Date(control.min)) {
+                            this.createAlertToolTip(control, `El valor mínimo permitido es: ${control.min}`);
+                            return false;
+                        }
+                        if (new Date(control.value) > new Date(control.max)) {
                             this.createAlertToolTip(control, `El valor máximo permitido es: ${control.max}`);
                             return false;
                         }
