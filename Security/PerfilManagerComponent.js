@@ -1,5 +1,6 @@
 
 import { Cat_Dependencias, Tbl_Profile } from '../../ModelProyect/ProyectDataBaseModel.js';
+import { activityStyle } from '../../Proyect/style.js';
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
 import { WFilterOptions } from '../WComponents/WFilterControls.js';
 import { ModalMessege, ModalVericateAction } from "../WComponents/WForm.js";
@@ -93,14 +94,14 @@ class PerfilManagerComponent extends HTMLElement {
             const dependencias = await new Cat_Dependencias().Get();
             const modal = new WModalForm({
                 ModelObject: new Tbl_Profile({
-                    Nombres: {type: "text", hidden: true},
-                    Apellidos: {type: "text", hidden: true},
-                    FechaNac: {type: "text", hidden: true},
-                    Sexo: {type: "text", hidden: true},
-                    Foto: {type: "text", hidden: true},
-                    DNI: {type: "text", hidden: true},
-                    Correo_institucional: {type: "text", hidden: true},
-                    Estado: {type: "text", hidden: true},
+                    Nombres: { type: "text", hidden: true },
+                    Apellidos: { type: "text", hidden: true },
+                    FechaNac: { type: "text", hidden: true },
+                    Sexo: { type: "text", hidden: true },
+                    Foto: { type: "text", hidden: true },
+                    DNI: { type: "text", hidden: true },
+                    Correo_institucional: { type: "text", hidden: true },
+                    Estado: { type: "text", hidden: true },
                     CaseTable_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias() }
                 }), ObjectOptions: {
                     SaveFunction: async (profile) => {
@@ -125,38 +126,7 @@ class PerfilManagerComponent extends HTMLElement {
     ]
 
 
-    WStyle = css`
-        .dashBoardView{
-            display: grid;
-            grid-template-columns: auto auto ;  
-            grid-gap: 20px          
-        }
-        .OptionContainer {
-            margin: 0 0 20px 0;
-        }
-        .dashBoardView w-colum-chart { 
-            grid-column: span 2;
-        }
-        .actividad {
-            border: 1px solid #d9d6d6;
-            padding: 15px;
-            margin-bottom: 10px;           
-            color: #0a2542;
-            border-radius: 15px;
-        }
-        .actividad h4 {
-            margin: 5px 0px;
-        }
-        .actividad .propiedades {
-            font-size: 14px;
-            display: flex;
-            gap: 20px;
-        }
-        .actividad .options {
-            display: flex;
-            justify-content: flex-end;            
-        }
-    `
+    WStyle = activityStyle.cloneNode(true)
 
     mapCaseToPaginatorElement(Dataset) {
         return Dataset.map(actividad => {

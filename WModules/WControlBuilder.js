@@ -28,7 +28,7 @@ class ControlBuilder {
         </div>       
         <style>        
           .progressDivContainer{
-            position: relative; width: 100%;  height: auto;  margin: 10px 0px; display: flex;
+            position: relative; width: 100%;  height: auto;  margin: 0px 0px; display: flex;
           }          
           .progressDivContainer > .progressDiv{
             width: 100%;  height: 20px;  background: ${barColor}; overflow: hidden; border-radius: 15px;
