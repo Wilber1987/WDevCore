@@ -135,14 +135,38 @@ class WAjaxTools {
         return {};
     }
 }
-/**
- * 
- * @param {TemplateStringsArray} body 
+/** 
  * @returns {HTMLElement}
+ * @param {any} strings
+ * @param {any[]} values
  */
-function html(body) {
+function html(strings, ...values) {
     // @ts-ignore
-    return WRender.CreateStringNode(body);
+    // Unir las partes de la plantilla de cadena
+    const result = strings.reduce((accumulator, currentString, index) => {
+        accumulator += currentString;
+        if (index < values.length) {
+            const value = values[index];
+            if (typeof value === 'function') {
+                // Extraer el nombre del evento y el manejador
+                const match = currentString.match(/(\s*on\w+)=/);
+                if (match && match[1]) {
+                    const eventName = match[1];
+                    accumulator += `${eventName}="${value.toString()}"`;
+                } else {
+                    accumulator += value;
+                }
+            } else {
+                accumulator += value;
+            }
+        }
+        return accumulator;
+    }, '');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = result;
+
+    return wrapper.firstElementChild;
+    return WRender.CreateStringNode(result);
 }
 export { html }
 class WRender {

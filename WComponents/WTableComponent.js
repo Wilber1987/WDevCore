@@ -378,7 +378,7 @@ class WTableComponent extends HTMLElement {
                 case "MASTERDETAIL":
                     break;
                 case "DATE": case "FECHA":
-                    td.append(value.toString().toDateFormatEs());
+                    td.append(value?.toString()?.toDateFormatEs());
                     tr.append(td);
                     break;
                 case "OPERATION":

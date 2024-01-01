@@ -94,24 +94,29 @@ class WStyledRender extends HTMLElement {
         return bodyStyle;
     }
 }
-/**
- * 
- * @param {TemplateStringsArray} body 
+/** 
  * @returns {HTMLStyleElement}
+ * @param {any} strings
+ * @param {any[]} values
  */
-function css(body) {
-    // @ts-ignore
-    return WRender.Create({ tagName: "style", innerHTML: body.toString() });
-}
-/**
- * 
- * @param {TemplateStringsArray} body 
- * @returns {HTMLElement}
- */
-function html(body) {
-    // @ts-ignore
-    return WRender.CreateStringNode(body.toString());
-}
+function css(strings, ...values) {
+    // Unir las partes de la plantilla de cadena
+    const result = strings.reduce((accumulator, currentString, index) => {
+        // Añadir la cadena actual
+        accumulator += currentString;
+        // Si hay un valor correspondiente, añadirlo
+        if (index < values.length) {
+            accumulator += values[index];
+        }
+        return accumulator;
+    }, '');
+    // Crear un nuevo estilo HTML
+    const styleElement = document.createElement('style');
+    styleElement.textContent = result;
+
+    return styleElement;
+};
+
 customElements.define("w-style", WStyledRender);
 export { WCssClass, WStyledRender, css };
 
