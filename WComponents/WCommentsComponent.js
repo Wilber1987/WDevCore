@@ -88,17 +88,16 @@ class WCommentsComponent extends HTMLElement {
             // @ts-ignore
             Body: this.RitchInput.value,
             Attach_Files: this.RitchInput.Files,
-            Id_Case: this.CommentsIdentify,
             Id_User: this.User.UserI
         }
+        Message[ this.CommentsIdentifyName ] =  this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlAdd, Message);
         this.RitchInput.FunctionClear();
         this.update();
     }
     update = async () => {
-        const Message = {
-            Id_Case: this.CommentsIdentify
-        }
+        const Message = {}
+        Message[ this.CommentsIdentifyName ] =  this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlSearch, Message);
         //console.log(response);
         this.Dataset = response;
@@ -220,7 +219,7 @@ class WCommentsComponent extends HTMLElement {
             color: #ffffff;
             float: right;
         }        
-        .comment label, .commentSelf label {
+        .comment label, .commentSelf label, .comment p, .commentSelf p {
             display: block;
             text-align: right;
         }

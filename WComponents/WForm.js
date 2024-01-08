@@ -77,7 +77,7 @@ class WForm extends HTMLElement {
                 this.SetOperationValues(Model, target)
                 const control = this.shadowRoot?.querySelector("#ControlValue" + property);
                 //console.log(property, Model[property]);
-                if (Model[property].type.toUpperCase() != "IMG" && control) {
+                if (Model[property]?.type.toUpperCase() != "IMG" && control) {
                     // @ts-ignore
                     control.value = target[property];
                 }
@@ -208,6 +208,9 @@ class WForm extends HTMLElement {
         return Form;
     }
     isNotDrawable(Model, prop) {
+        if (Model[prop] == undefined) {
+            return true;
+        }
         return (Model[prop]?.__proto__ == Object.prototype &&
             (Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
             || Model[prop]?.__proto__ == Function.prototype

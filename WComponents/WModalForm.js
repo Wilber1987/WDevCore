@@ -25,7 +25,7 @@ class WModalForm extends HTMLElement {
             this.WidthContainer = "80%";
             this.DivColumns = this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
         } else if (this.StyleForm == "FullScreen") {
-            this.WidthContainer = "100%";
+            this.WidthContainer = "95%";
             this.DivColumns = this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
         } else {
             this.WidthContainer = "80%";
@@ -176,7 +176,7 @@ class WModalForm extends HTMLElement {
                         "grid-template-rows": "70px calc(100% - 70px)",
                         //"overflow": "hidden",
                         "margin": "auto",
-                        "margin-top": this.StyleForm == "FullScreen" ? 0 : 30,
+                        "margin-top": this.StyleForm == "FullScreen" ? 30 : 30,
                         "background-color": this.DarkMode ? "#444444" : "#fff",
                         "width": this.WidthContainer,
                         // "max-height": "calc(100vh - 120px)",
