@@ -632,21 +632,22 @@ class WArrayF {
                 for (const prop in element) {
                     NewElement[prop] = element[prop]
                 }
-                if (!element.count) {
-                    NewElement.count = 1;
-                }
+                NewElement.count = element.count ?? 1;
+                //console.log(NewElement);
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
+                console.log(NewElement);
                 DataArraySR.push(NewElement)
             } else {
-                if (!element.count) {
-                    DFilt.count = DFilt.count + 1;
-                }
+                //console.log(DFilt);
+                const countVal = element.count ?? 1;
+                DFilt.count = DFilt.count + countVal;
+                console.log(countVal, DFilt.count);
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
-                if (sumParam != null) {
+                if (sumParam != null && element[sumParam] != null && element[sumParam] != undefined) {
                     DFilt[sumParam] = DFilt[sumParam] + element[sumParam];
                 }
             }
-        });
+        });        
         return DataArraySR;
     }
     static MaxValue(Data, MaxParam) {

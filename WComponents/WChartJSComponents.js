@@ -37,7 +37,7 @@ class ColumChart extends HTMLElement {
         this.attachShadow({ mode: "open" });
     }
     attributeChangedCallBack() {
-        this.DrawChart();
+        //this.DrawChart();
     }
     connectedCallback() {
         //console.log("conected");
@@ -65,12 +65,11 @@ class ColumChart extends HTMLElement {
     }
     InitializeDataset() {
         if (this.EvalValue == null && this.Dataset.length != 0) {
-            this.Dataset = WArrayF.GroupByObject(this.Dataset, this.Dataset[0]);
+            //this.Dataset = WArrayF.GroupByObject(this.Dataset, this.Dataset[0]);
             this.EvalValue = "count";
         }
     }
     DrawChart() {
-
         this.shadowRoot.append(WRender.createElement(WChartStyle(this.ChartInstance)));
         const object = {};
         if (this.ChartInstance.DirectionChart = "row") {
@@ -80,6 +79,8 @@ class ColumChart extends HTMLElement {
             object[element] = "";
         });
         this.Totals = WArrayF.GroupByObject(this.ChartInstance.Dataset, object, this.EvalValue);
+        console.log(this.ChartInstance.Dataset, object, this.EvalValue);
+        console.log(this.Totals);
         this.MaxVal = WArrayF.MaxValue(this.Totals, this.EvalValue);
         this.MinVal = WArrayF.MinValue(this.Totals, this.EvalValue);
         this.EvalArray = WArrayF.GroupBy(this.ChartInstance.Dataset, this.AttNameEval);
@@ -549,6 +550,7 @@ const WChartStyle = (ChartInstance) => {
                     "font-size": " 18px",
                     "padding-bottom": 10,
                     display: "flex",
+                "margin": 0,
                     "justify-content": "center",
                 }), new WCssClass(".SectionLabels, .SectionLabelGroup ", {
                     "display": " flex",
