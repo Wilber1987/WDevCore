@@ -1015,6 +1015,7 @@ class WForm extends HTMLElement {
         console.log(ObjectF);
         if (this.Config.ValidateFunction != undefined &&
             typeof this.Config.ValidateFunction === "function") {
+                console.log("sav bbbeddd");
             const response = this.Config.ValidateFunction(ObjectF);
             if (response.validate == false) {
                 alert(response.message);
@@ -1022,15 +1023,19 @@ class WForm extends HTMLElement {
             }
         }
         if (!this.Validate(ObjectF)) {
+            console.log("sav bbbe");
             return;
         }
         if (this.Config.ObjectOptions?.Url != undefined || this.Config.SaveFunction == undefined) {
+            console.log("sav bbbedzzzzdd");
             const ModalCheck = this.ModalCheck(ObjectF, this.Config.SaveFunction == undefined);
             this.shadowRoot?.append(ModalCheck)
         } else if (this.Config.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
+            console.log("sav bbbeddfffdd");
             const ModalCheck = this.ModalCheck(ObjectF, true);
             this.shadowRoot?.append(ModalCheck)
         } else {
+            console.log("save");
             this.Config.SaveFunction(ObjectF);
         }
     }
@@ -1108,10 +1113,10 @@ class WForm extends HTMLElement {
             }
         }
         //console.log(JSON.stringify(this.#OriginalObject), JSON.stringify(ObjectF));
-        if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
+        //if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
             //this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
             //return false;
-        }
+        //}
         return true;
     }
 

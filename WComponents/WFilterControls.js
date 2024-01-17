@@ -7,7 +7,7 @@ import { WCssClass, css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
 /**
  * @typedef {Object} FilterConfig 
- *  * @property {Array} Dataset    
+ *  * @property {Array} Dataset  
     * @property {Function} FilterFunction
     * @property {Boolean} [Display]
     * @property {Boolean} [AutoFilter]
@@ -350,12 +350,16 @@ class WFilterOptions extends HTMLElement {
                     type: "date",
                     className: prop + " firstDate",
                     id: prop + "first",
+                    // @ts-ignore
+                    value: new Date().toISO(),
                     placeholder: prop,
                     onchange: (ev) => { this.filterFunction() }
                 }, {
                     tagName: "input",
                     type: "date",
-                    className: prop + " secondDate",
+                    className: prop + " secondDate",                    
+                    // @ts-ignore
+                    value: new Date().subtractDays(30).toISO(),
                     id: prop + "second",
                     placeholder: prop,
                     onchange: (ev) => { this.filterFunction() }
