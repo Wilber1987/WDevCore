@@ -778,7 +778,7 @@ class WArrayF {
             } else {
                 for (const objectProto in objetoEvaluado) {
                     if (objetoEvaluado[objectProto] != null) {
-                        if (objetoEvaluado[objectProto].toString().toUpperCase().startsWith(parametro.toString().toUpperCase())) {
+                        if (objetoEvaluado[objectProto].toString().toUpperCase().includes(parametro.toString().toUpperCase())) {
                             return objetoEvaluado;
                         }
                     }
@@ -798,7 +798,7 @@ class WArrayF {
                             if (evalF(param, item)) {
                                 return true
                             }
-                        } else if (item.toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
+                        } else if (item.toString().toUpperCase().includes(param.toString().toUpperCase())) {
                             return true;
                         }
                     }
@@ -806,7 +806,7 @@ class WArrayF {
                 if (find) {
                     return element;
                 }
-            } else if (element.toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
+            } else if (element.toString().toUpperCase().includes(param.toString().toUpperCase())) {
                 return element;
             }
         }
@@ -945,7 +945,8 @@ Date.prototype.toISO = function () {
  * @returns {Date}
  */
 Date.prototype.addDays = function (days) {
-    return this.setDate(this.getDate() + days);
+    this.setDate(this.getDate() + days)
+    return this;
 };
 /**
  * 
