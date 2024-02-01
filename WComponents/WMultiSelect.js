@@ -73,9 +73,6 @@ class MultiSelect extends HTMLElement {
     connectedCallback() {
         this.Draw();
         this.DrawLabel();
-        window.addEventListener("click", ()=>{
-            
-        })
     }
 
     Draw = (Dataset = this.Dataset) => {

@@ -48,6 +48,19 @@ class WForm extends HTMLElement {
         this.ObjectProxy = this.ObjectProxy ?? undefined;
         this.CreateOriginalObject();
     }
+    connectedCallback() {
+        this.DivForm.addEventListener("click", (e) => this.undisplayMultiSelects(e));
+        this.DivForm.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
+    }
+    undisplayMultiSelects = (e) => {
+        // @ts-ignore
+        if (!e.target.tagName.includes("W-MULTI-SELECT")) {
+            this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
+                // @ts-ignore
+                m.tool.className = "toolInactive";
+            })
+        }
+    }
     #OriginalObject = {};
     DrawComponent = async () => {
         this.DarkMode = this.DarkMode ?? false;
@@ -338,6 +351,9 @@ class WForm extends HTMLElement {
             case "IMG": case "IMAGE": case "IMAGES":
                 const Multiple = ModelProperty.type.toUpperCase() == "IMAGES" ? true : false;
                 InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple, onChangeEvent);
+                if (ModelProperty.disabled) {
+                    InputControl.style.pointerEvents = "none";
+                }
                 if (Multiple) {
                     ObjectF[prop] = ImageArray;
                 }
@@ -382,6 +398,7 @@ class WForm extends HTMLElement {
                 break;
             case "SELECT":
                 InputControl = this.CreateSelect(prop, ObjectF, ModelProperty.Dataset, onChangeEvent);
+                InputControl.disabled = ModelProperty.disabled ?? false;
                 ObjectF[prop] = InputControl.value;
                 break;
             case "OPERATION":
@@ -415,6 +432,9 @@ class WForm extends HTMLElement {
                 val = ObjectF[prop];
                 const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = await this.CreateWSelect(InputControl, DataseFilter, prop, ObjectF, Model);
+                if (ModelProperty.disabled) {
+                    InputControl.style.pointerEvents = "none";
+                }
                 this.FindObjectMultiselect(val, InputControl);
                 break;
             case "MULTISELECT":
@@ -431,6 +451,9 @@ class WForm extends HTMLElement {
                         }
                     }, Dataset: Datasetilt, ModelObject: ModelProperty.ModelObject
                 });
+                if (ModelProperty.disabled) {
+                    InputControl.style.pointerEvents = "none";
+                }
                 this.FindObjectMultiselect(val, InputControl);
                 ObjectF[prop] = InputControl.selectedItems;
                 break;
@@ -483,6 +506,9 @@ class WForm extends HTMLElement {
                         Add: true, Edit: true, Delete: true, Search: true
                     }
                 });
+                if (ModelProperty.disabled) {
+                    InputControl.style.pointerEvents = "none";
+                }
                 break;
             case "MODEL":
                 ControlLabel.className += " formHeader";
@@ -497,6 +523,9 @@ class WForm extends HTMLElement {
                     ModelObject: await WArrayF.isModelFromFunction(Model, prop),
                     Options: false
                 });
+                if (ModelProperty.disabled) {
+                    InputControl.style.pointerEvents = "none";
+                }
                 break;
             case "FILE":
                 InputControl = WRender.Create({
@@ -596,11 +625,11 @@ class WForm extends HTMLElement {
                 val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
                 const placeholderp = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 const pass = WRender.Create({
-                    tagName: "input", id: "ControlPass1" + prop, className: prop, value: val,
+                    tagName: "input", id: "ControlPass1" + prop, className: prop, value: val, disabled: ModelProperty.disabled,
                     type: ModelProperty.type, placeholder: placeholderp, onchange: onChangeEvent
                 })
                 const pass2 = WRender.Create({
-                    tagName: "input", id: "ControlPass2" + prop, className: prop, value: val,
+                    tagName: "input", id: "ControlPass2" + prop, className: prop, value: val, disabled: ModelProperty.disabled,
                     type: ModelProperty.type, placeholder: placeholderp, onchange: () => {
                         // @ts-ignore
                         if (pass.value != pass2.value) {
@@ -1015,7 +1044,7 @@ class WForm extends HTMLElement {
         console.log(ObjectF);
         if (this.Config.ValidateFunction != undefined &&
             typeof this.Config.ValidateFunction === "function") {
-                console.log("sav bbbeddd");
+            console.log("sav bbbeddd");
             const response = this.Config.ValidateFunction(ObjectF);
             if (response.validate == false) {
                 alert(response.message);
@@ -1114,8 +1143,8 @@ class WForm extends HTMLElement {
         }
         //console.log(JSON.stringify(this.#OriginalObject), JSON.stringify(ObjectF));
         //if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
-            //this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
-            //return false;
+        //this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
+        //return false;
         //}
         return true;
     }

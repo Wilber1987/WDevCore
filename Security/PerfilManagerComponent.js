@@ -1,5 +1,6 @@
 
-import { Cat_Dependencias, Tbl_Profile } from '../../ModelProyect/ProyectDataBaseModel.js';
+//@ts-check
+import { Cat_Dependencias } from '../../ModelProyect/ProyectDataBaseModel.js';
 import { activityStyle } from '../../Proyect/style.js';
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
 import { WFilterOptions } from '../WComponents/WFilterControls.js';
@@ -8,28 +9,32 @@ import { WModalForm } from "../WComponents/WModalForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
 import { css } from '../WModules/WStyledRender.js';
+import { Tbl_Profile } from './Tbl_Profile.js';
 
 const OnLoad = async () => {
+    // @ts-ignore
     Aside.append(WRender.Create({ tagName: "h3", innerText: "Administración de perfiles" }));
     const AdminPerfil = new PerfilManagerComponent();
+    // @ts-ignore
     Aside.append(AdminPerfil.MainNav);
+    // @ts-ignore
     Main.appendChild(AdminPerfil);
 }
 window.onload = OnLoad;
 class PerfilManagerComponent extends HTMLElement {
     /**
         * 
-        * @param {Array<Tbl_Profile>} Dataset 
+        * @param {Array<Tbl_Profile>} [Dataset] 
         */
     constructor(Dataset) {
         super();
-        Dataset.forEach(d => {
+        Dataset?.forEach(d => {
             d.CaseTable_Dependencias_Usuarios = d.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
         });
         this.Dataset = Dataset;
         console.log(this.Dataset);
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot.append(this.WStyle, StylesControlsV2.cloneNode(true), StylesControlsV3.cloneNode(true));
+        this.shadowRoot?.append(this.WStyle, StylesControlsV2.cloneNode(true), StylesControlsV3.cloneNode(true));
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
         this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.OptionContainer = WRender.Create({ className: "OptionContainer" });
@@ -47,7 +52,7 @@ class PerfilManagerComponent extends HTMLElement {
             }))
 
         });
-        this.shadowRoot.append(this.OptionContainer, this.TabContainer);
+        this.shadowRoot?.append(this.OptionContainer, this.TabContainer);
         this.perfilManagerComponent();
     }
 
@@ -56,7 +61,7 @@ class PerfilManagerComponent extends HTMLElement {
             Dataset: this.Dataset,
             AddItemsFromApi: false,
             AutoSave: true,
-            ModelObject: this.ModelObject, userStyles: [StylesControlsV2],
+            ModelObject: this.ModelObject, CustomStyle: StylesControlsV2,
             Options: {
                 MultiSelect: true,
                 Show: true,
@@ -64,6 +69,7 @@ class PerfilManagerComponent extends HTMLElement {
             }
         });
         this.FilterOptions = new WFilterOptions({
+            // @ts-ignore
             Dataset: this.Dataset,
             ModelObject: this.ModelObject,
             FilterFunction: (DFilt) => {
@@ -82,13 +88,15 @@ class PerfilManagerComponent extends HTMLElement {
             d.CaseTable_Dependencias_Usuarios = d.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
         });
         this.Dataset = Dataset;
+        // @ts-ignore
         this.mainTable.selectedItems = [];
         this.mainTable?.DrawTable(this.Dataset);
     }
     UserActions = [{
-        name: "Asignar a dependencia", action: async (/**@type {CaseTable_Case}*/element) => {
+        name: "Asignar a dependencia", action: async () => {
+            // @ts-ignore
             if (this.mainTable.selectedItems.length <= 0) {
-                this.shadowRoot.append(ModalMessege("Seleccione perfiles"));
+                this.shadowRoot?.append(ModalMessege("Seleccione perfiles"));
                 return;
             }
             const dependencias = await new Cat_Dependencias().Get();
@@ -105,22 +113,23 @@ class PerfilManagerComponent extends HTMLElement {
                     CaseTable_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias() }
                 }), ObjectOptions: {
                     SaveFunction: async (profile) => {
-                        this.shadowRoot.append(ModalVericateAction(async () => {
+                        this.shadowRoot?.append(ModalVericateAction(async () => {
                             const response =
-                                await new Tbl_Profile().AsignarDependencias(this.mainTable.selectedItems,
-                                    profile.CaseTable_Dependencias_Usuarios, profile.CaseTable_Comments);
+                                // @ts-ignore
+                                await new Tbl_Profile().AsignarDependencias(this.mainTable?.selectedItems,
+                                    profile.CaseTable_Dependencias_Usuarios);
                             if (response.status == 200) {
-                                this.shadowRoot.append(ModalMessege("Asignación Correcta"));
+                                this.shadowRoot?.append(ModalMessege("Asignación Correcta"));
                                 this.update();
                             } else {
-                                this.shadowRoot.append(ModalMessege("Error"));
+                                this.shadowRoot?.append(ModalMessege("Error"));
                             }
                             modal.close();
                         }, "Esta seguro que desea asignar a esta dependencia"))
                     }
                 }
             });
-            this.shadowRoot.append(modal);
+            this.shadowRoot?.append(modal);
         }
     }
     ]
@@ -132,7 +141,7 @@ class PerfilManagerComponent extends HTMLElement {
         return Dataset.map(actividad => {
             actividad.Dependencia = actividad.Cat_Dependencias.Descripcion;
             //actividad.Progreso = actividad.CaseTable_Tareas?.filter(tarea => tarea.Estado?.includes("Finalizado")).length;
-            return this.perfilElement(actividad);
+            //return this.perfilElement(actividad);
         });
     }
 }
