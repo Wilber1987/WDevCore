@@ -47,7 +47,7 @@ class WFilterOptions extends HTMLElement {
             class: "options", children: [
                 { tagName: "label", innerText: "Filtros" },
                 {//display
-                    tagName: 'input', style: 'transform: rotate(0deg)', class: 'BtnDinamictT', value: '>', onclick: async (ev) => {
+                    tagName: 'input', style: 'transform: rotate(0deg)', class: 'BtnDinamictT', type: "button", value: '>', onclick: async (ev) => {
                         if (ControlOptions.className == "OptionContainer") {
                             ev.target.style["transform"] = "rotate(90deg)";
                             ControlOptions.className = "OptionContainer OptionContainerActive";
@@ -460,8 +460,8 @@ class WFilterOptions extends HTMLElement {
             background-color: #4894aa;
             color: #fff;
             border-radius: 0.2cm;
-            width: 10px;
-            height: 10px;
+            width: 25px;
+            height: 25px;
             background-color:#4894aa;
             font-family: monospace;
         }

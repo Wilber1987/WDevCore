@@ -389,7 +389,7 @@ class WTableComponent extends HTMLElement {
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
                         style: this.Options?.Select ? "cursor: pointer" : "",
-                        innerText: value == "" ? "-" : WOrtograficValidation.es(value)
+                        innerHTML: value == "" ? "-" : WOrtograficValidation.es(value)
                     }));
                     tr.append(td);
                     break;
@@ -689,6 +689,18 @@ class WTableComponent extends HTMLElement {
                 padding: 0.8rem;
                 text-align: left;
                 vertical-align: top;
+            }
+            .WTable td  label{overflow: hidden;
+                max-height: 200px;
+                text-overflow: ellipsis;
+                display: block;
+                overflow-y: auto;
+                font-size: 10px !important;
+                padding: 0 5px;
+            }
+            .WTable td  label * {
+                font-size: 11px !important;
+                text-align: justify !important;
             }
 
             .WTable .tdAction {

@@ -186,6 +186,17 @@ class WDetailObject extends HTMLElement {
         .DataContainer label:first-letter {
             text-transform: uppercase;
         }
+        .TextArea {
+            grid-column: span 3;
+            font-size: 11px !important;
+            text-align: justify;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .TextArea * {
+            font-size: 11px !important;
+            text-align: justify;
+        }
         w-detail-card {
             width: 100%;
         }
@@ -220,7 +231,7 @@ class WDetailObject extends HTMLElement {
             text-align: left;
             justify-content: space-between;
             flex-wrap: wrap;
-            height: 36px;
+            min-height: 36px;
             overflow: hidden;
             border-right: 8px solid #d9d9d9;
             border-radius: 8px;
@@ -307,6 +318,14 @@ class ProfileCard extends HTMLElement {
                         tagName: 'div', class: 'DataContainer', children: [
                             (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
                             { tagName: 'label', className: "label-value", innerText: ObjectDetail[prop]?.toDateFormatEs() ?? "" }
+                        ]
+                    }));
+                    break;
+                case "TEXTAREA": 
+                    this.container.append(WRender.Create({
+                        tagName: 'div', class: 'DataContainer TextArea', children: [
+                            (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
+                            { tagName: 'label', className: "label-value", innerHTML: ObjectDetail[prop] ?? "" }
                         ]
                     }));
                     break;
