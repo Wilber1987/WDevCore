@@ -1,9 +1,10 @@
-import { Tbl_Datos_Laborales, Tbl_Formacion_Academica, Tbl_Investigaciones, Tbl_Profile } from "../Model/ModelDatabase.js";
+import { Tbl_Datos_Laborales, Tbl_Formacion_Academica, Tbl_Investigaciones } from "../Model/ModelDatabase.js";
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WForm } from "../WComponents/WForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { WAjaxTools, WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
+import { Tbl_Profile } from "./Tbl_Profile.js";
 
 const OnLoad = async () => {
     //const { WRender, WAjaxTools } = await import("./WDevCore/WModules/WComponentsTools.js");

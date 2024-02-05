@@ -26,8 +26,6 @@ class Tbl_Profile extends EntityClass {
         type: 'Multiselect', hiddenFilter: true,
         ModelObject: () => new Cat_Dependencias(), required: false,
         action: async (Profile, /** @type {WForm} */ Form) => {
-            console.log(Profile);
-            console.log(Profile.CaseTable_Dependencias_Usuarios);
             if (Profile.CaseTable_Dependencias_Usuarios.length > 0) {
                 const servicios = await new Tbl_Servicios({
                     FilterData: [{
@@ -36,17 +34,18 @@ class Tbl_Profile extends EntityClass {
 
                     }]
                 }).Get();
-                this.Tbl_Servicios.disabled = false;
+                this.Tbl_Servicios_Profile.Dataset = servicios;
+                this.Tbl_Servicios_Profile.disabled = false;
                 Form.DrawComponent();
             } else {
-                this.Tbl_Servicios.disabled = true;
-                this.Tbl_Servicios.Dataset = [];
-                Profile.Tbl_Servicios = [];
+                this.Tbl_Servicios_Profile.disabled = true;
+                this.Tbl_Servicios_Profile.Dataset = [];
+                Profile.Tbl_Servicios_Profile = [];
                 Form.DrawComponent();
             }
         }
     }
-    Tbl_Servicios = { type: 'Multiselect', hiddenFilter: true, ModelObject: () => new Tbl_Servicios(), required: false, disabled: true }
+    Tbl_Servicios_Profile = { type: 'Multiselect', hiddenFilter: true, ModelObject: () => new Tbl_Servicios(), required: false, disabled: true }
     /**
       * @param {Array<Tbl_Profile>} perfiles
       * @param {Cat_Dependencias} dependencia

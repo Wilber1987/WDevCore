@@ -1,5 +1,5 @@
 
-import { Tbl_Profile } from '../../ModelProyect/ProyectDataBaseModel.js';
+
 import { ChangePasswordModel } from './SecurityModel.js';
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WAppNavigator } from '../WComponents/WAppNavigator.js';
@@ -9,6 +9,7 @@ import { WModalForm } from "../WComponents/WModalForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WAjaxTools, WRender } from '../WModules/WComponentsTools.js';
 import { WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
+import { Tbl_Profile } from './Tbl_Profile.js';
 
 const OnLoad = async () => {
     Aside.append(WRender.Create({ tagName: "h3", innerText: "Administración de perfiles" }));
@@ -60,7 +61,7 @@ class PerfilClass extends HTMLElement {
                         new WForm({
                             AutoSave: true,
                             EditObject: this.response,
-                            ModelObject: new Tbl_Profile(),
+                            ModelObject: new Tbl_Profile({ CaseTable_Dependencias_Usuarios: undefined, Tbl_Servicios_Profile: undefined}),
                             ImageUrlPath: ""
                         }));
                 }
@@ -83,6 +84,7 @@ class PerfilClass extends HTMLElement {
         //const Id_Institucion = await WAjaxTools.PostRequest("../../api/PublicCat/GetInstitucion");
         // const Id_Paises = await WAjaxTools.PostRequest("../../api/PublicCat/GetPaises");
         const InvestigadorModel = new Tbl_Profile({
+            CaseTable_Dependencias_Usuarios: undefined, Tbl_Servicios_Profile: undefined
         });
         const EditForm = WRender.Create({
             className: "FormContainer", style: {
