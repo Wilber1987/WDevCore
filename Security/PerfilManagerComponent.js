@@ -1,6 +1,6 @@
 
 //@ts-check
-import { Cat_Dependencias } from '../../ModelProyect/ProyectDataBaseModel.js';
+import { Cat_Dependencias, Tbl_Servicios } from '../../ModelProyect/ProyectDataBaseModel.js';
 import { activityStyle } from '../../Proyect/style.js';
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
 import { WFilterOptions } from '../WComponents/WFilterControls.js';
@@ -23,16 +23,12 @@ const OnLoad = async () => {
 window.onload = OnLoad;
 class PerfilManagerComponent extends HTMLElement {
     /**
-        * 
-        * @param {Array<Tbl_Profile>} [Dataset] 
-        */
+    * @param {Array<Tbl_Profile>} [Dataset] 
+    */
     constructor(Dataset) {
         super();
-        Dataset?.forEach(d => {
-            d.CaseTable_Dependencias_Usuarios = d.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
-        });
+        this.updateDataset(Dataset);
         this.Dataset = Dataset;
-        console.log(this.Dataset);
         this.attachShadow({ mode: 'open' });
         this.shadowRoot?.append(this.WStyle, StylesControlsV2.cloneNode(true), StylesControlsV3.cloneNode(true));
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
@@ -41,6 +37,15 @@ class PerfilManagerComponent extends HTMLElement {
         this.OptionContainer2 = WRender.Create({ className: "OptionContainer" });
         this.ModelObject = new Tbl_Profile({});
         this.Draw();
+    }
+    updateDataset(Dataset) {
+        Dataset?.forEach(d => {
+            d.CaseTable_Dependencias_Usuarios = d.CaseTable_Dependencias_Usuarios?.map(dp => ({
+                Id_Dependencia: dp.Cat_Dependencias.Id_Dependencia,
+                Descripcion: dp.Cat_Dependencias.Descripcion
+            }));
+            d.Tbl_Servicios_Profile = d.Tbl_Servicios_Profile?.map(dp => dp.Tbl_Servicios);
+        });
     }
     connectedCallback() { }
     Draw = async () => {
@@ -84,9 +89,7 @@ class PerfilManagerComponent extends HTMLElement {
     }
     update = async () => {
         const Dataset = await new Tbl_Profile().Get();
-        Dataset.forEach(d => {
-            d.CaseTable_Dependencias_Usuarios = d.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
-        });
+        this.updateDataset(Dataset);
         this.Dataset = Dataset;
         // @ts-ignore
         this.mainTable.selectedItems = [];
@@ -99,7 +102,7 @@ class PerfilManagerComponent extends HTMLElement {
                 this.shadowRoot?.append(ModalMessege("Seleccione perfiles"));
                 return;
             }
-            const dependencias = await new Cat_Dependencias().Get();
+            //const dependencias = await new Cat_Dependencias().Get();
             const modal = new WModalForm({
                 ModelObject: new Tbl_Profile({
                     Nombres: { type: "text", hidden: true },
@@ -110,7 +113,8 @@ class PerfilManagerComponent extends HTMLElement {
                     DNI: { type: "text", hidden: true },
                     Correo_institucional: { type: "text", hidden: true },
                     Estado: { type: "text", hidden: true },
-                    CaseTable_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias() }
+                    CaseTable_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias() },
+                    Tbl_Servicios: { type: 'Wselect', ModelObject: () => new Tbl_Servicios(), hidden: true }
                 }), ObjectOptions: {
                     SaveFunction: async (profile) => {
                         this.shadowRoot?.append(ModalVericateAction(async () => {

@@ -24,7 +24,7 @@ class Tbl_Profile extends EntityClass {
     //PROPIEDADES DE HELPDESK
     CaseTable_Dependencias_Usuarios = {
         type: 'Multiselect', hiddenFilter: true,
-        ModelObject: () => new Cat_Dependencias(), required: false,
+        ModelObject: () => new Cat_Dependencias(), require: false,
         action: async (Profile, /** @type {WForm} */ Form) => {
             if (Profile.CaseTable_Dependencias_Usuarios.length > 0) {
                 const servicios = await new Tbl_Servicios({
@@ -45,7 +45,10 @@ class Tbl_Profile extends EntityClass {
             }
         }
     }
-    Tbl_Servicios_Profile = { type: 'Multiselect', hiddenFilter: true, ModelObject: () => new Tbl_Servicios(), required: false, disabled: true }
+    Tbl_Servicios_Profile = {
+        type: 'Multiselect', hiddenFilter: true, ModelObject: () => new Tbl_Servicios(),
+        require: false, disabled: true
+    }
     /**
       * @param {Array<Tbl_Profile>} perfiles
       * @param {Cat_Dependencias} dependencia

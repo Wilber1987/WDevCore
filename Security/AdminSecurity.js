@@ -32,7 +32,9 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
             let response = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/get" + Model.constructor.name, {});
             if (TabName == "Usuarios") {
                 response = response.map(u => {
-                    u.Security_Users_Roles = u.Security_Users_Roles?.map(r => r.Security_Role);
+                    u.Security_Users_Roles = u.Security_Users_Roles?.map(r => r.Security_Role);                    
+                    u.Tbl_Profile.CaseTable_Dependencias_Usuarios = u.Tbl_Profile.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
+                    u.Tbl_Profile.Tbl_Servicios_Profile = u.Tbl_Profile.Tbl_Servicios_Profile?.map(dp => dp.Tbl_Servicios);
                     return u;
                 })
             } else if (TabName == "Roles") {
