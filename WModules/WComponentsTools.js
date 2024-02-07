@@ -794,10 +794,17 @@ class WArrayF {
     * @param {string} prop
     */
     static isModelFromFunction(Model, prop) {
-        if (Model[prop].ModelObject.__proto__ == Function.prototype) {
-            Model[prop].ModelObject = Model[prop].ModelObject();
+        return this.ModelFromFunction(Model[prop]);
+    }
+    /**
+    * @param {Object} Model
+    * @param {string} prop
+    */
+    static ModelFromFunction(propierty) {
+        if (propierty.ModelObject.__proto__ == Function.prototype) {
+            propierty.ModelObject = propierty.ModelObject();
         }
-        return Model[prop].ModelObject;
+        return propierty.ModelObject;
     }
     //STRINGS
     static Capitalize(str) {
