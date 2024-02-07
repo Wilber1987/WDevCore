@@ -105,13 +105,7 @@ class WFilterOptions extends HTMLElement {
             case "SELECT":
                 return this.CreateSelectControl(prop, Dataset);
             case "WSELECT": case "MULTISELECT":
-                if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
-                    ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
-                    /**@type {EntityClass} */
-                    const entity =  ModelProperty.EntityModel ?? ModelProperty.ModelObject;
-                    ModelProperty.Dataset = await entity.Get();
-                }
-                return await this.CreateWSelect(ModelProperty.Dataset, prop);
+                return await this.CreateWSelect(ModelProperty, prop);
             case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA": case "PASSWORD":
                 break;
             case "RADIO": case "CHECKBOX":
@@ -205,7 +199,7 @@ class WFilterOptions extends HTMLElement {
             }
             this.Config.Dataset = await Model.Get();
         }
-        
+
         const DFilt = this.Config.Dataset.filter(obj => {
             let flagObj = true;
             this.FilterControls.forEach(control => {
@@ -387,16 +381,26 @@ class WFilterOptions extends HTMLElement {
         });
         return InputControl;
     }
-    async CreateWSelect(Dataset, prop) {
+    async CreateWSelect(ModelProperty, prop) {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
-            Dataset: Dataset,
+            Dataset: ModelProperty.Dataset,
             id: prop,
             FullDetail: true,
             action: () => {
                 this.filterFunction();
             }
         });
+        InputControl.onclick = async () => {
+            if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
+                ModelProperty.ModelObject = await WArrayF.ModelFromFunction(ModelProperty);
+                /**@type {EntityClass} */
+                const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
+                ModelProperty.Dataset = await entity.Get();
+                InputControl.Dataset = ModelProperty.Dataset;
+                InputControl.Draw();
+            }
+        }
         return InputControl;
     }
 
