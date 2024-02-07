@@ -87,7 +87,7 @@ class WForm extends HTMLElement {
             }, set: (target, property, value, receiver) => {
                 this.ExistChange = true;
                 target[property] = value;
-                this.SetOperationValues(Model, target)
+                console.log(value);                
                 const control = this.shadowRoot?.querySelector("#ControlValue" + property);
                 //console.log(property, Model[property]);
                 if (Model[property]?.type.toUpperCase() != "IMG" && control) {
@@ -97,6 +97,7 @@ class WForm extends HTMLElement {
                 if (this.Config.ProxyAction != undefined) {
                     this.Config.ProxyAction(this)
                 }
+                this.SetOperationValues(Model, target)
                 return true;
             }
         };
@@ -107,6 +108,7 @@ class WForm extends HTMLElement {
         for (const prop in Model) {
             if (Model[prop]?.__proto__ == Object.prototype) {
                 if (Model[prop].type?.toUpperCase() == "OPERATION") {
+                    //if (Model[prop].type?.toUpperCase() == "OPERATION") {
                     target[prop] = Model[prop].action(this.FormObject, this);
                     const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
                     if (control) {
@@ -156,7 +158,7 @@ class WForm extends HTMLElement {
                 } else {
                     let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
                     //ObjectF[prop] = val;
-                    const onChangeEvent = (ev) => {
+                    const onChangeEvent = async (ev) => {
                         /**
                          * @type {HTMLInputElement}
                          */
@@ -166,7 +168,7 @@ class WForm extends HTMLElement {
                         */
                         const currentTarget = ev.currentTarget
 
-                        this.onChange(targetControl, currentTarget, ObjectF, prop, Model);
+                        await this.onChange(targetControl, currentTarget, ObjectF, prop, Model);
                     }
                     /**
                      * @type {HTMLLabelElement}
@@ -660,7 +662,7 @@ class WForm extends HTMLElement {
                     min: ModelProperty.min,
                     max: ModelProperty.max,
                     placeholder: placeholder,
-                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    //onchange: ModelProperty.disabled ? undefined : onChangeEvent,
                     disabled: ModelProperty.disabled
                 });
                 break;
@@ -688,9 +690,15 @@ class WForm extends HTMLElement {
             });
         }
         InputControl.id = "ControlValue" + prop;
-        if (actionFunction != null) {
-            InputControl.addEventListener("change", () => { actionFunction(ObjectF, this, InputControl, prop) });
-        }
+
+        InputControl.addEventListener("change", async (ev) => {
+            if (!ModelProperty.disabled) {
+                await onChangeEvent(ev)
+                if (actionFunction != null) {
+                    actionFunction(ObjectF, this, InputControl, prop)
+                }
+            }
+        });
 
         return InputControl;
     }
