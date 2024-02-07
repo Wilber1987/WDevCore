@@ -5,6 +5,7 @@ import { WModalForm } from "../WComponents/WModalForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WAjaxTools, WRender } from '../WModules/WComponentsTools.js';
 import { ChangePasswordModel, ChangeRolesModel, ChangeStateModel, Security_Permissions, Security_Roles, Security_Users } from "./SecurityModel.js";
+import { Tbl_Profile } from "./Tbl_Profile.js";
 window.addEventListener("load", async () => {
     const DOMManager = new ComponentsManager({ MainContainer: Main });
     const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});
@@ -32,9 +33,12 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
             let response = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/get" + Model.constructor.name, {});
             if (TabName == "Usuarios") {
                 response = response.map(u => {
-                    u.Security_Users_Roles = u.Security_Users_Roles?.map(r => r.Security_Role);                    
-                    u.Tbl_Profile.CaseTable_Dependencias_Usuarios = u.Tbl_Profile.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
-                    u.Tbl_Profile.Tbl_Servicios_Profile = u.Tbl_Profile.Tbl_Servicios_Profile?.map(dp => dp.Tbl_Servicios);
+                    u.Security_Users_Roles = u.Security_Users_Roles?.map(r => r.Security_Role);  
+                    if (!u.Tbl_Profile) {
+                        u.Tbl_Profile = {};
+                    }                  
+                    u.Tbl_Profile.CaseTable_Dependencias_Usuarios = u.Tbl_Profile?.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
+                    u.Tbl_Profile.Tbl_Servicios_Profile = u.Tbl_Profile?.Tbl_Servicios_Profile?.map(dp => dp.Tbl_Servicios);
                     return u;
                 })
             } else if (TabName == "Roles") {
