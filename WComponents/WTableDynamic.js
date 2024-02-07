@@ -266,7 +266,7 @@ class WTableDynamicComp extends HTMLElement {
             type: 'div', props: { id: '', class: 'TableOptionsBTN' }, children: [
                 {//display
                     type: 'input', props: {
-                        style: 'transform: rotate(90deg)', type: 'button', class: 'BtnDinamictT', value: '>', onclick: async (ev) => {
+                        style: 'transform: rotate(90deg)', type: 'button', class: 'BtnDinamictT', type: "button",value: '>', onclick: async (ev) => {
                             if (TOpcion.className == "TableOptions") {
                                 ev.target.style["transform"] = "inherit";
                                 TOpcion.className = "TableOptionsInact";

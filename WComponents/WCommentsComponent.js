@@ -15,6 +15,7 @@ class WCommentsComponent extends HTMLElement {
         this.UrlAdd = props.UrlAdd;
         this.User = props.User;
         this.CommentsIdentify = props.CommentsIdentify;
+        this.CommentsIdentifyName = props.CommentsIdentifyName;
         this.attachShadow({ mode: 'open' });
         this.CommentsContainer = WRender.Create({ className: "CommentsContainer" })
         this.MessageInput = WRender.Create({ tagName: 'textarea' });
@@ -73,10 +74,10 @@ class WCommentsComponent extends HTMLElement {
     saveComment = async () => {
         const Message = {
             // @ts-ignore
-            Body: this.MessageInput.value,
-            Id_Case: this.CommentsIdentify,
+            Body: this.MessageInput.value,           
             Id_User: this.User.UserId
         }
+        Message[ this.CommentsIdentifyName ] =  this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlAdd, Message);
         // @ts-ignore
         this.MessageInput.value = "";
@@ -87,17 +88,16 @@ class WCommentsComponent extends HTMLElement {
             // @ts-ignore
             Body: this.RitchInput.value,
             Attach_Files: this.RitchInput.Files,
-            Id_Case: this.CommentsIdentify,
             Id_User: this.User.UserI
         }
+        Message[ this.CommentsIdentifyName ] =  this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlAdd, Message);
         this.RitchInput.FunctionClear();
         this.update();
     }
     update = async () => {
-        const Message = {
-            Id_Case: this.CommentsIdentify
-        }
+        const Message = {}
+        Message[ this.CommentsIdentifyName ] =  this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlSearch, Message);
         //console.log(response);
         this.Dataset = response;
@@ -219,7 +219,7 @@ class WCommentsComponent extends HTMLElement {
             color: #ffffff;
             float: right;
         }        
-        .comment label, .commentSelf label {
+        .comment label, .commentSelf label, .comment p, .commentSelf p {
             display: block;
             text-align: right;
         }

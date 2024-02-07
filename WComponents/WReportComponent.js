@@ -76,19 +76,7 @@ class WReportComponent extends HTMLElement {
             const div = WRender.Create({ className: "report-container" + (page ? " father" : " child")  });
             if (dato.__proto__ == Object.prototype) {
                 for (const prop in dato) {
-                    if ((prop == "get" || prop == "set") ||
-                        prop == "ApiMethods" ||
-                        prop == "FilterData" ||
-                        prop == "Get" ||
-                        prop == "GetByProps" ||
-                        prop == "FindByProps" ||
-                        prop == "Save" ||
-                        prop == "Update" ||
-                        prop == "GetData" ||
-                        prop == "SaveData" ||
-                        dato[prop] == null ||
-                        dato[prop] == undefined ||
-                        dato[prop].__proto__.constructor.name == "AsyncFunction") {
+                    if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
                         continue;
                     }
                     let header;
@@ -131,6 +119,31 @@ class WReportComponent extends HTMLElement {
         });
         container.append(divFooter);
         return container;
+    }
+    isNotDrawable(prop, ModelObject, element) {
+        if ((ModelObject[prop]?.type == undefined
+            || ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+            || ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
+            || ModelObject[prop]?.primary == true
+            || ModelObject[prop]?.hidden == true
+            || ModelObject[prop]?.hiddenInTable == true)
+            || element[prop]?.__proto__ == Function.prototype
+            || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
+            return true;
+        }
+        return (prop == "get" || prop == "set") ||
+            prop == "ApiMethods" ||
+            prop == "FilterData" ||
+            prop == "Get" ||
+            prop == "GetByProps" ||
+            prop == "FindByProps" ||
+            prop == "Save" ||
+            prop == "Update" ||
+            prop == "GetData" ||
+            prop == "SaveData" ||
+            element[prop] == null ||
+            element[prop] == undefined ||
+            element[prop].__proto__.constructor.name == "AsyncFunction";
     }
 
     BuildRow(dato, prop, titleHeader, footer, container, page = false) {
@@ -230,6 +243,7 @@ class WReportComponent extends HTMLElement {
         
         .row-number {
             justify-content: flex-end;
+            align-items: center;
         }
 
         .container {

@@ -1,3 +1,5 @@
+import { Tbl_Profile } from "./Tbl_Profile.js";
+
 //@ts-check
 class Security_Roles {
 	constructor(props) {
@@ -56,12 +58,13 @@ class Security_Users {
 			this[prop] = props[prop];
 		}
 	}
+    Tbl_Profile = {type: "Model", ModelObject : new Tbl_Profile()};
 	Id_User = { type: "number", primary: true };
 	Nombres = { type: "text" };
 	Descripcion = { type: "text", require: false };
 	Mail = { type: "email" };
 	Estado = { type: "Select", Dataset: ["ACTIVO", "INACTIVO"] };
-	Password = { type: "password", hiddenInTable: true };
+	Password = { type: "password", hiddenInTable: true };  
 	Security_Users_Roles = {
 		type: "MULTISELECT", Dataset: [{ Descripcion: "Role 1" }]
 	};
@@ -100,3 +103,4 @@ class ChangeRolesModel {
 	};
 }
 export { ChangeRolesModel }
+

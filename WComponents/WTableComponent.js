@@ -34,7 +34,7 @@ class WTableComponent extends HTMLElement {
         this.divTableContainer = WRender.Create({ type: "div", class: "tableContainer", children: [this.Table] });
         this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);
         this.FilterOptions = new WFilterOptions({
-            Dataset:  this.Dataset,
+            Dataset: this.Dataset,
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
             Display: Config.Options?.FilterDisplay ?? false,
             FilterFunction: (DFilt) => {
@@ -122,7 +122,6 @@ class WTableComponent extends HTMLElement {
      * @param {Array} Dataset 
      */
     DrawTable(Dataset = this.Dataset) {
-        //console.log(this.Dataset);
         this.DefineModelObject(Dataset);
         //console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
@@ -142,10 +141,10 @@ class WTableComponent extends HTMLElement {
     }
     DrawHeadOptions() {
         if (this.ThOptions.innerHTML != "") return;
-        if (this.Options != undefined && (this.Options.Search == true 
-            || this.Options.Add == true 
+        if (this.Options != undefined && (this.Options.Search == true
+            || this.Options.Add == true
             || this.Options.Filter == true)) {
-            
+
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
                     tagName: "input", class: "txtControl", type: "text",
@@ -153,15 +152,15 @@ class WTableComponent extends HTMLElement {
                     onchange: async (ev) => {
                         this.SearchFunction(ev);
                     }
-                }));                
+                }));
             }
-            if (this.Options.Filter == true) { 
+            if (this.Options.Filter == true) {
                 this.ThOptions.append(this.FilterOptions)
             }
             if (this.Options.Add == true) {
                 this.ThOptions.append(WRender.Create({
                     tagName: "button", class: "BtnTableSR",
-                    type: "button", innerText: "Nuevo", style: "margin: 10px 0px",
+                    type: "button", innerText: "Nuevo", style: "margin: 10px 0px; max-width: 300px",
                     onclick: async () => {
                         if (this.Options?.AddFunction != undefined)
                             this.Options.AddFunction();
@@ -379,7 +378,7 @@ class WTableComponent extends HTMLElement {
                 case "MASTERDETAIL":
                     break;
                 case "DATE": case "FECHA":
-                    td.append(value.toString().toDateFormatEs());
+                    td.append(value?.toString()?.toDateFormatEs());
                     tr.append(td);
                     break;
                 case "OPERATION":
@@ -390,7 +389,7 @@ class WTableComponent extends HTMLElement {
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
                         style: this.Options?.Select ? "cursor: pointer" : "",
-                        innerText: WOrtograficValidation.es(value)
+                        innerHTML: value == "" ? "-" : WOrtograficValidation.es(value)
                     }));
                     tr.append(td);
                     break;
@@ -412,13 +411,14 @@ class WTableComponent extends HTMLElement {
                         const index = this.Dataset.indexOf(element);
                         if (WArrayF.FindInArray(element, this.Dataset) == true) {
                             this.Dataset.splice(index, 1);
+                            console.log(this.Dataset);
                             //tr.parentNode.removeChild(tr);                                                  
                             if (this.Options?.DeleteAction) {
                                 this.Options?.DeleteAction(element)
                             }
                             if (this.Options?.UrlDelete) {
                                 WAjaxTools.PostRequest(this.Options?.UrlDelete, element);
-                            } else if (element.Delete) {
+                            } else if (element.Delete && this.TableConfig.AutoSave) {
                                 element.Delete();
                             }
                             this.DrawTable();
@@ -689,6 +689,18 @@ class WTableComponent extends HTMLElement {
                 padding: 0.8rem;
                 text-align: left;
                 vertical-align: top;
+            }
+            .WTable td  label{overflow: hidden;
+                max-height: 200px;
+                text-overflow: ellipsis;
+                display: block;
+                overflow-y: auto;
+                font-size: 10px !important;
+                padding: 0 5px;
+            }
+            .WTable td  label * {
+                font-size: 11px !important;
+                text-align: justify !important;
             }
 
             .WTable .tdAction {
@@ -1024,7 +1036,7 @@ class WCardTable extends HTMLElement {
     }
     EvalModelPrototype(prop, Model) {
         let value = "";
-        if (this.Element[prop] != null) {
+        if (this.Element != null && this.Element[prop] != null) {
             value = this.Element[prop];
         }
         if (this.IsDrawableProp(this.Element, prop)) {
@@ -1080,6 +1092,7 @@ class WCardTable extends HTMLElement {
             || this.Model[prop]?.primary == true
             || this.Model[prop]?.hidden == true
             || this.Model[prop]?.hiddenInTable == true)
+            || element == null
             || element[prop] == null || element[prop] == undefined
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction") {

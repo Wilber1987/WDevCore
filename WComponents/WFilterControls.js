@@ -7,7 +7,7 @@ import { WCssClass, css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
 /**
  * @typedef {Object} FilterConfig 
- *  * @property {Array} Dataset    
+ *  * @property {Array} Dataset  
     * @property {Function} FilterFunction
     * @property {Boolean} [Display]
     * @property {Boolean} [AutoFilter]
@@ -47,7 +47,7 @@ class WFilterOptions extends HTMLElement {
             class: "options", children: [
                 { tagName: "label", innerText: "Filtros" },
                 {//display
-                    tagName: 'input', style: 'transform: rotate(0deg)', class: 'BtnDinamictT', value: '>', onclick: async (ev) => {
+                    tagName: 'input', style: 'transform: rotate(0deg)', class: 'BtnDinamictT', type: "button", value: '>', onclick: async (ev) => {
                         if (ControlOptions.className == "OptionContainer") {
                             ev.target.style["transform"] = "rotate(90deg)";
                             ControlOptions.className = "OptionContainer OptionContainerActive";
@@ -344,12 +344,16 @@ class WFilterOptions extends HTMLElement {
                     type: "date",
                     className: prop + " firstDate",
                     id: prop + "first",
+                    // @ts-ignore
+                    value: new Date().subtractDays(30).toISO(),
                     placeholder: prop,
                     onchange: (ev) => { this.filterFunction() }
                 }, {
                     tagName: "input",
                     type: "date",
-                    className: prop + " secondDate",
+                    className: prop + " secondDate",                    
+                    // @ts-ignore
+                    value: new Date().addDays(1).toISO(),
                     id: prop + "second",
                     placeholder: prop,
                     onchange: (ev) => { this.filterFunction() }
@@ -412,7 +416,7 @@ class WFilterOptions extends HTMLElement {
         .filter-container {    
             margin-top:10px;        
             margin-bottom: 20px;
-            padding: 10px 20px;
+            padding: 5px 10px;
             display: flex;
             justify-content: center;
             flex-direction: column;
@@ -435,13 +439,16 @@ class WFilterOptions extends HTMLElement {
         .OptionContainerActive {
             overflow: inherit;
             max-height: inherit;
-            padding: 10px  5px;
+            padding: 5px;
             transition: all 0.3s;
         }
 
         .OptionContainer label {
             padding: 10px;
             display: block;
+        }
+        .options {
+            font-size: 12px;
         }
 
         .BtnDinamictT {
@@ -457,8 +464,8 @@ class WFilterOptions extends HTMLElement {
             background-color: #4894aa;
             color: #fff;
             border-radius: 0.2cm;
-            width: 15px;
-            height: 15px;
+            width: 25px;
+            height: 25px;
             background-color:#4894aa;
             font-family: monospace;
         }

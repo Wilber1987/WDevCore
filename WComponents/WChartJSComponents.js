@@ -2,16 +2,30 @@ import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 
 class ChartConfig {
-    TypeChart = 0;
-    Dataset = [];
-    Colors = [];
-    percentCalc = true
-    AttNameEval = "series";
-    EvalValue = "value";
-    groupParams = [];
+    // TypeChart = 0;
+    // Dataset = [];
+    // Colors = [];
+    // percentCalc = true
+    // AttNameEval = "series";
+    // EvalValue = "value";
+    // groupParams = [];
 }
+/**
+ * @typedef {Object} ChartInstance
+ * * @property {String} [TypeChart]
+ * * @property {Array} [Dataset]
+ * * @property {Array} [Colors]
+ * * @property {String} [percentCalc]
+ * * @property {String} [AttNameEval]
+ * * @property {String} [EvalValue]
+ * * @property {Array} [groupParams]
+ */
 const ColorsList = ["#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4", "#00bff3", "#e63da4", "#6a549f"];
 class ColumChart extends HTMLElement {
+    /**
+     * 
+     * @param {*} ChartInstance 
+     */
     constructor(ChartInstance = (new ChartConfig())) {
         super();
         this.ChartInstance = ChartInstance;
@@ -23,11 +37,11 @@ class ColumChart extends HTMLElement {
         this.attachShadow({ mode: "open" });
     }
     attributeChangedCallBack() {
-        this.DrawChart();
+        //this.DrawChart();
     }
     connectedCallback() {
         //console.log("conected");
-        if (this.ChartInstance.Dataset == null || this.ChartInstance.Dataset ==  undefined || this.ChartInstance.Dataset.length == 0) {
+        if (this.ChartInstance.Dataset == null || this.ChartInstance.Dataset == undefined || this.ChartInstance.Dataset.length == 0) {
             this.shadowRoot.innerHTML = "No hay datos que mostar";
             return;
         }
@@ -38,6 +52,7 @@ class ColumChart extends HTMLElement {
         this.EvalValue = this.ChartInstance.EvalValue ?? null;
         this.AttNameEval = this.ChartInstance.AttNameEval ?? null;
         this.Dataset = this.ChartInstance.Dataset ?? [];
+        this.InitializeDataset();
         this.ChartInstance.Colors = this.ChartInstance.Colors ?? [];
         if (this.ChartInstance.TypeChart == "staked") {// bar or staked
             this.ChartInstance.DirectionChart = "column";
@@ -47,6 +62,12 @@ class ColumChart extends HTMLElement {
             this.ChartInstance.DirectionChart = "row";
         }
         this.DrawChart();
+    }
+    InitializeDataset() {
+        if (this.EvalValue == null && this.Dataset.length != 0) {
+            //this.Dataset = WArrayF.GroupByObject(this.Dataset, this.Dataset[0]);
+            this.EvalValue = "count";
+        }
     }
     DrawChart() {
         this.shadowRoot.append(WRender.createElement(WChartStyle(this.ChartInstance)));
@@ -58,6 +79,8 @@ class ColumChart extends HTMLElement {
             object[element] = "";
         });
         this.Totals = WArrayF.GroupByObject(this.ChartInstance.Dataset, object, this.EvalValue);
+        console.log(this.ChartInstance.Dataset, object, this.EvalValue);
+        console.log(this.Totals);
         this.MaxVal = WArrayF.MaxValue(this.Totals, this.EvalValue);
         this.MinVal = WArrayF.MinValue(this.Totals, this.EvalValue);
         this.EvalArray = WArrayF.GroupBy(this.ChartInstance.Dataset, this.AttNameEval);
@@ -74,7 +97,7 @@ class ColumChart extends HTMLElement {
             SectionBars.append(this.DrawLineChart(this.EvalArray, this.ChartInstance.Colors, ChartFragment));
         }
     }
-    _AddSectionBars(Dataset = this.Dataset) {        
+    _AddSectionBars(Dataset = this.Dataset) {
         this.groupParams.forEach(groupParam => {
             let object = {};
             object[groupParam] = "";
@@ -527,6 +550,7 @@ const WChartStyle = (ChartInstance) => {
                     "font-size": " 18px",
                     "padding-bottom": 10,
                     display: "flex",
+                "margin": 0,
                     "justify-content": "center",
                 }), new WCssClass(".SectionLabels, .SectionLabelGroup ", {
                     "display": " flex",
@@ -553,10 +577,11 @@ const WChartStyle = (ChartInstance) => {
                     "align-items": " flex-end",
                     //"overflow-y": " hidden",
                     "position": " relative",
-                    "overflow-x": " scroll",
+                    "overflow-x": " auto",
                     "padding-top": 5,
                     "padding-left": 40,
                     "min-height": 150,
+                    "border-bottom": " solid 1px #d4d4d4",
                     //margin: "0px auto"
                 }), new WCssClass(".SectionBars label", {
                     padding: 5,
@@ -580,6 +605,8 @@ const WChartStyle = (ChartInstance) => {
                     "border-left": " solid 1px #d4d4d4",
                     "align-items": "center",
                     position: ChartInstance.TypeChart == "Line" ? "initial" : "relative"
+                }), new WCssClass(".groupBars:last-child ", {
+                    "border-right": " solid 1px #d4d4d4"
                 }), new WCssClass(".ContainerBars ", {
                     "display": " flex",
                     "width": " 100%",
@@ -820,20 +847,22 @@ class GanttChart extends HTMLElement {
         const fin = new Date(max.getTime() + INTERVALO);
 
         for (let i = inicio; i <= fin; i = new Date(i.getTime() + INTERVALO)) {
-           // console.log(formateadorFecha.format(i));
+            // console.log(formateadorFecha.format(i));
             this.TimeLine.append(WRender.Create({
                 id: i.toLocaleDateString(),
                 class: "TimeLineBlock",
-                children: [ i.toISO(), this.listOfAllDaysSpanish_mini[i.getDay()]] //formateadorFecha.format(i)
+                children: [i.toISO(), this.listOfAllDaysSpanish_mini[i.getDay()]] //formateadorFecha.format(i)
             }))
         }
         this.TaskContainer.innerHTML = "";
         this.Dataset.forEach(task => {
             const taskDetail = WRender.Create({
                 className: "taskDetail",
-                innerText: "#" + task.Id_Tarea + " " +task.Titulo
+                innerText: "#" + task.Id_Tarea + " " + task.Titulo
             })
             this.Task.append(taskDetail)
+            // console.log(task);
+            // console.log(task.Fecha_Inicio, task.Fecha_Finalizacion);
             const taskDiv = WRender.Create({
                 className: "taskBlock",
                 name: new Date(task.Fecha_Inicio).toLocaleDateString()
@@ -854,6 +883,7 @@ class GanttChart extends HTMLElement {
             const duration = el.name.split("-");
             const startDay = duration[0];
             const endDay = duration[1];
+            // console.log(el,duration, startDay, endDay);
             let left = 0,
                 width = 0;
 
@@ -863,7 +893,7 @@ class GanttChart extends HTMLElement {
             } else {
                 const filteredArray = daysArray.filter(day => day.id == startDay);
                 //console.log(filteredArray);
-                //console.log(startDay);
+                // console.log(daysArray,filteredArray);
                 left = filteredArray[0].offsetLeft;
             }
 
@@ -872,7 +902,7 @@ class GanttChart extends HTMLElement {
                 width = filteredArray[0].offsetLeft + filteredArray[0].offsetWidth / 2 - left;
             } else {
                 const filteredArray = daysArray.filter(day => day.id == endDay);
-                //console.log(endDay);
+                //console.log(daysArray,filteredArray);
                 width = filteredArray[0].offsetLeft + filteredArray[0].offsetWidth - left;
             }
 

@@ -135,14 +135,38 @@ class WAjaxTools {
         return {};
     }
 }
-/**
- * 
- * @param {TemplateStringsArray} body 
+/** 
  * @returns {HTMLElement}
+ * @param {any} strings
+ * @param {any[]} values
  */
-function html(body) {
+function html(strings, ...values) {
     // @ts-ignore
-    return WRender.CreateStringNode(body);
+    // Unir las partes de la plantilla de cadena
+    const result = strings.reduce((accumulator, currentString, index) => {
+        accumulator += currentString;
+        if (index < values.length) {
+            const value = values[index];
+            if (typeof value === 'function') {
+                // Extraer el nombre del evento y el manejador
+                const match = currentString.match(/(\s*on\w+)=/);
+                if (match && match[1]) {
+                    const eventName = match[1];
+                    accumulator += `${eventName}="${value.toString()}"`;
+                } else {
+                    accumulator += value;
+                }
+            } else {
+                accumulator += value;
+            }
+        }
+        return accumulator;
+    }, '');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = result;
+
+    return wrapper.firstElementChild;
+    return WRender.CreateStringNode(result);
 }
 export { html }
 class WRender {
@@ -608,21 +632,20 @@ class WArrayF {
                 for (const prop in element) {
                     NewElement[prop] = element[prop]
                 }
-                if (!element.count) {
-                    NewElement.count = 1;
-                }
+                NewElement.count = element.count ?? 1;
+                //console.log(NewElement);
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
                 DataArraySR.push(NewElement)
             } else {
-                if (!element.count) {
-                    DFilt.count = DFilt.count + 1;
-                }
+                //console.log(DFilt);
+                const countVal = element.count ?? 1;
+                DFilt.count = DFilt.count + countVal;
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
-                if (sumParam != null) {
+                if (sumParam != null && element[sumParam] != null && element[sumParam] != undefined) {
                     DFilt[sumParam] = DFilt[sumParam] + element[sumParam];
                 }
             }
-        });
+        });        
         return DataArraySR;
     }
     static MaxValue(Data, MaxParam) {
@@ -755,7 +778,7 @@ class WArrayF {
             } else {
                 for (const objectProto in objetoEvaluado) {
                     if (objetoEvaluado[objectProto] != null) {
-                        if (objetoEvaluado[objectProto].toString().toUpperCase().startsWith(parametro.toString().toUpperCase())) {
+                        if (objetoEvaluado[objectProto].toString().toUpperCase().includes(parametro.toString().toUpperCase())) {
                             return objetoEvaluado;
                         }
                     }
@@ -775,7 +798,7 @@ class WArrayF {
                             if (evalF(param, item)) {
                                 return true
                             }
-                        } else if (item.toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
+                        } else if (item.toString().toUpperCase().includes(param.toString().toUpperCase())) {
                             return true;
                         }
                     }
@@ -783,7 +806,7 @@ class WArrayF {
                 if (find) {
                     return element;
                 }
-            } else if (element.toString().toUpperCase().startsWith(param.toString().toUpperCase())) {
+            } else if (element.toString().toUpperCase().includes(param.toString().toUpperCase())) {
                 return element;
             }
         }
@@ -929,7 +952,8 @@ Date.prototype.toISO = function () {
  * @returns {Date}
  */
 Date.prototype.addDays = function (days) {
-    return this.setDate(this.getDate() + days);
+    this.setDate(this.getDate() + days)
+    return this;
 };
 /**
  * 
