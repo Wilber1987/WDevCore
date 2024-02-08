@@ -645,7 +645,7 @@ class WArrayF {
                     DFilt[sumParam] = DFilt[sumParam] + element[sumParam];
                 }
             }
-        });        
+        });
         return DataArraySR;
     }
     static MaxValue(Data, MaxParam) {
@@ -945,6 +945,11 @@ Date.prototype.toISO = function () {
       ':' + pad(this.getUTCSeconds()) +
       '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
       'Z' */;
+};
+Date.prototype.toStartDate = function () {
+    return new Date(this.getUTCFullYear() +
+        '-' + pad(this.getUTCMonth() + 1) +
+        '-' + pad(this.getUTCDate()))
 };
 /**
  * 

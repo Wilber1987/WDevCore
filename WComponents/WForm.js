@@ -87,7 +87,7 @@ class WForm extends HTMLElement {
             }, set: (target, property, value, receiver) => {
                 this.ExistChange = true;
                 target[property] = value;
-                console.log(value);                
+                //console.log(value);                
                 const control = this.shadowRoot?.querySelector("#ControlValue" + property);
                 //console.log(property, Model[property]);
                 if (Model[property]?.type.toUpperCase() != "IMG" && control) {
@@ -859,7 +859,7 @@ class WForm extends HTMLElement {
     }
 
     FindObjectMultiselect(val, InputControl) {
-        console.log(val, InputControl.Dataset);
+        //console.log(val, InputControl.Dataset);
         if (val != null && val != undefined && val.__proto__ == Array.prototype) {
             val.forEach((item) => {
                 const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, item));
@@ -1050,10 +1050,9 @@ class WForm extends HTMLElement {
         return DivOptions;
     }
     Save = async (ObjectF = this.FormObject) => {
-        console.log(ObjectF);
+        //console.log(ObjectF);
         if (this.Config.ValidateFunction != undefined &&
             typeof this.Config.ValidateFunction === "function") {
-            console.log("sav bbbeddd");
             const response = this.Config.ValidateFunction(ObjectF);
             if (response.validate == false) {
                 alert(response.message);
@@ -1061,19 +1060,15 @@ class WForm extends HTMLElement {
             }
         }
         if (!this.Validate(ObjectF)) {
-            console.log("sav bbbe");
             return;
         }
         if (this.Config.ObjectOptions?.Url != undefined || this.Config.SaveFunction == undefined) {
-            console.log("sav bbbedzzzzdd");
             const ModalCheck = this.ModalCheck(ObjectF, this.Config.SaveFunction == undefined);
             this.shadowRoot?.append(ModalCheck)
         } else if (this.Config.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
-            console.log("sav bbbeddfffdd");
             const ModalCheck = this.ModalCheck(ObjectF, true);
             this.shadowRoot?.append(ModalCheck)
         } else {
-            console.log("save");
             this.Config.SaveFunction(ObjectF);
         }
     }
