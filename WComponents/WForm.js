@@ -658,7 +658,7 @@ class WForm extends HTMLElement {
                     tagName: "input",
                     className: prop,
                     value: val,
-                    type: ModelProperty.type,
+                    type: ModelProperty.type.toUpperCase() == "MONEY" ? "number" : ModelProperty.type,
                     min: ModelProperty.min,
                     max: ModelProperty.max,
                     placeholder: placeholder,

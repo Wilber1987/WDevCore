@@ -84,7 +84,7 @@ class WDetailObject extends HTMLElement {
                 switch (Model[prop].type.toUpperCase()) {
                     case "MASTERDETAIL":
                         tabElements.push({
-                            name:  Model[prop].label ??  WOrtograficValidation.es(prop), url: "#",
+                            name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
                                 this.TabManager.NavigateFunction(prop, new WTableComponent({
                                     Options: { Search: true },
@@ -98,12 +98,12 @@ class WDetailObject extends HTMLElement {
                         break;
                     case "MODEL":
                         tabElements.push({
-                            name:   Model[prop].label ??  WOrtograficValidation.es(prop), url: "#",
+                            name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
-                                this.TabManager.NavigateFunction(prop, new ProfileCard({                                    
+                                this.TabManager.NavigateFunction(prop, new ProfileCard({
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     ObjectDetail: ObjectDetail[prop]
-                                    
+
                                 }));
                             }
                         });
@@ -294,7 +294,7 @@ class ProfileCard extends HTMLElement {
     }
 
     createPropDetail(ObjectDetail, prop, Model) {
-        ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop];       
+        ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop];
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "TEXT":
@@ -305,11 +305,15 @@ class ProfileCard extends HTMLElement {
                         ]
                     }));
                     break;
-                case "NUMBER":
+                case "NUMBER": case "MONEY":
                     this.container.append(WRender.Create({
                         tagName: 'div', class: 'DataContainer', children: [
                             (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
-                            { tagName: 'label', className: "label-value", innerText: (typeof ObjectDetail[prop] === "number" ? ObjectDetail[prop].toFixed(2) : "") }
+                            {
+                                tagName: 'label', className: "label-value", innerText:
+                                    (typeof ObjectDetail[prop] === "number" &&  Model[prop].type.toUpperCase() == "MONEY" 
+                                    ? ObjectDetail[prop].toFixed(2) : ObjectDetail[prop])
+                            }
                         ]
                     }));
                     break;
@@ -321,7 +325,7 @@ class ProfileCard extends HTMLElement {
                         ]
                     }));
                     break;
-                case "TEXTAREA": 
+                case "TEXTAREA":
                     this.container.append(WRender.Create({
                         tagName: 'div', class: 'DataContainer TextArea', children: [
                             (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
