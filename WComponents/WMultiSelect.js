@@ -241,7 +241,8 @@ class MultiSelect extends HTMLElement {
         if (this.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
             return true;
         }
-        else if ((this.ModelObject[prop]?.type == undefined
+        else if (this.ModelObject == undefined 
+            || (this.ModelObject[prop]?.type == undefined
             || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             || this.ModelObject[prop]?.primary == true
             || this.ModelObject[prop]?.hidden == true

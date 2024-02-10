@@ -589,6 +589,7 @@ class WForm extends HTMLElement {
                 });
                 break;
             case "CHECKBOX":
+                //val = val == "" &&  ModelProperty.defaultValue != undefined ? ModelProperty.defaultValue : val;
                 ObjectF[prop] = typeof val === "boolean" ? val : false;
                 ControlContainer.className += " radioCheckedControl";
                 ControlLabel.htmlFor = "ControlValue" + prop;
@@ -599,7 +600,7 @@ class WForm extends HTMLElement {
                     className: prop,
                     value: ObjectF[prop],
                     // @ts-ignore
-                    checked: typeof val === "boolean" ? val : false,
+                    checked: typeof val === "boolean" ? val :  false,
                     onchange: ModelProperty.disabled ? undefined : onChangeEvent,
                     type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
                     disabled: ModelProperty.disabled
