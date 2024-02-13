@@ -1567,6 +1567,7 @@ class WForm extends HTMLElement {
 const ModalVericateAction = (Action, title) => {
     const ModalCheck = new WSimpleModalForm({
         title: "AVISO",
+        CloseOption: false,
         ObjectModal: [
             WRender.Create({ tagName: "h3", innerText: title ?? "¿Esta seguro que desea guardar este registro?" }),
             WRender.Create({
@@ -1587,6 +1588,7 @@ const ModalVericateAction = (Action, title) => {
 const ModalMessege = (message, detail = "") => {
     const ModalCheck = new WSimpleModalForm({
         title: message,
+        CloseOption: false,
         ObjectModal: [WRender.Create({ tagName: 'p', class: "modalP", innerText: detail }), WRender.Create({
             style: { textAlign: "center" },
             children: [WRender.Create({
