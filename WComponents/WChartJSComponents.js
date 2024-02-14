@@ -585,6 +585,7 @@ const WChartStyle = (ChartInstance) => {
                     //margin: "0px auto"
                 }), new WCssClass(".SectionBars label", {
                     padding: 5,
+                    "min-height": 12,
                 }), new WCssClass(".GroupSection ", {
                     "display": " flex",
                     "align-items": "center",

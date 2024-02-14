@@ -1,4 +1,4 @@
-//import { Cat_Dependencias, Tbl_Servicios } from "../../ModelProyect/ProyectDataBaseModel.js";
+import { Cat_Dependencias, Tbl_Servicios } from "../../ModelProyect/ProyectDataBaseModel.js";
 import { WForm } from "../WComponents/WForm.js";
 import { FilterData } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";

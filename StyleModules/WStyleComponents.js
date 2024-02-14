@@ -210,8 +210,7 @@ const StylesControlsV2 = css`
     .input,
     w-multi-select,
     select,
-    textarea,
-    input:-internal-autofill-selected {
+    textarea{
         width: 100%;
         background-color: #f0f0f0 !important;
         border-radius: 10px;

@@ -320,10 +320,7 @@ class WSimpleModalForm extends HTMLElement {
         }
         ComponentsManager.modalFunction(this)
     }
-    DrawModalHead() {
-        if (this.CloseOption == false) {
-            return;
-        }
+    DrawModalHead() {        
         const InputClose = WRender.Create({
             tagName: 'button',
             class: 'BtnClose', //class: 'Btn',
@@ -333,7 +330,9 @@ class WSimpleModalForm extends HTMLElement {
             className: "ModalHeader",
             innerHTML: this.title
         });
-        Section.append(InputClose);
+        if (this.CloseOption != false) {
+            Section.append(InputClose);
+        }       
         return Section;
     }
     close = () => {
