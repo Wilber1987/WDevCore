@@ -11,6 +11,7 @@ import { MultiSelect } from "./WMultiSelect.js";
     * @property {Function} FilterFunction
     * @property {Boolean} [Display]
     * @property {Boolean} [AutoFilter]
+    * @property {Boolean} [AutoSetDate]
     * @property {Object} [ModelObject]
     * @property {Object} [EntityModel]
 **/
@@ -345,7 +346,7 @@ class WFilterOptions extends HTMLElement {
                     className: prop + " firstDate",
                     id: prop + "first",
                     // @ts-ignore
-                    value: new Date().subtractDays(30).toISO(),
+                    value: this.Config.AutoSetDate == true ? new Date().subtractDays(30).toISO() : undefined,
                     placeholder: prop,
                     onchange: (ev) => { this.filterFunction() }
                 }, {
@@ -353,7 +354,7 @@ class WFilterOptions extends HTMLElement {
                     type: "date",
                     className: prop + " secondDate",                    
                     // @ts-ignore
-                    value: new Date().addDays(1).toISO(),
+                    value: this.Config.AutoSetDate == true ? new Date().addDays(1).toISO() : undefined,
                     id: prop + "second",
                     placeholder: prop,
                     onchange: (ev) => { this.filterFunction() }
