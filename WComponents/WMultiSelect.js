@@ -8,6 +8,7 @@ import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 /**
  * @typedef {Object} ConfigMS 
  *  * @property {Array} Dataset
+    * @property {Array} [selectedItems]
     * @property {Function} [action]
     * @property {String} [id]
     * @property {Object} [ModelObject]
@@ -27,7 +28,7 @@ class MultiSelect extends HTMLElement {
         this.Dataset = this.Config.Dataset ?? [];
         this.ModelObject = this.Config.ModelObject ?? undefined;
         this.attachShadow({ mode: 'open' });
-        this.selectedItems = [];
+        this.selectedItems = this.Config.selectedItems ?? [];
         this.NameSelected = "";
         this.FieldName = "";
         this.FullDetail = this.Config.FullDetail ?? true;
@@ -137,7 +138,7 @@ class MultiSelect extends HTMLElement {
                 children: [OptionLabel, Option, SubContainer]
             });
             this.OptionsContainer.append(Options);
-            if (this.FullDetail) {
+            if (this.FullDetail && typeof element !== "string") {
                 Options.append(this.BuilDetail(element))
             }
         });
@@ -241,12 +242,12 @@ class MultiSelect extends HTMLElement {
         if (this.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
             return true;
         }
-        else if (this.ModelObject == undefined 
+        else if (this.ModelObject == undefined
             || (this.ModelObject[prop]?.type == undefined
-            || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
-            || this.ModelObject[prop]?.primary == true
-            || this.ModelObject[prop]?.hidden == true
-            || this.ModelObject[prop]?.hiddenInTable == true)
+                || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+                || this.ModelObject[prop]?.primary == true
+                || this.ModelObject[prop]?.hidden == true
+                || this.ModelObject[prop]?.hiddenInTable == true)
             || element[prop] == null || element[prop] == undefined
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
@@ -325,10 +326,9 @@ const MainMenu = css`
         padding: 5px;
         border-radius: 0.3cm;
         background-color: #009f97;  color: #fff;margin: 3px;  
-        font-size: 12px;
+        font-size: 11px;
         align-items: center;
         overflow: hidden;        
-        text-transform: uppercase;
         line-height: 18px;
         display: flex;
     }

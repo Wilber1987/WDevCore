@@ -1,9 +1,10 @@
 //@ts-check
 import { StylesControlsV2, StyleScrolls } from "../StyleModules/WStyleComponents.js";
-import { WAjaxTools, WRender } from "../WModules/WComponentsTools.js";
+import { WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
-import { WRichText } from "../WWComponentsPROTOS/WRichText.js";
+import { WRichText } from "./WRichText.js";
 import { WModalForm } from "./WModalForm.js";
+import { MultiSelect } from "./WMultiSelect.js";
 
 class WCommentsComponent extends HTMLElement {
     constructor(props) {
@@ -51,7 +52,7 @@ class WCommentsComponent extends HTMLElement {
                 {
                     tagName: 'label',
                     innerText: 'Texto normal', onclick: async () => {
-                        this.CommentsContainer.style.height = "calc(100% - 100px)";
+                        this.CommentsContainer.style.height = "calc(100% - 150px)";
                         this.RitchOptionContainer.style.display = "none";
                         this.OptionContainer.style.display = "grid";
                     }
@@ -66,18 +67,25 @@ class WCommentsComponent extends HTMLElement {
                 }
             ]
         })
+        this.Mails =WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.Mail);
+        this.SelectedMails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.Mail);
+
+
+        this.MailsSelect = new MultiSelect({ Dataset: this.Mails, selectedItems: this.SelectedMails });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true), StylesControlsV2.cloneNode(true),
-            this.CustomStyle, this.CommentsContainer, this.TypeTextContainer,
+            this.CustomStyle, this.CommentsContainer, this.TypeTextContainer, this.MailsSelect,
             this.OptionContainer, this.RitchOptionContainer)
         this.DrawWCommentsComponent();
+
     }
     saveComment = async () => {
         const Message = {
             // @ts-ignore
-            Body: this.MessageInput.value,           
-            Id_User: this.User.UserId
+            Body: this.MessageInput.value,
+            Id_User: this.User.UserId,
+            Mails: this.MailsSelect.selectedItems
         }
-        Message[ this.CommentsIdentifyName ] =  this.CommentsIdentify
+        Message[this.CommentsIdentifyName] = this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlAdd, Message);
         // @ts-ignore
         this.MessageInput.value = "";
@@ -90,14 +98,14 @@ class WCommentsComponent extends HTMLElement {
             Attach_Files: this.RitchInput.Files,
             Id_User: this.User.UserI
         }
-        Message[ this.CommentsIdentifyName ] =  this.CommentsIdentify
+        Message[this.CommentsIdentifyName] = this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlAdd, Message);
         this.RitchInput.FunctionClear();
         this.update();
     }
     update = async () => {
         const Message = {}
-        Message[ this.CommentsIdentifyName ] =  this.CommentsIdentify
+        Message[this.CommentsIdentifyName] = this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlSearch, Message);
         //console.log(response);
         this.Dataset = response;
@@ -106,7 +114,7 @@ class WCommentsComponent extends HTMLElement {
     connectedCallback() {
         const scrollToBottom = () => {
             this.CommentsContainer.scrollTop = this.CommentsContainer.scrollHeight
-                //- this.CommentsContainer.clientHeight;
+            //- this.CommentsContainer.clientHeight;
         }
         scrollToBottom();
         this.Interval = setInterval(async () => {
@@ -125,23 +133,25 @@ class WCommentsComponent extends HTMLElement {
                 if (attach.Type.toUpperCase().includes("JPG")
                     || attach.Type.toUpperCase().includes("JPEG")
                     || attach.Type.toUpperCase().includes("PNG")) {
-                    attachs.append(WRender.Create({ tagName: "img", src: attach.Value.replace("wwwroot", "") , onclick : ()=>{                        
-                        this.shadowRoot?.append(new WModalForm({
-                            ObjectModal: WRender.Create({
-                                tagName: "img", src: attach.Value.replace("wwwroot", ""), style: {
-                                    width: "auto",
-                                    objectFit: "cover",
-                                    height: "calc(100% - 20px)",
-                                    maxWidth: "100%",
-                                    overflow: "hidden",
-                                    borderRadius: "20px"
-                                }
-                            })
-                        }))
-                    }}));
+                    attachs.append(WRender.Create({
+                        tagName: "img", src: attach.Value.replace("wwwroot", ""), onclick: () => {
+                            this.shadowRoot?.append(new WModalForm({
+                                ObjectModal: WRender.Create({
+                                    tagName: "img", src: attach.Value.replace("wwwroot", ""), style: {
+                                        width: "auto",
+                                        objectFit: "cover",
+                                        height: "calc(100% - 20px)",
+                                        maxWidth: "100%",
+                                        overflow: "hidden",
+                                        borderRadius: "20px"
+                                    }
+                                })
+                            }))
+                        }
+                    }));
                 } else if (attach.Type.toUpperCase().includes("PDF")) {
                     attachs.append(WRender.Create({
-                        tagName: "a", innerText: attach.Name , onclick: () => {
+                        tagName: "a", innerText: attach.Name, onclick: () => {
                             this.shadowRoot?.append(new WModalForm({
                                 ObjectModal: WRender.Create({
                                     tagName: "iframe", src: attach.Value.replace("wwwroot", ""), style: {
@@ -175,7 +185,7 @@ class WCommentsComponent extends HTMLElement {
             min-width: 380px;
             min-height: 350px;
             background-color: #e9e9e9;     
-            height: calc(100%  - 100px);
+            height: calc(100%  - 150px);
             border-radius: 10px;
             padding: 10px;
             display: block;
@@ -191,10 +201,11 @@ class WCommentsComponent extends HTMLElement {
             font-weight: bold;
             font-size: 12px;
         }
-        .OptionContainer {
-            padding: 10px;
+        .OptionContainer {     
+            margin: 10px 0px;       
             display: grid;
-            grid-template-columns: calc(100% - 120px) 80px;
+            grid-template-columns: calc(100% - 70px) 60px;
+            gap: 10px;
             min-width: 400px;
         }
         .RichOptionContainer {
@@ -254,7 +265,8 @@ class WCommentsComponent extends HTMLElement {
             color: #020c1f;
         }
         w-rich-text {
-            width: 100%;
+            margin-top: 10px;
+            width: calc(100% - 12px);
         }
        
     `

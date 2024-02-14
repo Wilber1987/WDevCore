@@ -214,7 +214,7 @@ const StylesControlsV2 = css`
     input:-internal-autofill-selected {
         width: 100%;
         background-color: #f0f0f0 !important;
-        border-radius: 55px;
+        border-radius: 10px;
         padding: 10px;
         outline: none;
         border: none;

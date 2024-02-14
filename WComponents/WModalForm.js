@@ -291,7 +291,11 @@ customElements.define("w-modal-form", WModalForm);
 export { WModalForm }
 
 class WSimpleModalForm extends HTMLElement {
-    constructor(Config = (new ModalConfig())) {
+    /**
+     * 
+     * @param {ModalConfig} Config 
+     */
+    constructor(Config) {
         super();
         this.attachShadow({ mode: "open" });
         this.append(this.modalStyle);
@@ -317,6 +321,9 @@ class WSimpleModalForm extends HTMLElement {
         ComponentsManager.modalFunction(this)
     }
     DrawModalHead() {
+        if (this.CloseOption == false) {
+            return;
+        }
         const InputClose = WRender.Create({
             tagName: 'button',
             class: 'BtnClose', //class: 'Btn',
