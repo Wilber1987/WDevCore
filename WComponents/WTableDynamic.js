@@ -484,6 +484,7 @@ class WTableDynamicComp extends HTMLElement {
         return new WFilterOptions({
             Dataset: this.TableConfig.Dataset,
             DisplayFilts: this.DisplayFilts,
+            AutoSetDate: true,
             FilterFunction: (DFilt) => {
                 this.DefineTable(DFilt);
             }

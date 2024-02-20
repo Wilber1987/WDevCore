@@ -80,6 +80,7 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
             });
             const filterOptions = new WFilterOptions({
                 Dataset: response,
+                AutoSetDate: true,
                 ModelObject: Model,
                 FilterFunction: (DFilt) => {
                     mainComponent.DrawTable(DFilt);

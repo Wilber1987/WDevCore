@@ -513,7 +513,7 @@ class RadialChart extends HTMLElement {
         let dashoffset = (Perimetro * (1 - progress)) - val;
         //console.log("progress:", value + "%", "|", "offset:", dashoffset);
         //console.log("perimetro:", Perimetro + "%", "|", "offset:", dashoffset);
-        circle.style.strokeDashoffset = dashoffset;
+        circle.style.strokeDashoffset =  dashoffset < 0 ? 0 : dashoffset;
     }
 }
 const GenerateColor = () => {
@@ -585,6 +585,7 @@ const WChartStyle = (ChartInstance) => {
                     //margin: "0px auto"
                 }), new WCssClass(".SectionBars label", {
                     padding: 5,
+                    "min-height": 12,
                 }), new WCssClass(".GroupSection ", {
                     "display": " flex",
                     "align-items": "center",
@@ -769,7 +770,7 @@ const WChartStyle = (ChartInstance) => {
                     "transform-origin": " 50% 50%",
                     "fill": " none",
                     "cursor": " pointer",
-                    "clip-path": " circle(50% at 50% 50%)",
+                    "clip-path": " circle(33% at 50% 50%)",
                 }), new WCssClass(".circleText ", {
                     "transition": " all 0.5s",
                     "height": " 100%",
@@ -779,7 +780,7 @@ const WChartStyle = (ChartInstance) => {
                     "background-color": " #999999",
                     "background-blend-mode": " screen",
                     "z-index": " 5",
-                    "clip-path": " circle(52% at 50% 50%)",
+                    "clip-path": " circle(35% at 50% 50%)",
                 }), new WCssClass(".progress__meter,.progress__value ", {
                     "fill": " none",
                 }), new WCssClass(".progress__meter ", {

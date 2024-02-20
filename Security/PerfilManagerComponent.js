@@ -76,6 +76,7 @@ class PerfilManagerComponent extends HTMLElement {
         this.FilterOptions = new WFilterOptions({
             // @ts-ignore
             Dataset: this.Dataset,
+            AutoSetDate: true,
             ModelObject: this.ModelObject,
             FilterFunction: (DFilt) => {
                 this.mainTable?.DrawTable(DFilt);
