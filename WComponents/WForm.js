@@ -1578,6 +1578,10 @@ const ModalVericateAction = (Action, title) => {
                             await Action();
                             ModalCheck.close();
                         }
+                    }), WRender.Create({
+                        tagName: 'input', type: 'button', className: 'Btn', value: 'CANCELAR', onclick: async () => {                           
+                            ModalCheck.close();
+                        }
                     })
                 ]
             })
