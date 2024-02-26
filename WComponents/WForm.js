@@ -293,6 +293,14 @@ class WForm extends HTMLElement {
         } else if (targetControl?.type == "radio") {
             ObjectF[prop] = targetControl?.value;
         } else {
+            if (parseFloat(targetControl?.value) < parseFloat(targetControl?.min)) {                
+                targetControl.value = targetControl?.min;               
+                this.createInfoToolTip(targetControl, `El valor mínimo permitido es: ${targetControl?.min}`);
+            }
+            if (parseFloat(targetControl?.value) > parseFloat(targetControl?.max)) {                
+                targetControl.value = targetControl?.max;
+                this.createInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
+            }
             ObjectF[prop] = targetControl?.value;
             if (targetControl?.pattern) {
                 let regex = new RegExp(targetControl?.pattern);
@@ -659,7 +667,7 @@ class WForm extends HTMLElement {
                     tagName: "input",
                     className: prop,
                     value: val,
-                    type: ModelProperty.type.toUpperCase() == "MONEY" ? "number" : ModelProperty.type,
+                    type: ModelProperty.type.toUpperCase() == "MONEY"  ||  ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type,
                     min: ModelProperty.min,
                     max: ModelProperty.max,
                     placeholder: placeholder,
@@ -1173,6 +1181,20 @@ class WForm extends HTMLElement {
         });
         control.focus();
     }
+    createInfoToolTip(control, message) {
+        if (!control.parentNode.querySelector(".ToolTip")) {
+            const toolTip = WRender.Create({
+                tagName: "span",
+                innerHTML: message,
+                className: "ToolTip ToolInfo"
+            });
+            control.parentNode.append(toolTip);
+        }
+        WRender.SetStyle(control, {
+            boxShadow: "0 0 3px #ef4d00"
+        });
+        control.focus();
+    }
 
     ModalCheck(ObjectF, withModel = false) {
         const modalCheckFunction = async () => {
@@ -1391,12 +1413,15 @@ class WForm extends HTMLElement {
                 border-radius: 0.3cm;
                 left: 10px;
                 bottom: -10px;
-                font-size: 10px;
+                font-size: 18px;
                 font-weight: 500;
                 color: rgb(227, 0, 0);
             }
             .ToolTip::first-letter{
                 text-transform: capitalize;
+            }
+            .ToolInfo {
+                color: #12b823;
             }
             .draw-canvas {
                 border: 2px dotted #CCCCCC;

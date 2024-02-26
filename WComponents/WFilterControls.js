@@ -480,7 +480,7 @@ class WFilterOptions extends HTMLElement {
         .OptionContainer input,
         .OptionContainer select {
             margin: 0px;
-            padding: 10px;
+            padding: 5px 10px;
         }
 
         .multi-control-container {
