@@ -8,6 +8,7 @@ class WOrtograficValidation {
         try {
             val = val.toString().replaceAll("_id", "")
                 .replaceAll("CaseTable_", "")
+                .replaceAll("_ModelComponent", " ")
                 .replaceAll("Tbl_", "")
                 .replaceAll("CaseTable_", "")
                 .replaceAll("Cat_", "")
@@ -23,7 +24,7 @@ class WOrtograficValidation {
                 .replaceAll("tbl", "")
                 .replaceAll("id_", "")
                 .replaceAll("Id_", "")
-                .replaceAll("_Id", "")
+                //.replaceAll("_Id", "")
                 .replaceAll("_", " ");
             const words = val.split(" ");
             let valReturn = "";

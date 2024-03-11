@@ -1411,9 +1411,9 @@ class WForm extends HTMLElement {
                 position: absolute;
                 padding: 5px 15px;
                 border-radius: 0.3cm;
-                left: 10px;
-                bottom: -10px;
-                font-size: 18px;
+                left: 5px;
+                bottom: -17px;
+                font-size: 10px;
                 font-weight: 500;
                 color: rgb(227, 0, 0);
             }
@@ -1589,25 +1589,25 @@ class WForm extends HTMLElement {
         return WRender.Create({ style: { display: "none" }, children: [style, wstyle] });
     }
 }
-const ModalVericateAction = (Action, title) => {
+const ModalVericateAction = (Action, title, withClose= true) => {
     const ModalCheck = new WSimpleModalForm({
         title: "AVISO",
         CloseOption: false,
         ObjectModal: [
             WRender.Create({ tagName: "h3", innerText: title ?? "¿Esta seguro que desea guardar este registro?" }),
             WRender.Create({
-                style: { textAlign: "center" },
+                style: { textAlign: "center", display: "flex" },
                 children: [
                     WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {
                             await Action();
                             ModalCheck.close();
                         }
-                    }), WRender.Create({
+                    }), withClose ? WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'CANCELAR', onclick: async () => {                           
                             ModalCheck.close();
                         }
-                    })
+                    }): ""
                 ]
             })
         ]
