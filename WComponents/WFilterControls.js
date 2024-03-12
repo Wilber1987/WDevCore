@@ -66,7 +66,7 @@ class WFilterOptions extends HTMLElement {
             const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop).map(s => s[prop]);
             if (this.isDrawable(this.ModelObject, prop)) {
                 if (this.ModelObject[prop].__proto__ == Object.prototype) {
-                    const filterControl = await this.CreateModelControl(this.ModelObject, prop, SelectData);
+                    const filterControl = await this.CreateModelControl(this.ModelObject, prop, this.ModelObject[prop].Dataset ?? SelectData);
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({
                             className: this.ModelObject[prop].type.toUpperCase() == "DATE"
@@ -480,7 +480,7 @@ class WFilterOptions extends HTMLElement {
         .OptionContainer input,
         .OptionContainer select {
             margin: 0px;
-            padding: 10px;
+            padding: 5px 10px;
         }
 
         .multi-control-container {
@@ -507,6 +507,9 @@ class WFilterOptions extends HTMLElement {
         input.firstDate,
         input.secondDate {
             padding-left: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         input.firstDate::before {
             content: "Desde: ";

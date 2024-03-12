@@ -305,14 +305,17 @@ class ProfileCard extends HTMLElement {
                         ]
                     }));
                     break;
-                case "NUMBER": case "MONEY":
+                case "NUMBER": case "MONEY": case "PERCENTAGE":
+                    let text;
                     this.container.append(WRender.Create({
                         tagName: 'div', class: 'DataContainer', children: [
                             (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
                             {
                                 tagName: 'label', className: "label-value", innerText:
                                     (typeof ObjectDetail[prop] === "number" &&  Model[prop].type.toUpperCase() == "MONEY" 
-                                    ? ObjectDetail[prop].toFixed(2) : ObjectDetail[prop])
+                                    ? ObjectDetail[prop].toFixed(2) :
+                                    typeof ObjectDetail[prop] === "number" &&  Model[prop].type.toUpperCase() == "PERCENTAGE" 
+                                    ? `${ ObjectDetail[prop]} %`: ObjectDetail[prop])
                             }
                         ]
                     }));

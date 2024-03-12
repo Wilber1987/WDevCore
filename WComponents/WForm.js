@@ -293,6 +293,14 @@ class WForm extends HTMLElement {
         } else if (targetControl?.type == "radio") {
             ObjectF[prop] = targetControl?.value;
         } else {
+            if (parseFloat(targetControl?.value) < parseFloat(targetControl?.min)) {                
+                targetControl.value = targetControl?.min;               
+                this.createInfoToolTip(targetControl, `El valor mínimo permitido es: ${targetControl?.min}`);
+            }
+            if (parseFloat(targetControl?.value) > parseFloat(targetControl?.max)) {                
+                targetControl.value = targetControl?.max;
+                this.createInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
+            }
             ObjectF[prop] = targetControl?.value;
             if (targetControl?.pattern) {
                 let regex = new RegExp(targetControl?.pattern);
@@ -671,7 +679,7 @@ class WForm extends HTMLElement {
                     tagName: "input",
                     className: prop,
                     value: val,
-                    type: ModelProperty.type.toUpperCase() == "MONEY" ? "number" : ModelProperty.type,
+                    type: ModelProperty.type.toUpperCase() == "MONEY"  ||  ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type,
                     min: ModelProperty.min,
                     max: ModelProperty.max,
                     placeholder: placeholder,
@@ -1185,6 +1193,20 @@ class WForm extends HTMLElement {
         });
         control.focus();
     }
+    createInfoToolTip(control, message) {
+        if (!control.parentNode.querySelector(".ToolTip")) {
+            const toolTip = WRender.Create({
+                tagName: "span",
+                innerHTML: message,
+                className: "ToolTip ToolInfo"
+            });
+            control.parentNode.append(toolTip);
+        }
+        WRender.SetStyle(control, {
+            boxShadow: "0 0 3px #ef4d00"
+        });
+        control.focus();
+    }
 
     ModalCheck(ObjectF, withModel = false) {
         const modalCheckFunction = async () => {
@@ -1401,14 +1423,17 @@ class WForm extends HTMLElement {
                 position: absolute;
                 padding: 5px 15px;
                 border-radius: 0.3cm;
-                left: 10px;
-                bottom: -10px;
+                left: 5px;
+                bottom: -17px;
                 font-size: 10px;
                 font-weight: 500;
                 color: rgb(227, 0, 0);
             }
             .ToolTip::first-letter{
                 text-transform: capitalize;
+            }
+            .ToolInfo {
+                color: #12b823;
             }
             .draw-canvas {
                 border: 2px dotted #CCCCCC;
@@ -1576,25 +1601,25 @@ class WForm extends HTMLElement {
         return WRender.Create({ style: { display: "none" }, children: [style, wstyle] });
     }
 }
-const ModalVericateAction = (Action, title) => {
+const ModalVericateAction = (Action, title, withClose= true) => {
     const ModalCheck = new WSimpleModalForm({
         title: "AVISO",
         CloseOption: false,
         ObjectModal: [
             WRender.Create({ tagName: "h3", innerText: title ?? "¿Esta seguro que desea guardar este registro?" }),
             WRender.Create({
-                style: { textAlign: "center" },
+                style: { textAlign: "center", display: "flex" },
                 children: [
                     WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {
                             await Action();
                             ModalCheck.close();
                         }
-                    }), WRender.Create({
+                    }), withClose ? WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'CANCELAR', onclick: async () => {                           
                             ModalCheck.close();
                         }
-                    })
+                    }): ""
                 ]
             })
         ]
