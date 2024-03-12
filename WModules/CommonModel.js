@@ -73,6 +73,7 @@ function ModelFunction() { }
     * @property {Boolean} [hidden] desabilita la propiedad y la oculta
     * @property {Boolean} [hiddenInTable] oculta en la tabla
     * @property {Boolean} [require]
+    * @property {Boolean} [primary]
     * @property {Boolean} [disabled]
     * @property {String} [label]
     * @property {Array} [fileType]
@@ -341,7 +342,7 @@ class ElementStyle {
     * @property {String} [UrlAdd]
     * @property {String} [UrlDelete]
     * @property {String} [UrlSearch]
-    * @property {Function} [AddFunction]
+    * @property {Function} [AddAction]
 **/
 /**
  * @typedef {Object} SearchItemsFromApi 

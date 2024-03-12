@@ -72,7 +72,9 @@ class WTableComponent extends HTMLElement {
             }
         }));
         const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
+        
         const isWithtModel = this.TableConfig.ModelObject?.Get != undefined
+        
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
@@ -513,9 +515,15 @@ class WTableComponent extends HTMLElement {
                     SaveFunction: (NewObject) => {
                         if (element == undefined) {
                             this.Dataset.push(NewObject);
+                            if (this.Options?.AddAction != undefined) {
+                                this.Options.AddAction(element);
+                            }
                             this.DrawTable();
                         } else {
                             //this.DrawTRow(tr, element);
+                            if (this.Options?.EditAction != undefined) {
+                                this.Options.EditAction(element);
+                            }
                             this.DrawTable();
                         }
                     }

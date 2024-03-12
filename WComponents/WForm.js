@@ -505,7 +505,19 @@ class WForm extends HTMLElement {
                     ParentEntity: ObjectF,
                     ImageUrlPath: this.Config.ImageUrlPath,
                     Options: {
-                        Add: true, Edit: true, Delete: true, Search: true
+                        Add: true, Edit: true, Delete: true, Search: true,
+                        AddAction: ()=>{ 
+                            if (ModelProperty.action) {
+                                ModelProperty.action(ObjectF, this, InputControl, prop)
+                            }
+                            this.SetOperationValues(Model)
+                        },
+                        EditAction: ()=>{
+                            if (ModelProperty.action) {
+                                ModelProperty.action(ObjectF, this, InputControl, prop)
+                            }
+                            this.SetOperationValues(Model)
+                        }
                     }
                 });
                 if (ModelProperty.disabled) {
