@@ -14,6 +14,8 @@ import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
     * @property {Object} [ModelObject]
     * @property {Boolean} [MultiSelect]
     * @property {Boolean} [FullDetail]
+    * @property {Boolean} [AddObject]
+    * @property {String} [AddPatern]
 **/
 
 class MultiSelect extends HTMLElement {
@@ -56,7 +58,34 @@ class MultiSelect extends HTMLElement {
             placeholder: "Buscar...",
             onchange: async (ev) => {
                 const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value);
-                this.Draw(Dataset);
+                console.log(Dataset.length, this.AddObject, this.ModelObject);
+                if (Dataset.length == 0 && this.Config.AddObject == true && this.ModelObject == undefined) {//TODO REPARAR EL MODEL OBJECT
+                    const targetControl = ev.target;
+                    const addBtn = WRender.Create({
+                        tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar', onclick: async () => {
+                            let regex = this.Config?.AddPatern ? new RegExp(this.Config?.AddPatern) : undefined;
+                            if (this.Config?.AddPatern == undefined || regex?.test(targetControl.value)) {
+                                this.Dataset.push(targetControl.value);
+                                this.selectedItems.push(targetControl.value);
+                                targetControl.value = ""
+                                this.Draw(await WArrayF.searchFunction(this.Dataset, targetControl.value));
+                                this.DrawLabel();
+                                addBtn.remove();
+                                const tool = targetControl.parentNode.querySelector(".ToolTip");                                
+                                if (tool != null) {
+                                    tool.remove();
+                                }
+                            } else {
+                                addBtn.remove();
+                                this.createAlertToolTip(targetControl, `Formato inválido`);
+                            }
+                        }
+                    })
+                    this.tool.append(addBtn)
+                    console.log(true);
+                } else {
+                    this.Draw(Dataset);
+                }
             }
         });
         this.shadowRoot.append(
@@ -69,6 +98,20 @@ class MultiSelect extends HTMLElement {
         }
         this.shadowRoot.append(this.SetOptions());
         this.LabelMultiselect.onclick = this.DisplayOptions;
+    }
+    createAlertToolTip(control, message) {
+        if (!control.parentNode.querySelector(".ToolTip")) {
+            const toolTip = WRender.Create({
+                tagName: "span",
+                innerHTML: message,
+                className: "ToolTip"
+            });
+            control.parentNode.append(toolTip);
+        }
+        WRender.SetStyle(control, {
+            boxShadow: "0 0 3px #ef4d00"
+        });
+        control.focus();
     }
 
     connectedCallback() {
@@ -424,6 +467,27 @@ const MainMenu = css`
     }
     .ElementDetail:hover,  .OContainer:hover > .ElementDetail {
         background-color: #d2d2d2;
+    }
+    .addBtn{
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        padding: 5px;
+        font-size: 11px;
+        color: #fff;
+        border: none;
+        background-color: #479207;
+        cursor: pointer;
+    }
+    .ToolTip {
+        position: absolute;
+        padding: 5px 15px;
+        border-radius: 0.3cm;
+        font-size: 10px;
+        font-weight: 500;
+        color: rgb(227, 0, 0);
+        top: 7px;
+        right: 50px;
     }
 `
 const SubMenu = {

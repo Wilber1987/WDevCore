@@ -11,7 +11,7 @@ class WCommentsComponent extends HTMLElement {
         super();
         this.Dataset = props.Dataset ?? [];
         this.ModelObject = props.ModelObject;
-
+        this.AddObject = props.AddObject;
         this.UrlSearch = props.UrlSearch;
         this.UrlAdd = props.UrlAdd;
         this.User = props.User;
@@ -67,11 +67,16 @@ class WCommentsComponent extends HTMLElement {
                 }
             ]
         })
-        this.Mails =WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.Mail);
+        this.Mails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.Mail);
         this.SelectedMails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.Mail);
 
 
-        this.MailsSelect = new MultiSelect({ Dataset: this.Mails, selectedItems: this.SelectedMails });
+        this.MailsSelect = new MultiSelect({
+            Dataset: this.Mails,
+            selectedItems: this.SelectedMails,
+            AddObject: this.AddObject, 
+            AddPatern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"//patron de correo
+        });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true), StylesControlsV2.cloneNode(true),
             this.CustomStyle, this.CommentsContainer, this.TypeTextContainer, this.MailsSelect,
             this.OptionContainer, this.RitchOptionContainer)
