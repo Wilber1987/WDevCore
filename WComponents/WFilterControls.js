@@ -390,6 +390,7 @@ class WFilterOptions extends HTMLElement {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
             Dataset: ModelProperty.Dataset,
+            ModelObject: ModelProperty.ModelObject,
             id: prop,
             FullDetail: true,
             action: () => {

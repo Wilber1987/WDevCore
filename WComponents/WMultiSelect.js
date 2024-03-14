@@ -58,9 +58,14 @@ class MultiSelect extends HTMLElement {
             placeholder: "Buscar...",
             onchange: async (ev) => {
                 const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value);
-                console.log(Dataset,this.ModelObject?.Get );
+                //console.log(Dataset, this.ModelObject, this.ModelObject?.Get );
+                if (this.ModelObject?.__proto__ == Function.prototype) {
+                    this.ModelObject = this.ModelObject();
+                }
                 if (Dataset.length == 0 && this.ModelObject?.Get != undefined) {
-                    const responseDataset = await this.ModelObject?.Get();
+                    var filterObject = {}
+                    filterObject[this.DisplayName] = ev.target.value
+                    const responseDataset = await new this.ModelObject.constructor(filterObject).Get();
                     responseDataset?.forEach(r => {
                         this.Dataset.push(r);
                     })
@@ -89,7 +94,7 @@ class MultiSelect extends HTMLElement {
 
     addBtn(targetControl) {
         const addBtn = WRender.Create({
-            tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async () => {              
+            tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async () => {
                 if (this.ModelObject != undefined) {
                     this.ModalCRUD(undefined, targetControl, addBtn)
                 } else {
@@ -268,16 +273,24 @@ class MultiSelect extends HTMLElement {
         if (typeof element === "string") {
             return element
         }
-        return element.tipo ?? element.Descripcion ??
-            element.descripcion ??
-            element.desc ??
-            element.name ??
-            element.Name ??
-            element.nombre ??
-            element.Nombre ??
-            element.Nombres ??
-            element.Descripcion_Servicio ??
-            "Element" + index;
+        this.DisplayName = undefined;
+        const keys = ["tipo",
+            "Descripcion",
+            "descripcion",
+            "desc",
+            "name",
+            "Name",
+            "nombre",
+            "Nombre",
+            "Nombres",
+            "Descripcion_Servicio"]
+        for (const key in element) {
+            if (keys.find(k => k == key) != null) {
+                this.DisplayName = key;
+                break;
+            }
+        }
+        return element[this.DisplayName] ?? "Element" + index;
     }
     DisplayOptions = () => {
         if (this.tool.className.includes("toolActive")) {
@@ -332,7 +345,7 @@ class MultiSelect extends HTMLElement {
                     Url: element ? this.Options?.UrlUpdate : this.Options?.UrlAdd,
                     AddObject: element ? false : true,
                     SaveFunction: async (NewObject) => {
-                        this.Dataset.push(NewObject);                       
+                        this.Dataset.push(NewObject);
                         if (!this.MultiSelect) {
                             this.selectedItems.shift();
                         }
