@@ -329,20 +329,21 @@ class ElementStyle {
     * @property {Boolean} [Filter]
     * @property {Boolean} [Edit]
     * @property {Boolean} [FilterDisplay]
-    * @property {Function} [EditAction] requiere Edit en true, recibe como parametro el elemnto
     * @property {Boolean} [Delete]
-    * @property {Function} [DeleteAction] requiere Delete en true, recibe como parametro el elemnto
     * @property {Boolean} [Add]
     * @property {Boolean} [Search]
     * @property {Boolean} [Select]
-    * @property {Function} [SelectAction] requiere select en true
     * @property {Boolean} [MultiSelect] funciona solo cuando select esta habilitado
     * @property {Array<Actions>} [UserActions]
     * @property {String} [UrlUpdate]
     * @property {String} [UrlAdd]
     * @property {String} [UrlDelete]
     * @property {String} [UrlSearch]
-    * @property {Function} [AddAction]
+    * @property {Function} [AddAction] requiere Add en true, recibe como parametro el elemento
+    * @property {Function} [EditAction] requiere Edit en true, recibe como parametro el elemento
+    * @property {Function} [DeleteAction] requiere Delete en true, recibe como parametro el elemnto
+    * @property {Function} [SelectAction] requiere select en true, recibe como parametro el elemnto
+    * 
 **/
 /**
  * @typedef {Object} SearchItemsFromApi 

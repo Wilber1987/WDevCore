@@ -58,31 +58,18 @@ class MultiSelect extends HTMLElement {
             placeholder: "Buscar...",
             onchange: async (ev) => {
                 const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value);
-                console.log(Dataset.length, this.AddObject, this.ModelObject);
-                if (Dataset.length == 0 && this.Config.AddObject == true && this.ModelObject == undefined) {//TODO REPARAR EL MODEL OBJECT
-                    const targetControl = ev.target;
-                    const addBtn = WRender.Create({
-                        tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar', onclick: async () => {
-                            let regex = this.Config?.AddPatern ? new RegExp(this.Config?.AddPatern) : undefined;
-                            if (this.Config?.AddPatern == undefined || regex?.test(targetControl.value)) {
-                                this.Dataset.push(targetControl.value);
-                                this.selectedItems.push(targetControl.value);
-                                targetControl.value = ""
-                                this.Draw(await WArrayF.searchFunction(this.Dataset, targetControl.value));
-                                this.DrawLabel();
-                                addBtn.remove();
-                                const tool = targetControl.parentNode.querySelector(".ToolTip");                                
-                                if (tool != null) {
-                                    tool.remove();
-                                }
-                            } else {
-                                addBtn.remove();
-                                this.createAlertToolTip(targetControl, `Formato inválido`);
-                            }
-                        }
+                console.log(Dataset,this.ModelObject?.Get );
+                if (Dataset.length == 0 && this.ModelObject?.Get != undefined) {
+                    const responseDataset = await this.ModelObject?.Get();
+                    responseDataset?.forEach(r => {
+                        this.Dataset.push(r);
                     })
+                    return responseDataset;
+                }
+                if (Dataset.length == 0 && this.Config.AddObject == true) {
+                    const targetControl = ev.target;
+                    const addBtn = this.addBtn(targetControl)
                     this.tool.append(addBtn)
-                    console.log(true);
                 } else {
                     this.Draw(Dataset);
                 }
@@ -99,6 +86,36 @@ class MultiSelect extends HTMLElement {
         this.shadowRoot.append(this.SetOptions());
         this.LabelMultiselect.onclick = this.DisplayOptions;
     }
+
+    addBtn(targetControl) {
+        const addBtn = WRender.Create({
+            tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async () => {              
+                if (this.ModelObject != undefined) {
+                    this.ModalCRUD(undefined, targetControl, addBtn)
+                } else {
+                    let regex = this.Config?.AddPatern ? new RegExp(this.Config?.AddPatern) : undefined;
+                    if (this.Config?.AddPatern == undefined || regex?.test(targetControl.value)) {
+                        this.Dataset.push(targetControl.value);
+                        this.selectedItems.push(targetControl.value);
+                        targetControl.value = "";
+                        this.Draw(await WArrayF.searchFunction(this.Dataset, targetControl.value));
+                        this.DrawLabel();
+                        addBtn.remove();
+                        const tool = targetControl.parentNode.querySelector(".ToolTip");
+                        if (tool != null) {
+                            tool.remove();
+                        }
+                    } else {
+                        addBtn.remove();
+                        this.createAlertToolTip(targetControl, `Formato inválido`);
+                    }
+                }
+
+            }
+        });
+        return addBtn;
+    }
+
     createAlertToolTip(control, message) {
         if (!control.parentNode.querySelector(".ToolTip")) {
             const toolTip = WRender.Create({
@@ -298,6 +315,44 @@ class MultiSelect extends HTMLElement {
         }
         return true;
     }
+    ModalCRUD(element, targetControl, addBtn) {
+        this.shadowRoot?.append(
+            new WModalForm({
+                ModelObject: this.ModelObject,
+                EntityModel: this.EntityModel,
+                AutoSave: this.Config.AutoSave ?? false,
+                ParentModel: this.Config.ParentModel,
+                ParentEntity: this.Config.ParentEntity,
+                EditObject: element,
+                icon: this.Config.icon,
+                ImageUrlPath: this.Config.ImageUrlPath,
+                title: element ? "Editar" : "Nuevo",
+                ValidateFunction: this.Config.ValidateFunction,
+                ObjectOptions: {
+                    Url: element ? this.Options?.UrlUpdate : this.Options?.UrlAdd,
+                    AddObject: element ? false : true,
+                    SaveFunction: async (NewObject) => {
+                        this.Dataset.push(NewObject);                       
+                        if (!this.MultiSelect) {
+                            this.selectedItems.shift();
+                        }
+                        this.selectedItems.push(NewObject);
+
+                        targetControl.value = "";
+                        this.Draw(await WArrayF.searchFunction(this.Dataset, targetControl.value));
+                        this.DrawLabel();
+                        if (this.Config.action != undefined) {
+                            this.Config.action(this.selectedItems);
+                        }
+                        addBtn.remove();
+                        const tool = targetControl.parentNode.querySelector(".ToolTip");
+                        if (tool != null) {
+                            tool.remove();
+                        }
+                    }
+                }
+            }));
+    }
 }
 customElements.define("w-multi-select", MultiSelect);
 export { MultiSelect }
@@ -478,6 +533,8 @@ const MainMenu = css`
         border: none;
         background-color: #479207;
         cursor: pointer;
+        border-radius: 5px;
+        font-size: 9px;
     }
     .ToolTip {
         position: absolute;

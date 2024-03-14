@@ -455,6 +455,7 @@ class WForm extends HTMLElement {
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = new MultiSelect({
+                    AddObject: true,
                     action: (selecteds) => {
                         if (ModelProperty.action) {
                             ModelProperty.action(ObjectF, this, InputControl, prop)
@@ -521,6 +522,18 @@ class WForm extends HTMLElement {
                             this.SetOperationValues(Model)
                         },
                         EditAction: ()=>{
+                            if (ModelProperty.action) {
+                                ModelProperty.action(ObjectF, this, InputControl, prop)
+                            }
+                            this.SetOperationValues(Model)
+                        }, 
+                        DeleteAction: ()=>{
+                            if (ModelProperty.action) {
+                                ModelProperty.action(ObjectF, this, InputControl, prop)
+                            }
+                            this.SetOperationValues(Model)
+                        },
+                        SelectAction: ()=>{
                             if (ModelProperty.action) {
                                 ModelProperty.action(ObjectF, this, InputControl, prop)
                             }
@@ -906,6 +919,7 @@ class WForm extends HTMLElement {
         InputControl = new MultiSelect({
             MultiSelect: false,
             Dataset: Dataset,
+            AddObject: true,
             ModelObject: this.Config.ModelObject[prop].ModelObject,
             action: (ItemSelects) => {
                 ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_

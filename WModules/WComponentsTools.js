@@ -754,7 +754,7 @@ class WArrayF {
         return val;
     }
     static async searchFunction(Dataset, param, apiUrl) {
-        return Dataset.filter((element) => {
+        const dataset = Dataset.filter((element) => {
             for (const prop in element) {
                 try {
                     if (this.evalValue(element[prop], param) != null) {
@@ -764,7 +764,8 @@ class WArrayF {
                     console.log(element);
                 }
             }
-        });
+        });      
+        return dataset;
     }
     static evalValue = (element, param) => {
         const evalF = (parametro, objetoEvaluado) => {
