@@ -57,6 +57,8 @@ class PerfilClass extends HTMLElement {
                     this.response = await WAjaxTools.PostRequest("../../api/Profile/TakeProfile",
                         { Id_Perfil: this.Id_Perfil }
                     );
+                   // this.response.CaseTable_Dependencias_Usuarios = undefined;
+                   // this.response.CaseTable_Participantes = undefined;
                     this.TabManager.NavigateFunction("Tab-Edit-Generales",
                         new WForm({
                             AutoSave: true,

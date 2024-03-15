@@ -163,10 +163,8 @@ class WTableComponent extends HTMLElement {
                 this.ThOptions.append(WRender.Create({
                     tagName: "button", class: "BtnTableSR",
                     type: "button", innerText: "Nuevo", style: "margin: 10px 0px; max-width: 300px",
-                    onclick: async () => {
-                        if (this.Options?.AddAction != undefined)
-                            this.Options.AddAction();
-                        else this.ModalCRUD();
+                    onclick: async () => {                       
+                        this.ModalCRUD();
                     }
                 }))
             }
