@@ -893,7 +893,7 @@ class WForm extends HTMLElement {
     }
 
     FindObjectMultiselect(val, InputControl) {
-        //console.log(val, InputControl.Dataset);
+        console.log(val, InputControl.Dataset);
         if (val != null && val != undefined && val.__proto__ == Array.prototype) {
             val.forEach((item) => {
                 const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, item));

@@ -696,7 +696,7 @@ class WTableComponent extends HTMLElement {
                 text-align: left;
                 vertical-align: top;
             }
-            .WTable td  label { overflow: hidden;
+            .WTable td label { overflow: hidden;
                 max-height: 200px;
                 max-width: 300px;
                 text-overflow: ellipsis;
@@ -708,6 +708,10 @@ class WTableComponent extends HTMLElement {
             .WTable td  label * {
                 font-size: 11px !important;
                 text-align: justify !important;
+                padding: 0px !important;
+                margin: 0px !important;
+                background: none !important;
+                max-width: 100%
             }
 
             .WTable .tdAction {
