@@ -415,13 +415,13 @@ const MainMenu = css`
         align-items: center;
         cursor: pointer;
         height: 100%;
-        height: 34px;
+        height: 22px;
     }
     .LabelMultiselect .selecteds {       
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
-        min-height: 33px;
+        min-height: 22px;
         width: calc(100% - 30px);
         overflow-x: auto;
     } 
@@ -434,7 +434,7 @@ const MainMenu = css`
         max-height: 0px !important;
     }
     .LabelMultiselect label {
-        padding: 5px;
+        padding: 0 5px;
         border-radius: 0.3cm;
         background-color: #009f97;  color: #fff;margin: 3px;  
         font-size: 11px;
