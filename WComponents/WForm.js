@@ -1622,7 +1622,7 @@ const ModalVericateAction = (Action, title, withClose= true) => {
         ObjectModal: [
             WRender.Create({ tagName: "h3", innerText: title ?? "¿Esta seguro que desea guardar este registro?" }),
             WRender.Create({
-                style: { textAlign: "center", display: "flex" },
+                style: { justifyContent: "center", display: "flex" },
                 children: [
                     WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {

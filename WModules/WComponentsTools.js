@@ -276,7 +276,7 @@ class WRender {
                 return document.createTextNode("Nodo nulo o indefinido.");
             } else if (typeof Node === "string" || typeof Node === "number") {
                 if (Node.length == 0) {
-                    return "";
+                    this.CreateStringNode(`<label></label>`);
                 } else if (Node.length > 100) {
                     return this.CreateStringNode(`<p>${Node}</p>`);
                 }
