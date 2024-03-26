@@ -698,7 +698,6 @@ class WTableComponent extends HTMLElement {
             }
             .WTable td label { overflow: hidden;
                 max-height: 200px;
-                max-width: 300px;
                 text-overflow: ellipsis;
                 display: block;
                 overflow-y: auto;
