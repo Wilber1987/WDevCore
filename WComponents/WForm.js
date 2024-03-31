@@ -34,7 +34,7 @@ class WForm extends HTMLElement {
         this.DataRequire = this.DataRequire ?? true;
         this.StyleForm = this.Config.StyleForm;
         this.limit = 2;
-        this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px) calc(50% - 10px)";
+        this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px)  calc(50% - 10px)";
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));

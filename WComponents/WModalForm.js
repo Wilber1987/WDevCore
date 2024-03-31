@@ -239,14 +239,13 @@ class WModalForm extends HTMLElement {
                         "position": "relative",
                         "left": "-10px;",
                     }), new WCssClass(`.ObjectModalContainer`, {
-                       // overflow: "hidden",
-                       // "overflow-y": 'auto',
                         "max-height": "calc(100vh - 120px)",
                         height: "100%",
                         width: "90%",
                         margin: "auto",
                         "margin-bottom": 20,
-                        "text-align": "center",
+                        display: "flex",   
+                        "justify-content": "center",                 
                         padding: 5,
                         "overflow-y": "auto" 
                     }),
