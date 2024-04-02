@@ -38,10 +38,10 @@ class MultiSelect extends HTMLElement {
         WRender.SetStyle(this, {
             display: "block",
             position: "relative",
-            boxShadow: "0 0 4px 0 rgb(0,0,0,50%)",
+            boxShadow: "0 0 5px #c1c1c1;",
             fontSize: "12px",
             height: "initial",
-            padding: "2px"
+            padding: "0"
         });
 
         this.MultiSelect = this.Config.MultiSelect ?? true;
@@ -204,7 +204,10 @@ class MultiSelect extends HTMLElement {
             });
             this.OptionsContainer.append(Options);
             if (this.FullDetail && typeof element !== "string") {
-                Options.append(this.BuilDetail(element))
+                const detail = this.BuilDetail(element);
+                if (detail.childNodes.length > 0) {
+                    Options.append(detail)
+                }                
             }
         });
     }
@@ -379,7 +382,7 @@ class WToolTip extends HTMLElement {
                 position: absolute;
                 width: 100%;
                 z-index: 1;
-                box-shadow: 0 0 5px rgb(0 0 0 / 50%);
+                box-shadow: 0 0 5px #c1c1c1;;
                 transition: all .1s;
                 max-height: 0px;
                 background-color: #fff;
@@ -415,13 +418,13 @@ const MainMenu = css`
         align-items: center;
         cursor: pointer;
         height: 100%;
-        height: 34px;
+        height: 24px;
     }
     .LabelMultiselect .selecteds {       
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
-        min-height: 33px;
+        min-height: 18px;
         width: calc(100% - 30px);
         overflow-x: auto;
     } 
@@ -434,14 +437,15 @@ const MainMenu = css`
         max-height: 0px !important;
     }
     .LabelMultiselect label {
-        padding: 5px;
-        border-radius: 0.3cm;
-        background-color: #009f97;  color: #fff;margin: 3px;  
-        font-size: 11px;
+        padding: 2px 5px;
+        border-radius: 0.2cm;
+        background-color: #009f97;  color: #fff;
+        margin: 3px;  
+        font-size: 9px;
         align-items: center;
         overflow: hidden;        
-        line-height: 18px;
         display: flex;
+        line-height: 12px;
     }
     .LabelMultiselect label button {
         border: none;
@@ -450,6 +454,7 @@ const MainMenu = css`
         font-weight: bold;
         border-left: solid 2px #062e2c;
         background: none;
+        padding: 0px 5px;
     }
     .OptionsContainer {
         max-height: 500px;
@@ -458,7 +463,7 @@ const MainMenu = css`
         width: 100%;
         background: #fff;
         position: relative;
-        box-shadow: 0 0 4px 0 rgb(0, 0, 0, 50%);
+        box-shadow: 0 0 5px #c1c1c1;;
     }
     .MenuActive {
         max-height: 500px;
@@ -480,6 +485,7 @@ const MainMenu = css`
         width: 100%;
         cursor: pointer;
         padding: 10px 10px;
+        font-size: 11px;
         text-align: justify;
     }
     .SubMenu {
@@ -509,13 +515,13 @@ const MainMenu = css`
         box-shadow: 0 0 5px #4894aa;
     }
     .btnSelect {
-        height: 15px;
-        width: 18px;
+        height: 12px;
+        width: 14px;
         border-radius: 50%;
         position: absolute;
         right: 0px;
         margin-right: 10px;
-        background: #000;
+        background: #696969;
         clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
         transition: all 0.1s;
     }

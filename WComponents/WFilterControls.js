@@ -1,5 +1,7 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+// @ts-ignore
+import { ModelProperty } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";
 import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -139,7 +141,11 @@ class WFilterOptions extends HTMLElement {
                 if (this.ModelObject[control.id]) {
                     let values;
                     let filterType;
+                    /**
+                     * @type {ModelProperty}
+                     */
                     const ModelProperty = this.ModelObject[control.id];
+                    let propiertyName = control.id;
                     switch (ModelProperty.type?.toUpperCase()) {
                         case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
                             if (control.value != null && control.value != undefined && control.value != "") {
@@ -167,8 +173,34 @@ class WFilterOptions extends HTMLElement {
                             }
                             break;
                         case "WSELECT": case "MULTISELECT":
-                            if (control.selectedItems.length > 0) {
-                                // findElement(control);
+                            if (control.selectedItems.length > 0 && ModelProperty.ModelObject != undefined) {
+                                if (ModelProperty.ModelObject.__proto__ == Function.prototype) {
+                                    ModelProperty.ModelObject = ModelProperty.ModelObject();
+                                    console.log(ModelProperty.ModelObject);
+                                }
+                                //TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
+                                let foraingKeyName = null;
+                                const foreynKeyExist = ModelProperty.foreingKey && this.ModelObject.hasOwnProperty(ModelProperty.foreingKey);
+                                if (!foreynKeyExist) {
+                                    for (const propiedad in ModelProperty.ModelObject) {
+                                        const keyNameSames = ModelProperty.ModelObject[propiedad].primary
+                                            && ModelProperty.ModelObject.hasOwnProperty(propiedad) 
+                                            && this.ModelObject.hasOwnProperty(propiedad);
+                                        if (keyNameSames) {
+                                            foraingKeyName = propiedad;
+                                        }
+                                    }
+                                } else {
+                                    foraingKeyName = ModelProperty.foreingKey;
+                                }
+                                if (foraingKeyName != null) {
+                                    values = []
+                                    filterType = "IN";
+                                    propiertyName = foraingKeyName
+                                    control.selectedItems?.forEach(element => {
+                                        values.push(element[foraingKeyName].toString())
+                                    });
+                                }
                             }
                             break;
                         case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA": case "PASSWORD":
@@ -188,7 +220,7 @@ class WFilterOptions extends HTMLElement {
                         Values: values
                     });*/
                     this.ModelObject.FilterData.push({
-                        PropName: control.id,
+                        PropName: propiertyName,
                         FilterType: filterType,
                         Values: values
                     })
@@ -352,7 +384,7 @@ class WFilterOptions extends HTMLElement {
                 }, {
                     tagName: "input",
                     type: "date",
-                    className: prop + " secondDate",                    
+                    className: prop + " secondDate",
                     // @ts-ignore
                     value: this.Config.AutoSetDate == true ? new Date().addDays(1).toISO() : undefined,
                     id: prop + "second",
@@ -450,7 +482,7 @@ class WFilterOptions extends HTMLElement {
             display: block;
         }
         .options {
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .BtnDinamictT {
@@ -461,13 +493,13 @@ class WFilterOptions extends HTMLElement {
             outline: none;
             text-align: center;
             display: inline-block;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             background-color: #4894aa;
             color: #fff;
             border-radius: 0.2cm;
-            width: 25px;
-            height: 25px;
+            width: 15px;
+            height: 15px;
             background-color:#4894aa;
             font-family: monospace;
         }
@@ -475,7 +507,7 @@ class WFilterOptions extends HTMLElement {
         .OptionContainer div {
             display: grid;
             grid-template-rows: 30px auto;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .OptionContainer input,
@@ -539,7 +571,7 @@ class WFilterOptions extends HTMLElement {
                 display: grid;
                 grid-template-rows: 30px 30px;
                 grid-template-columns: auto;
-                font-size: 12px;
+                font-size: 11px;
             }
         }
         @container (max-width: 700px) {
