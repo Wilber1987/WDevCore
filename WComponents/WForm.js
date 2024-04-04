@@ -34,7 +34,7 @@ class WForm extends HTMLElement {
         this.DataRequire = this.DataRequire ?? true;
         this.StyleForm = this.Config.StyleForm;
         this.limit = 2;
-        this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px) calc(50% - 10px)";
+        this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px)  calc(50% - 10px)";
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
@@ -90,7 +90,7 @@ class WForm extends HTMLElement {
                 //console.log(value);                
                 const control = this.shadowRoot?.querySelector("#ControlValue" + property);
                 //console.log(property, Model[property]);
-                if (Model[property]?.type.toUpperCase() != "IMG" && control) {
+                if (Model[property]?.type?.toUpperCase() != "IMG" && control) {
                     // @ts-ignore
                     control.value = target[property];
                 }
@@ -160,6 +160,7 @@ class WForm extends HTMLElement {
                     let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
                     //ObjectF[prop] = val;
                     const onChangeEvent = async (ev) => {
+                        console.log(ev);
                         /**
                          * @type {HTMLInputElement}
                          */
@@ -202,9 +203,9 @@ class WForm extends HTMLElement {
                         if (typeof Model[prop] === "string" && Model[prop].length >= 50) {
                             InputControl = WRender.Create({ tagName: "textarea", className: prop });
                         } else if (parseFloat(Model[prop]).toString() != "NaN") {
-                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "number", placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
+                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "number",onchange: onChangeEvent, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
                         } else {
-                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text", placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
+                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text",onchange: onChangeEvent, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
                         }
                         ControlContainer.append(InputControl);
                         Form.appendChild(ControlContainer);
@@ -248,7 +249,7 @@ class WForm extends HTMLElement {
     * @returns 
     */
     onChange = async (targetControl, currentTarget, ObjectF, prop, Model) => { //evento de actualizacion del componente
-        if (Model[prop].validateFunction) {
+      if (Model[prop].validateFunction) {
             const result = Model[prop].validateFunction(ObjectF, targetControl?.value);
             if (!result.success) {
                 alert(result.message);
@@ -305,6 +306,7 @@ class WForm extends HTMLElement {
                 this.createInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
             }
             ObjectF[prop] = targetControl?.value;
+            console.log(ObjectF[prop]);
             if (targetControl?.pattern) {
                 let regex = new RegExp(targetControl?.pattern);
                 if (regex.test(ObjectF[prop])) {
@@ -1657,7 +1659,7 @@ const ModalVericateAction = (Action, title, withClose = true) => {
         ObjectModal: [
             WRender.Create({ tagName: "h3", innerText: title ?? "¿Esta seguro que desea guardar este registro?" }),
             WRender.Create({
-                style: { textAlign: "center", display: "flex" },
+                style: { justifyContent: "center", display: "flex" },
                 children: [
                     WRender.Create({
                         tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {

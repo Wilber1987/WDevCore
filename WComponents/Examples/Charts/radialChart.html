@@ -9,8 +9,9 @@
 
 <body>
     <main></main>
+    <script type="module" src="./radialChart.js"></script>
     <script type="module">
-        import { RadialChart } from "../WChartJSComponents.js";
+        import { RadialChart } from "../../WChartJSComponents.js";
         const data = [
             {
                 "squadName": "Super Hero Squad",
@@ -60,40 +61,13 @@
                 "count": 1               
             }
         ]
-        document.querySelector("main").append(
+        /*document.querySelector("main").append(
             new RadialChart({ 
                 Dataset: data,
                 AttNameEval : "homeTown",
-                EvalValue : "count",
-                groupParams : ["mes", "trimestre", "formed"],
-                Header: "HEADER",
-                SubHeader: "SUB HEADER - Test propierty...",
-                Logo: "../../../Media/Image/logo.png"
+                EvalValue : "count"              
              })
-        )
-        const data2 = [
-            {
-                "squadName": "Super Hero Squad",
-                "homeTown": "Metro City",
-                "formed": 2016,
-                mes: 2,
-                trimestre: 1,
-                "secretBase": "Super tower",
-                "active": true,
-                "count": 1               
-            }
-        ]
-        document.querySelector("main").append(
-            new RadialChart({ 
-                Dataset: data2,
-                AttNameEval : "homeTown",
-                EvalValue : "count",
-                groupParams : ["mes", "trimestre", "formed"],
-                Header: "HEADER",
-                SubHeader: "SUB HEADER - Test propierty...",
-                Logo: "../../../Media/Image/logo.png"
-             })
-        )
+        )*/
     </script>
 </body>
 

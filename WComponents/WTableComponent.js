@@ -25,7 +25,7 @@ class WTableComponent extends HTMLElement {
         this.ModelObject = {};
         this.paginate = Config.paginate ?? true;
         this.attachShadow({ mode: "open" });
-        this.TypeMoney = "Euro";
+        this.TypeMoney = Config.TypeMoney  ?? "Euro";
         this.TableConfig = Config ?? {};
         this.Dataset = this.TableConfig.Dataset ?? [];
         this.ThOptions = WRender.Create({ class: "thOptions" });
@@ -198,32 +198,6 @@ class WTableComponent extends HTMLElement {
      * @returns {HTMLElement}
      */
     DrawTBody = (Dataset = this.Dataset) => {
-        ///**@type {Array<HTMLElement>} */
-        //const tbodys = [];
-
-        /*for (let index = 0; index < this.numPage; index++) {
-            let tBodyStyle = "display:none";
-            if (index == 0) {
-                tBodyStyle = "display:content";
-            }
-            tbodys.push(WRender.Create({ tagName: "tbody", class: "tbodyChild", style: tBodyStyle }));
-        }
-        let page = 0;
-        Dataset.forEach((element, DatasetIndex) => {
-            if (DatasetIndex >= 50) {
-                //return;
-            }
-            let tr = WRender.Create({ tagName: "tr" });
-            this.DrawTRow(tr, element, DatasetIndex);
-            if (tbodys[page] && (this.paginate == true && Dataset.length > this.maxElementByPage)) {
-                tbodys[page].append(tr);
-                if (tbodys[page].children.length == this.maxElementByPage) {
-                    page++;
-                }
-            } else {
-                tbodys[page].append(tr);
-            }
-        });*/
         let tbody = WRender.Create({ tagName: "tbody" });
         Dataset.slice((this.ActualPage - 1) * this.maxElementByPage,
             this.ActualPage * this.maxElementByPage)
@@ -310,7 +284,6 @@ class WTableComponent extends HTMLElement {
     }
 
     async EvalModelPrototype(Model, prop, tr, element, index) {
-
         let value = element[prop] != null && element[prop] != undefined ? element[prop] : "";
         let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index, class: "td_" + prop });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
@@ -385,6 +358,14 @@ class WTableComponent extends HTMLElement {
                     td.append(element[prop] != null || element[prop] != undefined ? value.toString() : Model[prop].action(element));
                     tr.append(td);
                     break;
+                case "MONEY":
+                    td.append(WRender.Create({
+                        tagName: "label", htmlFor: "select" + index,
+                        style: this.Options?.Select ? "cursor: pointer" : "",
+                        innerHTML: value == "" ? "-" : `${Money[this.TypeMoney]} ${value.toFixed(2)}`
+                    }));
+                    tr.append(td);
+                    break;
                 default:
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
@@ -395,7 +376,8 @@ class WTableComponent extends HTMLElement {
                     break;
             }
         } else {
-            tr.innerHTML = value;
+            td.innerHTML = value;
+            tr.append(td)
         }
     }
 
@@ -698,7 +680,6 @@ class WTableComponent extends HTMLElement {
             }
             .WTable td label { overflow: hidden;
                 max-height: 200px;
-                max-width: 300px;
                 text-overflow: ellipsis;
                 display: block;
                 overflow-y: auto;
@@ -1080,7 +1061,6 @@ class WCardTable extends HTMLElement {
             grid-template-columns: auto;
             grid-template-rows: auto;
             overflow: hidden;
-            padding:10px;
         }
         .CardTableContainer img {
             grid-row: span 4;

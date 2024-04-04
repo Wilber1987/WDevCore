@@ -276,7 +276,7 @@ class WRender {
                 return document.createTextNode("Nodo nulo o indefinido.");
             } else if (typeof Node === "string" || typeof Node === "number") {
                 if (Node.length == 0) {
-                    return "";
+                    this.CreateStringNode(`<label></label>`);
                 } else if (Node.length > 100) {
                     return this.CreateStringNode(`<p>${Node}</p>`);
                 }
@@ -598,6 +598,7 @@ class WArrayF {
                 DataArraySR.push(NewElement)
             } else {
                 if (!element.count) {
+                    element.count = 1;
                     DFilt.count = DFilt.count + 1;
                 }
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";

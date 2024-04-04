@@ -76,11 +76,13 @@ function ModelFunction() { }
     * @property {Boolean} [primary]
     * @property {Boolean} [disabled]
     * @property {String} [label]
+    * @property {String} [foreingKey] nombre de la llave foranea que enlaza el ModelObject de esta propiedad con la propiedad padre
     * @property {Array} [fileType]
     * @property {Array} [ControlAction] botones adicionales que se le agregan al control 
     * @property {String} [pattern]
     * @property {String} [defaultValue]
     * @property {String} [placeholder]
+    * @property {Boolean} [hiddenFilter]
     * @property {String | Number} [min] para rangos de tipo number y date
     * @property {String | Number} [max] para rangos de tipo number y date
     * @property {String} [fieldRequire] CAMBIA UN ESTADO DE UNA PROPIEDAD A REQUERIDO
@@ -360,11 +362,11 @@ class ElementStyle {
     * @property {Object} [ParentModel]  
     * @property {Object} [ParentEntity]
     * @property {Boolean} [DarkMode]
-    * @property {Boolean} [paginate]
+    * @property {Boolean} [paginate] 
     * @property {Boolean} [AddItemsFromApi]
     * @property {Boolean} [AutoSave]
     * @property {SearchItemsFromApi} [SearchItemsFromApi]
-    * @property {String} [TypeMoney] 
+    * @property {String} [TypeMoney] Euro, Dollar, Cordoba
     * @property {Number} [maxElementByPage] 
     * @property {TableOptions} [Options]
     * @property {String} [ImageUrlPath]
