@@ -12,19 +12,19 @@ class ChartConfig {
 }
 /**
  * @typedef {Object} ChartInstance
- * * @property {String} [TypeChart]
+ * * @property {String} [TypeChart] staked, Line, bar
  * * @property {Array} [Dataset]
  * * @property {Array} [Colors]
  * * @property {String} [percentCalc]
  * * @property {String} [AttNameEval]
  * * @property {String} [EvalValue]
- * * @property {Array} [groupParams]
+ * * @property {Array} [groupParams] 
  */
 const ColorsList = ["#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4", "#00bff3", "#e63da4", "#6a549f"];
 class ColumChart extends HTMLElement {
     /**
      * 
-     * @param {*} ChartInstance 
+     * @param {ChartInstance} ChartInstance 
      */
     constructor(ChartInstance = (new ChartConfig())) {
         super();
@@ -72,15 +72,14 @@ class ColumChart extends HTMLElement {
     DrawChart() {
         this.shadowRoot.append(WRender.createElement(WChartStyle(this.ChartInstance)));
         const object = {};
-        if (this.ChartInstance.DirectionChart = "row") {
+        if (this.ChartInstance.DirectionChart == "row") {
             object[this.AttNameEval] = "";
         }
         this.groupParams.forEach(element => {
             object[element] = "";
         });
         this.Totals = WArrayF.GroupByObject(this.ChartInstance.Dataset, object, this.EvalValue);
-        console.log(this.ChartInstance.Dataset, object, this.EvalValue);
-        console.log(this.Totals);
+       
         this.MaxVal = WArrayF.MaxValue(this.Totals, this.EvalValue);
         this.MinVal = WArrayF.MinValue(this.Totals, this.EvalValue);
         this.EvalArray = WArrayF.GroupBy(this.ChartInstance.Dataset, this.AttNameEval);
@@ -147,18 +146,25 @@ class ColumChart extends HTMLElement {
                     this.EvalArray.forEach(Eval => {
                         arrayP[this.AttNameEval] = Eval[this.AttNameEval];
                         const Data = this.FindData(arrayP);
-                        groupBar.children.push(this.DrawBar(
-                            Data,
-                            index,
-                            arrayP[this.AttNameEval],
-                            this.ChartInstance.percentCalc == true ? Group.count : this.MaxVal
-                        ));
+                        if (Data != "n/a" || this.ChartInstance.TypeChart?.toUpperCase() == "LINE") {
+                            groupBar.children.push(this.DrawBar(
+                                Data,
+                                index,
+                                arrayP[this.AttNameEval],
+                                this.ChartInstance.percentCalc == true ? Group.count : this.MaxVal
+                            ));
+                        }
+
                         index++;
                     });
                 }
             }
-            trGroup.children.push(groupBar);
-            div.children.push(trGroup);
+            const gBars = WRender.Create(groupBar);
+            if (gBars.querySelectorAll(".Bars").length > 0 || this.ChartInstance.TypeChart?.toUpperCase() == "LINE") {
+                trGroup.children.push(groupBar);
+                div.children.push(trGroup);
+            }
+
         });
         return div;
     }
@@ -208,7 +214,9 @@ class ColumChart extends HTMLElement {
         if (this.ChartInstance.TypeChart == "Line") {
             WRender.SetStyle(Bars, {
                 margin: "0px 10px",
-                opacity: 0
+                opacity: 0,
+                margin: 0,
+                padding:0
             });
         }
         return Bars;
@@ -296,7 +304,7 @@ class ColumChart extends HTMLElement {
             //console.log(groupBar);
             //console.log((groupBar.parentNode.offsetWidth - 50) / BarContainers.length);
             //console.log(groupBar.style);
-            groupBar.style.width = ((groupBar.parentNode.offsetWidth - 50) / BarContainers.length) + "px";
+            //groupBar.style.width = ((groupBar.parentNode.offsetWidth - 50) / BarContainers.length) + "px";
             WRender.SetStyle(groupBar.querySelector("containerbar"), {
                 justifyContent: "center",
             });
@@ -513,7 +521,7 @@ class RadialChart extends HTMLElement {
         let dashoffset = (Perimetro * (1 - progress)) - val;
         //console.log("progress:", value + "%", "|", "offset:", dashoffset);
         //console.log("perimetro:", Perimetro + "%", "|", "offset:", dashoffset);
-        circle.style.strokeDashoffset =  dashoffset < 0 ? 0 : dashoffset;
+        circle.style.strokeDashoffset = dashoffset < 0 ? 0 : dashoffset;
     }
 }
 const GenerateColor = () => {
@@ -527,279 +535,337 @@ const GenerateColor = () => {
 }
 const WChartStyle = (ChartInstance) => {
     //console.log(ChartInstance);
-    return {
-        type: "w-style",
-        props: {
-            ClassList: [
-                new WCssClass(".WChartContainer ", {
-                    "padding-left": " 30px",
-                    "font-size": " 11px",
-                    "border": " #d4d4d4 solid 1px",
-                    "padding": " 20px",
-                    "overflow": " hidden",
-                    height: "calc(100% - 40px)",
-                    display: "flex",
-                    "justify-content": "center",
-                    "flex-direction": "column",
-                    "text-overflow": "ellipsis",
-                    "white-space": "nowrap",
-                    "max-height": 450,
-                    position: "relative"
-                }), new WCssClass(".WChartContainer h3", {
-                    color: "#444",
-                    "font-size": " 18px",
-                    "padding-bottom": 10,
-                    display: "flex",
-                "margin": 0,
-                    "justify-content": "center",
-                }), new WCssClass(".SectionLabels, .SectionLabelGroup ", {
-                    "display": " flex",
-                    "justify-content": " center",
-                    "align-items": " center",
-                    "padding-top": " 5px",
-                    "padding-bottom": " 5px",
-                    "flex-wrap": " wrap",
-                }), new WCssClass(".SectionLabels label, .SectionLabelGroup label ", {
-                    "display": " flex",
-                    "height": " 20px",
-                    "justify-content": " center",
-                    "align-items": " center",
-                    "font-size": " 9px",
-                }), new WCssClass(".SectionLabels label span, .SectionLabelGroup label span ", {
-                    "min-height": " 20px",
-                    "width": " 20px",
-                    "content": '" "',
-                    "border-radius": " 50%",
-                    "display": " inline-flex",
-                    "margin": " 5px",
-                }), new WCssClass(".SectionBars", {
-                    "display": " flex",
-                    "align-items": " flex-end",
-                    //"overflow-y": " hidden",
-                    "position": " relative",
-                    "overflow-x": " auto",
-                    "padding-top": 5,
-                    "padding-left": 40,
-                    "min-height": 150,
-                    "border-bottom": " solid 1px #d4d4d4",
-                    //margin: "0px auto"
-                }), new WCssClass(".SectionBars label", {
-                    padding: 5,
-                    "min-height": 12,
-                }), new WCssClass(".GroupSection ", {
-                    "display": " flex",
-                    "align-items": "center",
-                    "height": " 100%",
-                    //"position": " relative",
-                    "flex-direction": "column-reverse",
-                    "flex-grow": " 1",
-                    "border-bottom": " solid 1px #d4d4d4",
-                    //"border-right": " solid 1px #d4d4d4",
-                    "border-top": " solid 1px #d4d4d4"
-                }), new WCssClass(".groupBars ", {
-                    width: "100%",
-                    //width: 300,
-                    //"height": " 180px",
-                    "display": " flex",
-                    "flex-direction": "column-reverse",
-                    //"flex-grow": " 1",
-                    "border-left": " solid 1px #d4d4d4",
-                    "align-items": "center",
-                    position: ChartInstance.TypeChart == "Line" ? "initial" : "relative"
-                }), new WCssClass(".groupBars:last-child ", {
-                    "border-right": " solid 1px #d4d4d4"
-                }), new WCssClass(".ContainerBars ", {
-                    "display": " flex",
-                    "width": " 100%",
-                    //"padding-left": " 10px",
-                    //"padding-right": " 10px",
-                    "flex-direction": ChartInstance.DirectionChart,
-                    "align-items": " flex-end",
-                    "justify-content": "flex-end",
-                    overflow: "hidden",
-                    "border-bottom": "1px solid #BFBFBF",
-                }), new WCssClass(".ContainerBars .Bars ", {
-                    "display": " block",
-                    "margin": " 0 auto",
-                    //"align-self": "center",
-                    "margin-top": " 0px",
-                    "z-index": " 1",
-                    "width": ChartInstance.TypeChart == "Line" ? 1 : 30,
-                    //"min-height": " 20PX",
-                    //"min-width": 10,
-                    "background": " rgb(177, 177, 177)",
-                    "background": " linear-gradient(0deg, rgba(177, 177, 177, 1) 0%, rgba(209, 209, 209, 1) 53%)",
-                }), new WCssClass(".Bars label ", {
-                    "width": " 100%",
-                    "text-align": " center",
-                    "display": " block",
-                    "font-size": " 8px",
-                    "margin-top": " 5px",
-                    "overflow": " hidden",
-                    "color": "#fff",
-                    padding: 0
-                }), new WCssClass(".BackGrounLineX ", {
-                    "display": " flex",
-                    "position": " absolute",
-                    "flex-direction": " column-reverse",
-                    "width": " 100%",
-                    "height": " 100%",
-                    "left": " 0px",
-                    "top": 0,
-                    "height": " 180px",
-                    "right": " 0px",
-                }), new WCssClass(".groupBars .BackGrounLineXNumber ", {
-                    "left": ChartInstance.TypeChart == "Line" ? 0 : -40,
-                }),
-                new WCssClass(".groupBars .IconsGroup ", {
-                    "left": " -25px",
-                }), new WCssClass(".CharLineX ", {
-                    "position": " relative",
-                    "border-top": " rgb(190, 190, 190) solid 1px",
-                    "height": " 100%",
-                    "display": " block",
-                    "align-items": " flex-start",
-                    "display": " flex",
-                    "padding-left": " 5PX",
-                }), new WCssClass(".CharLineXNumber ", {
-                    "position": " relative",
-                    "border-top": " rgba(190, 190, 190, 0) solid 1px",
-                    "height": " 100%",
-                    "align-items": " flex-start",
-                    "display": " flex",
-                    "font-size": " 9px",
-                }), new WCssClass(".CharLineXNumber label", {
-                    padding: 0,
-                    "padding-top": 5,
-                    width: 35,
-                    display: "block",
-                    "text-align": "right",
-                    "padding-right": 5
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-thumb", {
-                    "background": " #ccc",
-                    "border-radius": " 4px",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-thumb:hover", {
-                    "background": " #b3b3b3",
-                    "box-shadow": " 0 0 3px 2px rgba(0, 0, 0, 0.2)",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-thumb:active ", {
-                    "background-color": " #999999",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar ", {
-                    "width": " 8px",
-                    "height": " 10px",
-                    "margin": " 10px",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-track ", {
-                    "background": " #e1e1e1",
-                    "border-radius": " 4px",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-track:active ,.SectionBars::-webkit-scrollbar-track:hover", {
-                    "background": " #d4d4d4",
-                }), new WCssClass(`.IconsGroup`, {
-                    "display": " flex",
-                    "position": " absolute",
-                    //"justify-content": "space-between",
-                    "flex-direction": " column-reverse",
-                    "width": " 100%",
-                    "height": " 100%",
-                    "left": 15,
-                    "border-bottom": 0,
-                    "right": 0,
-                }), new WCssClass(`.IconG`, {
-                    height: 20,
-                    width: 20,
-                    margin: 1,
-                    "border-radius": "4px !important"
-                }), new WCssClass(`.circleLineChart`, {
-                    cursor: "pointer",
-                    //"-webkit-filter": "drop-shadow( 0px 0px 1px rgba(0, 0, 0, .7))",
-                    //filter: "drop-shadow( 0px 0px 1px rgba(0, 0, 0, .7))"
-                }), new WCssClass(`.PathLine`, {
-                    transition: 'all 1s',
-                    "stroke-dasharray": "1000",
-                    "stroke-dashoffset": "0",
-                    animation: "dash 1s linear"
-
-                }),
-                /*RADIALLLLL------------------------------------------------------------------------------------------------------*/
-                //#region RADIALLLLL
-                new WCssClass(".SectionRadialChart ", {
-                    "position": " relative",
-                    "text-align": " center",
-                    "display": " block",
-                    "width": " 100%",
-                    "height": 220,
-                }), new WCssClass(".RadialDataBackground ", {
-                    "transform": " rotate(-90deg)",
-                }), new WCssClass(".RadialDataBackground:first-child ", {
-                    "margin-bottom": " 20px",
-                }), new WCssClass(".RadialData ", {
-                    "height": " 200px",
-                    "width": " 200px",
-                    "border-radius": " 50%",
-                    "display": " block",
-                    "position": " absolute",
-                    "top": " 0",
-                    "left": " calc(50% - 100px)",
-                    "margin": " auto",
-                }), new WCssClass(".RadialData::before ", {
-                    "content": '" "',
-                    "color": " #fff",
-                    "height": " 200px",
-                    "width": " 200px",
-                    "border-radius": " 50%",
-                    "display": " block",
-                    "position": " absolute",
-                    "top": " 0",
-                    "left": " calc(50% - 100px)",
-                    "margin": " auto",
-                    "background": " linear-gradient( 90deg, rgb(12, 109, 148) 50%, rgba(255, 255, 55, 0) 50%)",
-                }), new WCssClass(".RadialData::after ", {
-                    "content": '" "',
-                    "color": " #fff",
-                    "height": " 200px",
-                    "width": " 200px",
-                    "border-radius": " 50%",
-                    "display": " block",
-                    "position": " absolute",
-                    "top": " 0",
-                    "left": " calc(50% - 100px)",
-                    "margin": " auto",
-                    "background": " linear-gradient( 180deg, rgb(12, 109, 148) 50%, rgba(255, 255, 55, 0) 50%)",
-                }), new WCssClass(".RadialChart ", {
-                    "height": " 100%",
-                }), new WCssClass(".circle ", {
-                    "transition": " all 0.5s",
-                    "transform-origin": " 50% 50%",
-                    "fill": " none",
-                    "cursor": " pointer",
-                    "clip-path": " circle(33% at 50% 50%)",
-                }), new WCssClass(".circleText ", {
-                    "transition": " all 0.5s",
-                    "height": " 100%",
-                    "width": " 100%",
-                    "transform-origin": " 50% 50%",
-                }), new WCssClass(".circle:hover", {
-                    "background-color": " #999999",
-                    "background-blend-mode": " screen",
-                    "z-index": " 5",
-                    "clip-path": " circle(35% at 50% 50%)",
-                }), new WCssClass(".progress__meter,.progress__value ", {
-                    "fill": " none",
-                }), new WCssClass(".progress__meter ", {
-                    "stroke": " #e6e6e6",
-                }),
-                //#endregion RADIAL
-            ], KeyFrame: [
-                {
-                    animate: "dash", ClassList: [
-                        new WCssClass(`from`, {
-                            "stroke-dashoffset": "1000"
-                        }), new WCssClass(`to`, {
-                            "stroke-dashoffset": "0"
-                        }),
-                    ]
-                }
-            ]
+    return css`
+        .WChartContainer {
+            padding-left: 30px;
+            font-size: 11px;
+            border: #e9e6e6 solid 1px;
+            padding: 20px;
+            overflow: hidden;
+            height: calc(100% - 40px);
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-height: 450px;
+            position: relative;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
-    };
+
+        .WChartContainer h3 {
+            color: #444;
+            font-size: 18px;
+            padding-bottom: 10px;
+            display: flex;
+            margin: 0px;
+            justify-content: center;
+        }
+
+        .SectionLabels,
+        .SectionLabelGroup {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .SectionLabels label,
+        .SectionLabelGroup label {
+            display: flex;
+            height: 20px;
+            justify-content: center;
+            align-items: center;
+            font-size: 9px;
+        }
+
+        .SectionLabels label span,
+        .SectionLabelGroup label span {
+            min-height: 20px;
+            width: 20px;
+            content: " ";
+            border-radius: 50%;
+            display: inline-flex;
+            margin: 5px;
+        }
+
+        .SectionBars {
+            display: flex;
+            align-items: flex-end;
+            position: relative;
+            overflow-x: auto;
+            padding-top: 5px;
+            padding-left: 40px;
+            min-height: 150px;
+            border-bottom: solid 1px #e9e6e6;
+        }
+
+        .SectionBars label {
+            padding: 5px;
+            min-height: 12px;
+        }
+
+        .GroupSection {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            flex-direction: column-reverse;
+            flex-grow: 1;
+            border-bottom: solid 1px #e9e6e6;
+            border-top: solid 1px #e9e6e6;
+        }
+
+        .groupBars {
+            width: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            border-left: solid 1px #e9e6e6;
+            align-items: center;
+            position: ${ChartInstance.TypeChart == "Line" ? "initial" : "relative"};
+        }
+
+        .groupBars:last-child {
+            border-right: solid 1px #e9e6e6;
+        }
+
+        .ContainerBars {
+            display: flex;
+            width: 100%;
+            flex-direction: ${ChartInstance.DirectionChart};
+            align-items: flex-end;
+            justify-content: flex-end;
+            overflow: hidden;
+            border-bottom: 1px solid #e9e6e6;
+        }
+
+        .ContainerBars .Bars {
+            display: block;
+            margin: 0 auto;
+            margin-top: 0px;
+            z-index: 1;
+            width: ${ChartInstance.TypeChart == "Line" ? "1px" : "70%"};
+            background: linear-gradient(0deg, rgba(177, 177, 177, 1) 0%, rgba(209, 209, 209, 1) 53%);
+        }
+
+        .Bars label {
+            width: 100%;
+            text-align: center;
+            display: block;
+            font-size: 8px;
+            margin-top: 1px;
+            overflow: hidden;
+            color: #fff;
+            padding: 0px;
+        }
+
+        .BackGrounLineX {
+            display: flex;
+            position: absolute;
+            flex-direction: column-reverse;
+            width: 100%;
+            height: 180px;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+        }
+
+        .groupBars .BackGrounLineXNumber {
+            left: ${ChartInstance.TypeChart == "Line" ? 0 : "-40px"};
+        }
+
+        .groupBars .IconsGroup {
+            left: -25px;
+        }
+
+        .CharLineX {
+            position: relative;
+            border-top: #e9e6e6 solid 1px;
+            height: 100%;
+            display: flex;
+            align-items: flex-start;
+            padding-left: 5PX;
+        }
+
+        .CharLineXNumber {
+            position: relative;
+            border-top: rgba(190, 190, 190, 0) solid 1px;
+            height: 100%;
+            align-items: flex-start;
+            display: flex;
+            font-size: 9px;
+        }
+
+        .CharLineXNumber label {
+            padding: 0px;
+            padding-top: 5px;
+            width: 35px;
+            display: block;
+            text-align: right;
+            padding-right: 5px;
+        }
+
+        .SectionBars::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .SectionBars::-webkit-scrollbar-thumb:hover {
+            background: #b3b3b3;
+            box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .SectionBars::-webkit-scrollbar-thumb:active {
+            background-color: #999999;
+        }
+
+        .SectionBars::-webkit-scrollbar {
+            width: 4px;
+            height: 5px;
+            margin: 5px;
+        }
+
+        .SectionBars::-webkit-scrollbar-track {
+            background: #e1e1e1;
+            border-radius: 4px;
+        }
+
+        .SectionBars::-webkit-scrollbar-track:active,
+        .SectionBars::-webkit-scrollbar-track:hover {
+            background: #e9e6e6;
+        }
+
+        .IconsGroup {
+            display: flex;
+            position: absolute;
+            flex-direction: column-reverse;
+            width: 100%;
+            height: 100%;
+            left: 15px;
+            border-bottom: 0px;
+            right: 0px;
+        }
+
+        .IconG {
+            height: 20px;
+            width: 20px;
+            margin: 1px;
+            border-radius: 4px !important;
+        }
+
+        .circleLineChart {
+            cursor: pointer;
+        }
+
+        .PathLine {
+            transition: all 1s;
+            stroke-dasharray: 10000;
+            stroke-dashoffset: 0;
+            animation: dash 1s linear;
+        }
+
+        .SectionRadialChart {
+            position: relative;
+            text-align: center;
+            display: block;
+            width: 100%;
+            height: 220px;
+        }
+
+        .RadialDataBackground {
+            transform: rotate(-90deg);
+        }
+
+        .RadialDataBackground:first-child {
+            margin-bottom: 20px;
+        }
+
+        .RadialData {
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: calc(50% - 100px);
+            margin: auto;
+        }
+
+        .RadialData::before {
+            content: " ";
+            color: #fff;
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: calc(50% - 100px);
+            margin: auto;
+            background: linear-gradient(90deg, rgb(12, 109, 148) 50%, rgba(255, 255, 55, 0) 50%);
+        }
+
+        .RadialData::after {
+            content: " ";
+            color: #fff;
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: calc(50% - 100px);
+            margin: auto;
+            background: linear-gradient(180deg, rgb(12, 109, 148) 50%, rgba(255, 255, 55, 0) 50%);
+        }
+
+        .RadialChart {
+            height: 100%;
+        }
+
+        .circle {
+            transition: all 0.5s;
+            transform-origin: 50% 50%;
+            fill: none;
+            cursor: pointer;
+            clip-path: circle(33% at 50% 50%);
+        }
+
+        .circleText {
+            transition: all 0.5s;
+            height: 100%;
+            width: 100%;
+            transform-origin: 50% 50%;
+        }
+
+        .circle:hover {
+            background-color: #999999;
+            background-blend-mode: screen;
+            z-index: 5;
+            clip-path: circle(35% at 50% 50%);
+        }
+
+        .progress__meter,
+        .progress__value {
+            fill: none;
+        }
+
+        .progress__meter {
+            stroke: #e6e6e6;
+        }
+
+        @keyframes dash {
+            from {
+                stroke-dashoffset: 1000;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }`;   
+    
+   
 }
 
 class GanttChart extends HTMLElement {
