@@ -18,6 +18,7 @@ class ChartConfig {
  * * @property {Boolean} [percentCalc]
  * * @property {String} [AttNameEval]
  * * @property {String} [EvalValue]
+ * * @property {String} [Title]
  * * @property {Array} [groupParams] 
  */
 const ColorsList = ["#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4", "#00bff3", "#e63da4", "#6a549f"];
