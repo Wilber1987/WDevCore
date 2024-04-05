@@ -71,10 +71,8 @@ class WTableComponent extends HTMLElement {
                 ]
             }
         }));
-        const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
-        
-        const isWithtModel = this.TableConfig.ModelObject?.Get != undefined
-        
+        const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);        
+        const isWithtModel = this.TableConfig.ModelObject?.Get != undefined        
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
@@ -146,7 +144,6 @@ class WTableComponent extends HTMLElement {
         if (this.Options != undefined && (this.Options.Search == true
             || this.Options.Add == true
             || this.Options.Filter == true)) {
-
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
                     tagName: "input", class: "txtControl", type: "text",
@@ -698,6 +695,7 @@ class WTableComponent extends HTMLElement {
             .WTable .tdAction {
                 text-align: center;
                 width: 120px;
+                align-items: center,
             }
 
             .WTable tbody tr:nth-child(odd) {
@@ -916,11 +914,11 @@ class WTableComponent extends HTMLElement {
                 font-weight: bold;
                 border: none;
                 padding: 5px;
-                margin: 2px;
+                margin-left: 5px;
                 text-align: center;
                 display: inline-block;
-                min-width: 30px;
-                font-size: 12px;
+                min-width: 20px;
+                font-size: 10px;
                 cursor: pointer;
                 background-color: #4894aa;
                 color: #fff;
@@ -928,7 +926,7 @@ class WTableComponent extends HTMLElement {
             }
 
             .Btn {
-                width: 120px;
+                cursor: pointer;
             }
 
             .BtnTableS {

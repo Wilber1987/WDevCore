@@ -15,16 +15,16 @@ class ModelObject {
 }
 const tab = WRender.Create({ className: "tab" })
 const navigator = new WAppNavigator({
-    Direction: "row",
+    Direction: "column",
     Inicialize: true,
     Elements: [{
-        id: "Tab-dasboard", name: "Tabla basica", action: async (ev) => {
+       id:"Tab-dasboard", name: "Tabla basica", action: async (ev) => {
             DOMManager.NavigateFunction("Tab-dasboard", new WTableComponent({
                 Dataset: data
             }));
         }
     }, {
-        id: "Tab-Generales", name: "Tabla con modelo",
+        id:"Tab-Generales", name: "Tabla con modelo",
         action: async (ev) => {
             DOMManager.NavigateFunction("Tab-Generales", new WTableComponent({
                 Dataset: data,
@@ -32,7 +32,7 @@ const navigator = new WAppNavigator({
             }));
         }
     }, {
-        id: "Tab-Generales", name: "Tabla con modelo y opciones customizadas",
+        id:"Tab-Options", name: "Tabla con modelo y opciones customizadas",
         action: async (ev) => {
             DOMManager.NavigateFunction("Tab-Options", new WTableComponent({
                 Dataset: data,
@@ -48,13 +48,13 @@ const navigator = new WAppNavigator({
             }));
         }
     }, {
-        id: "Tab-Generales", name: "Tabla con opciones y acciones customizadas",
+        id:"Tab-Options2", name: "Tabla con opciones y acciones customizadas",
         action: async (ev) => {
-            DOMManager.NavigateFunction("Tab-Options", new WTableComponent({
+            DOMManager.NavigateFunction("Tab-Options2", new WTableComponent({
                 Dataset: data,
                 ModelObject: new ModelObject(),
                 Options: {
-                    Add: false, AddAction: (targetObject) => { alert("se agrego:" + JSON.stringify(targetObject)) },
+                    Add: true, AddAction: (targetObject) => { alert("se agrego:" + JSON.stringify(targetObject)) },
                     Edit: true, EditAction: (targetObject) => { alert("se edito:" + JSON.stringify(targetObject)) },
                     MultiSelect: true, SelectAction: (targetObject) => { alert("se selecciono:" + JSON.stringify(targetObject)) },
                     Delete: true, DeleteAction: (targetObject) => { alert("se elimino:" + JSON.stringify(targetObject)) }

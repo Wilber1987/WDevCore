@@ -54,7 +54,7 @@ class ColumChart extends HTMLElement {
         this.AttNameEval = this.ChartInstance.AttNameEval ?? null;
         this.Dataset = this.ChartInstance.Dataset ?? [];
         this.InitializeDataset();
-        this.ChartInstance.Colors = this.ChartInstance.Colors ?? [];
+        this.ChartInstance.Colors = this.ChartInstance.Colors ?? ColorsList;
         if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {// bar or stacked
             this.ChartInstance.DirectionChart = "row";
         } else if (this.ChartInstance.TypeChart?.toUpperCase() == "LINE") {// line
@@ -225,8 +225,8 @@ class ColumChart extends HTMLElement {
             number = Math.round(number * multiplier) / multiplier
             labelCol = number + '%';
         }
-        const Bars = html`<Bars class="Bars bar${index} ${SerieName.replaceAll(" ", "_")}_${GroupName}"
-                name="${SerieName.replaceAll(" ", "_")}"
+        const Bars = html`<Bars class="Bars bar${index} ${SerieName.toString().replaceAll(" ", "_")}_${GroupName}"
+                name="${SerieName.toString().replaceAll(" ", "_")}"
                 style="height:${Size * BarSize}px;background:${this.ChartInstance.Colors[index]}">
                 <label>
                     ${labelCol}
@@ -527,6 +527,7 @@ class RadialChart extends HTMLElement {
                     //"stroke-linecap": "round"
                 },
             });
+           
             //texto
             let degs = (360 * porcentajeF) / 100;
             let degs2 = (((360 * porcentaje) / 100) / 2) - 12;
@@ -543,6 +544,7 @@ class RadialChart extends HTMLElement {
                     transform: `translate(0,0),rotate(-${degs + (degs2)})`,
                 }
             })
+          
             if (this.ChartInstance.percentCalc == true) {
                 TextSVG.append(document.createTextNode(porcentaje + "%"));
             } else {
@@ -582,7 +584,18 @@ class RadialChart extends HTMLElement {
         circle.style.strokeDasharray = Perimetro;
         let progress = value / 100;
         let dashoffset = (Perimetro * (1 - progress)) - val;
-        circle.style.strokeDashoffset = dashoffset < 0 ? 0 : dashoffset;
+        circle.style.strokeDashoffset =  Perimetro;//dado que es animado este parametro lo define el to 
+        circle.appendChild(WRender.createElementNS({
+            type: "animate",
+            props: {
+                attributeName: "stroke-dashoffset",
+                //attributeName: "stroke-dasharray",
+                from: `${ circle.style.strokeDasharray}` ,                
+                to: `${dashoffset < 0 ? 0 : dashoffset - 6}`,
+                dur: "1s",
+                fill: "freeze",
+            }
+        }))
     }
 }
 const GenerateColor = () => {
@@ -598,10 +611,9 @@ const WChartStyle = (ChartInstance) => {
     //console.log(ChartInstance);
     return css`
         .WChartContainer {
-            padding-left: 30px;
             font-size: 11px;
             border: #e9e6e6 solid 1px;
-            padding: 20px;
+            padding: 20px 10px;
             overflow: hidden;
             height: calc(100% - 40px);
             display: flex;
