@@ -178,6 +178,7 @@ class WAppNavigator extends HTMLElement {
                 ClassList: [
                     new WCssClass(`.nav, .navInactive, .navActive`, {
                         display: "flex",
+                        "font-family": "Verdana, Geneva, Tahoma, sans-serif",
                         "flex-direction": navDirection,
                         padding: "0px 10px",
                         transition: "all 1s",

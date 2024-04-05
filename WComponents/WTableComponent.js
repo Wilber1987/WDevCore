@@ -656,7 +656,7 @@ class WTableComponent extends HTMLElement {
                 overflow: auto;
             }
             .WTable {
-                font-family: Verdana, sans-serif;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
                 width: 100%;
                 border-collapse: collapse;
                 font-size: 10px;
@@ -860,6 +860,8 @@ class WTableComponent extends HTMLElement {
                 cursor: pointer;
                 border-radius: 0.2cm;
                 transition: all 0.6s;
+                font-size: 12px;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
             }
 
             .paginateBTNHidden {

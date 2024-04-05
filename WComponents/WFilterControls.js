@@ -443,6 +443,9 @@ class WFilterOptions extends HTMLElement {
     }
 
     styles = css`
+        *{
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
         .reportV {
             margin: 10px;
         }
@@ -483,16 +486,20 @@ class WFilterOptions extends HTMLElement {
         }
         .options {
             font-size: 11px;
+            display: flex;
+            align-items: center;
         }
 
         .BtnDinamictT {
+            justify-content: center;
+            align-items: center;
+            display: flex;
             font-weight: bold;
             border: none;
-            padding: 5px;
+            padding: 0px;
             margin: 5px;
             outline: none;
             text-align: center;
-            display: inline-block;
             font-size: 11px;
             cursor: pointer;
             background-color: #4894aa;

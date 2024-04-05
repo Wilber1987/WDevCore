@@ -45,12 +45,31 @@ document.querySelector("main").append(
         groupParams: ["year", "trimestre"],
     })
 )
+
 document.querySelector("main").append(
     new ColumChart({
         Title: "CHART 1 - Mono Agrupación",
         TypeChart: "Line",
         Dataset: data,
         AttNameEval: "homeTown",
-        groupParams: ["mes", "year", "trimestre"],
+        groupParams: [ "year", "mes"],
+    })
+)
+document.querySelector("main").append(
+    new ColumChart({
+        Title: "CHART 1 - Mono Agrupación",
+        TypeChart: "Line",
+        Dataset: data,
+        AttNameEval: "homeTown",
+        groupParams: [ "year", "trimestre", "mes"],
+    })
+)
+document.querySelector("main").append(
+    new ColumChart({
+        Title: "CHART 1 - Triple agrupación",
+        Dataset: data,
+        AttNameEval: "homeTown",
+       // EvalValue: "value", // suma el valor del value para obtener la sumatoria completa del array
+        groupParams: ["year", "trimestre", "mes"],
     })
 )

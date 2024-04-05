@@ -1,17 +1,233 @@
 const data = [
     {
         squadName: "Super Hero Squad",
+        homeTown: "City2",
+        year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    }, {
+        squadName: "Super Hero Squad",
+        homeTown: "City2",
+        year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City2",
+        year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
         homeTown: "City1",
         year: 2016,
         mes: "febrero",
         trimestre: "primer",
         secretBase: "Base 1",
         active: true,
-        value: 4
-    }, {
+        value: 10
+    },{
         squadName: "Super Hero Squad",
         homeTown: "City1",
         year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2016,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2017,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2017,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2017,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2017,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2017,
+        mes: "febrero",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 10
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2016,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2016,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2017,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2017,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2016,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City1",
+        year: 2017,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City2",
+        year: 2017,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City2",
+        year: 2016,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City2",
+        year: 2017,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City2",
+        year: 2017,
+        mes: "marzo",
+        trimestre: "primer",
+        secretBase: "Base 1",
+        active: true,
+        value: 4
+    },{
+        squadName: "Super Hero Squad",
+        homeTown: "City2",
+        year: 2017,
         mes: "marzo",
         trimestre: "primer",
         secretBase: "Base 1",

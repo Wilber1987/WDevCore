@@ -84,6 +84,14 @@ class ColumChart extends HTMLElement {
         this.MaxVal = WArrayF.MaxValue(this.Totals, this.EvalValue);
         this.MinVal = WArrayF.MinValue(this.Totals, this.EvalValue);
         this.EvalArray = WArrayF.GroupBy(this.ChartInstance.Dataset, this.AttNameEval);
+        if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
+            this.EvalArray.forEach(Eval => {
+                const stackedValue = WArrayF.SumValAtt(this.Totals.filter(t => t[this.AttNameEval] == Eval[this.AttNameEval]), this.EvalValue);                
+                if (this.MaxVal < stackedValue) {
+                    this.MaxVal = stackedValue
+                }
+            });
+        }
         let ChartFragment = WRender.createElement({ type: 'div', props: { id: '', class: 'WChartContainer' } });
         if (this.ChartInstance.Title) {
             ChartFragment.append(WRender.Create({ tagName: "h3", innerText: this.ChartInstance.Title }))
@@ -93,7 +101,7 @@ class ColumChart extends HTMLElement {
         ChartFragment.append(SectionBars);
         ChartFragment.append(this.DrawGroups());
         this.shadowRoot.append(ChartFragment);
-        if (this.ChartInstance.TypeChart == "Line") {            
+        if (this.ChartInstance.TypeChart == "Line") {
             window.addEventListener("resize", () => {
                 SectionBars.querySelector("svg").remove();
                 SectionBars.append(this.DrawLineChart(this.EvalArray, this.ChartInstance.Colors, ChartFragment));
@@ -131,8 +139,8 @@ class ColumChart extends HTMLElement {
             let trGroup = { type: "GroupSection", props: { class: "GroupSection" }, children: [WArrayF.Capitalize(Group[Groups.groupParam])] };
             let groupBar = { type: "containerbar", props: { style: "padding:0px", class: "ContainerBars" }, children: [] };
             if (GroupIndex == 0) {
-                trGroup.children.push(this._DrawBackgroundLine());
-                trGroup.children.push(this._DrawIconsGroups());
+                trGroup.children.push(this.DrawBackgroundLine());
+                trGroup.children.push(this.DrawIconsGroups());
             }
             GroupIndex++;
             arrayP[Groups.groupParam] = Group[Groups.groupParam];
@@ -146,29 +154,36 @@ class ColumChart extends HTMLElement {
                 trGroup.props.class = "groupBars";
                 groupBar.props.style = "height: 180px";
                 if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
-                    groupBar.props.style= "height: 180px; flex-direction: column;"
+                    groupBar.props.style = "height: 180px; flex-direction: column;"
                 }
-                groupBar.children.push(this._DrawBackgroundLine(false));
+                groupBar.children.push(this.DrawBackgroundLine(false));
                 if (this.EvalArray != null) {
                     let index = 0;
+
+
                     this.EvalArray.forEach(Eval => {
                         arrayP[this.AttNameEval] = Eval[this.AttNameEval];
+                        const stackedValue = WArrayF.SumValAtt(this.Totals.filter(t => t[this.AttNameEval] == arrayP[this.AttNameEval]), this.EvalValue);
+                        if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
+                            //console.log(stackedValue);
+                        }
                         const Data = this.FindData(arrayP);
-                        if (Data != "n/a" || this.ChartInstance.TypeChart?.toUpperCase() == "LINE") {
+                        if (Data != "n/a") {
                             groupBar.children.push(this.DrawBar(
                                 Data,
                                 index,
-                                arrayP[this.AttNameEval],
-                                this.ChartInstance.percentCalc == true ? Group.count : this.MaxVal
+                                arrayP[this.AttNameEval],                                
+                               // this.ChartInstance.percentCalc == true ? Group.count :
+                                 this.MaxVal,
+                                Group[Groups.groupParam]
                             ));
                         }
-
                         index++;
                     });
                 }
             }
             const gBars = WRender.Create(groupBar);
-            if (gBars.querySelectorAll(".Bars").length > 0 || this.ChartInstance.TypeChart?.toUpperCase() == "LINE") {
+            if (gBars.querySelectorAll(".Bars").length > 0) {
                 trGroup.children.push(groupBar);
                 div.children.push(trGroup);
             }
@@ -197,22 +212,20 @@ class ColumChart extends HTMLElement {
         })
         return SectionLabels;
     }
-    DrawBar(DataValue, index, SerieName = "", MaxVal) {
-        //console.log(MaxVal);
+    DrawBar(DataValue, index, SerieName = "", MaxVal, GroupName = "") {
+
         var Size = this.ChartInstance.ContainerSize;
         var Size = 180;
         var BarSize = DataValue == "n/a" ? 0 : DataValue / MaxVal;
         var labelCol = DataValue;
-        var styleP = "";
         if (this.ChartInstance.percentCalc == true) {
             //dibujar el valor en porcentaje
-            //styleP = ";flex-grow: 1;"
             var multiplier = Math.pow(10, 1 || 0);
             var number = DataValue / (MaxVal > 0 ? MaxVal : 1) * 100
             number = Math.round(number * multiplier) / multiplier
             labelCol = number + '%';
         }
-        const Bars =html`<Bars class="Bars bar${index}"
+        const Bars = html`<Bars class="Bars bar${index} ${SerieName.replaceAll(" ", "_")}_${GroupName}"
                 name="${SerieName.replaceAll(" ", "_")}"
                 style="height:${Size * BarSize}px;background:${this.ChartInstance.Colors[index]}">
                 <label>
@@ -227,7 +240,7 @@ class ColumChart extends HTMLElement {
                 margin: 0,
                 padding: 0
             });
-        }else  {
+        } else {
             Bars.append(css`.bar${index}{  animation: Animatebar${index} 1s forwards;}
                 @keyframes Animatebar${index} {
                     0% {  height: 0; }
@@ -236,7 +249,7 @@ class ColumChart extends HTMLElement {
         }
         return Bars;
     }
-    _DrawBackgroundLine(label = true) {
+    DrawBackgroundLine(label = true) {
         var countLine = 8;
         var val = parseFloat(this.MaxVal / countLine)
         if (this.ChartInstance.percentCalc == true) {
@@ -277,7 +290,7 @@ class ColumChart extends HTMLElement {
         }
         return ContainerLine;
     }
-    _DrawIconsGroups = () => {
+    DrawIconsGroups = () => {
         const IconsGroup = WRender.createElement({ type: 'div', props: { id: '', class: 'IconsGroup' } })
         this.groupParams.forEach((element, index) => {
             IconsGroup.append(WRender.CreateStringNode(`<div class='IconG' 
@@ -332,8 +345,10 @@ class ColumChart extends HTMLElement {
                 Colors.push(GenerateColor());
             }
             const serie = element[this.AttNameEval].replaceAll(" ", "_");
+            const groupName = this.groupParams[this.groupParams.length - 1];
+            const groupValue = element[groupName]
             const bars = ChartFragment.querySelectorAll(`bars[name=${serie}]`);
-
+            //const bars = ChartFragment.querySelectorAll(`.${serie}_${groupValue}`); 
             const Path = WRender.createElementNS({
                 type: "path",
                 props: {
@@ -343,17 +358,19 @@ class ColumChart extends HTMLElement {
                     stroke: color,
                     "fill-opacity": 0,
                     "stroke-width": 3,
-                    "stroke-dasharray":containerWid.toString(),
-                }, children : []
+                    "stroke-dasharray": containerWid.toString(),
+                }, children: []
             });
-           
+
             LineChart.append(Path);
             setTimeout(() => {
                 LineChart.querySelectorAll(`path[name=${serie}]`).forEach(path => {
                     let M00 = "";
                     let DPropiety = "";
                     let ABar = null;
+
                     bars.forEach((bar, IndexBars) => {
+                        //console.log(serie, bar.dataset);
                         let Cx = 0;
                         if (IndexBars == 0) {
                             M00 = `M ${bar.offsetLeft - 40} ${bar.offsetTop + 2} `
@@ -382,12 +399,13 @@ class ColumChart extends HTMLElement {
                     path.appendChild(WRender.createElementNS({
                         type: "animate",
                         props: {
-                            attributeName:"stroke-dashoffset",
+                            attributeName: "stroke-dashoffset",
                             from: containerWid,
                             to: "0",
                             dur: "2s",
                             fill: "freeze",
-                        }}))
+                        }
+                    }))
                 });
             }, 10);
             index++;
@@ -427,7 +445,7 @@ class RadialChart extends HTMLElement {
             this.EvalValue = "count";
         }
         this.Dataset = WArrayF.GroupBy(this.ChartInstance.Dataset,
-             this.AttNameEval, this.EvalValue);
+            this.AttNameEval, this.EvalValue);
         console.log(this.Dataset);
 
     }
@@ -492,7 +510,7 @@ class RadialChart extends HTMLElement {
         console.log(this.Dataset);
         this.Dataset.forEach((element) => {
             let porcentaje = parseInt((element[this.EvalValue] / total) * 100);
-            console.log(porcentaje,this.EvalValue, element[this.EvalValue] ,total );
+            console.log(porcentaje, this.EvalValue, element[this.EvalValue], total);
             let color = element.color;
             if (this.ChartInstance.Colors) {
                 color = this.ChartInstance.Colors[index];
@@ -519,7 +537,6 @@ class RadialChart extends HTMLElement {
                     x: 0,
                     y: 0,
                     fill: "#fff",
-                    //"transform-origin": "60px 60px",
                     "dominant-baseline": "middle",
                     "text-anchor": "middle",
                     "font-size": "6",
@@ -565,8 +582,6 @@ class RadialChart extends HTMLElement {
         circle.style.strokeDasharray = Perimetro;
         let progress = value / 100;
         let dashoffset = (Perimetro * (1 - progress)) - val;
-        //console.log("progress:", value + "%", "|", "offset:", dashoffset);
-        //console.log("perimetro:", Perimetro + "%", "|", "offset:", dashoffset);
         circle.style.strokeDashoffset = dashoffset < 0 ? 0 : dashoffset;
     }
 }
@@ -692,8 +707,9 @@ const WChartStyle = (ChartInstance) => {
             display: block;
             margin: 0 auto;
             margin-top: 0px;
+            min-height: 10px;
             z-index: 1;
-            width: ${ChartInstance.TypeChart == "Line" ? "1px" : "70%"};
+            width: ${ChartInstance.TypeChart == "Line" ? "1px" : "60%"};
             background: linear-gradient(0deg, rgba(177, 177, 177, 1) 0%, rgba(209, 209, 209, 1) 53%);           
         }
         
