@@ -1,4 +1,3 @@
-import { WAppNavigator } from "../WComponents/WAppNavigator.js";
 import { ElementStyle, WNode } from "./CommonModel.js";
 import { EntityClass } from "./EntityClass.js";
 
