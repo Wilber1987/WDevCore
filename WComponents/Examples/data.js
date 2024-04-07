@@ -1,3 +1,13 @@
+class ModelObject {
+    /**@type {ModelProperty}*/ squadName = { type: 'text' };
+    /**@type {ModelProperty}*/ homeTown = { type: 'text' };
+    /**@type {ModelProperty}*/ year = { type: 'select' };
+    /**@type {ModelProperty}*/ mes = { type: 'select' };
+    /**@type {ModelProperty}*/ trimestre = { type: 'text' };
+    /**@type {ModelProperty}*/ secretBase = { type: 'text', hiddenInTable: true };
+    /**@type {ModelProperty}*/ active = { type: 'checkbox', hiddenInTable: true };
+    /**@type {ModelProperty}*/ value = { type: 'number', hiddenInTable: true };
+}
 const data = [
     {
         squadName: "Super Hero Squad",
@@ -987,4 +997,4 @@ const data = [
         value: 4
     }
 ]
-export { data }
+export { data, ModelObject }

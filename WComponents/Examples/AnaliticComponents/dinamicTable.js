@@ -2,7 +2,7 @@ import { ModelProperty } from "../../../WModules/CommonModel.js";
 import { ComponentsManager, WRender } from "../../../WModules/WComponentsTools.js";
 import { WAppNavigator } from "../../WAppNavigator.js";
 import { WTableDynamicComp } from "../../WTableDynamic.js";
-import { data } from "../data.js";
+import { data, ModelObject } from "../data.js";
 
 const tab = WRender.Create({ className: "tab" })
 const navigator = new WAppNavigator({
@@ -16,6 +16,7 @@ const navigator = new WAppNavigator({
                 AttNameEval: "homeTown",
                 groupParams: ["year"],
                 AddChart: true,
+                ModelObject : new ModelObject()
             };
             const WTableReport = new WTableDynamicComp(TableConfigG);
             DOMManager.NavigateFunction("Tab-dasboard", WTableReport);

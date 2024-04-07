@@ -2,17 +2,8 @@ import { ModelProperty } from "../../../WModules/CommonModel.js";
 import { ComponentsManager, WRender } from "../../../WModules/WComponentsTools.js";
 import { WAppNavigator } from "../../WAppNavigator.js";
 import { WTableComponent } from "../../WTableComponent.js";
-import { data } from "../data.js";
-class ModelObject {
-    /**@type {ModelProperty}*/ squadName = { type: 'text' };
-    /**@type {ModelProperty}*/ homeTown = { type: 'text' };
-    /**@type {ModelProperty}*/ year = { type: 'number' };
-    /**@type {ModelProperty}*/ mes = { type: 'text' };
-    /**@type {ModelProperty}*/ trimestre = { type: 'text' };
-    /**@type {ModelProperty}*/ secretBase = { type: 'text', hiddenInTable: true };
-    /**@type {ModelProperty}*/ active = { type: 'checkbox', hiddenInTable: true };
-    /**@type {ModelProperty}*/ value = { type: 'number', hiddenInTable: true };
-}
+import { data, ModelObject } from "../data.js";
+
 const tab = WRender.Create({ className: "tab" })
 const navigator = new WAppNavigator({
     Direction: "column",

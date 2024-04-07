@@ -439,14 +439,14 @@ class RadialChart extends HTMLElement {
         this.shadowRoot.append(WRender.createElement(WChartStyle(this.ChartInstance)));
         this.DrawChart();
     }
-    InitializeDataset() {
+    InitializeDataset() {       
         if (this.EvalValue == null && this.ChartInstance.Dataset?.length != 0) {
             //this.Dataset = WArrayF.GroupByObject(this.Dataset, this.Dataset[0]);
             this.EvalValue = "count";
         }
         this.Dataset = WArrayF.GroupBy(this.ChartInstance.Dataset,
             this.AttNameEval, this.EvalValue);
-        console.log(this.Dataset);
+        
 
     }
     DrawChart = async () => {
@@ -507,10 +507,9 @@ class RadialChart extends HTMLElement {
         const total = WArrayF.SumValue(this.Dataset, this.EvalValue);
         let index = 0;
         let porcentajeF = 0;
-        console.log(this.Dataset);
         this.Dataset.forEach((element) => {
             let porcentaje = parseInt((element[this.EvalValue] / total) * 100);
-            console.log(porcentaje, this.EvalValue, element[this.EvalValue], total);
+            //console.log(porcentaje, this.EvalValue, element[this.EvalValue], total);
             let color = element.color;
             if (this.ChartInstance.Colors) {
                 color = this.ChartInstance.Colors[index];

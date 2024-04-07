@@ -592,6 +592,7 @@ class WArrayF {
                     NewElement[prop] = element[prop]
                 }
                 if (!element.count) {
+                    element.count = 1;
                     NewElement.count = 1;
                 }
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
@@ -599,10 +600,12 @@ class WArrayF {
             } else {
                 if (!element.count) {
                     element.count = 1;
-                    DFilt.count = DFilt.count + 1;
+                    DFilt.count++;
+                } else {
+                    DFilt.count = DFilt.count + element.count;
                 }
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
-                if (sumProperty != null) {
+                if (sumProperty != null && sumProperty != "count") {
                     DFilt[sumProperty] = DFilt[sumProperty] + element[sumProperty];
                 }
             }
@@ -765,7 +768,7 @@ class WArrayF {
                     console.log(element);
                 }
             }
-        });      
+        });
         return dataset;
     }
     static evalValue = (element, param) => {

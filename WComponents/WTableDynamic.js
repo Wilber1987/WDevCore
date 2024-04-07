@@ -6,6 +6,15 @@ import { WTableComponent } from "./WTableComponent.js";
 import { WFilterOptions } from "./WFilterControls.js";
 import { ColumChart, RadialChart } from "./WChartJSComponents.js";
 import { StyleScrolls } from "../StyleModules/WStyleComponents.js";
+import { ModelProperty } from "../WModules/CommonModel.js";
+import { WForm } from "./WForm.js";
+class DinamicConfigModel {
+    constructor(/**@type {Function}*/ action) {
+        this.action = action
+    }
+    /**@type {ModelProperty}*/ Grafico = { type: 'radio', Dataset: ["Barras", "Linea"], action: (element) => this.action(element) };
+    /**@type {ModelProperty}*/ Data = { type: 'radio', Dataset: [ "Porcentaje", "Totales"], action: (element) => this.action(element) };
+}
 class WTableDynamicComp extends HTMLElement {
     constructor(TableConfig = {}) {
         super();
@@ -19,7 +28,16 @@ class WTableDynamicComp extends HTMLElement {
         this.EvalValue = this.TableConfig.EvalValue ?? null;
         this.AttNameEval = this.TableConfig.AttNameEval ?? null;
         this.OperationsType = "sum";//"sum" count;
-
+        this.ModelObject =  this.TableConfig.ModelObject;
+        this.Config = TableConfig.ConfigOptions ?? {}
+        this.ChartDisplayConfig( this.Config );
+        this.ConfigForm = new WForm({
+            DivColumns: "calc(33% - 5px)  calc(33% - 5px) calc(33% - 5px)", Options: false,
+            EditObject: this.Config, ModelObject: new DinamicConfigModel((element) => {
+                this.ChartDisplayConfig(element);
+                this.DefineTable();
+            })
+        });
         this.attachShadow({ mode: "open" });
         this.MainTable = WRender.createElement({ type: "div", props: { class: this.TableClass, id: "MainTable" + this.id }, children: [] });
         this.divTableContainer = WRender.createElement({
@@ -30,9 +48,22 @@ class WTableDynamicComp extends HTMLElement {
             type: "div",
             props: { id: "Chart" + this.id, className: "CharttableReport" },
         });
-        this.FilterControl = WRender.createElement(this.FilterOptions());
-        this.ConfigControl = WRender.createElement(this.CreateConfig());
+        this.FilterControl =this.FilterOptions();
+        this.ConfigControl = this.CreateConfig();
     }
+    ChartDisplayConfig(element) {
+        if (element.Data == "Totales") {
+            this.percentCalc = false;
+        } else {
+            this.percentCalc = true;
+        }
+        if (element.Grafico == "Linea") {
+            this.TableConfig.TypeChart = "Line";
+        } else {
+            this.TableConfig.TypeChart = undefined ;
+        }
+    }
+
     connectedCallback() {
         if (this.MainTable.innerHTML != "") {
             return;
@@ -81,7 +112,7 @@ class WTableDynamicComp extends HTMLElement {
         this.ChartContainer.innerHTML = "";
         this.DrawGroupTable(this.Dataset);
         if (this.TableConfig.AddChart) {
-           this.DrawChart();
+            this.DrawChart();
         }
         return;
     }
@@ -310,7 +341,7 @@ class WTableDynamicComp extends HTMLElement {
                 }, {//Print
                     type: 'button', props: {
                         class: 'BtnDinamictT', innerText: '', onclick: async () => {
-                            const MainTable = this.MainTable.innerHTML + this.TableStyle.innerHTML;
+                            const MainTable = this.MainTable.innerHTML + `<style>${this.TableStyle.innerHTML}</style>`  ;
                             const MainChart = this.ChartContainer.querySelector("w-colum-chart");
                             const PrintNode = MainTable + MainChart.shadowRoot.innerHTML;
                             //console.log(PrintNode);
@@ -321,7 +352,7 @@ class WTableDynamicComp extends HTMLElement {
                             ventimp.close();
                         }
                     }, children: [{ type: 'img', props: { src: this.Icons.config, srcset: this.Icons.printI } }]
-                }, {//Config
+                },/*{//Config
                     type: 'button', props: {
                         class: 'BtnDinamictT', innerText: '', onclick: async () => {
                             this.shadowRoot.append(WRender.createElement({
@@ -336,15 +367,11 @@ class WTableDynamicComp extends HTMLElement {
                             }));
                         }
                     }, children: [{ type: 'img', props: { src: this.Icons.config, srcset: this.Icons.config } }]
-                }
+                }*/
             ]
         });
         TOpcion.append(divBTNS, divAtt,
-            WRender.createElement({
-                type: 'div', props: {
-                    class: 'TableOptionsAtribs OptionsAtribsGroup'
-                }, children: [divEvalAttib, divEvalGroups, divEvalValue]
-            }))
+            WRender.createElement({  type: 'div', props: {  class: 'TableOptionsAtribs OptionsAtribsGroup' }, children: [divEvalAttib, divEvalGroups, divEvalValue]}), this.ConfigForm)
         return TOpcion;
     }
     DrawChart() {
@@ -359,12 +386,16 @@ class WTableDynamicComp extends HTMLElement {
                 AttNameEval: this.AttNameEval,
                 EvalValue: this.EvalValue,
                 groupParams: this.groupParams,
+                percentCalc: this.percentCalc
             };
             this.ChartContainer.append(new ColumChart(CharConfig));
             this.groupParams.forEach(param => {
                 this.ChartContainer.append(new RadialChart({
-                    Dataset: this.ProcessData,
-                    AttNameEval: param
+                    Dataset: this.Dataset,
+                    Title: param,
+                    AttNameEval: param,
+                    percentCalc: this.percentCalc
+                    //EvalValue: this.EvalValue
                 }))
             });
             return;
@@ -494,6 +525,8 @@ class WTableDynamicComp extends HTMLElement {
             Dataset: this.TableConfig.Dataset,
             DisplayFilts: this.DisplayFilts,
             AutoSetDate: true,
+            ModelObject: this.ModelObject,
+            Display: true,
             FilterFunction: (DFilt) => {
                 this.DefineTable(DFilt);
             }
@@ -568,7 +601,8 @@ class WTableDynamicComp extends HTMLElement {
                 text-overflow: ellipsis;
                 min-width: 60px;
                 background-color: #eee;
-                padding: 0.5rem;
+                padding: 3px;
+                font-size: 9px;
                 text-align: left;
                 font-weight: bold;
                 color: #126e8d;
@@ -587,7 +621,8 @@ class WTableDynamicComp extends HTMLElement {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 min-width: 60px;
-                padding: 0.5rem;
+                padding: 5px;
+                font-size: 9px;
                 text-align: left;
             }            
             TDataTotal {
@@ -597,8 +632,9 @@ class WTableDynamicComp extends HTMLElement {
                 text-overflow: ellipsis;
                 min-width: 60px;
                 border-top: solid 1px #ccc;
-                padding: 0.5rem;
                 text-align: left;
+                font-size: 9px;
+                padding: 5px;
                 font-weight: bold;
             }            
             .Cajon {
@@ -745,7 +781,15 @@ class WTableDynamicComp extends HTMLElement {
             .CharttableReport w-colum-chart {
                 grid-column: span 3;
             }
-        `       
+            .TableOptions w-form {
+                grid-column: span 2;
+                background-color: #fff;
+                box-shadow: 0 0 2px 0 rgba(0, 0, 0, 30%);
+            }
+            .TableOptionsInact w-form  {
+                display: none !important;
+            }
+        `
         return WTableStyle;
     }
     Icons = {

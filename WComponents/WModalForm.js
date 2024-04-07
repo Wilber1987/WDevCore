@@ -244,7 +244,7 @@ class WModalForm extends HTMLElement {
                         width: "90%",
                         margin: "auto",
                         "margin-bottom": 20,
-                        display: "flex",   
+                        display: "block",   
                         "justify-content": "center",                 
                         padding: 5,
                         "overflow-y": "auto" 

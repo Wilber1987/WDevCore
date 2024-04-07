@@ -160,7 +160,7 @@ class WForm extends HTMLElement {
                     let val = ObjectF[prop] == undefined || ObjectF[prop] == null ? "" : ObjectF[prop];
                     //ObjectF[prop] = val;
                     const onChangeEvent = async (ev) => {
-                        console.log(ev);
+                        //console.log(ev);
                         /**
                          * @type {HTMLInputElement}
                          */
@@ -223,7 +223,7 @@ class WForm extends HTMLElement {
             }
 
         }
-        console.log(DivForm);
+        //console.log(DivForm);
         DivForm.append(Form, ComplexForm);
     }
     isNotDrawable(Model, prop) {
@@ -306,7 +306,7 @@ class WForm extends HTMLElement {
                 this.createInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
             }
             ObjectF[prop] = targetControl?.value;
-            console.log(ObjectF[prop]);
+            //console.log(ObjectF[prop]);
             if (targetControl?.pattern) {
                 let regex = new RegExp(targetControl?.pattern);
                 if (regex.test(ObjectF[prop])) {
