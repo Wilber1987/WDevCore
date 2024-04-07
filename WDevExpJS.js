@@ -17,18 +17,26 @@ async function buildLinks(path) {
     links.forEach(element => {
         const name = element.title.replace(".html", "")
             linksContainer.append(css`
-            .site-header .a${name} {
-                z-index :1;
+            .site-header .${name} {                
+                height: 400px;
+                width: 700px;
+                transform: translateX(100%)
+            }
+            .site-header .${name} img {
+                height: 400px;
+                width: 700px;
+                object-fit: cover
             }
             .site-header .a${name}:hover ~ .${name} {
                 opacity: 1;
                 z-index :1;
+                transform: translateX(0%)
             }
         `)
         linksContainer.append(WRender.Create({
             tagName: 'a', className: 'a'+name, innerText: name.replace("_",  " "), href: route + element.title
         }));
-        linksContainer.append(html`<div class="preview ${name}" style='color: #000'>${name.replace("_",  " ")}</div>`)
+        linksContainer.append(html`<div class="preview ${name}" style='color: #000'><img src="./Media/ImageComponents/${name}.png"/></div>`)
        
     });
 }
