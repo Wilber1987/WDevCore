@@ -1,6 +1,6 @@
 import { WRender } from "../WModules/WComponentsTools.js";
 import { WIcons } from "../WModules/WIcons.js";
-import { WCssClass } from "../WModules/WStyledRender.js";
+import { css, WCssClass } from "../WModules/WStyledRender.js";
 
 
 /**
@@ -171,172 +171,204 @@ class WAppNavigator extends HTMLElement {
         if (this.Direction == "column") {
             navDirection = "column";
         }
-        const Style = {
-            type: "w-style",
-            props: {
-                id: "NavStyle" + this.id,
-                ClassList: [
-                    new WCssClass(`.nav, .navInactive, .navActive`, {
-                        display: "flex",
-                        "font-family": "Verdana, Geneva, Tahoma, sans-serif",
-                        "flex-direction": navDirection,
-                        padding: "0px 10px",
-                        transition: "all 1s",
-                        "justify-content": this.alignItems,
-                        "flex-wrap": "wrap",
-                        position: "relative"
-                    }), new WCssClass(`.tab`, {
-                        display: "flex",
-                        "flex-direction": navDirection,
-                        //padding: "0px 10px",
-                        transition: "all 1s",
-                        "justify-content": "center"
-                    }), new WCssClass(`.tab .elementNavActive`, {
-                        "border-top": "solid 1px rgba(0,0,0,0)",
-                        "border-left": "solid 1px rgba(0,0,0,0)",
-                        "border-right": "solid 1px rgba(0,0,0,0)",
-                        "border-radius": "0.1cm",
-                        color: this.DarkMode ? "#4da6ff" : "#444444"
-                    }), new WCssClass(`a`, {
-                        "text-decoration": "none",
-                        cursor: "pointer"
-                    }), new WCssClass(`.elementNav`, {
-                        "text-decoration": "none",
-                        color: this.DarkMode ? "#d3d3d3" : "#444444",
-                        padding: 8,
-                        "border": "solid 1px rgb(0,0,0,0)",
-                        "border-bottom": `solid 2px rgba(0,0,0,0)`,
-                        transition: "all 0.6s",
-                        display: "flex", "align-items": "center",
-                        cursor: "pointer",
-                        "font-size": 12,
-                        position: "relative"
-                    }), new WCssClass(`.elementNavActive`, {
-                        "text-decoration": "none",
-                        color: this.DarkMode ? "#4da6ff" : "#444444",
-                        padding: "8px",
-                        "font-size": 12,
-                        "border": "solid 1px rgb(0,0,0,0)",
-                        "border-bottom": "solid 2px #4da6ff",
-                        transition: "all 0.6s",
-                        display: "flex", "align-items": "center",
-                    }), new WCssClass(`h4.elementNavActive`, {
-                        display: "none",
-                    }), new WCssClass(`.elementNav:hover`, {
-                        "border-bottom": "solid 2px #444444"
-                    }), new WCssClass(`header`, {
-                        display: "flex",
-                        "align-items": "center",
-                        "justify-content": this.alignItems,
-                        "box-shadow": "0 1px 1px 0 rgba(0,0,0,0.3)"
-                    }), new WCssClass(`.IconNav`, {
-                        height: 20,
-                        width: 20,
-                        margin: 5
-                    }), new WCssClass(`.tab .elementNavActive, .tab .elementNav`, {
-                        display: "flex",
-                        "flex-direction": "column",
-                        "min-width": 100
-                    }), new WCssClass(`.tab .IconNav`, {
-                        height: 40,
-                        width: 40
-                    }), new WCssClass(`.NavTitle`, {
-                        "font-size": "1.1rem",
-                        padding: "10px",
-                        color: "#888888",
-                        cursor: "pointer"
-                    }),
-                    //Estilos de submenu
-                    new WCssClass(` .DisplayMenu`, {
-                        overflow: "hidden",
-                        "padding-left": "10px",
-                        "max-height": "1000px",
-                        display: "flex",
-                        "flex-direction": "column",
-                        margin: "10px 0px"
-                    }), new WCssClass(` .AbsoluteDisplay`, {
-                        position: "absolute",
-                        top:"+40px",
-                        left: 0,
-                        "background-color": "#fff",
-                        padding: 12,
-                        "box-shadow": "0 0 5px 0 #888",
-                        "border-radius": 15
-                    }),  new WCssClass(` .UnDisplayMenu`, {
-                        overflow: "hidden",
-                        "max-height": "0px",                        
-                        padding: 0,
-                        "box-shadow": "none"
-                    }),new WCssClass(`.DisplayMenu a`, {
-                        "text-decoration": "none",
-                        color: "#8e8e8e",
-                        padding: 10,
-                        "font-size": 12,
-                        "margin-bottom": 10,
-                        "border-radius": 5,
-                        "background-color": this.DarkMode ? "rgb(0,0,0,50%)" : "rgb(0,0,0,10%)",
-                        color: this.DarkMode ? "#d3d3d3" : "#444444",
-                        //padding: "10px",
-                    }), //ocultacion. 
-                    new WCssClass(`.DisplayBtn`, {
-                        margin: "10px",
-                        display: "none",
-                        height: "15px", width: "15px",
-                        cursor: "pointer",
-                        filter: this.DarkMode ? "invert(90%)" : "invert(0%)"
-                    }), new WCssClass(`.navActive`, {
-                        overflow: "hidden",
-                        "max-height": "5000px",
-                    })
-                ],
-                MediaQuery: [{
-                    condicion: "(max-width: 1200px)",
-                    ClassList: []
-                }, {
-                    condicion: "(max-width: 800px)",
-                    ClassList: [
-                        new WCssClass(`.DisplayBtn`, {
-                            display: "initial",
-                            height: 25,
-                            width: 25,
-                        }), new WCssClass(`.nav`, {
-                            "flex-direction": "column",
-                            overflow: "hidden",
-                            "max-height": "0px"
-                        }), new WCssClass(`.navActive, .navInactive, .nav`, {
-                            overflow: "hidden",
-                            "max-height": "5000px",
-                            transition: "all 0.6s",
-                            "position": "fixed",
-                            "z-index": "999",
-                            "background-color": this.DarkMode ? "#444444" : "#fff",
-                            "color": "#fff",
-                            "width": "80%",
-                            "height": "100vh",
-                            top: 0,
-                            "box-shadow": "0 5px 5px 3px rgba(0,0,0,0.3)",
-                            "flex-direction": "column",
-                            "justify-content": "initial",
-                            "padding-top": 20,
-                            right: this.DisplayMode == "left" ? "inherit" : "0"
-
-                        }), new WCssClass(`.navInactive, .nav`, {
-                            opacity: "0",
-                            "pointer-events": "none",
-                            transform: this.DisplayMode == "left" ? "translateX(-100%)" : "translateX(+100%)",
-
-                        }),
-                        new WCssClass(`header`, {
-                            display: "flex",
-                            "align-items": "center",
-                            "justify-content": this.alignItems,
-                            "box-shadow": "none"
-                        }),
-                    ]
-                }]
+        return css` .nav,
+            .navInactive,
+            .navActive {
+                display: flex;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                flex-direction: ${navDirection};
+                padding: 0px 10px;
+                transition: all 1s;
+                justify-content: ${this.alignItems};
+                flex-wrap: wrap;
+                position: relative;
             }
-        }
-        return Style;
+        
+            .tab {
+                display: flex;
+                flex-direction: ${navDirection};
+                transition: all ease 1s;
+                justify-content: center;
+            }
+        
+            .tab .elementNavActive {
+                border-top: solid 1px rgba(0, 0, 0, 0);
+                border-left: solid 1px rgba(0, 0, 0, 0);
+                border-right: solid 1px rgba(0, 0, 0, 0);
+                border-radius: 0.1cm;
+                color: ${this.DarkMode ? "#4da6ff" : "#444444"};
+            }
+        
+            a {
+                text-decoration: none;
+                cursor: pointer;
+            }
+        
+            .elementNav {
+                text-decoration: none;
+                color: ${this.DarkMode ? "#d3d3d3" : "#444444"};
+                padding: 8px;
+                border: solid 1px rgb(0, 0, 0, 0);
+                border-bottom: solid 2px rgba(0, 0, 0, 0);
+                transition: all 0.6s;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                font-size: 12px;
+                position: relative;
+            }
+        
+            .elementNavActive {
+                text-decoration: none;
+                color: ${this.DarkMode ? "#4da6ff" : "#444444"};
+                padding: 8px;
+                font-size: 12px;
+                border: solid 1px rgb(0, 0, 0, 0);
+                border-bottom: solid 2px #4da6ff;
+                transition: all 0.6s;
+                display: flex;
+                align-items: center;
+            }
+        
+            h4.elementNavActive {
+                display: none;
+            }
+        
+            .elementNav:hover {
+                border-bottom: solid 2px #444444;
+            }
+        
+            header {
+                display: flex;
+                align-items: center;
+                justify-content: ${this.alignItems};
+                box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.3);
+            }
+        
+            .IconNav {
+                height: 20px;
+                width: 20px;
+                margin: 5px;
+            }
+        
+            .tab .elementNavActive,
+            .tab .elementNav {
+                display: flex;
+                flex-direction: column;
+                min-width: 100px;
+            }
+        
+            .tab .IconNav {
+                height: 40px;
+                width: 40px;
+            }
+        
+            .NavTitle {
+                font-size: 1.1rem;
+                padding: 10px;
+                color: #888888;
+                cursor: pointer;
+            }
+        
+            .DisplayMenu {
+                overflow: hidden;
+                padding-left: 10px;
+                max-height: 1000px;
+                display: flex;
+                flex-direction: column;
+                margin: 10px 0px;
+            }
+        
+            .AbsoluteDisplay {
+                position: absolute;
+                top: +40px;
+                left: 0px;
+                background-color: #fff;
+                padding: 12px;
+                box-shadow: 0 0 5px 0 #888;
+                border-radius: 15px;
+            }
+        
+            .UnDisplayMenu {
+                overflow: hidden;
+                max-height: 0px;
+                padding: 0px;
+                box-shadow: none;
+            }
+        
+            .DisplayMenu a {
+                text-decoration: none;
+                color: ${this.DarkMode ? "#d3d3d3" : "#444444"};
+                padding: 10px;
+                font-size: 12px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+                background-color: ${this.DarkMode ? "rgb(0,0,0,50%)" : "rgb(0,0,0,10%)"};
+            }
+        
+            .DisplayBtn {
+                margin: 10px;
+                display: none;
+                height: 15px;
+                width: 15px;
+                cursor: pointer;
+                filter: ${ this.DarkMode ? "invert(90%)" : "invert(0%)"};
+            }
+        
+            .navActive {
+                overflow: hidden;
+                max-height: 5000px;
+            }
+        
+            @media (max-width: 1200px) {}
+        
+            @media (max-width: 800px) {
+                .DisplayBtn {
+                    display: initial;
+                    height: 25px;
+                    width: 25px;
+                }
+        
+                .nav {
+                    flex-direction: column;
+                    overflow: hidden;
+                    max-height: 0px;
+                }
+        
+                .navActive,
+                .navInactive,
+                .nav {
+                    overflow: hidden;
+                    max-height: 5000px;
+                    transition: all 0.6s;
+                    position: fixed;
+                    z-index: 999;
+                    background-color: #fff;
+                    color: #fff;
+                    width: 80%;
+                    height: 100vh;
+                    top: 0px;
+                    box-shadow: 0 5px 5px 3px rgba(0, 0, 0, 0.3);
+                    flex-direction: column;
+                    justify-content: initial;
+                    padding-top: 20px;
+                    right: inherit;
+                }
+        
+                .navInactive,
+                .nav {
+                    opacity: 0;
+                    pointer-events: none;
+                    transform: translateX(-100%);
+                }
+        
+                header {
+                    display: flex;
+                    align-items: center;
+                    justify-content:  ${ this.alignItems};
+                    box-shadow: none;
+                }
+        }`;
     }
 }
 customElements.define("w-app-navigator", WAppNavigator);
