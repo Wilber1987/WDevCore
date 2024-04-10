@@ -84,6 +84,10 @@ class WCommentsComponent extends HTMLElement {
 
     }
     saveComment = async () => {
+        // @ts-ignore
+        if (this.MessageInput.value.length < 3) {
+            return; 
+        }
         const Message = {
             // @ts-ignore
             Body: this.MessageInput.value,
