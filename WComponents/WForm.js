@@ -433,7 +433,7 @@ class WForm extends HTMLElement {
                 });
                 Form.appendChild(ControlContainer);
                 break;
-            case "WSELECT":
+            case "WSELECT": case "WRADIO":
                 ObjectF[prop] = ObjectF[prop]?.__proto__ == Object.prototype ? ObjectF[prop] : null;
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
                     ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
@@ -462,7 +462,7 @@ class WForm extends HTMLElement {
                 this.FindObjectMultiselect(val, InputControl);
                 Form.appendChild(ControlContainer);
                 break;
-            case "MULTISELECT":
+            case "MULTISELECT": case "WCHECKBOX":
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
                     ModelProperty.ModelObject = await WArrayF.isModelFromFunction(Model, prop);
                     ModelProperty.Dataset = await ModelProperty.ModelObject.Get();
@@ -470,7 +470,9 @@ class WForm extends HTMLElement {
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = new MultiSelect({
-                    AddObject: true,
+                    AddObject: ModelProperty.type?.toUpperCase() != "WCHECKBOX",
+                    Mode: ModelProperty.type?.toUpperCase() == "WCHECKBOX" ? "SELECT_BOX": "SELECT",
+                    FullDetail: ModelProperty.type?.toUpperCase() != "WCHECKBOX",
                     action: (selecteds) => {
                         if (ModelProperty.action) {
                             ModelProperty.action(ObjectF, this, InputControl, prop)
@@ -922,7 +924,6 @@ class WForm extends HTMLElement {
     }
 
     FindObjectMultiselect(val, InputControl) {
-        console.log(val, InputControl.Dataset);
         if (val != null && val != undefined && val.__proto__ == Array.prototype) {
             val.forEach((item) => {
                 const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, item));
@@ -944,19 +945,21 @@ class WForm extends HTMLElement {
     }
 
     async CreateWSelect(InputControl, Dataset, prop, ObjectF, Model) {
+        const ModelProperty = Model[prop];
         const { MultiSelect } = await import("./WMultiSelect.js");
         InputControl = new MultiSelect({
             MultiSelect: false,
+            Mode: ModelProperty.type?.toUpperCase() == "WRADIO" ? "SELECT_BOX": "SELECT",
+            FullDetail: ModelProperty.type?.toUpperCase() != "WRADIO",
             Dataset: Dataset,
-            AddObject: true,
+            AddObject: ModelProperty.type?.toUpperCase() != "WRADIO",
             ModelObject: this.Config.ModelObject[prop].ModelObject,
             action: (ItemSelects) => {
                 ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_
                     ?? ItemSelects[0];
                 /**
                 * @type {ModelProperty}
-                */
-                const ModelProperty = Model[prop];
+                */                
                 if (ModelProperty.action) {
                     ModelProperty.action(ObjectF, this, InputControl, prop)
                 }

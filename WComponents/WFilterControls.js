@@ -180,7 +180,7 @@ class WFilterOptions extends HTMLElement {
                                 }
                                 //TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
                                 let foraingKeyName = null;
-                                const foreynKeyExist = ModelProperty.foreingKey && this.ModelObject.hasOwnProperty(ModelProperty.foreingKey);
+                                const foreynKeyExist = ModelProperty.ForeignKeyColumn && this.ModelObject.hasOwnProperty(ModelProperty.ForeignKeyColumn);
                                 if (!foreynKeyExist) {
                                     for (const propiedad in ModelProperty.ModelObject) {
                                         const keyNameSames = ModelProperty.ModelObject[propiedad].primary
@@ -191,7 +191,7 @@ class WFilterOptions extends HTMLElement {
                                         }
                                     }
                                 } else {
-                                    foraingKeyName = ModelProperty.foreingKey;
+                                    foraingKeyName = ModelProperty.ForeignKeyColumn;
                                 }
                                 if (foraingKeyName != null) {
                                     values = []

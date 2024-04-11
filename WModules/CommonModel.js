@@ -76,7 +76,7 @@ function ModelFunction() { }
     * @property {Boolean} [primary]
     * @property {Boolean} [disabled]
     * @property {String} [label]
-    * @property {String} [foreingKey] nombre de la llave foranea que enlaza el ModelObject de esta propiedad con la propiedad padre
+    * @property {String} [ForeignKeyColumn] nombre de la llave foranea que enlaza el ModelObject de esta propiedad con la propiedad padre
     * @property {Array} [fileType]
     * @property {Array} [ControlAction] botones adicionales que se le agregan al control 
     * @property {String} [pattern]
