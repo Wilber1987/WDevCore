@@ -363,7 +363,7 @@ class WTableComponent extends HTMLElement {
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
                         style: this.Options?.Select ? "cursor: pointer" : "",
-                        innerHTML: value == "" ? "-" : `${Money[this.TypeMoney]} ${value.toFixed(2)}`
+                        innerHTML: value == "" ? "-" : `${Money[this.TypeMoney]} ${ ((value =! undefined) &&  (value =! null) ? parseFloat(value).toFixed(2) : 0) }`
                     }));
                     tr.append(td);
                     break;
