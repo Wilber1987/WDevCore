@@ -1,27 +1,6 @@
-import { WAppNavigator } from "../WComponents/WAppNavigator.js";
 import { ElementStyle, WNode } from "./CommonModel.js";
 import { EntityClass } from "./EntityClass.js";
 
-function type(value) {
-    var r;
-    if (typeof value === 'object') {
-        if (value === null) {
-            return 'null';
-        }
-        if (typeof value.constructor === 'function' &&
-            (r = value.constructor.name) !== 'Object') {
-            if (r === '' || r === undefined) {
-                return Function.prototype.toString.call(value.constructor)
-                    .match(/^\n?(function|class)(\w?)/)[2] || 'anonymous';
-            }
-            return r;
-        }
-        return Object.prototype.toString.call(value).match(/\s(.*)\]/)[1];
-    } else if (typeof value === 'number') {
-        return isNaN(value) ? 'NaN' : 'number';
-    }
-    return typeof value;
-}
 class WAjaxTools {
     static Request = async (Url, typeRequest, Data = {}, typeHeader) => {
         try {
@@ -592,16 +571,20 @@ class WArrayF {
                     NewElement[prop] = element[prop]
                 }
                 if (!element.count) {
+                    element.count = 1;
                     NewElement.count = 1;
                 }
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
                 DataArraySR.push(NewElement)
             } else {
                 if (!element.count) {
-                    DFilt.count = DFilt.count + 1;
+                    element.count = 1;
+                    DFilt.count++;
+                } else {
+                    DFilt.count = DFilt.count + element.count;
                 }
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
-                if (sumProperty != null) {
+                if (sumProperty != null && sumProperty != "count") {
                     DFilt[sumProperty] = DFilt[sumProperty] + element[sumProperty];
                 }
             }
@@ -764,7 +747,7 @@ class WArrayF {
                     console.log(element);
                 }
             }
-        });      
+        });
         return dataset;
     }
     static evalValue = (element, param) => {
@@ -921,7 +904,7 @@ const GenerateColor = () => {
     }
     return color_aleatorio
 }
-export { WAjaxTools, WRender, ComponentsManager, WArrayF, type, GenerateColor }
+export { WAjaxTools, WRender, ComponentsManager, WArrayF, GenerateColor }
 
 //Date UTILITYS
 function pad(number) {

@@ -71,10 +71,8 @@ class WTableComponent extends HTMLElement {
                 ]
             }
         }));
-        const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
-        
-        const isWithtModel = this.TableConfig.ModelObject?.Get != undefined
-        
+        const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);        
+        const isWithtModel = this.TableConfig.ModelObject?.Get != undefined        
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
@@ -146,7 +144,6 @@ class WTableComponent extends HTMLElement {
         if (this.Options != undefined && (this.Options.Search == true
             || this.Options.Add == true
             || this.Options.Filter == true)) {
-
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
                     tagName: "input", class: "txtControl", type: "text",
@@ -284,7 +281,6 @@ class WTableComponent extends HTMLElement {
     }
 
     async EvalModelPrototype(Model, prop, tr, element, index) {
-
         let value = element[prop] != null && element[prop] != undefined ? element[prop] : "";
         let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index, class: "td_" + prop });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
@@ -377,7 +373,8 @@ class WTableComponent extends HTMLElement {
                     break;
             }
         } else {
-            tr.innerHTML = value;
+            td.innerHTML = value;
+            tr.append(td)
         }
     }
 
@@ -656,7 +653,7 @@ class WTableComponent extends HTMLElement {
                 overflow: auto;
             }
             .WTable {
-                font-family: Verdana, sans-serif;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
                 width: 100%;
                 border-collapse: collapse;
                 font-size: 10px;
@@ -698,6 +695,7 @@ class WTableComponent extends HTMLElement {
             .WTable .tdAction {
                 text-align: center;
                 width: 120px;
+                align-items: center,
             }
 
             .WTable tbody tr:nth-child(odd) {
@@ -860,6 +858,8 @@ class WTableComponent extends HTMLElement {
                 cursor: pointer;
                 border-radius: 0.2cm;
                 transition: all 0.6s;
+                font-size: 12px;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
             }
 
             .paginateBTNHidden {
@@ -914,11 +914,11 @@ class WTableComponent extends HTMLElement {
                 font-weight: bold;
                 border: none;
                 padding: 5px;
-                margin: 2px;
+                margin-left: 5px;
                 text-align: center;
                 display: inline-block;
-                min-width: 30px;
-                font-size: 12px;
+                min-width: 20px;
+                font-size: 10px;
                 cursor: pointer;
                 background-color: #4894aa;
                 color: #fff;
@@ -926,7 +926,7 @@ class WTableComponent extends HTMLElement {
             }
 
             .Btn {
-                width: 120px;
+                cursor: pointer;
             }
 
             .BtnTableS {

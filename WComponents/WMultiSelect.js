@@ -16,6 +16,7 @@ import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
     * @property {Boolean} [FullDetail]
     * @property {Boolean} [AddObject]
     * @property {String} [AddPatern]
+    * @property {String} [Mode]
 **/
 
 class MultiSelect extends HTMLElement {
@@ -85,6 +86,9 @@ class MultiSelect extends HTMLElement {
             StyleScrolls.cloneNode(true),
             MainMenu.cloneNode(true)
         );
+        if (Config.Mode == "SELECT_BOX") {
+            this.shadowRoot.append(selectBoxStyle.cloneNode(true));
+        }
         if (Style != null && Style.__proto__ == WStyledRender.prototype) {
             this.shadowRoot.append(Style);
         }
@@ -439,7 +443,8 @@ const MainMenu = css`
     .LabelMultiselect label {
         padding: 2px 5px;
         border-radius: 0.2cm;
-        background-color: #009f97;  color: #fff;
+        background-color: #009f97; 
+        color: #fff;
         margin: 3px;  
         font-size: 9px;
         align-items: center;
@@ -575,3 +580,16 @@ const SubMenu = {
         })
     ]
 }
+
+const selectBoxStyle = css`
+    w-tooltip {  
+        position: relative !important;
+        box-shadow: none !important;
+    }
+    .OptionsContainer {
+        box-shadow: none;
+    }
+    .txtControl, .LabelMultiselect {
+        display: none;
+    }
+`
