@@ -682,6 +682,7 @@ class WTableComponent extends HTMLElement {
                 overflow-y: auto;
                 font-size: 10px !important;
                 padding: 0 5px;
+                max-width: 400px;
             }
             .WTable td  label * {
                 font-size: 11px !important;

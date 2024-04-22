@@ -414,6 +414,7 @@ class ModalConfig {
  *  * @property {String} [PropName]
     * @property {String} [FilterType]
     * @property {Array<any>} [Values]
+    * @property {Array<FilterData>} [Filters]
 **/
 class FilterData { }
 

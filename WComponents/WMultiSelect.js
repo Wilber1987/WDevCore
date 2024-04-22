@@ -4,6 +4,7 @@ import { StyleScrolls, StylesControlsV1 } from "../StyleModules/WStyleComponents
 import { WModalForm } from "./WModalForm.js";
 import { WIcons, WIconsPath } from "../WModules/WIcons.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
+import { FilterData } from "../WModules/CommonModel.js";
 
 /**
  * @typedef {Object} ConfigMS 
@@ -58,26 +59,28 @@ class MultiSelect extends HTMLElement {
             class: "txtControl",
             placeholder: "Buscar...",
             onchange: async (ev) => {
-                const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value);
-                //console.log(Dataset, this.ModelObject, this.ModelObject?.Get );
                 if (this.ModelObject?.__proto__ == Function.prototype) {
                     this.ModelObject = this.ModelObject();
                 }
-                if (Dataset.length == 0 && this.ModelObject?.Get != undefined) {
-                    var filterObject = {}
-                    filterObject[this.DisplayName] = ev.target.value
-                    const responseDataset = await new this.ModelObject.constructor(filterObject).Get();
-                    responseDataset?.forEach(r => {
-                        this.Dataset.push(r);
-                    })
-                    return responseDataset;
-                }
-                if (Dataset.length == 0 && this.Config.AddObject == true) {
-                    const targetControl = ev.target;
-                    const addBtn = this.addBtn(targetControl)
-                    this.tool.append(addBtn)
+
+                if (this.ModelObject?.Get != undefined) {
+                    /**
+                     * @type {Array<FilterData>}
+                     */
+                    const filterData = []
+                    for (const prop in this.ModelObject) {
+                        if (this.ModelObject[prop].hiddenFilter == true) {
+                            continue;
+                        }
+                        if (this.ModelObject[prop].type?.toUpperCase() == "TEXT") {
+                            filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
+                        }
+                    }
+                    const responseDataset = await new this.ModelObject.constructor({ FilterData: [{ FilterType: "or", Filters: filterData }] }).Get();
+                    this.DrawFilterData(responseDataset, ev);
                 } else {
-                    this.Draw(Dataset);
+                    const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value);
+                    this.DrawFilterData(Dataset, ev);
                 }
             }
         });
@@ -94,6 +97,16 @@ class MultiSelect extends HTMLElement {
         }
         this.shadowRoot.append(this.SetOptions());
         this.LabelMultiselect.onclick = this.DisplayOptions;
+    }
+
+    DrawFilterData(Dataset, ev) {
+        if (Dataset.length == 0 && this.Config.AddObject == true) {
+            const targetControl = ev.target;
+            const addBtn = this.addBtn(targetControl);
+            this.tool.append(addBtn);
+        } else {
+            this.Draw(Dataset);
+        }
     }
 
     addBtn(targetControl) {
@@ -211,7 +224,7 @@ class MultiSelect extends HTMLElement {
                 const detail = this.BuilDetail(element);
                 if (detail.childNodes.length > 0) {
                     Options.append(detail)
-                }                
+                }
             }
         });
     }

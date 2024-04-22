@@ -641,7 +641,7 @@ class WArrayF {
         return Maxvalue;
     }
     static MinValue(Data, MaxParam) {
-        var MinValue = Data[0][MaxParam];
+        var MinValue = Data[0][MaxParam] ?? 0
         for (let index = 0; index < Data.length; index++) {
             if (parseInt(Data[index][MaxParam]) < MinValue) {
                 MinValue = Data[index][MaxParam];

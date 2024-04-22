@@ -87,7 +87,7 @@ class WDetailObject extends HTMLElement {
                             name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
                                 this.TabManager.NavigateFunction(prop, new WTableComponent({
-                                    Options: { Search: true },
+                                    Options: { Search: true, Show: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,
                                     AddItemsFromApi: false,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
@@ -204,7 +204,7 @@ class WDetailObject extends HTMLElement {
         .cont {
             font-size: 12px;
             display: grid;
-            grid-template-columns: 33% 33% 33%;         
+            grid-template-columns: 24.5%  24.5% 24.5% 24.5%;         
             overflow-x: hidden;
             border-radius: 20px;            
             padding: 10px;
@@ -212,7 +212,7 @@ class WDetailObject extends HTMLElement {
             margin: 10px 0px;
         }    
         .cont h3 {
-            grid-column: span 3;
+            grid-column: span 4;
             width: 100%;
         }  
         .DataContainer label {
@@ -220,14 +220,12 @@ class WDetailObject extends HTMLElement {
         }
         .cont .label-value {          
             width: 100%;
-            margin-bottom: 5px;
             font-size:15px;
             font-weight: bold;
         }
 
         .DataContainer {
             display: flex;
-            padding: 5px;
             text-align: left;
             justify-content: space-between;
             flex-wrap: wrap;

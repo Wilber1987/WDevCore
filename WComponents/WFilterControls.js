@@ -181,6 +181,7 @@ class WFilterOptions extends HTMLElement {
                                 //TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
                                 let foraingKeyName = null;
                                 const foreynKeyExist = ModelProperty.ForeignKeyColumn && this.ModelObject.hasOwnProperty(ModelProperty.ForeignKeyColumn);
+                                console.log(foreynKeyExist);
                                 if (!foreynKeyExist) {
                                     for (const propiedad in ModelProperty.ModelObject) {
                                         const keyNameSames = ModelProperty.ModelObject[propiedad].primary
@@ -194,11 +195,19 @@ class WFilterOptions extends HTMLElement {
                                     foraingKeyName = ModelProperty.ForeignKeyColumn;
                                 }
                                 if (foraingKeyName != null) {
+                                    console.log(foraingKeyName);
                                     values = []
                                     filterType = "IN";
-                                    propiertyName = foraingKeyName
-                                    control.selectedItems?.forEach(element => {
-                                        values.push(element[foraingKeyName].toString())
+                                    propiertyName = foraingKeyName;   
+                                    let primaryKey = null;
+                                    for (const key in control.ModelObject) {
+                                        if (control.ModelObject[key].primary) {
+                                            primaryKey = key;
+                                            break;
+                                        }
+                                    }                               
+                                    control.selectedItems?.forEach(element => {                                       
+                                        values.push(element[primaryKey].toString())
                                     });
                                 }
                             }
@@ -231,6 +240,12 @@ class WFilterOptions extends HTMLElement {
                 return;
             }
             this.Config.Dataset = await Model.Get();
+            if (this.Config.FilterFunction != undefined) {
+                this.Config.FilterFunction(this.Config.Dataset);
+            } else {
+                console.log(this.Config.Dataset);
+            }
+            return;
         }
 
         const DFilt = this.Config.Dataset.filter(obj => {
@@ -422,7 +437,7 @@ class WFilterOptions extends HTMLElement {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
             Dataset: ModelProperty.Dataset,
-            ModelObject: ModelProperty.ModelObject,
+            ModelObject: ModelProperty.ModelObject.__proto__ == Function.prototype ?  ModelProperty.ModelObject() : ModelProperty.ModelObject,
             id: prop,
             FullDetail: true,
             action: () => {
