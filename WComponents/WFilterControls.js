@@ -42,6 +42,18 @@ class WFilterOptions extends HTMLElement {
         this.DrawFilter();
     }
     connectedCallback() {
+        this.shadowRoot?.addEventListener("click", (e) => this.undisplayMultiSelects(e));
+        this.shadowRoot?.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
+    }
+    undisplayMultiSelects = (e) => {
+        // @ts-ignore
+        if (!e.target.tagName.includes("W-MULTI-SELECT")) {
+            this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
+                // @ts-ignore
+                m.tool.className = "toolInactive";
+                //TODO HACER LO DEL SPAN
+            })
+        }
     }
     DrawFilter = async () => {
         this.FilterContainer.innerHTML = "";
@@ -437,6 +449,7 @@ class WFilterOptions extends HTMLElement {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
             Dataset: ModelProperty.Dataset,
+            IsFilterControl: true,
             ModelObject: ModelProperty.ModelObject.__proto__ == Function.prototype ?  ModelProperty.ModelObject() : ModelProperty.ModelObject,
             id: prop,
             FullDetail: true,

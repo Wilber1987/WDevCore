@@ -12,12 +12,13 @@ import { FilterData } from "../WModules/CommonModel.js";
     * @property {Array} [selectedItems]
     * @property {Function} [action]
     * @property {String} [id]
+    * @property {Boolean} [IsFilterControl]
     * @property {Object} [ModelObject]
     * @property {Boolean} [MultiSelect]
     * @property {Boolean} [FullDetail]
     * @property {Boolean} [AddObject]
     * @property {String} [AddPatern]
-    * @property {String} [Mode]
+    * @property {String} [Mode] IsFilterControl
 **/
 
 class MultiSelect extends HTMLElement {
@@ -38,7 +39,7 @@ class MultiSelect extends HTMLElement {
         this.FullDetail = this.Config.FullDetail ?? true;
         this.SubOptionsFieldName = "";
         WRender.SetStyle(this, {
-            display: "block",
+            display: this.Config.IsFilterControl == true ? "flex" : "block",
             position: "relative",
             boxShadow: "0 0 5px #c1c1c1;",
             fontSize: "12px",
@@ -48,10 +49,11 @@ class MultiSelect extends HTMLElement {
 
         this.MultiSelect = this.Config.MultiSelect ?? true;
         this.LabelMultiselect = WRender.Create({
-            className: "LabelMultiselect " + (this.MultiSelect ? "multi" : "select"), children: [
-                { className: "selecteds" },
-                { tagName: "span", className: "btnSelect" }
-            ]
+            className: "LabelMultiselect " + (this.MultiSelect ? "multi" : "select")
+                + (this.Config.IsFilterControl == true ? " IsFilterControl" : ""), children: [
+                    { className: "selecteds" },
+                    { tagName: "span", className: "btnSelect" }
+                ]
         });
         this.OptionsContainer = WRender.Create({ className: "OptionsContainer MenuInactive" });
         this.SearchControl = WRender.Create({
@@ -229,10 +231,25 @@ class MultiSelect extends HTMLElement {
         });
     }
     SetOptions = () => {
-        this.tool = new WToolTip([
-            this.SearchControl,
-            this.OptionsContainer
-        ]);
+        if (this.Config.IsFilterControl) {
+            this.shadowRoot.append(this.SearchControl);
+            this.SearchControl.style.borderRadius = "0 10px 10px 0";
+            this.SearchControl.onfocus =  ()=> {
+                if (!this.tool.className.includes("toolActive")) {
+                    this.LabelMultiselect.querySelector("span").className = "btnSelect spanActive"
+                    this.tool.className = "toolActive";
+                } 
+            }
+            this.tool = new WToolTip([
+                this.OptionsContainer
+            ]);
+        } else {
+            this.tool = new WToolTip([
+                this.SearchControl,
+                this.OptionsContainer
+            ]);
+        }
+
         return this.tool
     }
     DrawLabel = () => {
@@ -404,7 +421,8 @@ class WToolTip extends HTMLElement {
                 max-height: 0px;
                 background-color: #fff;
                 overflow: hidden;  
-                left: 0;             
+                left: 0;      
+                top: 27px;       
             }
             w-tooltip.active {
                 max-height: 600px;
@@ -444,7 +462,13 @@ const MainMenu = css`
         min-height: 18px;
         width: calc(100% - 30px);
         overflow-x: auto;
-    } 
+    }
+    .LabelMultiselect.IsFilterControl,  .LabelMultiselect.IsFilterControl .selecteds {   
+        width: calc(100%);
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }  
+   
     .toolActive {       
         border: solid 1px #9b9b9b;
         max-height: 600px;
@@ -522,7 +546,7 @@ const MainMenu = css`
     }
     .txtControl {
         width: calc(100% - 30px);
-        padding: 10px 15px;
+        padding: 5px 10px;
         border: none;
         outline: none;
     }
