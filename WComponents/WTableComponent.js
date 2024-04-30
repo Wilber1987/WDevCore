@@ -1,7 +1,7 @@
 //@ts-check
 // @ts-ignore
 import { TableConfig } from "../WModules/CommonModel.js";
-import { WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
+import { ConvertToMoneyString, WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
@@ -25,7 +25,7 @@ class WTableComponent extends HTMLElement {
         this.ModelObject = {};
         this.paginate = Config.paginate ?? true;
         this.attachShadow({ mode: "open" });
-        this.TypeMoney = Config.TypeMoney  ?? "Euro";
+        this.TypeMoney = Config.TypeMoney;
         this.TableConfig = Config ?? {};
         this.Dataset = this.TableConfig.Dataset ?? [];
         this.ThOptions = WRender.Create({ class: "thOptions" });
@@ -71,8 +71,8 @@ class WTableComponent extends HTMLElement {
                 ]
             }
         }));
-        const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);        
-        const isWithtModel = this.TableConfig.ModelObject?.Get != undefined        
+        const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
+        const isWithtModel = this.TableConfig.ModelObject?.Get != undefined
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
@@ -160,7 +160,7 @@ class WTableComponent extends HTMLElement {
                 this.ThOptions.append(WRender.Create({
                     tagName: "button", class: "BtnTableSR",
                     type: "button", innerText: "Nuevo", style: "margin: 10px 0px; max-width: 300px",
-                    onclick: async () => {                       
+                    onclick: async () => {
                         this.ModalCRUD();
                     }
                 }))
@@ -359,7 +359,15 @@ class WTableComponent extends HTMLElement {
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
                         style: this.Options?.Select ? "cursor: pointer" : "",
-                        innerHTML: value == "" ? "-" : `${Money[this.TypeMoney]} ${ ((value =! undefined) &&  (value =! null) ? parseFloat(value).toFixed(2) : 0) }`
+                        innerHTML: value == "" ? "-" : `${this.GetMoney()} ${((value != undefined) && (value != null) ? ConvertToMoneyString(value) : 0)}`
+                    }));
+                    tr.append(td);
+                    break;
+                case "NUMBER":                   
+                    td.append(WRender.Create({
+                        tagName: "label", htmlFor: "select" + index,
+                        style: this.Options?.Select ? "cursor: pointer" : "",
+                        innerHTML: value == "" ? "-" : `${((value != undefined) && (value != null) ? parseFloat(value.toString()).toFixed(2) : 0)}`
                     }));
                     tr.append(td);
                     break;
@@ -406,6 +414,13 @@ class WTableComponent extends HTMLElement {
                 }
             }));
         }
+    }
+
+    GetMoney() {
+        if (!this.TypeMoney) {
+            return "";
+        }
+        return Money[this.TypeMoney];
     }
 
     EditBTN(Options, element, tr) {

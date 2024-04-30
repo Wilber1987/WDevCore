@@ -1,5 +1,5 @@
 
-import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WComponentsTools.js';
+import { WRender, WArrayF, ComponentsManager, WAjaxTools, ConvertToMoneyString } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WModalForm, WSimpleModalForm } from './WModalForm.js';
@@ -311,7 +311,7 @@ class ProfileCard extends HTMLElement {
                             {
                                 tagName: 'label', className: "label-value", innerText:
                                     (typeof ObjectDetail[prop] === "number" &&  Model[prop].type.toUpperCase() == "MONEY" 
-                                    ? ObjectDetail[prop].toFixed(2) :
+                                    ? ConvertToMoneyString(ObjectDetail[prop]) :
                                     typeof ObjectDetail[prop] === "number" &&  Model[prop].type.toUpperCase() == "PERCENTAGE" 
                                     ? `${ ObjectDetail[prop]} %`: ObjectDetail[prop])
                             }

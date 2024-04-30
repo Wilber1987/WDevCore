@@ -1,6 +1,7 @@
 import { ElementStyle, WNode } from "./CommonModel.js";
 import { EntityClass } from "./EntityClass.js";
 
+
 class WAjaxTools {
     static Request = async (Url, typeRequest, Data = {}, typeHeader) => {
         try {
@@ -1003,3 +1004,22 @@ String.prototype.toDateTimeFormatEs = function () {
 HTMLElement.prototype.SetStyle = function (Style = (new ElementStyle())) {
     WRender.SetStyle(this, Style);
 }
+
+//MONEDA
+/**
+ * 
+ * @param {Number} numero 
+ * @param {String} currency EUR
+ * @returns {String}
+ */
+function ConvertToMoneyString(numero, currency = undefined) {
+    return new Intl.NumberFormat('es-ES', {
+        style: 'decimal',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+    }).format(numero).replace(/,/g, '|').replace(/\./g, ',').replace(/\|/g, '.');;
+}
+
+export { ConvertToMoneyString }
