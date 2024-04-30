@@ -157,7 +157,7 @@ class MultiSelect extends HTMLElement {
 
     connectedCallback() {
         this.Draw();
-        this.DrawLabel();
+        
     }
 
     Draw = (Dataset = this.Dataset) => {
@@ -229,6 +229,7 @@ class MultiSelect extends HTMLElement {
                 }
             }
         });
+        this.DrawLabel();
     }
     SetOptions = () => {
         if (this.Config.IsFilterControl) {

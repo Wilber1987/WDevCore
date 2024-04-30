@@ -1470,7 +1470,7 @@ class WForm extends HTMLElement {
 
             .radioCheckedLabel{
                 cursor: pointer;
-                margin: 15px 0px 15px 10px;
+                
             }
 
             .ToolTip {
