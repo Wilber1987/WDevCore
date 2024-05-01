@@ -84,7 +84,7 @@ class WFilterOptions extends HTMLElement {
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({
                             className: this.ModelObject[prop].type.toUpperCase() == "DATE"
-                                || this.ModelObject[prop].type.toUpperCase() == "NUMBER" ? "multi-control-container" : "",
+                                || this.ModelObject[prop].type.toUpperCase() == "NUMBER" || this.ModelObject[prop].type.toUpperCase() == "WSELECT" ? "multi-control-container" : "",
                             children: [WOrtograficValidation.es(prop), filterControl]
                         }));
                         this.FilterControls.push(filterControl);
@@ -219,7 +219,8 @@ class WFilterOptions extends HTMLElement {
                                         }
                                     }                               
                                     control.selectedItems?.forEach(element => {                                       
-                                        values.push(element[primaryKey].toString())
+                                        // @ts-ignore
+                                        values.push(element[primaryKey]?.toString())
                                     });
                                 }
                             }
@@ -551,7 +552,7 @@ class WFilterOptions extends HTMLElement {
             padding: 5px 10px;
         }
 
-        .multi-control-container {
+        .multi-control-container, .w-multi-select-container {
             grid-column: span 2;
         }
         .multi-control {
