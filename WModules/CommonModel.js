@@ -106,6 +106,7 @@ class ModelProperty { }
     * @property {Object} [EntityModel]     
     * @property {Boolean} [DarkMode]
     * @property {Boolean} [AutoSave]
+    * @property {Boolean} [WSelectAddObject]
     * @property {Boolean} [DataRequire]
     * @property {String} [id] 
     * @property {String} [StyleForm] - columnX1 | columnX3 | columnX3   
@@ -361,6 +362,7 @@ class ElementStyle {
     * @property {Object} [EntityModel] 
     * @property {Object} [ParentModel]  
     * @property {Object} [ParentEntity]
+    * @property {Boolean} [WSelectAddObject]
     * @property {Boolean} [DarkMode]
     * @property {Boolean} [paginate] 
     * @property {Boolean} [AddItemsFromApi]
@@ -394,6 +396,7 @@ class TableConfig { };
     * @property {Array} [UserActions] 
     * @property {ObjectOptions} [ObjectOptions] //recibe las opcions del formulario incluido el SaveFunction si esque existiera alguna
     * @property {Boolean} [AutoSave]
+    * @property {Boolean} [WSelectAddObject]
     * @property {Function} [ValidateFunction]
     * @property {Object | WNode | Node} [ObjectModal] nodo o componente html que se dibujara dentro del modal
     * @property {Boolean} [CloseOption]

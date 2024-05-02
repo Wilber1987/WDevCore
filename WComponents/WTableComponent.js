@@ -398,7 +398,7 @@ class WTableComponent extends HTMLElement {
                         const index = this.Dataset.indexOf(element);
                         if (WArrayF.FindInArray(element, this.Dataset) == true) {
                             this.Dataset.splice(index, 1);
-                            console.log(this.Dataset);
+                            //console.log(this.Dataset);
                             //tr.parentNode.removeChild(tr);                                                  
                             if (this.Options?.DeleteAction) {
                                 this.Options?.DeleteAction(element)
@@ -435,7 +435,7 @@ class WTableComponent extends HTMLElement {
         }
     }
 
-    ShowBTN(Options, element) {
+    ShowBTN(Options, element) {        
         if (this.Options?.Show != undefined && this.Options.Show == true) {
             Options.append(WRender.Create({
                 tagName: "button",
@@ -495,7 +495,8 @@ class WTableComponent extends HTMLElement {
                 EntityModel: this.TableConfig.EntityModel,
                 AutoSave: this.TableConfig.AutoSave ?? false,
                 ParentModel: this.TableConfig.ParentModel,
-                ParentEntity: this.TableConfig.ParentEntity,
+                ParentEntity: this.TableConfig.ParentEntity,                
+                WSelectAddObject: this.TableConfig.WSelectAddObject,
                 EditObject: element,
                 icon: this.TableConfig.icon,
                 ImageUrlPath: this.TableConfig.ImageUrlPath,
@@ -586,7 +587,6 @@ class WTableComponent extends HTMLElement {
                     button.className = "paginateBTN";
                 }
             });
-            console.log(this.ActualPage);
             this.Table?.querySelector("tbody")?.remove();
             const tbody = this.DrawTBody(Dataset);
             this.Table.append(tbody);

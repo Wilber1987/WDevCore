@@ -84,7 +84,8 @@ class WFilterOptions extends HTMLElement {
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({
                             className: this.ModelObject[prop].type.toUpperCase() == "DATE"
-                                || this.ModelObject[prop].type.toUpperCase() == "NUMBER" || this.ModelObject[prop].type.toUpperCase() == "WSELECT" ? "multi-control-container" : "",
+                                || this.ModelObject[prop].type.toUpperCase() == "NUMBER" || this.ModelObject[prop].type.toUpperCase() == "WSELECT"
+                                || this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" ? "multi-control-container" : "",
                             children: [WOrtograficValidation.es(prop), filterControl]
                         }));
                         this.FilterControls.push(filterControl);

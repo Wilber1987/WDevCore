@@ -470,7 +470,7 @@ class WForm extends HTMLElement {
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = new MultiSelect({
-                    AddObject: ModelProperty.type?.toUpperCase() != "WCHECKBOX",
+                    AddObject: ModelProperty.type?.toUpperCase() != "WCHECKBOX" && this.Config.WSelectAddObject,
                     Mode: ModelProperty.type?.toUpperCase() == "WCHECKBOX" ? "SELECT_BOX": "SELECT",
                     FullDetail: ModelProperty.type?.toUpperCase() != "WCHECKBOX",
                     action: (selecteds) => {
@@ -952,7 +952,7 @@ class WForm extends HTMLElement {
             Mode: ModelProperty.type?.toUpperCase() == "WRADIO" ? "SELECT_BOX": "SELECT",
             FullDetail: ModelProperty.type?.toUpperCase() != "WRADIO",
             Dataset: Dataset,
-            AddObject: ModelProperty.type?.toUpperCase() != "WRADIO",
+            AddObject: ModelProperty.type?.toUpperCase() != "WRADIO" && this.Config.WSelectAddObject,
             ModelObject: this.Config.ModelObject[prop].ModelObject,
             action: (ItemSelects) => {
                 ObjectF[prop] = ItemSelects[0].id ?? ItemSelects[0].id_

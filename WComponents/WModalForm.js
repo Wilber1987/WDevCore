@@ -106,7 +106,7 @@ class WModalForm extends HTMLElement {
             const modalOb = this.ObjectModal.tagName ? WRender.Create(this.ObjectModal) : WRender.createElement(this.ObjectModal)
             this.Modal.children.push({ class: "ObjectModalContainer", children: [modalOb] });
         } else if (this.ObjectDetail || this.ModelObject || this.EditObject) { // MUESTRA EL DETALLE DE UN OBJETO EN UNA LISTA
-            const { WForm } = await import("./WForm.js");
+            const { WForm } = await import("./WForm.js");            
             this.Config.SaveFunction = (ObjectF, response) => {
                 if (this.ObjectOptions != undefined) {  /**TODO REVISAR */
                     if (this.ObjectOptions.SaveFunction != undefined) {
