@@ -69,7 +69,6 @@ class Security_Users {
 	Security_Users_Roles = {
 		type: "MULTISELECT", ModelObject: new Security_Roles(), Dataset: [{ Descripcion: "Role 1" }]
 	};
-	//Catalogo_Agentes = { type: 'WSELECT', ModelObject: () => new Catalogo_Agentes() };
 }
 export { Security_Users }
 class ChangePasswordModel {
