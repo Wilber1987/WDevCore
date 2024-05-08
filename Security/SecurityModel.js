@@ -23,7 +23,7 @@ class Security_Permissions {
 	}
 	Id_Permission = { type: "number", primary: true };
 	Descripcion = { type: "text" };
-	Detalle = { type: "text" };
+	Detalles = { type: "text" };
 	Estado = { type: "Select", Dataset: ["ACTIVO", "INACTIVO"] };
 }
 export { Security_Permissions }
