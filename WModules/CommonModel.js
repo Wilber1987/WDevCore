@@ -110,7 +110,8 @@ class ModelProperty { }
     * @property {Boolean} [DataRequire]
     * @property {String} [id] 
     * @property {String} [StyleForm] - columnX1 | columnX3 | columnX3   
-    * @property {String} [DivColumns] - columnX1 | columnX3 | columnX3  
+    * @property {String} [DivColumns] - columnX1 | columnX3 | columnX3 
+    * @property {Number} [limit] 
     * @property {Boolean} [Options]
     * @property {ObjectOptions} [ObjectOptions]
     * @property {String} [ImageUrlPath]

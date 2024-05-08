@@ -22,7 +22,7 @@ class WForm extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         WRender.SetStyle(this, {
-            height: "90%",
+            //height: "90%",
             display: "block"
         })
         for (const p in Config) {
@@ -33,7 +33,7 @@ class WForm extends HTMLElement {
         this.Options = this.Options ?? true;
         this.DataRequire = this.DataRequire ?? true;
         this.StyleForm = this.Config.StyleForm;
-        this.limit = 2;
+        this.limit = this.Config.limit ?? 2;
         this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px)  calc(50% - 10px)";
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
@@ -577,6 +577,8 @@ class WForm extends HTMLElement {
                 InputControl = new WForm({
                     StyleForm: this.StyleForm,
                     EditObject: ObjectF[prop],
+                    limit: this.limit,
+                    DivColumns: this.DivColumns,
                     ModelObject: await WArrayF.isModelFromFunction(Model, prop),
                     Options: false
                 });
@@ -1348,10 +1350,11 @@ class WForm extends HTMLElement {
             }
             .divForm .imageGridForm,
             .divForm .tableContainer {
-                grid-row: span 4;
+                grid-row: span 4;               
             }
             .divComplexForm .tableContainer {
                flex: 1;
+               width: 100%;
             }
             .divForm .textAreaContainer {
                 grid-row: span 2;
@@ -1626,6 +1629,10 @@ class WForm extends HTMLElement {
                     grid-template-rows: auto;
                     justify-content: center;
                 }
+                .divForm .imageGridForm, .divForm .tableContainer,
+                 .divForm .textAreaContainer, .divForm .titleContainer, .imgPhoto{
+                    grid-column: span 1 !important;
+                 }
 
                 .ContainerFormWModal {
                     margin-top: 0px;
@@ -1636,10 +1643,7 @@ class WForm extends HTMLElement {
                 .ObjectModalContainer {
                     max-height: calc(100% - 80px);
                 }
-
-                .imgPhoto {
-                    grid-column: span 1 !important;
-                }
+               
             }`;
         const wstyle = new WStyledRender({
             ClassList: [
