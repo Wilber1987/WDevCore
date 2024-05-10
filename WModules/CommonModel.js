@@ -71,6 +71,7 @@ function ModelFunction() { }
     TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | 
     CALENDAR | OPERATION (requiere un action para funcionar)
     * @property {Boolean} [hidden] desabilita la propiedad y la oculta
+    * @property {Object} [Options] 
     * @property {Boolean} [hiddenInTable] oculta en la tabla
     * @property {Boolean} [require]
     * @property {Boolean} [primary]

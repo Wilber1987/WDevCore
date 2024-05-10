@@ -2,7 +2,7 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
-import { WModalForm, WSimpleModalForm } from './WModalForm.js';
+import { LoadinModal, WModalForm, WSimpleModalForm } from './WModalForm.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { WIcons } from '../WModules/WIcons.js';
 import { WTableComponent } from './WTableComponent.js';
@@ -203,9 +203,9 @@ class WForm extends HTMLElement {
                         if (typeof Model[prop] === "string" && Model[prop].length >= 50) {
                             InputControl = WRender.Create({ tagName: "textarea", className: prop });
                         } else if (parseFloat(Model[prop]).toString() != "NaN") {
-                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "number",onchange: onChangeEvent, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
+                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "number", onchange: onChangeEvent, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
                         } else {
-                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text",onchange: onChangeEvent, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
+                            InputControl = WRender.Create({ tagName: "input", className: prop, value: val, type: "text", onchange: onChangeEvent, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)) });
                         }
                         ControlContainer.append(InputControl);
                         Form.appendChild(ControlContainer);
@@ -249,7 +249,7 @@ class WForm extends HTMLElement {
     * @returns 
     */
     onChange = async (targetControl, currentTarget, ObjectF, prop, Model) => { //evento de actualizacion del componente
-      if (Model[prop].validateFunction) {
+        if (Model[prop].validateFunction) {
             const result = Model[prop].validateFunction(ObjectF, targetControl?.value);
             if (!result.success) {
                 alert(result.message);
@@ -378,18 +378,19 @@ class WForm extends HTMLElement {
                 ControlContainer.className += " imgPhoto";
                 Form.appendChild(ControlContainer);
                 break;
-            case "DATE": case "FECHA":
+            case "DATE": case "FECHA": case "DATETIME":
                 let type = "date";
                 //@ts-ignore
                 let date_val = val == "" ? (new Date()).toISO() : ObjectF[prop];
                 let defaulMin = '1900-01-01';
                 let defaulMax = '3000-01-01';
-                if (ModelProperty.type.toUpperCase() == "HORA") {
-                    type = "time";
-                    date_val = val ?? "08:00";
-                    defaulMin = '00:00';
-                    defaulMax = '23:59';
+                if (ModelProperty.type.toUpperCase() == "DATETIME") {
+                    type = "datetime-local";
+                    defaulMin = '1900-01-01T00:00';
+                    defaulMax = '3000-01-01T23:59';
+                    date_val = val == "" ? new Date().toISOString() : ObjectF[prop];
                 }
+                console.log(date_val);
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, type: type,
                     placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
@@ -398,8 +399,15 @@ class WForm extends HTMLElement {
                     max: ModelProperty.max ?? defaulMax,
                     onchange: onChangeEvent
                 });
-                //@ts-ignore
-                ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
+                if (ModelProperty.type.toUpperCase() == "DATETIME") {
+                    // @ts-ignore
+                    ObjectF[prop] = InputControl.value = date_val.slice(0, -8);
+                } else {
+                    //@ts-ignore
+                    ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
+                }
+
+
                 Form.appendChild(ControlContainer);
                 break;
             case "HORA":
@@ -471,7 +479,7 @@ class WForm extends HTMLElement {
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = new MultiSelect({
                     AddObject: ModelProperty.type?.toUpperCase() != "WCHECKBOX" && this.Config.WSelectAddObject,
-                    Mode: ModelProperty.type?.toUpperCase() == "WCHECKBOX" ? "SELECT_BOX": "SELECT",
+                    Mode: ModelProperty.type?.toUpperCase() == "WCHECKBOX" ? "SELECT_BOX" : "SELECT",
                     FullDetail: ModelProperty.type?.toUpperCase() != "WCHECKBOX",
                     action: (selecteds) => {
                         if (ModelProperty.action) {
@@ -535,7 +543,10 @@ class WForm extends HTMLElement {
                     ParentEntity: ObjectF,
                     ImageUrlPath: this.Config.ImageUrlPath,
                     Options: {
-                        Add: true, Edit: true, Delete: true, Search: true,
+                        Add: ModelProperty.Options?.Add ?? true,
+                        Edit: ModelProperty.Options?.Edit ?? true,
+                        Delete: ModelProperty.Options?.Delete ?? true,
+                        Search: ModelProperty.Options?.Search ?? true,
                         AddAction: () => {
                             if (ModelProperty.action) {
                                 ModelProperty.action(ObjectF, this, InputControl, prop)
@@ -951,7 +962,7 @@ class WForm extends HTMLElement {
         const { MultiSelect } = await import("./WMultiSelect.js");
         InputControl = new MultiSelect({
             MultiSelect: false,
-            Mode: ModelProperty.type?.toUpperCase() == "WRADIO" ? "SELECT_BOX": "SELECT",
+            Mode: ModelProperty.type?.toUpperCase() == "WRADIO" ? "SELECT_BOX" : "SELECT",
             FullDetail: ModelProperty.type?.toUpperCase() != "WRADIO",
             Dataset: Dataset,
             AddObject: ModelProperty.type?.toUpperCase() != "WRADIO" && this.Config.WSelectAddObject,
@@ -961,7 +972,7 @@ class WForm extends HTMLElement {
                     ?? ItemSelects[0];
                 /**
                 * @type {ModelProperty}
-                */                
+                */
                 if (ModelProperty.action) {
                     ModelProperty.action(ObjectF, this, InputControl, prop)
                 }
@@ -1257,7 +1268,7 @@ class WForm extends HTMLElement {
     }
 
     ModalCheck(ObjectF, withModel = false) {
-        const modalCheckFunction = async () => {
+        const modalCheckFunction = async (/** @type {LoadinModal} */ LoadinModal) => {
             try {
                 if (withModel) {
                     const response = await this.Config.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
@@ -1266,6 +1277,7 @@ class WForm extends HTMLElement {
                     const response = await WAjaxTools.PostRequest(this.Config.ObjectOptions?.Url, ObjectF);
                     this.ExecuteSaveFunction(ObjectF, response);
                 }
+                LoadinModal.close();
                 ModalCheck.close();
                 // if (this.Config.SaveFunction != undefined) {
                 //     console.log("HEARE");
@@ -1274,6 +1286,7 @@ class WForm extends HTMLElement {
                 //     this.Config.ObjectOptions?.SaveFunction(ObjectF);
                 // }
             } catch (error) {
+                LoadinModal.close();
                 ModalCheck.close();
                 console.log(error);
                 this.shadowRoot?.append(ModalMessege(error));
@@ -1288,7 +1301,9 @@ class WForm extends HTMLElement {
                         children: [{
                             tagName: 'input', type: 'button', className: 'Btn', value: 'SI', onclick: async (ev) => {
                                 ev.target.enabled = false;
-                                modalCheckFunction();
+                                const loadinModal = new LoadinModal();
+                                ModalCheck.shadowRoot?.append(loadinModal);
+                                modalCheckFunction(loadinModal);
                             }
                         }, {
                             tagName: 'input', type: 'button', className: 'Btn', value: 'NO', onclick: async () => {

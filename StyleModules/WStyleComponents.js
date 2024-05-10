@@ -207,6 +207,7 @@ const StylesControlsV2 = css`
     input[type=time],
     input[type=tel],
     input[type=url],
+    input[type=datetime-local],
     .input,
     w-multi-select,
     select,

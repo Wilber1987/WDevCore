@@ -547,12 +547,15 @@ class WTableComponent extends HTMLElement {
         }
     }
     TrueOptions() {
-        return this.Options?.MultiSelect != undefined ||
-            this.Options?.Select != undefined ||
-            this.Options?.Show != undefined ||
-            this.Options?.Edit != undefined ||
-            this.Options?.Delete != undefined ||
-            this.Options?.UserActions != undefined;
+        
+        return this.Options?.MultiSelect == true ||
+            this.Options?.Select == true ||
+            this.Options?.Show == true ||
+            this.Options?.Edit == true ||
+            this.Options?.Delete == true ||
+            // @ts-ignore
+            (this.Options?.UserActions?.__proto__ == Array.prototype 
+                && this.Options?.UserActions?.length > 0);
     }
 
     isSorteable(element, prop) {
