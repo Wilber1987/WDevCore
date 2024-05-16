@@ -37,7 +37,7 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
                     if (!u.Tbl_Profile) {
                         u.Tbl_Profile = {};
                     }
-                    u.Tbl_Profile.CaseTable_Dependencias_Usuarios = u.Tbl_Profile?.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
+                    u.Tbl_Profile.Tbl_Dependencias_Usuarios = u.Tbl_Profile?.Tbl_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
                     u.Tbl_Profile.Tbl_Servicios_Profile = u.Tbl_Profile?.Tbl_Servicios_Profile?.map(dp => dp.Tbl_Servicios);
                     return u;
                 })

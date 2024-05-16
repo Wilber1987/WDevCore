@@ -57,13 +57,13 @@ class PerfilClass extends HTMLElement {
                     this.response = await WAjaxTools.PostRequest("../../api/Profile/TakeProfile",
                         { Id_Perfil: this.Id_Perfil }
                     );
-                   // this.response.CaseTable_Dependencias_Usuarios = undefined;
-                   // this.response.CaseTable_Participantes = undefined;
+                   // this.response.Tbl_Dependencias_Usuarios = undefined;
+                   // this.response.Tbl_Participantes = undefined;
                     this.TabManager.NavigateFunction("Tab-Edit-Generales",
                         new WForm({
                             AutoSave: true,
                             EditObject: this.response,
-                            ModelObject: new Tbl_Profile({ CaseTable_Dependencias_Usuarios: undefined, Tbl_Servicios_Profile: undefined}),
+                            ModelObject: new Tbl_Profile({ Tbl_Dependencias_Usuarios: undefined, Tbl_Servicios_Profile: undefined}),
                             ImageUrlPath: ""
                         }));
                 }
@@ -86,7 +86,7 @@ class PerfilClass extends HTMLElement {
         //const Id_Institucion = await WAjaxTools.PostRequest("../../api/PublicCat/GetInstitucion");
         // const Id_Paises = await WAjaxTools.PostRequest("../../api/PublicCat/GetPaises");
         const InvestigadorModel = new Tbl_Profile({
-            CaseTable_Dependencias_Usuarios: undefined, Tbl_Servicios_Profile: undefined
+            Tbl_Dependencias_Usuarios: undefined, Tbl_Servicios_Profile: undefined
         });
         const EditForm = WRender.Create({
             className: "FormContainer", style: {

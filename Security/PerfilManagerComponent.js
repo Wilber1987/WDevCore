@@ -40,7 +40,7 @@ class PerfilManagerComponent extends HTMLElement {
     }
     updateDataset(Dataset) {
         Dataset?.forEach(d => {
-            d.CaseTable_Dependencias_Usuarios = d.CaseTable_Dependencias_Usuarios?.map(dp => ({
+            d.Tbl_Dependencias_Usuarios = d.Tbl_Dependencias_Usuarios?.map(dp => ({
                 Id_Dependencia: dp.Cat_Dependencias.Id_Dependencia,
                 Descripcion: dp.Cat_Dependencias.Descripcion
             }));
@@ -114,7 +114,7 @@ class PerfilManagerComponent extends HTMLElement {
                     DNI: { type: "text", hidden: true },
                     Correo_institucional: { type: "text", hidden: true },
                     Estado: { type: "text", hidden: true },
-                    CaseTable_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias() },
+                    Tbl_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias() },
                     Tbl_Servicios: { type: 'Wselect', ModelObject: () => new Tbl_Servicios(), hidden: true }
                 }), ObjectOptions: {
                     SaveFunction: async (profile) => {
@@ -122,7 +122,7 @@ class PerfilManagerComponent extends HTMLElement {
                             const response =
                                 // @ts-ignore
                                 await new Tbl_Profile().AsignarDependencias(this.mainTable?.selectedItems,
-                                    profile.CaseTable_Dependencias_Usuarios);
+                                    profile.Tbl_Dependencias_Usuarios);
                             if (response.status == 200) {
                                 this.shadowRoot?.append(ModalMessege("Asignación Correcta"));
                                 this.update();
@@ -145,7 +145,7 @@ class PerfilManagerComponent extends HTMLElement {
     mapCaseToPaginatorElement(Dataset) {
         return Dataset.map(actividad => {
             actividad.Dependencia = actividad.Cat_Dependencias.Descripcion;
-            //actividad.Progreso = actividad.CaseTable_Tareas?.filter(tarea => tarea.Estado?.includes("Finalizado")).length;
+            //actividad.Progreso = actividad.Tbl_Tareas?.filter(tarea => tarea.Estado?.includes("Finalizado")).length;
             //return this.perfilElement(actividad);
         });
     }
