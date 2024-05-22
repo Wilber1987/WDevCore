@@ -380,15 +380,15 @@ class WForm extends HTMLElement {
                 break;
             case "DATE": case "FECHA": case "DATETIME":
                 let type = "date";
-                //@ts-ignore
-                let date_val = val == "" ? (new Date()).toISO() : ObjectF[prop];
+                let date_val = val == "" ? //@ts-ignore 
+                    (ModelProperty.type.toUpperCase() == "DATETIME" ? new Date().toISOString() : new Date().toISO())
+                    : ObjectF[prop];
                 let defaulMin = '1900-01-01';
                 let defaulMax = '3000-01-01';
                 if (ModelProperty.type.toUpperCase() == "DATETIME") {
                     type = "datetime-local";
                     defaulMin = '1900-01-01T00:00';
                     defaulMax = '3000-01-01T23:59';
-                    date_val = val == "" ? new Date().toISOString() : ObjectF[prop];
                 }
                 console.log(date_val);
                 InputControl = WRender.Create({
@@ -399,15 +399,16 @@ class WForm extends HTMLElement {
                     max: ModelProperty.max ?? defaulMax,
                     onchange: onChangeEvent
                 });
+               
                 if (ModelProperty.type.toUpperCase() == "DATETIME") {
+                    ObjectF[prop] = date_val.length > 16 ? date_val.slice(0, -8): date_val
                     // @ts-ignore
-                    ObjectF[prop] = InputControl.value = date_val.slice(0, -8);
+                    InputControl.value = ObjectF[prop];
+                    
                 } else {
                     //@ts-ignore
-                    ObjectF[prop] = InputControl.value = (new Date(date_val)).toISO();
+                    nputControl.value = ObjectF[prop] = (new Date(date_val)).toISO();
                 }
-
-
                 Form.appendChild(ControlContainer);
                 break;
             case "HORA":
