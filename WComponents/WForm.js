@@ -87,12 +87,14 @@ class WForm extends HTMLElement {
             }, set: (target, property, value, receiver) => {
                 this.ExistChange = true;
                 target[property] = value;
-                //console.log(value);                
-                const control = this.shadowRoot?.querySelector("#ControlValue" + property);
+                //console.log(value);   
                 //console.log(property, Model[property]);
-                if (Model[property]?.type?.toUpperCase() != "IMG" && control) {
-                    // @ts-ignore
-                    control.value = target[property];
+                if (!["IMG", "DATE", "DATETIME"].includes(Model[property]?.type?.toUpperCase())) {
+                    const control = this.shadowRoot?.querySelector("#ControlValue" + property);
+                    if (control) {
+                        // @ts-ignore
+                        control.value = target[property];
+                    }
                 }
                 if (this.Config.ProxyAction != undefined) {
                     this.Config.ProxyAction(this)
@@ -297,12 +299,14 @@ class WForm extends HTMLElement {
         } else if (targetControl?.type == "radio") {
             ObjectF[prop] = targetControl?.value;
         } else {
+            console.log(targetControl?.min, targetControl?.max);
+            console.log(ObjectF[prop], targetControl?.value, targetControl);
             if (parseFloat(targetControl?.value) < parseFloat(targetControl?.min)) {
-                targetControl.value = targetControl?.min;
+                //targetControl.value = targetControl?.min;
                 this.createInfoToolTip(targetControl, `El valor mínimo permitido es: ${targetControl?.min}`);
             }
             if (parseFloat(targetControl?.value) > parseFloat(targetControl?.max)) {
-                targetControl.value = targetControl?.max;
+                //targetControl.value = targetControl?.max;
                 this.createInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
             }
             ObjectF[prop] = targetControl?.value;
@@ -392,22 +396,24 @@ class WForm extends HTMLElement {
                 }
                 console.log(date_val);
                 InputControl = WRender.Create({
-                    tagName: "input", className: prop, type: type,
+                    tagName: "input",
+                    //id: "ControlValue" + prop,
+                    className: prop, type: type,
                     placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
                     disabled: ModelProperty.disabled,
-                    min: ModelProperty.min ?? defaulMin,
-                    max: ModelProperty.max ?? defaulMax,
+                    //min: ModelProperty.min ?? defaulMin,
+                    //max: ModelProperty.max ?? defaulMax,
                     onchange: onChangeEvent
                 });
-               
+
                 if (ModelProperty.type.toUpperCase() == "DATETIME") {
-                    ObjectF[prop] = date_val.length > 16 ? date_val.slice(0, -8): date_val
+                    ObjectF[prop] = date_val.length > 16 ? date_val.slice(0, -8) : date_val
                     // @ts-ignore
                     InputControl.value = ObjectF[prop];
-                    
+
                 } else {
                     //@ts-ignore
-                    nputControl.value = ObjectF[prop] = (new Date(date_val)).toISO();
+                    InputControl.value = ObjectF[prop] = (new Date(date_val)).toISO();
                 }
                 Form.appendChild(ControlContainer);
                 break;
@@ -1154,6 +1160,7 @@ class WForm extends HTMLElement {
         }
     }
     Validate = (ObjectF = this.FormObject) => {
+
         if (this.DataRequire == true) {
             for (const prop in ObjectF) {
                 if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require) {
@@ -1700,7 +1707,7 @@ const ModalVericateAction = (Action, title, withClose = true) => {
     });
     return ModalCheck;
 }
-const ModalMessege = (message, detail = "") => {
+const ModalMessege = (message, detail = "", reload = false) => {
     const ModalCheck = new WSimpleModalForm({
         title: message,
         CloseOption: false,
@@ -1709,6 +1716,9 @@ const ModalMessege = (message, detail = "") => {
             children: [WRender.Create({
                 tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {
                     ModalCheck.close();
+                    if (reload == true) {
+                        window.location.reload();
+                    }
                 }
             }), css`
                 .modalP{
