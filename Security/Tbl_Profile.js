@@ -23,15 +23,15 @@ class Tbl_Profile extends EntityClass {
     Correo_institucional = { type: 'text', label: "correo", disabled: true, hidden: true };
     Estado = { type: "Select", Dataset: ["ACTIVO", "INACTIVO"] };
     //PROPIEDADES DE HELPDESK
-    // CaseTable_Dependencias_Usuarios = {
+    // Tbl_Dependencias_Usuarios = {
     //     type: 'Multiselect', hiddenFilter: true,
     //     ModelObject: () => new Cat_Dependencias(), require: false,
     //     action: async (Profile, /** @type {WForm} */ Form) => {
-    //         if (Profile.CaseTable_Dependencias_Usuarios.length > 0) {
+    //         if (Profile.Tbl_Dependencias_Usuarios.length > 0) {
     //             const servicios = await new Tbl_Servicios({
     //                 FilterData: [{
     //                     PropName: "Id_Dependencia", FilterType: "in", Values:
-    //                         Profile.CaseTable_Dependencias_Usuarios.map(d => d.Id_Dependencia.toString())
+    //                         Profile.Tbl_Dependencias_Usuarios.map(d => d.Id_Dependencia.toString())
 
     //                 }]
     //             }).Get();

@@ -145,7 +145,6 @@ function html(strings, ...values) {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = result;
 
-    return wrapper.firstElementChild;
     return WRender.CreateStringNode(result);
 }
 export { html }
@@ -571,7 +570,8 @@ class WArrayF {
                 for (const prop in element) {
                     NewElement[prop] = element[prop]
                 }
-                if (!element.count) {
+                console.log(element);
+                if (element.hasOwnProperty("count")) {
                     element.count = 1;
                     NewElement.count = 1;
                 }
