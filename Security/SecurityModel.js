@@ -11,7 +11,7 @@ class Security_Roles {
 	Descripcion = { type: "text" };
 	Estado = { type: "Select", Dataset: ["ACTIVO", "INACTIVO"] };
 	Security_Permissions_Roles = {
-		type: "MULTISELECT", Dataset: [{ Descripcion: "Permission 1" }]
+		type: "MULTISELECT",  ModelObject:new Security_Permissions(), Dataset: [{ Descripcion: "Permission 1" }]
 	};
 }
 export { Security_Roles }
@@ -23,6 +23,7 @@ class Security_Permissions {
 	}
 	Id_Permission = { type: "number", primary: true };
 	Descripcion = { type: "text" };
+	Detalles = { type: "text" };
 	Estado = { type: "Select", Dataset: ["ACTIVO", "INACTIVO"] };
 }
 export { Security_Permissions }
@@ -66,9 +67,8 @@ class Security_Users {
 	Estado = { type: "Select", Dataset: ["ACTIVO", "INACTIVO"] };
 	Password = { type: "password", hiddenInTable: true };  
 	Security_Users_Roles = {
-		type: "MULTISELECT", Dataset: [{ Descripcion: "Role 1" }]
+		type: "MULTISELECT", ModelObject: new Security_Roles(), Dataset: [{ Descripcion: "Role 1" }]
 	};
-	//Catalogo_Agentes = { type: 'WSELECT', ModelObject: () => new Catalogo_Agentes() };
 }
 export { Security_Users }
 class ChangePasswordModel {

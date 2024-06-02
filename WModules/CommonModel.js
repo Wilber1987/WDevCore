@@ -71,16 +71,19 @@ function ModelFunction() { }
     TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | 
     CALENDAR | OPERATION (requiere un action para funcionar)
     * @property {Boolean} [hidden] desabilita la propiedad y la oculta
+    * @property {Object} [Options] 
     * @property {Boolean} [hiddenInTable] oculta en la tabla
     * @property {Boolean} [require]
     * @property {Boolean} [primary]
     * @property {Boolean} [disabled]
     * @property {String} [label]
+    * @property {String} [ForeignKeyColumn] nombre de la llave foranea que enlaza el ModelObject de esta propiedad con la propiedad padre
     * @property {Array} [fileType]
     * @property {Array} [ControlAction] botones adicionales que se le agregan al control 
     * @property {String} [pattern]
     * @property {String} [defaultValue]
     * @property {String} [placeholder]
+    * @property {Boolean} [hiddenFilter]
     * @property {String | Number} [min] para rangos de tipo number y date
     * @property {String | Number} [max] para rangos de tipo number y date
     * @property {String} [fieldRequire] CAMBIA UN ESTADO DE UNA PROPIEDAD A REQUERIDO
@@ -104,10 +107,12 @@ class ModelProperty { }
     * @property {Object} [EntityModel]     
     * @property {Boolean} [DarkMode]
     * @property {Boolean} [AutoSave]
+    * @property {Boolean} [WSelectAddObject]
     * @property {Boolean} [DataRequire]
     * @property {String} [id] 
     * @property {String} [StyleForm] - columnX1 | columnX3 | columnX3   
-    * @property {String} [DivColumns] - columnX1 | columnX3 | columnX3  
+    * @property {String} [DivColumns] - columnX1 | columnX3 | columnX3 
+    * @property {Number} [limit] 
     * @property {Boolean} [Options]
     * @property {ObjectOptions} [ObjectOptions]
     * @property {String} [ImageUrlPath]
@@ -359,12 +364,13 @@ class ElementStyle {
     * @property {Object} [EntityModel] 
     * @property {Object} [ParentModel]  
     * @property {Object} [ParentEntity]
+    * @property {Boolean} [WSelectAddObject]
     * @property {Boolean} [DarkMode]
-    * @property {Boolean} [paginate]
+    * @property {Boolean} [paginate] 
     * @property {Boolean} [AddItemsFromApi]
     * @property {Boolean} [AutoSave]
     * @property {SearchItemsFromApi} [SearchItemsFromApi]
-    * @property {String} [TypeMoney] 
+    * @property {String} [TypeMoney] Euro, Dollar, Cordoba
     * @property {Number} [maxElementByPage] 
     * @property {TableOptions} [Options]
     * @property {String} [ImageUrlPath]
@@ -392,6 +398,7 @@ class TableConfig { };
     * @property {Array} [UserActions] 
     * @property {ObjectOptions} [ObjectOptions] //recibe las opcions del formulario incluido el SaveFunction si esque existiera alguna
     * @property {Boolean} [AutoSave]
+    * @property {Boolean} [WSelectAddObject]
     * @property {Function} [ValidateFunction]
     * @property {Object | WNode | Node} [ObjectModal] nodo o componente html que se dibujara dentro del modal
     * @property {Boolean} [CloseOption]
@@ -412,6 +419,7 @@ class ModalConfig {
  *  * @property {String} [PropName]
     * @property {String} [FilterType]
     * @property {Array<any>} [Values]
+    * @property {Array<FilterData>} [Filters]
 **/
 class FilterData { }
 

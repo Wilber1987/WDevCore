@@ -1,27 +1,7 @@
-import { WAppNavigator } from "../WComponents/WAppNavigator.js";
 import { ElementStyle, WNode } from "./CommonModel.js";
 import { EntityClass } from "./EntityClass.js";
 
-function type(value) {
-    var r;
-    if (typeof value === 'object') {
-        if (value === null) {
-            return 'null';
-        }
-        if (typeof value.constructor === 'function' &&
-            (r = value.constructor.name) !== 'Object') {
-            if (r === '' || r === undefined) {
-                return Function.prototype.toString.call(value.constructor)
-                    .match(/^\n?(function|class)(\w?)/)[2] || 'anonymous';
-            }
-            return r;
-        }
-        return Object.prototype.toString.call(value).match(/\s(.*)\]/)[1];
-    } else if (typeof value === 'number') {
-        return isNaN(value) ? 'NaN' : 'number';
-    }
-    return typeof value;
-}
+
 class WAjaxTools {
     static Request = async (Url, typeRequest, Data = {}, typeHeader) => {
         try {
@@ -165,7 +145,6 @@ function html(strings, ...values) {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = result;
 
-    return wrapper.firstElementChild;
     return WRender.CreateStringNode(result);
 }
 export { html }
@@ -276,7 +255,7 @@ class WRender {
                 return document.createTextNode("Nodo nulo o indefinido.");
             } else if (typeof Node === "string" || typeof Node === "number") {
                 if (Node.length == 0) {
-                    return "";
+                    this.CreateStringNode(`<label></label>`);
                 } else if (Node.length > 100) {
                     return this.CreateStringNode(`<p>${Node}</p>`);
                 }
@@ -591,17 +570,22 @@ class WArrayF {
                 for (const prop in element) {
                     NewElement[prop] = element[prop]
                 }
-                if (!element.count) {
+                console.log(element);
+                if (element.hasOwnProperty("count")) {
+                    element.count = 1;
                     NewElement.count = 1;
                 }
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
                 DataArraySR.push(NewElement)
             } else {
                 if (!element.count) {
-                    DFilt.count = DFilt.count + 1;
+                    element.count = 1;
+                    DFilt.count++;
+                } else {
+                    DFilt.count = DFilt.count + element.count;
                 }
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
-                if (sumProperty != null) {
+                if (sumProperty != null && sumProperty != "count") {
                     DFilt[sumProperty] = DFilt[sumProperty] + element[sumProperty];
                 }
             }
@@ -658,7 +642,7 @@ class WArrayF {
         return Maxvalue;
     }
     static MinValue(Data, MaxParam) {
-        var MinValue = Data[0][MaxParam];
+        var MinValue = Data[0][MaxParam] ?? 0
         for (let index = 0; index < Data.length; index++) {
             if (parseInt(Data[index][MaxParam]) < MinValue) {
                 MinValue = Data[index][MaxParam];
@@ -764,7 +748,7 @@ class WArrayF {
                     console.log(element);
                 }
             }
-        });      
+        });
         return dataset;
     }
     static evalValue = (element, param) => {
@@ -921,7 +905,7 @@ const GenerateColor = () => {
     }
     return color_aleatorio
 }
-export { WAjaxTools, WRender, ComponentsManager, WArrayF, type, GenerateColor }
+export { WAjaxTools, WRender, ComponentsManager, WArrayF, GenerateColor }
 
 //Date UTILITYS
 function pad(number) {
@@ -1020,3 +1004,22 @@ String.prototype.toDateTimeFormatEs = function () {
 HTMLElement.prototype.SetStyle = function (Style = (new ElementStyle())) {
     WRender.SetStyle(this, Style);
 }
+
+//MONEDA
+/**
+ * 
+ * @param {Number} numero 
+ * @param {String} currency EUR
+ * @returns {String}
+ */
+function ConvertToMoneyString(numero, currency = undefined) {
+    return new Intl.NumberFormat('es-ES', {
+        style: 'decimal',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+    }).format(numero).replace(/,/g, '|').replace(/\./g, ',').replace(/\|/g, '.');;
+}
+
+export { ConvertToMoneyString }

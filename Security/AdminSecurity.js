@@ -17,11 +17,11 @@ window.addEventListener("load", async () => {
         Direction: "column",
         Elements: [
             ElementTab("Roles", DOMManager, new Security_Roles({
-                Security_Permissions_Roles: { type: "multiselect", Dataset: Permisos }
+                Security_Permissions_Roles: { type: "multiselect",  ModelObject: new Security_Permissions(), Dataset: Permisos }
             })),
             ElementTab("Permisos", DOMManager, new Security_Permissions()),
             ElementTab("Usuarios", DOMManager, new Security_Users({
-                Security_Users_Roles: { type: "multiselect", Dataset: Roles }
+                Security_Users_Roles: { type: "multiselect", ModelObject: new Security_Roles(),  Dataset: Roles }
             })),
         ]
     }));
@@ -33,11 +33,11 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
             let response = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/get" + Model.constructor.name, {});
             if (TabName == "Usuarios") {
                 response = response.map(u => {
-                    u.Security_Users_Roles = u.Security_Users_Roles?.map(r => r.Security_Role);  
+                    u.Security_Users_Roles = u.Security_Users_Roles?.map(r => r.Security_Role);
                     if (!u.Tbl_Profile) {
                         u.Tbl_Profile = {};
-                    }                  
-                    u.Tbl_Profile.CaseTable_Dependencias_Usuarios = u.Tbl_Profile?.CaseTable_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
+                    }
+                    u.Tbl_Profile.Tbl_Dependencias_Usuarios = u.Tbl_Profile?.Tbl_Dependencias_Usuarios?.map(dp => dp.Cat_Dependencias);
                     u.Tbl_Profile.Tbl_Servicios_Profile = u.Tbl_Profile?.Tbl_Servicios_Profile?.map(dp => dp.Tbl_Servicios);
                     return u;
                 })
@@ -51,9 +51,10 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
                 Dataset: response,
                 ModelObject: Model,
                 Options: {
+                    Filter: true, FilterDisplay: true,
                     Add: TabName != "Permisos", UrlAdd: "../api/ApiEntitySECURITY/save" + Model.constructor.name,
                     Edit: TabName != "Permisos" && TabName != "Usuarios", UrlUpdate: "../api/ApiEntitySECURITY/save" + Model.constructor.name,
-                    Search: true, UrlSearch: "../api/ApiEntitySECURITY/get" + Model.constructor.name,
+                    //Search: true, UrlSearch: "../api/ApiEntitySECURITY/get" + Model.constructor.name,
                     UserActions: [
                         TabName == "Usuarios" ? {
                             name: "Cambiar estado", action: (object) => {
@@ -78,19 +79,9 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
                     ]
                 }
             });
-            const filterOptions = new WFilterOptions({
-                Dataset: response,
-                AutoSetDate: true,
-                ModelObject: Model,
-                FilterFunction: (DFilt) => {
-                    mainComponent.DrawTable(DFilt);
-                }
-            });
-            WRender.SetStyle(filterOptions, { marginBottom: "20px", display: "block" })
             DOMManager.NavigateFunction(Model.constructor.name,
                 WRender.Create({
-                    className: "container", children:
-                        [filterOptions, mainComponent]
+                    className: "container", children: [mainComponent]
                 }));
         }
     };

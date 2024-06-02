@@ -207,12 +207,13 @@ const StylesControlsV2 = css`
     input[type=time],
     input[type=tel],
     input[type=url],
+    input[type=datetime-local],
     .input,
     w-multi-select,
     select,
     textarea{
         width: 100%;
-        background-color: #f0f0f0 !important;
+        background-color: #f7f4f4 !important;
         border-radius: 10px;
         padding: 5px 10px;
         outline: none;

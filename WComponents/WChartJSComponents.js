@@ -1,4 +1,4 @@
-import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
+import { WRender, WArrayF, html } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 
 class ChartConfig {
@@ -12,19 +12,20 @@ class ChartConfig {
 }
 /**
  * @typedef {Object} ChartInstance
- * * @property {String} [TypeChart]
+ * * @property {String} [TypeChart] staked, Line, bar
  * * @property {Array} [Dataset]
  * * @property {Array} [Colors]
- * * @property {String} [percentCalc]
+ * * @property {Boolean} [percentCalc]
  * * @property {String} [AttNameEval]
  * * @property {String} [EvalValue]
- * * @property {Array} [groupParams]
+ * * @property {String} [Title]
+ * * @property {Array} [groupParams] 
  */
 const ColorsList = ["#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4", "#00bff3", "#e63da4", "#6a549f"];
 class ColumChart extends HTMLElement {
     /**
      * 
-     * @param {*} ChartInstance 
+     * @param {ChartInstance} ChartInstance 
      */
     constructor(ChartInstance = (new ChartConfig())) {
         super();
@@ -32,7 +33,7 @@ class ColumChart extends HTMLElement {
         this.ChartInstance.Colors = this.ChartInstance.Colors ?? ColorsList
         this.GroupsData = [];
         this.ProcessData = [];
-        this.IconsGroupColores = ["#c39c10", "#ab5", "#285a76", "#4640a3", "#8640a3"]
+        this.IconsGroupColores = ["#ffc700", "#01a503", "#285a76", "#4640a3", "#8640a3"]
         this.MainChart = { type: "section", props: { class: "SectionBars" }, children: [] };
         this.attachShadow({ mode: "open" });
     }
@@ -53,10 +54,10 @@ class ColumChart extends HTMLElement {
         this.AttNameEval = this.ChartInstance.AttNameEval ?? null;
         this.Dataset = this.ChartInstance.Dataset ?? [];
         this.InitializeDataset();
-        this.ChartInstance.Colors = this.ChartInstance.Colors ?? [];
-        if (this.ChartInstance.TypeChart == "staked") {// bar or staked
-            this.ChartInstance.DirectionChart = "column";
-        } else if (this.ChartInstance.TypeChart == "Line") {// bar or staked
+        this.ChartInstance.Colors = this.ChartInstance.Colors ?? ColorsList;
+        if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {// bar or stacked
+            this.ChartInstance.DirectionChart = "row";
+        } else if (this.ChartInstance.TypeChart?.toUpperCase() == "LINE") {// line
             this.ChartInstance.DirectionChart = "row";
         } else {
             this.ChartInstance.DirectionChart = "row";
@@ -72,18 +73,25 @@ class ColumChart extends HTMLElement {
     DrawChart() {
         this.shadowRoot.append(WRender.createElement(WChartStyle(this.ChartInstance)));
         const object = {};
-        if (this.ChartInstance.DirectionChart = "row") {
+        if (this.ChartInstance.DirectionChart == "row") {
             object[this.AttNameEval] = "";
         }
         this.groupParams.forEach(element => {
             object[element] = "";
         });
         this.Totals = WArrayF.GroupByObject(this.ChartInstance.Dataset, object, this.EvalValue);
-        console.log(this.ChartInstance.Dataset, object, this.EvalValue);
-        console.log(this.Totals);
+
         this.MaxVal = WArrayF.MaxValue(this.Totals, this.EvalValue);
         this.MinVal = WArrayF.MinValue(this.Totals, this.EvalValue);
         this.EvalArray = WArrayF.GroupBy(this.ChartInstance.Dataset, this.AttNameEval);
+        if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
+            this.EvalArray.forEach(Eval => {
+                const stackedValue = WArrayF.SumValAtt(this.Totals.filter(t => t[this.AttNameEval] == Eval[this.AttNameEval]), this.EvalValue);                
+                if (this.MaxVal < stackedValue) {
+                    this.MaxVal = stackedValue
+                }
+            });
+        }
         let ChartFragment = WRender.createElement({ type: 'div', props: { id: '', class: 'WChartContainer' } });
         if (this.ChartInstance.Title) {
             ChartFragment.append(WRender.Create({ tagName: "h3", innerText: this.ChartInstance.Title }))
@@ -94,6 +102,10 @@ class ColumChart extends HTMLElement {
         ChartFragment.append(this.DrawGroups());
         this.shadowRoot.append(ChartFragment);
         if (this.ChartInstance.TypeChart == "Line") {
+            window.addEventListener("resize", () => {
+                SectionBars.querySelector("svg").remove();
+                SectionBars.append(this.DrawLineChart(this.EvalArray, this.ChartInstance.Colors, ChartFragment));
+            });
             SectionBars.append(this.DrawLineChart(this.EvalArray, this.ChartInstance.Colors, ChartFragment));
         }
     }
@@ -127,8 +139,8 @@ class ColumChart extends HTMLElement {
             let trGroup = { type: "GroupSection", props: { class: "GroupSection" }, children: [WArrayF.Capitalize(Group[Groups.groupParam])] };
             let groupBar = { type: "containerbar", props: { style: "padding:0px", class: "ContainerBars" }, children: [] };
             if (GroupIndex == 0) {
-                trGroup.children.push(this._DrawBackgroundLine());
-                trGroup.children.push(this._DrawIconsGroups());
+                trGroup.children.push(this.DrawBackgroundLine());
+                trGroup.children.push(this.DrawIconsGroups());
             }
             GroupIndex++;
             arrayP[Groups.groupParam] = Group[Groups.groupParam];
@@ -141,24 +153,41 @@ class ColumChart extends HTMLElement {
                 trGroup.type = "groupbar";
                 trGroup.props.class = "groupBars";
                 groupBar.props.style = "height: 180px";
-                groupBar.children.push(this._DrawBackgroundLine(false));
+                if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
+                    groupBar.props.style = "height: 180px; flex-direction: column;"
+                }
+                groupBar.children.push(this.DrawBackgroundLine(false));
                 if (this.EvalArray != null) {
                     let index = 0;
+
+
                     this.EvalArray.forEach(Eval => {
                         arrayP[this.AttNameEval] = Eval[this.AttNameEval];
+                        const stackedValue = WArrayF.SumValAtt(this.Totals.filter(t => t[this.AttNameEval] == arrayP[this.AttNameEval]), this.EvalValue);
+                        if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
+                            //console.log(stackedValue);
+                        }
                         const Data = this.FindData(arrayP);
-                        groupBar.children.push(this.DrawBar(
-                            Data,
-                            index,
-                            arrayP[this.AttNameEval],
-                            this.ChartInstance.percentCalc == true ? Group.count : this.MaxVal
-                        ));
+                        if (Data != "n/a") {
+                            groupBar.children.push(this.DrawBar(
+                                Data,
+                                index,
+                                arrayP[this.AttNameEval],                                
+                               // this.ChartInstance.percentCalc == true ? Group.count :
+                                 this.MaxVal,
+                                Group[Groups.groupParam]
+                            ));
+                        }
                         index++;
                     });
                 }
             }
-            trGroup.children.push(groupBar);
-            div.children.push(trGroup);
+            const gBars = WRender.Create(groupBar);
+            if (gBars.querySelectorAll(".Bars").length > 0) {
+                trGroup.children.push(groupBar);
+                div.children.push(trGroup);
+            }
+
         });
         return div;
     }
@@ -183,37 +212,44 @@ class ColumChart extends HTMLElement {
         })
         return SectionLabels;
     }
-    DrawBar(DataValue, index, SerieName = "", MaxVal) {
-        //console.log(MaxVal);
+    DrawBar(DataValue, index, SerieName = "", MaxVal, GroupName = "") {
+
         var Size = this.ChartInstance.ContainerSize;
         var Size = 180;
         var BarSize = DataValue == "n/a" ? 0 : DataValue / MaxVal;
         var labelCol = DataValue;
-        var styleP = "";
         if (this.ChartInstance.percentCalc == true) {
             //dibujar el valor en porcentaje
-            //styleP = ";flex-grow: 1;"
             var multiplier = Math.pow(10, 1 || 0);
             var number = DataValue / (MaxVal > 0 ? MaxVal : 1) * 100
             number = Math.round(number * multiplier) / multiplier
             labelCol = number + '%';
         }
-        var Bars = WRender.CreateStringNode(`<Bars class="Bars"
-                name="${SerieName.replaceAll(" ", "_")}"
-                style="${styleP}height:${Size * BarSize}px;background:${this.ChartInstance.Colors[index]}">
+        const Bars = html`<Bars class="Bars bar${index} ${SerieName.toString().replaceAll(" ", "_")}_${GroupName}"
+                name="${SerieName.toString().replaceAll(" ", "_")}"
+                style="height:${Size * BarSize}px;background:${this.ChartInstance.Colors[index]}">
                 <label>
                     ${labelCol}
-                </labe>
-            </Bars>`);
+                </label>                
+            </Bars>`;
+
         if (this.ChartInstance.TypeChart == "Line") {
             WRender.SetStyle(Bars, {
                 margin: "0px 10px",
-                opacity: 0
+                opacity: 0,
+                margin: 0,
+                padding: 0
             });
+        } else {
+            Bars.append(css`.bar${index}{  animation: Animatebar${index} 1s forwards;}
+                @keyframes Animatebar${index} {
+                    0% {  height: 0; }
+                    100% { height: ${Size * BarSize}; }
+                }`);
         }
         return Bars;
     }
-    _DrawBackgroundLine(label = true) {
+    DrawBackgroundLine(label = true) {
         var countLine = 8;
         var val = parseFloat(this.MaxVal / countLine)
         if (this.ChartInstance.percentCalc == true) {
@@ -254,7 +290,7 @@ class ColumChart extends HTMLElement {
         }
         return ContainerLine;
     }
-    _DrawIconsGroups = () => {
+    DrawIconsGroups = () => {
         const IconsGroup = WRender.createElement({ type: 'div', props: { id: '', class: 'IconsGroup' } })
         this.groupParams.forEach((element, index) => {
             IconsGroup.append(WRender.CreateStringNode(`<div class='IconG' 
@@ -286,7 +322,8 @@ class ColumChart extends HTMLElement {
         const LineChart = WRender.createElementNS({
             type: "svg",
             props: {
-                style: "position:absolute; top: 0; width:100%; height: 100%"
+                style: "position:absolute; top: 0; width:100%; height: 100%",
+                overflow: "visible"
             }
         });
         var index = 0
@@ -296,18 +333,22 @@ class ColumChart extends HTMLElement {
             //console.log(groupBar);
             //console.log((groupBar.parentNode.offsetWidth - 50) / BarContainers.length);
             //console.log(groupBar.style);
-            groupBar.style.width = ((groupBar.parentNode.offsetWidth - 50) / BarContainers.length) + "px";
+            //groupBar.style.width = ((groupBar.parentNode.offsetWidth - 50) / BarContainers.length) + "px";
             WRender.SetStyle(groupBar.querySelector("containerbar"), {
                 justifyContent: "center",
             });
         });
+        const containerWid = ChartFragment.offsetWidth + 2000
         GroupLabelsData.forEach(element => {
             var color = Colors[index];
             if (!color) {
                 Colors.push(GenerateColor());
             }
             const serie = element[this.AttNameEval].replaceAll(" ", "_");
+            const groupName = this.groupParams[this.groupParams.length - 1];
+            const groupValue = element[groupName]
             const bars = ChartFragment.querySelectorAll(`bars[name=${serie}]`);
+            //const bars = ChartFragment.querySelectorAll(`.${serie}_${groupValue}`); 
             const Path = WRender.createElementNS({
                 type: "path",
                 props: {
@@ -317,16 +358,19 @@ class ColumChart extends HTMLElement {
                     stroke: color,
                     "fill-opacity": 0,
                     "stroke-width": 3,
-                    // d: `${M00} ${DPropiety}  m 0 0 z`
-                },
+                    "stroke-dasharray": containerWid.toString(),
+                }, children: []
             });
+
             LineChart.append(Path);
             setTimeout(() => {
                 LineChart.querySelectorAll(`path[name=${serie}]`).forEach(path => {
                     let M00 = "";
                     let DPropiety = "";
                     let ABar = null;
+
                     bars.forEach((bar, IndexBars) => {
+                        //console.log(serie, bar.dataset);
                         let Cx = 0;
                         if (IndexBars == 0) {
                             M00 = `M ${bar.offsetLeft - 40} ${bar.offsetTop + 2} `
@@ -352,7 +396,16 @@ class ColumChart extends HTMLElement {
                         LineChart.append(Circle);
                     });
                     path.setAttribute("d", `${M00} ${DPropiety}  m 0 0 z`)
-                    //console.log(`${M00} ${DPropiety}  m 0 0 z`);
+                    path.appendChild(WRender.createElementNS({
+                        type: "animate",
+                        props: {
+                            attributeName: "stroke-dashoffset",
+                            from: containerWid,
+                            to: "0",
+                            dur: "2s",
+                            fill: "freeze",
+                        }
+                    }))
                 });
             }, 10);
             index++;
@@ -362,10 +415,17 @@ class ColumChart extends HTMLElement {
 
 }
 class RadialChart extends HTMLElement {
+    /**
+     * 
+     * @param {ChartInstance} ChartInstance 
+     */
     constructor(ChartInstance = (new ChartConfig())) {
         super();
         this.attachShadow({ mode: "open" });
         this.ChartInstance = ChartInstance;
+        // this.Dataset = this.ChartInstance.Dataset ?? [];
+        this.EvalValue = this.ChartInstance.EvalValue ?? null;
+        this.AttNameEval = this.ChartInstance.AttNameEval ?? null;
         this.ChartInstance.Colors = this.ChartInstance.Colors ?? ColorsList
     }
     attributeChangedCallBack() {
@@ -375,8 +435,19 @@ class RadialChart extends HTMLElement {
         if (this.shadowRoot.innerHTML != "") {
             return;
         }
+        this.InitializeDataset();
         this.shadowRoot.append(WRender.createElement(WChartStyle(this.ChartInstance)));
         this.DrawChart();
+    }
+    InitializeDataset() {       
+        if (this.EvalValue == null && this.ChartInstance.Dataset?.length != 0) {
+            //this.Dataset = WArrayF.GroupByObject(this.Dataset, this.Dataset[0]);
+            this.EvalValue = "count";
+        }
+        this.Dataset = WArrayF.GroupBy(this.ChartInstance.Dataset,
+            this.AttNameEval, this.EvalValue);
+        
+
     }
     DrawChart = async () => {
         if (!this.ChartInstance) {
@@ -389,7 +460,7 @@ class RadialChart extends HTMLElement {
         }
         ChartFragment.append(
             this.DrawSeries(
-                this.ChartInstance.Dataset,
+                this.Dataset,
                 this.ChartInstance.Colors
             )
         );
@@ -423,25 +494,25 @@ class RadialChart extends HTMLElement {
         })
         return SectionLabels;
     }
-    _AddSectionData(Config) {
-        const DataSet = Config.Dataset;
+    _AddSectionData() {
         let SectionChart = document.createElement("section");
         SectionChart.className = "SectionRadialChart";
-        var Chart = WRender.createElementNS({
+        const Chart = WRender.createElementNS({
             type: "svg",
             props: {
                 viewBox: "0 0 120 120",
             }
         });
         Chart.setAttribute("class", "RadialChart");
-        var total = WArrayF.SumValue(DataSet, Config.EvalValue);
-        var index = 0;
-        var porcentajeF = 0;
-        DataSet.forEach((element) => {
-            let porcentaje = parseInt((element[Config.EvalValue] / total) * 100);
+        const total = WArrayF.SumValue(this.Dataset, this.EvalValue);
+        let index = 0;
+        let porcentajeF = 0;
+        this.Dataset.forEach((element) => {
+            let porcentaje = parseInt((element[this.EvalValue] / total) * 100);
+            //console.log(porcentaje, this.EvalValue, element[this.EvalValue], total);
             let color = element.color;
-            if (Config.Colors) {
-                color = Config.Colors[index];
+            if (this.ChartInstance.Colors) {
+                color = this.ChartInstance.Colors[index];
             }
             let Circle = WRender.createElementNS({
                 type: "circle",
@@ -455,6 +526,7 @@ class RadialChart extends HTMLElement {
                     //"stroke-linecap": "round"
                 },
             });
+           
             //texto
             let degs = (360 * porcentajeF) / 100;
             let degs2 = (((360 * porcentaje) / 100) / 2) - 12;
@@ -465,17 +537,17 @@ class RadialChart extends HTMLElement {
                     x: 0,
                     y: 0,
                     fill: "#fff",
-                    //"transform-origin": "60px 60px",
                     "dominant-baseline": "middle",
                     "text-anchor": "middle",
                     "font-size": "6",
                     transform: `translate(0,0),rotate(-${degs + (degs2)})`,
                 }
             })
-            if (Config.percentCalc == true) {
+          
+            if (this.ChartInstance.percentCalc == true) {
                 TextSVG.append(document.createTextNode(porcentaje + "%"));
             } else {
-                TextSVG.append(document.createTextNode(element[Config.EvalValue]));
+                TextSVG.append(document.createTextNode(element[this.EvalValue]));
             }
             let g = WRender.createElementNS({
                 type: "g",
@@ -487,7 +559,7 @@ class RadialChart extends HTMLElement {
             g.append(TextSVG);
             Circle.style.transform = "rotate(" + (360 * porcentajeF) / 100 + "deg)";
             porcentajeF = porcentajeF + porcentaje;
-            if (index == DataSet.length - 1) {
+            if (index == this.Dataset.length - 1) {
                 this.progressInitial(porcentaje, Circle, 4);
             } else {
                 this.progressInitial(porcentaje, Circle);
@@ -502,7 +574,7 @@ class RadialChart extends HTMLElement {
             index++;
         });
         SectionChart.append(Chart);
-        var index = 0;
+        index = 0;
         return SectionChart;
     }
     progressInitial(value, circle, val = 0) {
@@ -511,9 +583,18 @@ class RadialChart extends HTMLElement {
         circle.style.strokeDasharray = Perimetro;
         let progress = value / 100;
         let dashoffset = (Perimetro * (1 - progress)) - val;
-        //console.log("progress:", value + "%", "|", "offset:", dashoffset);
-        //console.log("perimetro:", Perimetro + "%", "|", "offset:", dashoffset);
-        circle.style.strokeDashoffset =  dashoffset < 0 ? 0 : dashoffset;
+        circle.style.strokeDashoffset =  Perimetro;//dado que es animado este parametro lo define el to 
+        circle.appendChild(WRender.createElementNS({
+            type: "animate",
+            props: {
+                attributeName: "stroke-dashoffset",
+                //attributeName: "stroke-dasharray",
+                from: `${ circle.style.strokeDasharray}` ,                
+                to: `${dashoffset < 0 ? 0 : dashoffset - 6}`,
+                dur: "1s",
+                fill: "freeze",
+            }
+        }))
     }
 }
 const GenerateColor = () => {
@@ -527,279 +608,333 @@ const GenerateColor = () => {
 }
 const WChartStyle = (ChartInstance) => {
     //console.log(ChartInstance);
-    return {
-        type: "w-style",
-        props: {
-            ClassList: [
-                new WCssClass(".WChartContainer ", {
-                    "padding-left": " 30px",
-                    "font-size": " 11px",
-                    "border": " #d4d4d4 solid 1px",
-                    "padding": " 20px",
-                    "overflow": " hidden",
-                    height: "calc(100% - 40px)",
-                    display: "flex",
-                    "justify-content": "center",
-                    "flex-direction": "column",
-                    "text-overflow": "ellipsis",
-                    "white-space": "nowrap",
-                    "max-height": 450,
-                    position: "relative"
-                }), new WCssClass(".WChartContainer h3", {
-                    color: "#444",
-                    "font-size": " 18px",
-                    "padding-bottom": 10,
-                    display: "flex",
-                "margin": 0,
-                    "justify-content": "center",
-                }), new WCssClass(".SectionLabels, .SectionLabelGroup ", {
-                    "display": " flex",
-                    "justify-content": " center",
-                    "align-items": " center",
-                    "padding-top": " 5px",
-                    "padding-bottom": " 5px",
-                    "flex-wrap": " wrap",
-                }), new WCssClass(".SectionLabels label, .SectionLabelGroup label ", {
-                    "display": " flex",
-                    "height": " 20px",
-                    "justify-content": " center",
-                    "align-items": " center",
-                    "font-size": " 9px",
-                }), new WCssClass(".SectionLabels label span, .SectionLabelGroup label span ", {
-                    "min-height": " 20px",
-                    "width": " 20px",
-                    "content": '" "',
-                    "border-radius": " 50%",
-                    "display": " inline-flex",
-                    "margin": " 5px",
-                }), new WCssClass(".SectionBars", {
-                    "display": " flex",
-                    "align-items": " flex-end",
-                    //"overflow-y": " hidden",
-                    "position": " relative",
-                    "overflow-x": " auto",
-                    "padding-top": 5,
-                    "padding-left": 40,
-                    "min-height": 150,
-                    "border-bottom": " solid 1px #d4d4d4",
-                    //margin: "0px auto"
-                }), new WCssClass(".SectionBars label", {
-                    padding: 5,
-                    "min-height": 12,
-                }), new WCssClass(".GroupSection ", {
-                    "display": " flex",
-                    "align-items": "center",
-                    "height": " 100%",
-                    //"position": " relative",
-                    "flex-direction": "column-reverse",
-                    "flex-grow": " 1",
-                    "border-bottom": " solid 1px #d4d4d4",
-                    //"border-right": " solid 1px #d4d4d4",
-                    "border-top": " solid 1px #d4d4d4"
-                }), new WCssClass(".groupBars ", {
-                    width: "100%",
-                    //width: 300,
-                    //"height": " 180px",
-                    "display": " flex",
-                    "flex-direction": "column-reverse",
-                    //"flex-grow": " 1",
-                    "border-left": " solid 1px #d4d4d4",
-                    "align-items": "center",
-                    position: ChartInstance.TypeChart == "Line" ? "initial" : "relative"
-                }), new WCssClass(".groupBars:last-child ", {
-                    "border-right": " solid 1px #d4d4d4"
-                }), new WCssClass(".ContainerBars ", {
-                    "display": " flex",
-                    "width": " 100%",
-                    //"padding-left": " 10px",
-                    //"padding-right": " 10px",
-                    "flex-direction": ChartInstance.DirectionChart,
-                    "align-items": " flex-end",
-                    "justify-content": "flex-end",
-                    overflow: "hidden",
-                    "border-bottom": "1px solid #BFBFBF",
-                }), new WCssClass(".ContainerBars .Bars ", {
-                    "display": " block",
-                    "margin": " 0 auto",
-                    //"align-self": "center",
-                    "margin-top": " 0px",
-                    "z-index": " 1",
-                    "width": ChartInstance.TypeChart == "Line" ? 1 : 30,
-                    //"min-height": " 20PX",
-                    //"min-width": 10,
-                    "background": " rgb(177, 177, 177)",
-                    "background": " linear-gradient(0deg, rgba(177, 177, 177, 1) 0%, rgba(209, 209, 209, 1) 53%)",
-                }), new WCssClass(".Bars label ", {
-                    "width": " 100%",
-                    "text-align": " center",
-                    "display": " block",
-                    "font-size": " 8px",
-                    "margin-top": " 5px",
-                    "overflow": " hidden",
-                    "color": "#fff",
-                    padding: 0
-                }), new WCssClass(".BackGrounLineX ", {
-                    "display": " flex",
-                    "position": " absolute",
-                    "flex-direction": " column-reverse",
-                    "width": " 100%",
-                    "height": " 100%",
-                    "left": " 0px",
-                    "top": 0,
-                    "height": " 180px",
-                    "right": " 0px",
-                }), new WCssClass(".groupBars .BackGrounLineXNumber ", {
-                    "left": ChartInstance.TypeChart == "Line" ? 0 : -40,
-                }),
-                new WCssClass(".groupBars .IconsGroup ", {
-                    "left": " -25px",
-                }), new WCssClass(".CharLineX ", {
-                    "position": " relative",
-                    "border-top": " rgb(190, 190, 190) solid 1px",
-                    "height": " 100%",
-                    "display": " block",
-                    "align-items": " flex-start",
-                    "display": " flex",
-                    "padding-left": " 5PX",
-                }), new WCssClass(".CharLineXNumber ", {
-                    "position": " relative",
-                    "border-top": " rgba(190, 190, 190, 0) solid 1px",
-                    "height": " 100%",
-                    "align-items": " flex-start",
-                    "display": " flex",
-                    "font-size": " 9px",
-                }), new WCssClass(".CharLineXNumber label", {
-                    padding: 0,
-                    "padding-top": 5,
-                    width: 35,
-                    display: "block",
-                    "text-align": "right",
-                    "padding-right": 5
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-thumb", {
-                    "background": " #ccc",
-                    "border-radius": " 4px",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-thumb:hover", {
-                    "background": " #b3b3b3",
-                    "box-shadow": " 0 0 3px 2px rgba(0, 0, 0, 0.2)",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-thumb:active ", {
-                    "background-color": " #999999",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar ", {
-                    "width": " 8px",
-                    "height": " 10px",
-                    "margin": " 10px",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-track ", {
-                    "background": " #e1e1e1",
-                    "border-radius": " 4px",
-                }), new WCssClass(".SectionBars::-webkit-scrollbar-track:active ,.SectionBars::-webkit-scrollbar-track:hover", {
-                    "background": " #d4d4d4",
-                }), new WCssClass(`.IconsGroup`, {
-                    "display": " flex",
-                    "position": " absolute",
-                    //"justify-content": "space-between",
-                    "flex-direction": " column-reverse",
-                    "width": " 100%",
-                    "height": " 100%",
-                    "left": 15,
-                    "border-bottom": 0,
-                    "right": 0,
-                }), new WCssClass(`.IconG`, {
-                    height: 20,
-                    width: 20,
-                    margin: 1,
-                    "border-radius": "4px !important"
-                }), new WCssClass(`.circleLineChart`, {
-                    cursor: "pointer",
-                    //"-webkit-filter": "drop-shadow( 0px 0px 1px rgba(0, 0, 0, .7))",
-                    //filter: "drop-shadow( 0px 0px 1px rgba(0, 0, 0, .7))"
-                }), new WCssClass(`.PathLine`, {
-                    transition: 'all 1s',
-                    "stroke-dasharray": "1000",
-                    "stroke-dashoffset": "0",
-                    animation: "dash 1s linear"
-
-                }),
-                /*RADIALLLLL------------------------------------------------------------------------------------------------------*/
-                //#region RADIALLLLL
-                new WCssClass(".SectionRadialChart ", {
-                    "position": " relative",
-                    "text-align": " center",
-                    "display": " block",
-                    "width": " 100%",
-                    "height": 220,
-                }), new WCssClass(".RadialDataBackground ", {
-                    "transform": " rotate(-90deg)",
-                }), new WCssClass(".RadialDataBackground:first-child ", {
-                    "margin-bottom": " 20px",
-                }), new WCssClass(".RadialData ", {
-                    "height": " 200px",
-                    "width": " 200px",
-                    "border-radius": " 50%",
-                    "display": " block",
-                    "position": " absolute",
-                    "top": " 0",
-                    "left": " calc(50% - 100px)",
-                    "margin": " auto",
-                }), new WCssClass(".RadialData::before ", {
-                    "content": '" "',
-                    "color": " #fff",
-                    "height": " 200px",
-                    "width": " 200px",
-                    "border-radius": " 50%",
-                    "display": " block",
-                    "position": " absolute",
-                    "top": " 0",
-                    "left": " calc(50% - 100px)",
-                    "margin": " auto",
-                    "background": " linear-gradient( 90deg, rgb(12, 109, 148) 50%, rgba(255, 255, 55, 0) 50%)",
-                }), new WCssClass(".RadialData::after ", {
-                    "content": '" "',
-                    "color": " #fff",
-                    "height": " 200px",
-                    "width": " 200px",
-                    "border-radius": " 50%",
-                    "display": " block",
-                    "position": " absolute",
-                    "top": " 0",
-                    "left": " calc(50% - 100px)",
-                    "margin": " auto",
-                    "background": " linear-gradient( 180deg, rgb(12, 109, 148) 50%, rgba(255, 255, 55, 0) 50%)",
-                }), new WCssClass(".RadialChart ", {
-                    "height": " 100%",
-                }), new WCssClass(".circle ", {
-                    "transition": " all 0.5s",
-                    "transform-origin": " 50% 50%",
-                    "fill": " none",
-                    "cursor": " pointer",
-                    "clip-path": " circle(33% at 50% 50%)",
-                }), new WCssClass(".circleText ", {
-                    "transition": " all 0.5s",
-                    "height": " 100%",
-                    "width": " 100%",
-                    "transform-origin": " 50% 50%",
-                }), new WCssClass(".circle:hover", {
-                    "background-color": " #999999",
-                    "background-blend-mode": " screen",
-                    "z-index": " 5",
-                    "clip-path": " circle(35% at 50% 50%)",
-                }), new WCssClass(".progress__meter,.progress__value ", {
-                    "fill": " none",
-                }), new WCssClass(".progress__meter ", {
-                    "stroke": " #e6e6e6",
-                }),
-                //#endregion RADIAL
-            ], KeyFrame: [
-                {
-                    animate: "dash", ClassList: [
-                        new WCssClass(`from`, {
-                            "stroke-dashoffset": "1000"
-                        }), new WCssClass(`to`, {
-                            "stroke-dashoffset": "0"
-                        }),
-                    ]
-                }
-            ]
+    return css`
+        .WChartContainer {
+            font-size: 11px;
+            border: #e9e6e6 solid 1px;
+            padding: 20px 10px;
+            overflow: hidden;
+            height: calc(100% - 40px);
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-height: 450px;
+            position: relative;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
-    };
+
+        .WChartContainer h3 {
+            color: #444;
+            font-size: 18px;
+            padding-bottom: 10px;
+            display: flex;
+            margin: 0px;
+            justify-content: center;
+        }
+
+        .SectionLabels,
+        .SectionLabelGroup {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .SectionLabels label,
+        .SectionLabelGroup label {
+            display: flex;
+            height: 20px;
+            justify-content: center;
+            align-items: center;
+            font-size: 9px;
+        }
+
+        .SectionLabels label span,
+        .SectionLabelGroup label span {
+            min-height: 20px;
+            width: 20px;
+            content: " ";
+            border-radius: 50%;
+            display: inline-flex;
+            margin: 5px;
+        }
+
+        .SectionBars {
+            display: flex;
+            align-items: flex-end;
+            position: relative;
+            overflow-x: auto;
+            padding-top: 5px;
+            padding-left: 40px;
+            min-height: 150px;
+            border-bottom: solid 1px #e9e6e6;
+        }
+
+        .SectionBars label {
+            padding: 5px;
+            min-height: 12px;
+        }
+
+        .GroupSection {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            flex-direction: column-reverse;
+            flex-grow: 1;
+            border-bottom: solid 1px #e9e6e6;
+            border-top: solid 1px #e9e6e6;
+        }
+
+        .groupBars {
+            width: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            border-left: solid 1px #e9e6e6;
+            align-items: center;
+            position: ${ChartInstance.TypeChart == "Line" ? "initial" : "relative"};
+        }
+
+        .groupBars:last-child {
+            border-right: solid 1px #e9e6e6;
+        }
+
+        .ContainerBars {
+            display: flex;
+            width: 100%;
+            flex-direction: ${ChartInstance.DirectionChart};
+            align-items: flex-end;
+            justify-content: flex-end;
+            overflow: hidden;
+            border-bottom: 1px solid #e9e6e6;
+        }
+
+        .ContainerBars .Bars {
+            height: 0px;
+            transition:all 1s;
+            display: block;
+            margin: 0 auto;
+            margin-top: 0px;
+            min-height: 10px;
+            z-index: 1;
+            width: ${ChartInstance.TypeChart == "Line" ? "1px" : "60%"};
+            background: linear-gradient(0deg, rgba(177, 177, 177, 1) 0%, rgba(209, 209, 209, 1) 53%);           
+        }
+        
+
+        .Bars label {
+            width: 100%;
+            text-align: center;
+            display: block;
+            font-size: 8px;
+            margin-top: 1px;
+            overflow: hidden;
+            color: #fff;
+            padding: 0px;
+        }
+
+        .BackGrounLineX {
+            display: flex;
+            position: absolute;
+            flex-direction: column-reverse;
+            width: 100%;
+            height: 180px;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+        }
+
+        .groupBars .BackGrounLineXNumber {
+            left: ${ChartInstance.TypeChart == "Line" ? 0 : "-40px"};
+        }
+
+        .groupBars .IconsGroup {
+            left: -25px;
+        }
+
+        .CharLineX {
+            position: relative;
+            border-top: #e9e6e6 solid 1px;
+            height: 100%;
+            display: flex;
+            align-items: flex-start;
+            padding-left: 5PX;
+        }
+
+        .CharLineXNumber {
+            position: relative;
+            border-top: rgba(190, 190, 190, 0) solid 1px;
+            height: 100%;
+            align-items: flex-start;
+            display: flex;
+            font-size: 9px;
+        }
+
+        .CharLineXNumber label {
+            padding: 0px;
+            padding-top: 5px;
+            width: 35px;
+            display: block;
+            text-align: right;
+            padding-right: 5px;
+        }
+
+        .SectionBars::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .SectionBars::-webkit-scrollbar-thumb:hover {
+            background: #b3b3b3;
+            box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .SectionBars::-webkit-scrollbar-thumb:active {
+            background-color: #999999;
+        }
+
+        .SectionBars::-webkit-scrollbar {
+            width: 4px;
+            height: 5px;
+            margin: 5px;
+        }
+
+        .SectionBars::-webkit-scrollbar-track {
+            background: #e1e1e1;
+            border-radius: 4px;
+        }
+
+        .SectionBars::-webkit-scrollbar-track:active,
+        .SectionBars::-webkit-scrollbar-track:hover {
+            background: #e9e6e6;
+        }
+
+        .IconsGroup {
+            display: flex;
+            position: absolute;
+            flex-direction: column-reverse;
+            width: 100px;
+            height: 100%;
+            left: 15px;
+            border-bottom: 0px;
+            right: 0px;
+        }
+
+        .IconG {
+            height: 16px;
+            width: 16px;
+            margin: 4px;
+            border-radius: 4px !important;
+        }
+
+        .circleLineChart {
+            cursor: pointer;
+        }
+
+        .SectionRadialChart {
+            position: relative;
+            text-align: center;
+            display: block;
+            width: 100%;
+            height: 220px;
+        }
+
+        .RadialDataBackground {
+            transform: rotate(-90deg);
+        }
+
+        .RadialDataBackground:first-child {
+            margin-bottom: 20px;
+        }
+
+        .RadialData {
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: calc(50% - 100px);
+            margin: auto;
+        }
+
+        .RadialData::before {
+            content: " ";
+            color: #fff;
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: calc(50% - 100px);
+            margin: auto;
+            background: linear-gradient(90deg, rgb(12, 109, 148) 50%, rgba(255, 255, 55, 0) 50%);
+        }
+
+        .RadialData::after {
+            content: " ";
+            color: #fff;
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: calc(50% - 100px);
+            margin: auto;
+            background: linear-gradient(180deg, rgb(12, 109, 148) 50%, rgba(255, 255, 55, 0) 50%);
+        }
+
+        .RadialChart {
+            height: 100%;
+        }
+
+        .circle {
+            transition: all 0.5s;
+            transform-origin: 50% 50%;
+            fill: none;
+            cursor: pointer;
+            clip-path: circle(33% at 50% 50%);
+        }
+
+        .circleText {
+            transition: all 0.5s;
+            height: 100%;
+            width: 100%;
+            transform-origin: 50% 50%;
+        }
+
+        .circle:hover {
+            background-color: #999999;
+            background-blend-mode: screen;
+            z-index: 5;
+            clip-path: circle(35% at 50% 50%);
+        }
+
+        .progress__meter,
+        .progress__value {
+            fill: none;
+        }
+
+        .progress__meter {
+            stroke: #e6e6e6;
+        }
+
+        @keyframes dash {
+            from {
+                stroke-dashoffset: 1000;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }`;
+
+
 }
 
 class GanttChart extends HTMLElement {

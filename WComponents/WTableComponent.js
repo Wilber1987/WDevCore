@@ -1,7 +1,7 @@
 //@ts-check
 // @ts-ignore
 import { TableConfig } from "../WModules/CommonModel.js";
-import { WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
+import { ConvertToMoneyString, WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
@@ -25,7 +25,7 @@ class WTableComponent extends HTMLElement {
         this.ModelObject = {};
         this.paginate = Config.paginate ?? true;
         this.attachShadow({ mode: "open" });
-        this.TypeMoney = "Euro";
+        this.TypeMoney = Config.TypeMoney;
         this.TableConfig = Config ?? {};
         this.Dataset = this.TableConfig.Dataset ?? [];
         this.ThOptions = WRender.Create({ class: "thOptions" });
@@ -72,9 +72,7 @@ class WTableComponent extends HTMLElement {
             }
         }));
         const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
-        
         const isWithtModel = this.TableConfig.ModelObject?.Get != undefined
-        
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         this.SearchItemsFromApi = this.TableConfig.SearchItemsFromApi;
         this.Colors = ["#ff6699", "#ffbb99", "#adebad"];
@@ -146,7 +144,6 @@ class WTableComponent extends HTMLElement {
         if (this.Options != undefined && (this.Options.Search == true
             || this.Options.Add == true
             || this.Options.Filter == true)) {
-
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
                     tagName: "input", class: "txtControl", type: "text",
@@ -164,9 +161,7 @@ class WTableComponent extends HTMLElement {
                     tagName: "button", class: "BtnTableSR",
                     type: "button", innerText: "Nuevo", style: "margin: 10px 0px; max-width: 300px",
                     onclick: async () => {
-                        if (this.Options?.AddAction != undefined)
-                            this.Options.AddAction();
-                        else this.ModalCRUD();
+                        this.ModalCRUD();
                     }
                 }))
             }
@@ -200,32 +195,6 @@ class WTableComponent extends HTMLElement {
      * @returns {HTMLElement}
      */
     DrawTBody = (Dataset = this.Dataset) => {
-        ///**@type {Array<HTMLElement>} */
-        //const tbodys = [];
-
-        /*for (let index = 0; index < this.numPage; index++) {
-            let tBodyStyle = "display:none";
-            if (index == 0) {
-                tBodyStyle = "display:content";
-            }
-            tbodys.push(WRender.Create({ tagName: "tbody", class: "tbodyChild", style: tBodyStyle }));
-        }
-        let page = 0;
-        Dataset.forEach((element, DatasetIndex) => {
-            if (DatasetIndex >= 50) {
-                //return;
-            }
-            let tr = WRender.Create({ tagName: "tr" });
-            this.DrawTRow(tr, element, DatasetIndex);
-            if (tbodys[page] && (this.paginate == true && Dataset.length > this.maxElementByPage)) {
-                tbodys[page].append(tr);
-                if (tbodys[page].children.length == this.maxElementByPage) {
-                    page++;
-                }
-            } else {
-                tbodys[page].append(tr);
-            }
-        });*/
         let tbody = WRender.Create({ tagName: "tbody" });
         Dataset.slice((this.ActualPage - 1) * this.maxElementByPage,
             this.ActualPage * this.maxElementByPage)
@@ -312,7 +281,6 @@ class WTableComponent extends HTMLElement {
     }
 
     async EvalModelPrototype(Model, prop, tr, element, index) {
-
         let value = element[prop] != null && element[prop] != undefined ? element[prop] : "";
         let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index, class: "td_" + prop });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
@@ -387,6 +355,22 @@ class WTableComponent extends HTMLElement {
                     td.append(element[prop] != null || element[prop] != undefined ? value.toString() : Model[prop].action(element));
                     tr.append(td);
                     break;
+                case "MONEY":
+                    td.append(WRender.Create({
+                        tagName: "label", htmlFor: "select" + index,
+                        style: this.Options?.Select ? "cursor: pointer" : "",
+                        innerHTML: value == "" ? "-" : `${this.GetMoney()} ${((value != undefined) && (value != null) ? ConvertToMoneyString(value) : 0)}`
+                    }));
+                    tr.append(td);
+                    break;
+                case "NUMBER":                   
+                    td.append(WRender.Create({
+                        tagName: "label", htmlFor: "select" + index,
+                        style: this.Options?.Select ? "cursor: pointer" : "",
+                        innerHTML: value == "" ? "-" : `${((value != undefined) && (value != null) ? parseFloat(value.toString()).toFixed(2) : 0)}`
+                    }));
+                    tr.append(td);
+                    break;
                 default:
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
@@ -397,7 +381,8 @@ class WTableComponent extends HTMLElement {
                     break;
             }
         } else {
-            tr.innerHTML = value;
+            td.innerHTML = value;
+            tr.append(td)
         }
     }
 
@@ -413,7 +398,7 @@ class WTableComponent extends HTMLElement {
                         const index = this.Dataset.indexOf(element);
                         if (WArrayF.FindInArray(element, this.Dataset) == true) {
                             this.Dataset.splice(index, 1);
-                            console.log(this.Dataset);
+                            //console.log(this.Dataset);
                             //tr.parentNode.removeChild(tr);                                                  
                             if (this.Options?.DeleteAction) {
                                 this.Options?.DeleteAction(element)
@@ -431,6 +416,13 @@ class WTableComponent extends HTMLElement {
         }
     }
 
+    GetMoney() {
+        if (!this.TypeMoney) {
+            return "";
+        }
+        return Money[this.TypeMoney];
+    }
+
     EditBTN(Options, element, tr) {
         if (this.Options?.Edit != undefined && this.Options.Edit == true && element.isEditable != false) {
             Options.append(WRender.Create({
@@ -443,7 +435,7 @@ class WTableComponent extends HTMLElement {
         }
     }
 
-    ShowBTN(Options, element) {
+    ShowBTN(Options, element) {        
         if (this.Options?.Show != undefined && this.Options.Show == true) {
             Options.append(WRender.Create({
                 tagName: "button",
@@ -503,7 +495,8 @@ class WTableComponent extends HTMLElement {
                 EntityModel: this.TableConfig.EntityModel,
                 AutoSave: this.TableConfig.AutoSave ?? false,
                 ParentModel: this.TableConfig.ParentModel,
-                ParentEntity: this.TableConfig.ParentEntity,
+                ParentEntity: this.TableConfig.ParentEntity,                
+                WSelectAddObject: this.TableConfig.WSelectAddObject,
                 EditObject: element,
                 icon: this.TableConfig.icon,
                 ImageUrlPath: this.TableConfig.ImageUrlPath,
@@ -554,12 +547,15 @@ class WTableComponent extends HTMLElement {
         }
     }
     TrueOptions() {
-        return this.Options?.MultiSelect != undefined ||
-            this.Options?.Select != undefined ||
-            this.Options?.Show != undefined ||
-            this.Options?.Edit != undefined ||
-            this.Options?.Delete != undefined ||
-            this.Options?.UserActions != undefined;
+        
+        return this.Options?.MultiSelect == true ||
+            this.Options?.Select == true ||
+            this.Options?.Show == true ||
+            this.Options?.Edit == true ||
+            this.Options?.Delete == true ||
+            // @ts-ignore
+            (this.Options?.UserActions?.__proto__ == Array.prototype 
+                && this.Options?.UserActions?.length > 0);
     }
 
     isSorteable(element, prop) {
@@ -594,7 +590,6 @@ class WTableComponent extends HTMLElement {
                     button.className = "paginateBTN";
                 }
             });
-            console.log(this.ActualPage);
             this.Table?.querySelector("tbody")?.remove();
             const tbody = this.DrawTBody(Dataset);
             this.Table.append(tbody);
@@ -676,7 +671,7 @@ class WTableComponent extends HTMLElement {
                 overflow: auto;
             }
             .WTable {
-                font-family: Verdana, sans-serif;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
                 width: 100%;
                 border-collapse: collapse;
                 font-size: 10px;
@@ -698,23 +693,28 @@ class WTableComponent extends HTMLElement {
                 text-align: left;
                 vertical-align: top;
             }
-            .WTable td  label { overflow: hidden;
+            .WTable td label { overflow: hidden;
                 max-height: 200px;
-                max-width: 300px;
                 text-overflow: ellipsis;
                 display: block;
                 overflow-y: auto;
                 font-size: 10px !important;
                 padding: 0 5px;
+                max-width: 400px;
             }
             .WTable td  label * {
                 font-size: 11px !important;
                 text-align: justify !important;
+                padding: 0px !important;
+                margin: 0px !important;
+                background: none !important;
+                max-width: 100%
             }
 
             .WTable .tdAction {
                 text-align: center;
                 width: 120px;
+                align-items: center,
             }
 
             .WTable tbody tr:nth-child(odd) {
@@ -877,6 +877,8 @@ class WTableComponent extends HTMLElement {
                 cursor: pointer;
                 border-radius: 0.2cm;
                 transition: all 0.6s;
+                font-size: 12px;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
             }
 
             .paginateBTNHidden {
@@ -931,11 +933,11 @@ class WTableComponent extends HTMLElement {
                 font-weight: bold;
                 border: none;
                 padding: 5px;
-                margin: 2px;
+                margin-left: 5px;
                 text-align: center;
                 display: inline-block;
-                min-width: 30px;
-                font-size: 12px;
+                min-width: 20px;
+                font-size: 10px;
                 cursor: pointer;
                 background-color: #4894aa;
                 color: #fff;
@@ -943,7 +945,7 @@ class WTableComponent extends HTMLElement {
             }
 
             .Btn {
-                width: 120px;
+                cursor: pointer;
             }
 
             .BtnTableS {
@@ -1078,7 +1080,6 @@ class WCardTable extends HTMLElement {
             grid-template-columns: auto;
             grid-template-rows: auto;
             overflow: hidden;
-            padding:10px;
         }
         .CardTableContainer img {
             grid-row: span 4;

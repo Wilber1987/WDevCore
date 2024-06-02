@@ -51,7 +51,7 @@ class WPaginatorViewer extends HTMLElement {
         this.append(WRender.createElement(this.DrawHeadOptions()))
         this.append(this.container);
         //PAGINACION         
-        this.maxElementByPage = 10;
+        this.maxElementByPage = this.PaginatorConfig.maxElementByPage ?? 10;
         this.SearchItemsFromApi = this.PaginatorConfig.SearchItemsFromApi;
         if (this.PaginatorConfig != undefined) {
             this.Dataset = this.PaginatorConfig.Dataset;

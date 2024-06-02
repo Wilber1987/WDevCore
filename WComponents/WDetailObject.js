@@ -1,5 +1,5 @@
 
-import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WComponentsTools.js';
+import { WRender, WArrayF, ComponentsManager, WAjaxTools, ConvertToMoneyString } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WModalForm, WSimpleModalForm } from './WModalForm.js';
@@ -9,7 +9,13 @@ import { WTableComponent } from './WTableComponent.js';
 import { WAppNavigator } from './WAppNavigator.js';
 import { ControlBuilder } from '../WModules/WControlBuilder.js';
 let photoB64;
-class Config { DOMManager = undefined; ModelObject = undefined; ImageUrlPath = undefined; ObjectDetail = {}; }
+class Config {
+    DOMManager = undefined;
+    EntityModel = undefined;
+    ModelObject = undefined;
+    ImageUrlPath = undefined;
+    ObjectDetail = {};
+}
 class WDetailObject extends HTMLElement {
     constructor(Config = new Config()) {
         super();
@@ -66,7 +72,10 @@ class WDetailObject extends HTMLElement {
                 switch (Model[prop].type.toUpperCase()) {
                     case "IMG":
                         isImg = true;
-                        ImageCards.append(ControlBuilder.BuildImage(ObjectDetail[prop], this.Config.ImageUrlPath))
+                        if (ObjectDetail[prop] != undefined && ObjectDetail[prop] != null) {
+                            ImageCards.append(ControlBuilder.BuildImage(ObjectDetail[prop], this.Config.ImageUrlPath))
+                        }
+
                         break;
                     default:
                         break;
@@ -86,10 +95,13 @@ class WDetailObject extends HTMLElement {
                         tabElements.push({
                             name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
+                                ObjectDetail[prop] = ObjectDetail[prop] != "" && ObjectDetail[prop] != undefined && ObjectDetail[prop] != null && ObjectDetail[prop].__proto__ == Array.prototype ?
+                                    ObjectDetail[prop] : [];
                                 this.TabManager.NavigateFunction(prop, new WTableComponent({
-                                    Options: { Search: true },
+                                    Options: { Search: true, Show: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,
                                     AddItemsFromApi: false,
+                                    EntityModel: this.Config.EntityModel,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
                                 }));
@@ -187,16 +199,13 @@ class WDetailObject extends HTMLElement {
             text-transform: uppercase;
         }
         .TextArea {
-            grid-column: span 3;
+            grid-column: span 4;
             font-size: 11px !important;
             text-align: justify;
             max-height: 300px;
             overflow-y: auto;
         }
-        .TextArea * {
-            font-size: 11px !important;
-            text-align: justify;
-        }
+       
         w-detail-card {
             width: 100%;
         }
@@ -204,7 +213,7 @@ class WDetailObject extends HTMLElement {
         .cont {
             font-size: 12px;
             display: grid;
-            grid-template-columns: 33% 33% 33%;         
+            grid-template-columns: 24.5%  24.5% 24.5% 24.5%;         
             overflow-x: hidden;
             border-radius: 20px;            
             padding: 10px;
@@ -212,7 +221,7 @@ class WDetailObject extends HTMLElement {
             margin: 10px 0px;
         }    
         .cont h3 {
-            grid-column: span 3;
+            grid-column: span 4;
             width: 100%;
         }  
         .DataContainer label {
@@ -220,31 +229,33 @@ class WDetailObject extends HTMLElement {
         }
         .cont .label-value {          
             width: 100%;
-            margin-bottom: 5px;
             font-size:15px;
             font-weight: bold;
         }
 
         .DataContainer {
             display: flex;
-            padding: 5px;
             text-align: left;
             justify-content: space-between;
             flex-wrap: wrap;
             min-height: 36px;
             overflow: hidden;
-            border-right: 8px solid #d9d9d9;
-            border-radius: 8px;
+            border-right: 1px solid #d9d9d9;
+            border-radius: 0 8px 8px 0;
             transition: all .5s;
         }
         .DataContainer:hover {           
-            border-right: 8px solid #575757;
+            border-right: 1px solid #575757;
         }
 
         @media (max-width: 800px) {
             .cont {               
-                grid-template-columns: 50% 50%;     
+                grid-template-columns: 100%;     
             }    
+            .cont h3, .TextArea  {
+                grid-column: span 1;
+                width: 100%;
+            }  
             .ImageCards {
                 max-width: 300px;
                 height: auto;
@@ -312,10 +323,10 @@ class ProfileCard extends HTMLElement {
                             (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
                             {
                                 tagName: 'label', className: "label-value", innerText:
-                                    (typeof ObjectDetail[prop] === "number" &&  Model[prop].type.toUpperCase() == "MONEY" 
-                                    ? ObjectDetail[prop].toFixed(2) :
-                                    typeof ObjectDetail[prop] === "number" &&  Model[prop].type.toUpperCase() == "PERCENTAGE" 
-                                    ? `${ ObjectDetail[prop]} %`: ObjectDetail[prop])
+                                    (typeof ObjectDetail[prop] === "number" && Model[prop].type.toUpperCase() == "MONEY"
+                                        ? ConvertToMoneyString(ObjectDetail[prop]) :
+                                        typeof ObjectDetail[prop] === "number" && Model[prop].type.toUpperCase() == "PERCENTAGE"
+                                            ? `${ObjectDetail[prop]} %` : ObjectDetail[prop])
                             }
                         ]
                     }));

@@ -7,10 +7,10 @@ class WOrtograficValidation {
     static es = (val = "") => {
         try {
             val = val.toString().replaceAll("_id", "")
-                .replaceAll("CaseTable_", "")
+                .replaceAll("Tbl_", "")
                 .replaceAll("_ModelComponent", " ")
                 .replaceAll("Tbl_", "")
-                .replaceAll("CaseTable_", "")
+                .replaceAll("Tbl_", "")
                 .replaceAll("Cat_", "")
                 .replaceAll("Catalogo_", "")
                 .replaceAll("catalogo_", "")

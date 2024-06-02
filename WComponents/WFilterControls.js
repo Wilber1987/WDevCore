@@ -1,5 +1,7 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+// @ts-ignore
+import { ModelProperty } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";
 import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -40,6 +42,18 @@ class WFilterOptions extends HTMLElement {
         this.DrawFilter();
     }
     connectedCallback() {
+        this.shadowRoot?.addEventListener("click", (e) => this.undisplayMultiSelects(e));
+        this.shadowRoot?.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
+    }
+    undisplayMultiSelects = (e) => {
+        // @ts-ignore
+        if (!e.target.tagName.includes("W-MULTI-SELECT")) {
+            this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
+                // @ts-ignore
+                m.tool.className = "toolInactive";
+                //TODO HACER LO DEL SPAN
+            })
+        }
     }
     DrawFilter = async () => {
         this.FilterContainer.innerHTML = "";
@@ -70,7 +84,8 @@ class WFilterOptions extends HTMLElement {
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({
                             className: this.ModelObject[prop].type.toUpperCase() == "DATE"
-                                || this.ModelObject[prop].type.toUpperCase() == "NUMBER" ? "multi-control-container" : "",
+                                || this.ModelObject[prop].type.toUpperCase() == "NUMBER" || this.ModelObject[prop].type.toUpperCase() == "WSELECT"
+                                || this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" ? "multi-control-container" : "",
                             children: [WOrtograficValidation.es(prop), filterControl]
                         }));
                         this.FilterControls.push(filterControl);
@@ -139,7 +154,11 @@ class WFilterOptions extends HTMLElement {
                 if (this.ModelObject[control.id]) {
                     let values;
                     let filterType;
+                    /**
+                     * @type {ModelProperty}
+                     */
                     const ModelProperty = this.ModelObject[control.id];
+                    let propiertyName = control.id;
                     switch (ModelProperty.type?.toUpperCase()) {
                         case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
                             if (control.value != null && control.value != undefined && control.value != "") {
@@ -167,8 +186,44 @@ class WFilterOptions extends HTMLElement {
                             }
                             break;
                         case "WSELECT": case "MULTISELECT":
-                            if (control.selectedItems.length > 0) {
-                                // findElement(control);
+                            if (control.selectedItems.length > 0 && ModelProperty.ModelObject != undefined) {
+                                if (ModelProperty.ModelObject.__proto__ == Function.prototype) {
+                                    ModelProperty.ModelObject = ModelProperty.ModelObject();
+                                    console.log(ModelProperty.ModelObject);
+                                }
+                                //TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
+                                let foraingKeyName = null;
+                                const foreynKeyExist = ModelProperty.ForeignKeyColumn && this.ModelObject.hasOwnProperty(ModelProperty.ForeignKeyColumn);
+                                console.log(foreynKeyExist);
+                                if (!foreynKeyExist) {
+                                    for (const propiedad in ModelProperty.ModelObject) {
+                                        const keyNameSames = ModelProperty.ModelObject[propiedad].primary
+                                            && ModelProperty.ModelObject.hasOwnProperty(propiedad) 
+                                            && this.ModelObject.hasOwnProperty(propiedad);
+                                        if (keyNameSames) {
+                                            foraingKeyName = propiedad;
+                                        }
+                                    }
+                                } else {
+                                    foraingKeyName = ModelProperty.ForeignKeyColumn;
+                                }
+                                if (foraingKeyName != null) {
+                                    console.log(foraingKeyName);
+                                    values = []
+                                    filterType = "IN";
+                                    propiertyName = foraingKeyName;   
+                                    let primaryKey = null;
+                                    for (const key in control.ModelObject) {
+                                        if (control.ModelObject[key].primary) {
+                                            primaryKey = key;
+                                            break;
+                                        }
+                                    }                               
+                                    control.selectedItems?.forEach(element => {                                       
+                                        // @ts-ignore
+                                        values.push(element[primaryKey]?.toString())
+                                    });
+                                }
                             }
                             break;
                         case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA": case "PASSWORD":
@@ -188,7 +243,7 @@ class WFilterOptions extends HTMLElement {
                         Values: values
                     });*/
                     this.ModelObject.FilterData.push({
-                        PropName: control.id,
+                        PropName: propiertyName,
                         FilterType: filterType,
                         Values: values
                     })
@@ -199,6 +254,12 @@ class WFilterOptions extends HTMLElement {
                 return;
             }
             this.Config.Dataset = await Model.Get();
+            if (this.Config.FilterFunction != undefined) {
+                this.Config.FilterFunction(this.Config.Dataset);
+            } else {
+                console.log(this.Config.Dataset);
+            }
+            return;
         }
 
         const DFilt = this.Config.Dataset.filter(obj => {
@@ -352,7 +413,7 @@ class WFilterOptions extends HTMLElement {
                 }, {
                     tagName: "input",
                     type: "date",
-                    className: prop + " secondDate",                    
+                    className: prop + " secondDate",
                     // @ts-ignore
                     value: this.Config.AutoSetDate == true ? new Date().addDays(1).toISO() : undefined,
                     id: prop + "second",
@@ -390,6 +451,8 @@ class WFilterOptions extends HTMLElement {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
             Dataset: ModelProperty.Dataset,
+            IsFilterControl: true,
+            ModelObject: ModelProperty.ModelObject.__proto__ == Function.prototype ?  ModelProperty.ModelObject() : ModelProperty.ModelObject,
             id: prop,
             FullDetail: true,
             action: () => {
@@ -410,6 +473,9 @@ class WFilterOptions extends HTMLElement {
     }
 
     styles = css`
+        *{
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
         .reportV {
             margin: 10px;
         }
@@ -449,24 +515,28 @@ class WFilterOptions extends HTMLElement {
             display: block;
         }
         .options {
-            font-size: 12px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
         }
 
         .BtnDinamictT {
+            justify-content: center;
+            align-items: center;
+            display: flex;
             font-weight: bold;
             border: none;
-            padding: 5px;
+            padding: 0px;
             margin: 5px;
             outline: none;
             text-align: center;
-            display: inline-block;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             background-color: #4894aa;
             color: #fff;
             border-radius: 0.2cm;
-            width: 25px;
-            height: 25px;
+            width: 15px;
+            height: 15px;
             background-color:#4894aa;
             font-family: monospace;
         }
@@ -474,7 +544,7 @@ class WFilterOptions extends HTMLElement {
         .OptionContainer div {
             display: grid;
             grid-template-rows: 30px auto;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .OptionContainer input,
@@ -483,7 +553,7 @@ class WFilterOptions extends HTMLElement {
             padding: 5px 10px;
         }
 
-        .multi-control-container {
+        .multi-control-container, .w-multi-select-container {
             grid-column: span 2;
         }
         .multi-control {
@@ -538,7 +608,7 @@ class WFilterOptions extends HTMLElement {
                 display: grid;
                 grid-template-rows: 30px 30px;
                 grid-template-columns: auto;
-                font-size: 12px;
+                font-size: 11px;
             }
         }
         @container (max-width: 700px) {
