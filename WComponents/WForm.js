@@ -477,7 +477,6 @@ class WForm extends HTMLElement {
                 }
                 this.FindObjectMultiselect(val, InputControl);
                 Form.appendChild(ControlContainer);
-
                 break;
             case "MULTISELECT": case "WCHECKBOX":
                 if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
