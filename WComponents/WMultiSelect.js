@@ -18,7 +18,7 @@ import { FilterData } from "../WModules/CommonModel.js";
     * @property {Boolean} [FullDetail]
     * @property {Boolean} [AddObject]
     * @property {String} [AddPatern]
-    * @property {String} [Mode] IsFilterControl
+    * @property {String} [Mode]  SELECT_BOX, SELECT
 **/
 
 class MultiSelect extends HTMLElement {
@@ -157,7 +157,9 @@ class MultiSelect extends HTMLElement {
 
     connectedCallback() {
         this.Draw();
-        
+        this.parentNode.addEventListener("click", (e) => this.undisplayMultiSelects(e));
+        this.parentNode.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
+        console.log(this.parentNode);
     }
 
     Draw = (Dataset = this.Dataset) => {
@@ -235,11 +237,11 @@ class MultiSelect extends HTMLElement {
         if (this.Config.IsFilterControl) {
             this.shadowRoot.append(this.SearchControl);
             this.SearchControl.style.borderRadius = "0 10px 10px 0";
-            this.SearchControl.onfocus =  ()=> {
+            this.SearchControl.onfocus = () => {
                 if (!this.tool.className.includes("toolActive")) {
                     this.LabelMultiselect.querySelector("span").className = "btnSelect spanActive"
                     this.tool.className = "toolActive";
-                } 
+                }
             }
             this.tool = new WToolTip([
                 this.OptionsContainer
@@ -366,6 +368,17 @@ class MultiSelect extends HTMLElement {
         }
         return true;
     }
+    undisplayMultiSelects = (e) => {
+        // @ts-ignore
+        if (!e.target.tagName.includes("W-MULTI-SELECT")) {
+            console.log( this.querySelectorAll("w-multi-select"));
+            document.querySelectorAll("w-multi-select").forEach(m => {
+                // @ts-ignore
+                m.tool.className = "toolInactive";
+                m.LabelMultiselect.querySelector("span").className = "btnSelect";
+            })
+        }
+    }
     ModalCRUD(element, targetControl, addBtn) {
         this.shadowRoot?.append(
             new WModalForm({
@@ -415,15 +428,15 @@ class WToolTip extends HTMLElement {
         this.append(css`
             w-tooltip{
                 position: absolute;
-                width: 100%;
+                width:  100%;
                 z-index: 1;
-                box-shadow: 0 0 5px #c1c1c1;;
+                box-shadow: 0 0 5px #e7e7e7;;
                 transition: all .1s;
                 max-height: 0px;
                 background-color: #fff;
                 overflow: hidden;  
                 left: 0;      
-                top: 27px;       
+                top: 100%;       
             }
             w-tooltip.active {
                 max-height: 600px;
@@ -454,7 +467,6 @@ const MainMenu = css`
         align-items: center;
         cursor: pointer;
         height: 100%;
-        height: 24px;
     }
     .LabelMultiselect .selecteds {       
         display: flex;
@@ -471,7 +483,7 @@ const MainMenu = css`
     }  
    
     .toolActive {       
-        border: solid 1px #9b9b9b;
+        border: solid 1px #e4e3e3;
         max-height: 600px;
         min-width: 300px;
     }
@@ -567,9 +579,11 @@ const MainMenu = css`
         background: #696969;
         clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
         transition: all 0.1s;
+        top: 50%;
+        transform: translateY(-50%);
     }
     .spanActive {
-        transform: rotate(-180deg);
+        transform: rotate(-180deg) translateY(50%);
     }
     .ElementDetail {
         display: grid;

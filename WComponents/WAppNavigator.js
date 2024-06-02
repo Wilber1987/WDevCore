@@ -60,6 +60,9 @@ class WAppNavigator extends HTMLElement {
         this.DarkMode = this.DarkMode ?? false;
         this.DisplayMode = this.DisplayMode ?? "left";
         this.shadowRoot.append(WRender.createElement(this.Style()));
+        if (this.Config.isMediaQuery == true) {
+            this.shadowRoot.append(this.MediaStyle());
+        }
         if (this.NavStyle == undefined) {
             this.NavStyle = "nav";
         }
@@ -318,9 +321,18 @@ class WAppNavigator extends HTMLElement {
             .navActive {
                 overflow: hidden;
                 max-height: 5000px;
-            }
-        
-            @media (max-width: 1200px) {}
+            }`;
+    }
+    MediaStyle() {
+        const style = this.querySelector("#NavMediaStyle" + this.id);
+        if (style) {
+            style.parentNode.removeChild(style);
+        }
+        let navDirection = "row";
+        if (this.Direction == "column") {
+            navDirection = "column";
+        }
+        return css` @media (max-width: 1200px) {}
         
             @media (max-width: 800px) {
                 .DisplayBtn {
