@@ -3,7 +3,8 @@ import { WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
 import { WModalForm } from "./WModalForm.js";
 
-const videoElement = WRender.Create({ tagName: 'video', className: 'videoElement' });
+// @ts-ignore
+const videoElement = WRender.Create({ tagName: 'video', className: 'videoElement' , autoplay: true});
 const canvas = WRender.Create({ tagName: 'canvas', className: 'canvas' });
 const croppedCanvas = WRender.Create({ tagName: 'canvas', className: 'croppedCanvas' });
 //context
@@ -89,10 +90,22 @@ class WImageCapture extends HTMLElement {
                             .camera-container {
                                 position: relative;
                                 width: -webkit-fill-available;
+                                height: -webkit-fill-available;
                             }
                             .videoElement {
                                 width: -webkit-fill-available;
+                                background-color: #000;
+                                height: calc(100% - 10px);
                             }  
+                            .ObjectModalContainer {
+                                width: -webkit-fill-available;
+                                padding: 0;
+                                margin-bottom: 0px;
+                                max-height: calc(100%)
+                            }
+                            .ContainerFormWModal{
+                                grid-template-rows: 50px calc(100% - 50px);
+                            }
                             .captureButton {
                                 height: 40px;
                                 width: 40px;
@@ -100,17 +113,17 @@ class WImageCapture extends HTMLElement {
                                 border-radius: 50%;
                                 border: none;
                                 position: absolute;
-                                bottom: 10px;
+                                bottom: 20px;
                                 display: block;
                                 margin: auto;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                cursor: pointer;
                             } 
                         `
                     ] })
             }));
 
-
-            //videoElement.style.display = 'block';
-            //captureButton.style.display = 'block';
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
                     videoElement.srcObject = stream;
@@ -138,11 +151,8 @@ class WImageCapture extends HTMLElement {
             tracks.forEach(track => track.stop());
         });
 
-        canvas.addEventListener('mousedown', (event) => {
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
+        const startDragging = (x, y) => {
+           
             const handle = this.getHandleUnderCursor(x, y);
             if (handle) {
                 isResizing = true;
@@ -152,34 +162,63 @@ class WImageCapture extends HTMLElement {
                 startY = y;
                 isDragging = true;
             }
-        });
+        };
 
-        canvas.addEventListener('mousemove', (event) => {
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
+        const continueDragging = (x, y) => {
+            console.log(x,y);
             if (isDragging) {
                 endX = x;
                 endY = y;
-
-                // Redibuja la imagen y el rectángulo de selección
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 0, 0);
                 this.drawSelectionRect(startX, startY, endX, endY);
             } else if (isResizing) {
                 this.resizeSelectionRect(x, y);
             }
-        });
+        };
 
-        document.addEventListener('mouseup', (event) => {
+        const stopDragging = () => {
             if (isDragging || isResizing) {
                 isDragging = false;
                 isResizing = false;
                 activeHandle = null;
                 this.cropImage();
             }
+        };
+
+        canvas.addEventListener('mousedown', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            startDragging(x, y);
         });
+
+        canvas.addEventListener('mousemove', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            continueDragging(x, y);
+        });
+
+        document.addEventListener('mouseup', stopDragging);
+
+        canvas.addEventListener('touchstart', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const touch = event.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            startDragging(x, y);
+        });
+
+        canvas.addEventListener('touchmove', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const touch = event.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            continueDragging(x, y);
+        });
+
+        document.addEventListener('touchend', stopDragging);
     }
 
     update() {
@@ -190,6 +229,7 @@ class WImageCapture extends HTMLElement {
         // @ts-ignore
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
         ctx.drawImage(img, 0, 0); // Redibujar la imagen original
+        console.log("draw",startX, startY, endX, endY);
 
         // Dibujar el rectángulo de selección
         ctx.beginPath();
@@ -216,7 +256,6 @@ class WImageCapture extends HTMLElement {
 
         this.updateHandles();
     }
-
 
     cropImage() {
         const cropWidth = endX - startX;
@@ -295,12 +334,12 @@ class WImageCapture extends HTMLElement {
                 break;
         }
 
-        // Redibuja la imagen y el rectángulo de selección
         // @ts-ignore
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
         this.drawSelectionRect(startX, startY, endX, endY);
     }
+
     CustomStyle = css`
         .capture-container{
             width: 100%;

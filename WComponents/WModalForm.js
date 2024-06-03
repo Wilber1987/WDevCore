@@ -242,7 +242,7 @@ class WModalForm extends HTMLElement {
                         "max-height": "calc(100vh - 120px)",
                         height: "100%",
                         width: "90%",
-                        margin: "auto",
+                        margin: "0px auto",
                         "margin-bottom": 20,
                         display: "block",   
                         "justify-content": "center",                 

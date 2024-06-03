@@ -260,8 +260,7 @@ class WRender {
                     return this.CreateStringNode(`<p>${Node}</p>`);
                 }
                 return this.CreateStringNode(`<label>${Node}</label>`);
-            } else if (Node.__proto__ === HTMLElement.prototype
-                || Node.__proto__.__proto__ === HTMLElement.prototype) {
+            } else if (this.isHTMLElement(Node)) {
                 return Node;
             } else {
                 if (Node.__proto__ == Array.prototype) {
@@ -301,8 +300,23 @@ class WRender {
             }
         } catch (error) {
             console.log(error, Node);
+            console.log(Node.__proto__);
+            console.log(Node.__proto__);
+            console.log(Node.__proto__);
             return document.createTextNode("Problemas en la construcción del nodo.");
         }
+    }
+    static isHTMLElement(node) {
+        let currentProto = Object.getPrototypeOf(node);
+        
+        while (currentProto !== null) {
+            if (currentProto === HTMLElement.prototype) {
+                return true;
+            }
+            currentProto = Object.getPrototypeOf(currentProto);
+        }
+        
+        return false;
     }
     /**
      * @param  {HTMLElement} Node
