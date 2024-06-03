@@ -363,7 +363,7 @@ class WTableComponent extends HTMLElement {
                     }));
                     tr.append(td);
                     break;
-                case "NUMBER":                   
+                case "NUMBER":
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
                         style: this.Options?.Select ? "cursor: pointer" : "",
@@ -435,7 +435,7 @@ class WTableComponent extends HTMLElement {
         }
     }
 
-    ShowBTN(Options, element) {        
+    ShowBTN(Options, element) {
         if (this.Options?.Show != undefined && this.Options.Show == true) {
             Options.append(WRender.Create({
                 tagName: "button",
@@ -495,7 +495,7 @@ class WTableComponent extends HTMLElement {
                 EntityModel: this.TableConfig.EntityModel,
                 AutoSave: this.TableConfig.AutoSave ?? false,
                 ParentModel: this.TableConfig.ParentModel,
-                ParentEntity: this.TableConfig.ParentEntity,                
+                ParentEntity: this.TableConfig.ParentEntity,
                 WSelectAddObject: this.TableConfig.WSelectAddObject,
                 EditObject: element,
                 icon: this.TableConfig.icon,
@@ -547,14 +547,14 @@ class WTableComponent extends HTMLElement {
         }
     }
     TrueOptions() {
-        
+
         return this.Options?.MultiSelect == true ||
             this.Options?.Select == true ||
             this.Options?.Show == true ||
             this.Options?.Edit == true ||
             this.Options?.Delete == true ||
             // @ts-ignore
-            (this.Options?.UserActions?.__proto__ == Array.prototype 
+            (this.Options?.UserActions?.__proto__ == Array.prototype
                 && this.Options?.UserActions?.length > 0);
     }
 
@@ -1025,7 +1025,6 @@ const WIcons = {
 const Money = { Euro: "€", Dollar: "$", Cordoba: "C$" }
 customElements.define("w-table-basic", WTableComponent);
 export { WTableComponent };
-export { WCardTable };
 class WCardTable extends HTMLElement {
     constructor(Element, Model, Config) {
         super();
@@ -1055,6 +1054,12 @@ class WCardTable extends HTMLElement {
                 case "IMAGE": case "IMAGES": case "IMG":
                     this.CardTableContainer.append(ControlBuilder.BuildImage(value, this.Config.ImageUrlPath));
                     break;
+                case "DATE": case "FECHA":
+                    this.CardTableContainer.append(
+                        WRender.Create({
+                            // @ts-ignore
+                            tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + value?.toString()?.toDateFormatEs()
+                        }))
                 case "SELECT": case "WSELECT":
                     break;
                 case "MULTISELECT":
@@ -1064,6 +1069,8 @@ class WCardTable extends HTMLElement {
                 case "MODEL":
                     break;
                 case "MASTERDETAIL":
+                    break;
+                case "Date":
                     break;
                 default:
                     this.CardTableContainer.append(
@@ -1092,6 +1099,17 @@ class WCardTable extends HTMLElement {
         .CardTableContainer label::first-letter {
             text-transform: uppercase;
         }
+        .imgPhoto {
+            width: 80px;
+            border-radius: 50%;
+            height: 80px;
+            size: 100%;
+            display: block;
+            margin: auto;
+            object-fit: cover;
+            box-shadow: 0 2px 5px 0 rgb(0 0 0 / 30%);
+            margin: 10px;
+        }
     `
     IsDrawableProp(element, prop) {
         if (this.Model == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
@@ -1112,3 +1130,4 @@ class WCardTable extends HTMLElement {
     }
 }
 customElements.define('w-card-table', WCardTable);
+export { WCardTable }

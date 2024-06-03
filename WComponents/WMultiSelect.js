@@ -5,6 +5,7 @@ import { WModalForm } from "./WModalForm.js";
 import { WIcons, WIconsPath } from "../WModules/WIcons.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { FilterData } from "../WModules/CommonModel.js";
+import { WCardTable } from "./WTableComponent.js";
 
 /**
  * @typedef {Object} ConfigMS 
@@ -342,12 +343,13 @@ class MultiSelect extends HTMLElement {
     }
     BuilDetail = (element) => {
         const elementDetail = WRender.Create({ className: "ElementDetail" });
-        for (const prop in WArrayF.replacer(element)) {
-            if (this.IsDrawableProp(element, prop)) {
-                elementDetail.append(WRender.Create({ className: "ElementProp", innerHTML: WOrtograficValidation.es(prop) + ":" }));
-                elementDetail.append(WRender.Create({ className: "ElementValue", innerHTML: WOrtograficValidation.es(element[prop]) }));
-            }
-        }
+        elementDetail.append(new WCardTable(WArrayF.replacer(element), this.ModelObject, this.Config))
+        // for (const prop in WArrayF.replacer(element)) {
+        //     if (this.IsDrawableProp(element, prop)) {
+        //         elementDetail.append(WRender.Create({ className: "ElementProp", innerHTML: WOrtograficValidation.es(prop) + ":" }));
+        //         elementDetail.append(WRender.Create({ className: "ElementValue", innerHTML: WOrtograficValidation.es(element[prop]) }));
+        //     }
+        // }
         return elementDetail;
     }
     IsDrawableProp(element, prop) {
@@ -584,8 +586,6 @@ const MainMenu = css`
         transform: rotate(-180deg) translateY(50%);
     }
     .ElementDetail {
-        display: grid;
-        grid-template-columns: 100px calc(100% - 110px);
         padding: 10px;
         background-color: #eeeeee;
         border-radius: 10px;
