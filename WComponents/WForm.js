@@ -11,6 +11,7 @@ import { WDetailObject } from './WDetailObject.js';
 import { EntityClass } from '../WModules/EntityClass.js';
 // @ts-ignore
 import { FormConfig, ModelProperty } from '../WModules/CommonModel.js';
+import { WImageCapture } from './WImageCapture.js';
 let photoB64;
 const ImageArray = [];
 
@@ -383,6 +384,20 @@ class WForm extends HTMLElement {
                 ControlContainer.className += " imgPhoto";
                 Form.appendChild(ControlContainer);
                 break;
+            case "IMAGECAPTURE":
+                InputControl = new WImageCapture({
+                    value: ObjectF[prop],
+                    action: (image) => {
+                        console.log(image);
+                        ObjectF[prop] = image;
+                    }
+                });
+                if (ModelProperty.disabled) {
+                    InputControl.style.pointerEvents = "none";
+                }
+                ControlContainer.className += " imgPhoto";
+                Form.appendChild(ControlContainer);
+                break;
             case "DATE": case "FECHA": case "DATETIME":
                 let type = "date";
                 let date_val = val == "" ? //@ts-ignore 
@@ -540,7 +555,7 @@ class WForm extends HTMLElement {
                 const masterDetailModel = await WArrayF.isModelFromFunction(Model, prop);
                 ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
-                ObjectF[prop] = ObjectF[prop] != "" && ObjectF[prop] != undefined  && ObjectF[prop] != null && ObjectF[prop].__proto__ == Array.prototype ?
+                ObjectF[prop] = ObjectF[prop] != "" && ObjectF[prop] != undefined && ObjectF[prop] != null && ObjectF[prop].__proto__ == Array.prototype ?
                     ObjectF[prop] :// this.CreateProxy(Model, ObjectF[prop]) :
                     [];// this.CreateProxy(Model, []);
                 InputControl = new WTableComponent({

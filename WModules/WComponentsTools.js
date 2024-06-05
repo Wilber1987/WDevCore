@@ -584,7 +584,7 @@ class WArrayF {
                 for (const prop in element) {
                     NewElement[prop] = element[prop]
                 }
-                console.log(element);
+                //console.log(element);
                 if (element.hasOwnProperty("count")) {
                     element.count = 1;
                     NewElement.count = 1;

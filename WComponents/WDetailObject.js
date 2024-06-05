@@ -70,7 +70,7 @@ class WDetailObject extends HTMLElement {
         for (const prop in Model) {
             if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
                 switch (Model[prop].type.toUpperCase()) {
-                    case "IMG":
+                    case "IMG": case "IMAGECAPTURE":
                         isImg = true;
                         if (ObjectDetail[prop] != undefined && ObjectDetail[prop] != null) {
                             ImageCards.append(ControlBuilder.BuildImage(ObjectDetail[prop], this.Config.ImageUrlPath))

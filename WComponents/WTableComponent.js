@@ -285,7 +285,7 @@ class WTableComponent extends HTMLElement {
         let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index, class: "td_" + prop });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
-                case "IMAGE": case "IMAGES": case "IMG":
+                case "IMAGE": case "IMAGES": case "IMG":case "IMAGECAPTURE":
                     td.append(ControlBuilder.BuildImage(value, this.TableConfig?.ImageUrlPath));
                     tr.append(td);
                     break;
@@ -1051,7 +1051,7 @@ class WCardTable extends HTMLElement {
         }
         if (this.IsDrawableProp(this.Element, prop)) {
             switch (Model[prop].type.toUpperCase()) {
-                case "IMAGE": case "IMAGES": case "IMG":
+                case "IMAGE": case "IMAGES": case "IMG":case "IMAGECAPTURE":
                     this.CardTableContainer.append(ControlBuilder.BuildImage(value, this.Config.ImageUrlPath));
                     break;
                 case "DATE": case "FECHA":

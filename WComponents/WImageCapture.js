@@ -3,28 +3,13 @@ import { WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
 import { WModalForm } from "./WModalForm.js";
 
-// @ts-ignore
-const videoElement = WRender.Create({ tagName: 'video', className: 'videoElement', autoplay: true });
-const canvas = WRender.Create({ tagName: 'canvas', className: 'canvas' });
-const croppedCanvas = WRender.Create({ tagName: 'canvas', className: 'croppedCanvas' });
-// context
-// @ts-ignore
-const ctx = canvas.getContext('2d');
-// @ts-ignore
-const croppedCtx = croppedCanvas.getContext('2d');
-let img = new Image();
-let startX, startY, endX, endY;
-let isDragging = false;
-let isResizing = false;
-let activeHandle = null;
-let croppedImageBase64 = '';
-let handles = [];
-let originalWidth, originalHeight; // Dimensiones originales de la imagen
+
 
 class WImageCapture extends HTMLElement {
     /**
      * @typedef {Object} Config 
         * @property {Function} [action]
+        * @property {String} [value]
     **/
     /**
     * @param {Config} [Config] 
@@ -39,10 +24,50 @@ class WImageCapture extends HTMLElement {
             overflow: "hidden"
         });
         this.shadowRoot?.append(this.CustomStyle);
+        // @ts-ignore
+        this.videoElement = WRender.Create({ tagName: 'video', className: 'videoElement', autoplay: true });
+        /**@type {HTMLCanvasElement} */
+        // @ts-ignore
+        this.canvas = WRender.Create({ tagName: 'canvas', className: 'canvas' });
+        /**@type {HTMLCanvasElement} */
+        // @ts-ignore
+        this.croppedCanvas = WRender.Create({ tagName: 'canvas', className: 'croppedCanvas' });
+        // context
+        /**@type {CanvasRenderingContext2D} */
+        // @ts-ignore
+        this.ctx = this.canvas.getContext('2d');
+        /**@type {CanvasRenderingContext2D} */
+        // @ts-ignore
+        this.croppedCtx = this.croppedCanvas.getContext('2d');
+        this.img = new Image();
+        this.startX;
+        this.startY;
+        this.endX;
+        this.endY;
+        this.isDragging = false;
+        this.isResizing = false;
+        this.activeHandle = null;
+        this.croppedImageBase64 = '';
+        this.handles = [];
+        this.originalWidth;
+        this.originalHeight; // Dimensiones originales de la imagen
         this.Draw();
     }
     connectedCallback() { }
     Draw = async () => {
+
+        if (this.Config.value) {
+            this.img.src = this.Config.value
+            this.img.onload = () => {
+                this.originalWidth = this.img.width;
+                this.originalHeight = this.img.height;
+                this.canvas.width = this.originalWidth;
+                this.canvas.height = this.originalHeight;
+                this.ctx.drawImage(this.img, 0, 0);
+                //this.drawImageWithObjectFit('fill');
+                this.initializeHandles();
+            };
+        }
         this.ControlContainer = WRender.Create({
             class: "capture-container", children: []
         });
@@ -72,9 +97,9 @@ class WImageCapture extends HTMLElement {
             }
         });
 
-        this.setEvents(InputControl, canvas, ctx, cameraButton, videoElement, captureButton);
+        this.setEvents(InputControl, this.canvas, this.ctx, cameraButton, this.videoElement, captureButton);
 
-        this.ControlContainer.append(InputControl, canvas, label, cameraButton);
+        this.ControlContainer.append(InputControl, this.canvas, label, cameraButton);
         this.shadowRoot?.append(this.ControlContainer);
     }
     setEvents(InputControl, canvas, ctx, cameraButton, videoElement, captureButton) {
@@ -90,13 +115,13 @@ class WImageCapture extends HTMLElement {
                 };
                 // Leer el archivo como base64
                 reader.readAsDataURL(file);
-                img.src = URL.createObjectURL(file);               
-                img.onload = () => {
-                    originalWidth = img.width;
-                    originalHeight = img.height;
-                    canvas.width = originalWidth;
-                    canvas.height = originalHeight;
-                    ctx.drawImage(img, 0, 0);
+                this.img.src = URL.createObjectURL(file);
+                this.img.onload = () => {
+                    this.originalWidth = this.img.width;
+                    this.originalHeight = this.img.height;
+                    canvas.width = this.originalWidth;
+                    canvas.height = this.originalHeight;
+                    this.ctx.drawImage(this.img, 0, 0);
                     this.initializeHandles();
                 };
                 event.target.value = '';
@@ -159,17 +184,17 @@ class WImageCapture extends HTMLElement {
         captureButton.addEventListener('click', () => {
             const videoWidth = videoElement.videoWidth;
             const videoHeight = videoElement.videoHeight;
-            originalWidth = videoWidth;
-            originalHeight = videoHeight;
+            this.originalWidth = videoWidth;
+            this.originalHeight = videoHeight;
             canvas.width = videoWidth;
             canvas.height = videoHeight;
-            ctx.drawImage(videoElement, 0, 0, videoWidth, videoHeight);
-            img.src = canvas.toDataURL('image/png');
+            this.ctx.drawImage(videoElement, 0, 0, videoWidth, videoHeight);
+            this.img.src = canvas.toDataURL('image/png');
             if (this.Config.action) {
-                this.Config.action(img.src);
+                this.Config.action(this.img.src);
             }
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
+            this.img.onload = () => {
+                this.ctx.drawImage(this.img, 0, 0);
                 this.initializeHandles();
             };
 
@@ -181,8 +206,8 @@ class WImageCapture extends HTMLElement {
 
         const getRelativeCoordinates = (clientX, clientY) => {
             const rect = canvas.getBoundingClientRect();
-            const scaleX = originalWidth / rect.width;
-            const scaleY = originalHeight / rect.height;
+            const scaleX = this.originalWidth / rect.width;
+            const scaleY = this.originalHeight / rect.height;
             const x = (clientX - rect.left) * scaleX;
             const y = (clientY - rect.top) * scaleY;
             return { x, y };
@@ -191,32 +216,32 @@ class WImageCapture extends HTMLElement {
         const startDragging = (x, y) => {
             const handle = this.getHandleUnderCursor(x, y);
             if (handle) {
-                isResizing = true;
-                activeHandle = handle;
+                this.isResizing = true;
+                this.activeHandle = handle;
             } else {
-                startX = x;
-                startY = y;
-                isDragging = true;
+                this.startX = x;
+                this.startY = y;
+                this.isDragging = true;
             }
         };
 
         const continueDragging = (x, y) => {
-            if (isDragging) {
-                endX = x;
-                endY = y;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-                this.drawSelectionRect(startX, startY, endX, endY);
-            } else if (isResizing) {
+            if (this.isDragging) {
+                this.endX = x;
+                this.endY = y;
+                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                this.ctx.drawImage(this.img, 0, 0);
+                this.drawSelectionRect(this.startX, this.startY, this.endX, this.endY);
+            } else if (this.isResizing) {
                 this.resizeSelectionRect(x, y);
             }
         };
 
         const stopDragging = () => {
-            if (isDragging || isResizing) {
-                isDragging = false;
-                isResizing = false;
-                activeHandle = null;
+            if (this.isDragging || this.isResizing) {
+                this.isDragging = false;
+                this.isResizing = false;
+                this.activeHandle = null;
                 this.updateHandles();
                 this.cropImage();
             }
@@ -248,22 +273,45 @@ class WImageCapture extends HTMLElement {
 
         document.addEventListener('touchend', stopDragging);
     }
+    drawImageWithObjectFit(fitStyle) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Limpia el this.canvas
+
+        let x = 0, y = 0, width = this.canvas.width, height = this.canvas.height;
+
+        if (fitStyle === 'contain' || fitStyle === 'scale-down') {
+            const scale = Math.min(this.canvas.width / this.img.width, this.canvas.height / this.img.height);
+            width = this.img.width * scale;
+            height = this.img.height * scale;
+            x = (this.canvas.width - width) / 2;
+            y = (this.canvas.height - height) / 2;
+        } else if (fitStyle === 'cover') {
+            const scale = Math.max(this.canvas.width / this.img.width, this.canvas.height / this.img.height);
+            width = this.img.width * scale;
+            height = this.img.height * scale;
+            x = (this.canvas.width - width) / 2;
+            y = (this.canvas.height - height) / 2;
+        } else if (fitStyle === 'none') {
+            width = this.img.width;
+            height = this.img.height;
+        }
+
+        this.ctx.drawImage(this.img, x, y, width, height);
+    }
 
     update() {
         this.Draw();
     }
 
     drawSelectionRect(startX, startY, endX, endY) {
-        // @ts-ignore
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
-        ctx.drawImage(img, 0, 0); // Redibujar la imagen original
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Limpiar el canvas
+        this.ctx.drawImage(this.img, 0, 0); // Redibujar la imagen original
 
         // Dibujar el rectángulo de selección
-        ctx.beginPath();
-        ctx.rect(startX, startY, endX - startX, endY - startY);
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        this.ctx.beginPath();
+        this.ctx.rect(startX, startY, endX - startX, endY - startY);
+        this.ctx.strokeStyle = 'red';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
 
         // Dibujar los círculos en las esquinas del rectángulo
         const handleRadius = 5; // Radio de los círculos
@@ -274,11 +322,11 @@ class WImageCapture extends HTMLElement {
             { x: endX, y: endY }
         ];
 
-        ctx.fillStyle = 'red';
+        this.ctx.fillStyle = 'red';
         handlePositions.forEach(pos => {
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, handleRadius, 0, 2 * Math.PI);
-            ctx.fill();
+            this.ctx.beginPath();
+            this.ctx.arc(pos.x, pos.y, handleRadius, 0, 2 * Math.PI);
+            this.ctx.fill();
         });
 
         // Actualizar las posiciones de los manejadores
@@ -286,45 +334,41 @@ class WImageCapture extends HTMLElement {
     }
 
     cropImage() {
-        const cropWidth = Math.abs(endX - startX);
-        const cropHeight = Math.abs(endY - startY);
-        const cropX = Math.min(startX, endX);
-        const cropY = Math.min(startY, endY);
+        const cropWidth = Math.abs(this.endX - this.startX);
+        const cropHeight = Math.abs(this.endY - this.startY);
+        const cropX = Math.min(this.startX, this.endX);
+        const cropY = Math.min(this.startY, this.endY);
 
-        // @ts-ignore
-        croppedCanvas.width = cropWidth;
-        // @ts-ignore
-        croppedCanvas.height = cropHeight;
+        this.croppedCanvas.width = cropWidth;
+        this.croppedCanvas.height = cropHeight;
 
-        croppedCtx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-        // @ts-ignore
-        croppedImageBase64 = croppedCanvas.toDataURL('image/png');
-        console.log(croppedImageBase64);
+        this.croppedCtx.drawImage(this.img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+        this.croppedImageBase64 = this.croppedCanvas.toDataURL('image/png');
+        //console.log(this.croppedImageBase64);
         if (this.Config.action) {
-            this.Config.action(croppedImageBase64);
+            this.Config.action(this.croppedImageBase64);
         }
-        //const imgt = WRender.Create({tagName: "img", src: croppedImageBase64})
+        //const imgt = WRender.Create({tagName: "img", src: this.croppedImageBase64})
         //this.shadowRoot.append(new WModalForm({ ObjectModal: imgt}))
     }
 
     initializeHandles() {
-        handles = []
-        const handleSize = 10;
+        this.handles = []
+        this.handleSize = 10;
         for (let i = 0; i < 4; i++) {
             const handle = document.createElement('div');
             handle.className = 'handle';
-            handle.style.width = `${handleSize}px`;
-            handle.style.height = `${handleSize}px`;
+            handle.style.width = `${this.handleSize}px`;
+            handle.style.height = `${this.handleSize}px`;
             handle.style.display = 'none';
             handle.style.position = 'absolute';
             this.shadowRoot?.appendChild(handle);
-            handles.push(handle);
+            this.handles.push(handle);
         }
     }
 
     updateHandles(handlePositions) {
-        handles.forEach((handle, index) => {
+        this.handles?.forEach((handle, index) => {
             if (handlePositions == undefined || handlePositions[index].x == undefined || handle.style.left == undefined) {
                 return
             }
@@ -335,37 +379,37 @@ class WImageCapture extends HTMLElement {
     }
 
     getHandleUnderCursor(x, y) {
-        return handles.find(handle => {
+        return this.handles?.find(handle => {
             const rect = handle.getBoundingClientRect();
             return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
         });
     }
 
     resizeSelectionRect(x, y) {
-        const handleIndex = handles.indexOf(activeHandle);
+        const handleIndex = this.handles?.indexOf(this.activeHandle);
         switch (handleIndex) {
             case 0:
-                startX = x;
-                startY = y;
+                this.startX = x;
+                this.startY = y;
                 break;
             case 1:
-                endX = x;
-                startY = y;
+                this.endX = x;
+                this.startY = y;
                 break;
             case 2:
-                startX = x;
-                endY = y;
+                this.startX = x;
+                this.endY = y;
                 break;
             case 3:
-                endX = x;
-                endY = y;
+                this.endX = x;
+                this.endY = y;
                 break;
         }
 
         // @ts-ignore
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        this.drawSelectionRect(startX, startY, endX, endY);
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.ctx.drawImage(this.img, 0, 0);
+        this.drawSelectionRect(this.startX, this.startY, this.endX, this.endY);
     }
     //TODO VER EL REZIGSING A POSTERIORI
     CustomStyle = css`
