@@ -86,6 +86,7 @@ class WAjaxTools {
         if (response.status == 400 || response.status == 403 || response.status == 404 || response.status == 500) {
             const messageError = await response.text();
             var lineas = messageError.split('\n');
+            alert(messageError)
             throw new Error(this.ProcessError(lineas[0])).message;
             if (typeof response !== "undefined" && typeof response !== "null" && response != "") {
                 return this.LocalData(Url);
