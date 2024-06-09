@@ -969,15 +969,14 @@ class WTableComponent extends HTMLElement {
             }
 
             .imgPhoto {
-                width: 80px;
+                width: 50px;
                 border-radius: 50%;
-                height: 80px;
+                height: 50px;
                 size: 100%;
                 display: block;
                 margin: auto;
                 object-fit: cover;
                 box-shadow: 0 2px 5px 0 rgb(0 0 0 / 30%);
-                margin: 10px;
             }
 
             *::-webkit-scrollbar-thumb {
@@ -1052,6 +1051,7 @@ class WCardTable extends HTMLElement {
         if (this.IsDrawableProp(this.Element, prop)) {
             switch (Model[prop].type.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG":case "IMAGECAPTURE":
+                    this.CardTableContainer.style.gridTemplateColumns = "auto auto";
                     this.CardTableContainer.append(ControlBuilder.BuildImage(value, this.Config.ImageUrlPath));
                     break;
                 case "DATE": case "FECHA":
@@ -1084,31 +1084,33 @@ class WCardTable extends HTMLElement {
     CardStyle = css`
         .CardTableContainer{
             display: grid;
-            grid-template-columns: auto;
+            grid-template-columns: 1px auto;
             grid-template-rows: auto;
+            gap: 5px;
             overflow: hidden;
+            grid-auto-flow: column;
         }
         .CardTableContainer img {
+            grid-column: 1/2;
+            margin-bottom: 5px;
             grid-row: span 4;
-            margin-bottom: 10px;
         }
         .CardTableContainer label {
             min-width: 180px;
-            margin-bottom:5px;
+            grid-column: 2/3;
         }
         .CardTableContainer label::first-letter {
             text-transform: uppercase;
         }
         .imgPhoto {
-            width: 80px;
+            width: 50px;
             border-radius: 50%;
-            height: 80px;
+            height: 50px;
             size: 100%;
             display: block;
             margin: auto;
             object-fit: cover;
             box-shadow: 0 2px 5px 0 rgb(0 0 0 / 30%);
-            margin: 10px;
         }
     `
     IsDrawableProp(element, prop) {
