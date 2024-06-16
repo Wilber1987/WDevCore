@@ -1,6 +1,6 @@
 //@ts-check
 // @ts-ignore
-import { FilterData, TableConfig } from "../WModules/CommonModel.js";
+import { FilterData, OrderData, TableConfig } from "../WModules/CommonModel.js";
 import { ConvertToMoneyString, WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -41,7 +41,7 @@ class WTableComponent extends HTMLElement {
                 this.DrawTable(DFilt);
             }
         });
-        /**@type {Array<FilterData>} */
+        /**@type {Array<OrderData>} */
         this.Sorts = [];
         /**@type {Number} */
         this.maxElementByPage = this.TableConfig.maxElementByPage ?? 10;
@@ -271,17 +271,17 @@ class WTableComponent extends HTMLElement {
     CreateSortOptions(prop) {
         const up = WRender.Create({
             tagName: 'input', type: 'button',
-            className: 'sort-up ' + (this.Sorts.find(s => s.PropName == prop && s.FilterType == "ASC") ? "sort-active" : ""),
+            className: 'sort-up ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "ASC") ? "sort-active" : ""),
             onclick: async () => {
-                const sort = new FilterData({ FilterType: "ASC", PropName: prop });
+                const sort = new OrderData({ OrderType: "ASC", PropName: prop });
                 const findSort = this.Sorts.find(s => s.PropName == prop);
                 if (findSort) {
-                    if (findSort.FilterType == sort.FilterType) {
+                    if (findSort.OrderType == sort.OrderType) {
                         this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
                         up.className = "sort-up";
                         down.className = "sort-down";
                     } else {
-                        findSort.FilterType = "ASC";
+                        findSort.OrderType = "ASC";
                         up.className = "sort-up sort-active";
                         down.className = "sort-down";
                     }
@@ -295,17 +295,17 @@ class WTableComponent extends HTMLElement {
         });
         const down = WRender.Create({
             tagName: 'input', type: 'button',
-            className: 'sort-down ' + (this.Sorts.find(s => s.PropName == prop && s.FilterType == "DESC") ? "sort-active" : ""),
+            className: 'sort-down ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "DESC") ? "sort-active" : ""),
             onclick: async () => {
-                const sort = new FilterData({ FilterType: "DESC", PropName: prop });
+                const sort = new OrderData({ OrderType: "DESC", PropName: prop });
                 const findSort = this.Sorts.find(s => s.PropName == prop);
                 if (findSort) {
-                    if (findSort.FilterType == sort.FilterType) {
+                    if (findSort.OrderType == sort.OrderType) {
                         this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
                         up.className = "sort-up";
                         down.className = "sort-down";
                     } else {
-                        findSort.FilterType = "DESC";
+                        findSort.OrderType = "DESC";
                         up.className = "sort-up";
                         down.className = "sort-down sort-active";
                     }
@@ -750,7 +750,8 @@ class WTableComponent extends HTMLElement {
                 padding: 10px;
                 text-transform: capitalize;
                 position: relative;
-                padding-right: 10px;
+                padding-right: 15px;
+                border-right: 1px #eaeaea solid;
             }
 
             .WTable th label::first-letter{
@@ -761,6 +762,7 @@ class WTableComponent extends HTMLElement {
                 padding: 0.8rem;
                 text-align: left;
                 vertical-align: top;
+                border-right: 1px #eaeaea solid;
             }
             .WTable td label { overflow: hidden;
                 max-height: 200px;
@@ -885,18 +887,20 @@ class WTableComponent extends HTMLElement {
                 display: flex;
                 flex-direction: column;
                 gap: 2px;
-                width: 10px;
-                height: 20px;
+                width: 8px;
+                height: 16px;
                 position: absolute;
-                right: 3px;
-                top:8px;
+                right: 8px;
+                top:50%;
+                transform: translateY(-50%);
+
             }
 
             .sort-up, .sort-down {
                 clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
                 background-color: #999;
-                height: 8px !important;
-                width: 10px;
+                height: 6px !important;
+                width: 8px;
                 border: none;
             }
             .sort-down {
@@ -1035,6 +1039,7 @@ class WTableComponent extends HTMLElement {
                 background-color: #4894aa;
                 color: #fff;
                 border-radius: 0.2cm;
+                margin-bottom: 2px;
             }
 
             .Btn {

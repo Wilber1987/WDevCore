@@ -152,9 +152,10 @@ class WFilterOptions extends HTMLElement {
         const Model = this.EntityModel ?? this.ModelObject;
         if (Model.Get || this.Config.AutoFilter == false) {
             this.ModelObject.FilterData = [];
+            this.ModelObject.OrderData = [];
             if(sorts){
                 sorts.forEach(sort => {
-                    this.ModelObject.FilterData.push(sort);
+                    this.ModelObject.OrderData.push(sort);
                 });
             }
             this.FilterControls.forEach(control => {

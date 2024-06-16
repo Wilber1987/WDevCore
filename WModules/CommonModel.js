@@ -435,6 +435,25 @@ class FilterData {
     Values;
     Filters;
 }
+class OrderData {
+    /**
+    * @param {Partial<OrdeData>} [props] 
+    */
+    constructor(props) {
+        for (const prop in props) {
+            this[prop] = props[prop];
+        }
+    }
+    PropName;
+    OrderType;
+    Asc(propName) {
+        return new OrderData({ PropName: propName, OrderType: "ASC" });
+    }
+    Desc(propName) {
+        return new OrderData({ PropName: propName, OrderType: "DESC" });
+    }
+
+}
 
 export {
     WNode,
@@ -444,5 +463,6 @@ export {
     ModelProperty,
     TableConfig,
     ModalConfig,
-    FilterData
+    FilterData,
+    OrderData
 }
