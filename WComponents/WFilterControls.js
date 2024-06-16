@@ -1,7 +1,7 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 // @ts-ignore
-import { ModelProperty } from "../WModules/CommonModel.js";
+import { FilterData, ModelProperty } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";
 import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -145,11 +145,18 @@ class WFilterOptions extends HTMLElement {
             && Model[prop].__proto__ != Function.prototype
             && Model[prop].__proto__.constructor.name != "AsyncFunction";
     }
-
-    filterFunction = async () => {
+    /**
+    * @param {Array<FilterData>} [sorts] 
+    */
+    filterFunction = async (sorts) => {
         const Model = this.EntityModel ?? this.ModelObject;
         if (Model.Get || this.Config.AutoFilter == false) {
             this.ModelObject.FilterData = [];
+            if(sorts){
+                sorts.forEach(sort => {
+                    this.ModelObject.FilterData.push(sort);
+                });
+            }
             this.FilterControls.forEach(control => {
                 if (this.ModelObject[control.id]) {
                     let values;
@@ -198,7 +205,7 @@ class WFilterOptions extends HTMLElement {
                                 if (!foreynKeyExist) {
                                     for (const propiedad in ModelProperty.ModelObject) {
                                         const keyNameSames = ModelProperty.ModelObject[propiedad].primary
-                                            && ModelProperty.ModelObject.hasOwnProperty(propiedad) 
+                                            && ModelProperty.ModelObject.hasOwnProperty(propiedad)
                                             && this.ModelObject.hasOwnProperty(propiedad);
                                         if (keyNameSames) {
                                             foraingKeyName = propiedad;
@@ -211,15 +218,15 @@ class WFilterOptions extends HTMLElement {
                                     console.log(foraingKeyName);
                                     values = []
                                     filterType = "IN";
-                                    propiertyName = foraingKeyName;   
+                                    propiertyName = foraingKeyName;
                                     let primaryKey = null;
                                     for (const key in control.ModelObject) {
                                         if (control.ModelObject[key].primary) {
                                             primaryKey = key;
                                             break;
                                         }
-                                    }                               
-                                    control.selectedItems?.forEach(element => {                                       
+                                    }
+                                    control.selectedItems?.forEach(element => {
                                         // @ts-ignore
                                         values.push(element[primaryKey]?.toString())
                                     });
@@ -452,7 +459,7 @@ class WFilterOptions extends HTMLElement {
             //MultiSelect: false,
             Dataset: ModelProperty.Dataset,
             IsFilterControl: true,
-            ModelObject: ModelProperty.ModelObject.__proto__ == Function.prototype ?  ModelProperty.ModelObject() : ModelProperty.ModelObject,
+            ModelObject: ModelProperty.ModelObject.__proto__ == Function.prototype ? ModelProperty.ModelObject() : ModelProperty.ModelObject,
             id: prop,
             FullDetail: true,
             action: () => {

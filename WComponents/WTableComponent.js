@@ -1,6 +1,6 @@
 //@ts-check
 // @ts-ignore
-import { TableConfig } from "../WModules/CommonModel.js";
+import { FilterData, TableConfig } from "../WModules/CommonModel.js";
 import { ConvertToMoneyString, WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -41,6 +41,8 @@ class WTableComponent extends HTMLElement {
                 this.DrawTable(DFilt);
             }
         });
+        /**@type {Array<FilterData>} */
+        this.Sorts = [];
         /**@type {Number} */
         this.maxElementByPage = this.TableConfig.maxElementByPage ?? 10;
         /**@type {Number} */
@@ -174,9 +176,12 @@ class WTableComponent extends HTMLElement {
         let tr = WRender.Create({ tagName: "tr" })
         for (const prop in element) {
             if (this.IsDrawableRow(element, prop)) {
+                const { up, down } = this.CreateSortOptions(prop);
                 const th = WRender.Create({
-                    tagName: "th", innerHTML: this.ModelObject[prop]?.label ?
-                        WOrtograficValidation.es(this.ModelObject[prop]?.label) : WOrtograficValidation.es(prop)
+                    tagName: "th",
+                    innerHTML: this.ModelObject[prop]?.label ?
+                        WOrtograficValidation.es(this.ModelObject[prop]?.label) : WOrtograficValidation.es(prop),
+                    children: [{ className: "sort-container", children: this.isSorteable(element, prop) ? [up, down] : [] }]
                 });
                 tr.append(th);
             }
@@ -263,6 +268,58 @@ class WTableComponent extends HTMLElement {
         });
     }
 
+    CreateSortOptions(prop) {
+        const up = WRender.Create({
+            tagName: 'input', type: 'button',
+            className: 'sort-up ' + (this.Sorts.find(s => s.PropName == prop && s.FilterType == "ASC") ? "sort-active" : ""),
+            onclick: async () => {
+                const sort = new FilterData({ FilterType: "ASC", PropName: prop });
+                const findSort = this.Sorts.find(s => s.PropName == prop);
+                if (findSort) {
+                    if (findSort.FilterType == sort.FilterType) {
+                        this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
+                        up.className = "sort-up";
+                        down.className = "sort-down";
+                    } else {
+                        findSort.FilterType = "ASC";
+                        up.className = "sort-up sort-active";
+                        down.className = "sort-down";
+                    }
+                } else {
+                    this.Sorts.push(sort);
+                    up.className = "sort-up sort-active";
+                    down.className = "sort-down";
+                }
+                this.FilterOptions.filterFunction(this.Sorts);
+            }
+        });
+        const down = WRender.Create({
+            tagName: 'input', type: 'button',
+            className: 'sort-down ' + (this.Sorts.find(s => s.PropName == prop && s.FilterType == "DESC") ? "sort-active" : ""),
+            onclick: async () => {
+                const sort = new FilterData({ FilterType: "DESC", PropName: prop });
+                const findSort = this.Sorts.find(s => s.PropName == prop);
+                if (findSort) {
+                    if (findSort.FilterType == sort.FilterType) {
+                        this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
+                        up.className = "sort-up";
+                        down.className = "sort-down";
+                    } else {
+                        findSort.FilterType = "DESC";
+                        up.className = "sort-up";
+                        down.className = "sort-down sort-active";
+                    }
+                } else {
+                    this.Sorts.push(sort);
+                    up.className = "sort-up";
+                    down.className = "sort-down sort-active";
+                }
+                this.FilterOptions.filterFunction(this.Sorts);
+            }
+        });
+        return { up, down };
+    }
+
     IsDrawableRow(element, prop) {
         if (this.TableConfig.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
             return true;
@@ -285,7 +342,7 @@ class WTableComponent extends HTMLElement {
         let td = WRender.Create({ tagName: "td", id: "td_" + prop + "_" + index, class: "td_" + prop });
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
-                case "IMAGE": case "IMAGES": case "IMG":case "IMAGECAPTURE":
+                case "IMAGE": case "IMAGES": case "IMG": case "IMAGECAPTURE":
                     td.append(ControlBuilder.BuildImage(value, this.TableConfig?.ImageUrlPath));
                     tr.append(td);
                     break;
@@ -559,8 +616,18 @@ class WTableComponent extends HTMLElement {
     }
 
     isSorteable(element, prop) {
-        return element[prop] != null &&
-            parseFloat(element[prop].toString().replaceAll("%", "").replaceAll(Money[this.TypeMoney], "")).toString() != "NaN";
+        if ((this.ModelObject[prop]?.type == undefined
+            || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+            || this.ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
+            || this.ModelObject[prop]?.type.toUpperCase() == "MODEL"
+            || this.ModelObject[prop]?.type.toUpperCase() == "IMG"
+            || this.ModelObject[prop]?.type.toUpperCase() == "IMAGE"
+            || this.ModelObject[prop]?.hiddenInTable == true)
+            || element[prop]?.__proto__ == Function.prototype
+            || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -682,6 +749,8 @@ class WTableComponent extends HTMLElement {
                 text-align: left;
                 padding: 10px;
                 text-transform: capitalize;
+                position: relative;
+                padding-right: 10px;
             }
 
             .WTable th label::first-letter{
@@ -811,6 +880,30 @@ class WTableComponent extends HTMLElement {
                 content: " ";
                 background-color: cornflowerblue;
                 transform: scale(1);
+            }
+            .sort-container{
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                width: 10px;
+                height: 20px;
+                position: absolute;
+                right: 3px;
+                top:8px;
+            }
+
+            .sort-up, .sort-down {
+                clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+                background-color: #999;
+                height: 8px !important;
+                width: 10px;
+                border: none;
+            }
+            .sort-down {
+                clip-path: polygon(100% 0, 0 0, 50% 100%);
+            }
+            .sort-active{
+                background-color: #322c64;
             }
 
             @media (max-width: 600px) {
@@ -1050,7 +1143,7 @@ class WCardTable extends HTMLElement {
         }
         if (this.IsDrawableProp(this.Element, prop)) {
             switch (Model[prop].type.toUpperCase()) {
-                case "IMAGE": case "IMAGES": case "IMG":case "IMAGECAPTURE":
+                case "IMAGE": case "IMAGES": case "IMG": case "IMAGECAPTURE":
                     this.CardTableContainer.style.gridTemplateColumns = "auto auto";
                     this.CardTableContainer.append(ControlBuilder.BuildImage(value, this.Config.ImageUrlPath));
                     break;

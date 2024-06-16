@@ -421,7 +421,20 @@ class ModalConfig {
     * @property {Array<any>} [Values]
     * @property {Array<FilterData>} [Filters]
 **/
-class FilterData { }
+class FilterData {
+    /**
+    * @param {Partial<FilterData>} [props] 
+    */
+    constructor(props) {
+        for (const prop in props) {
+            this[prop] = props[prop];
+        }
+    }
+    PropName;
+    FilterType;
+    Values;
+    Filters;
+}
 
 export {
     WNode,
