@@ -150,7 +150,7 @@ class WFilterOptions extends HTMLElement {
     */
     filterFunction = async (sorts) => {
         const Model = this.EntityModel ?? this.ModelObject;
-        if (Model.Get || this.Config.AutoFilter == false) {
+        if (Model.Get || this.Config.AutoFilter == false) {           
             this.ModelObject.FilterData = [];
             this.ModelObject.OrderData = [];
             if(sorts){
@@ -179,8 +179,8 @@ class WFilterOptions extends HTMLElement {
                         case "DATE": case "FECHA": case "HORA": case "NUMBER":
                             /**TODO */
                             filterType = "BETWEEN"
-                            const inputs = control.querySelectorAll("input");
-
+                            const inputs = control.querySelectorAll("input");                           
+                            
                             if (inputs[0].value != '' || inputs[1].value != '') {
                                 values = []
                                 if (inputs[0].value != '') {

@@ -530,6 +530,7 @@ class RadialChart extends HTMLElement {
             //texto
             let degs = (360 * porcentajeF) / 100;
             let degs2 = (((360 * porcentaje) / 100) / 2) - 12;
+            //console.log(`translate(0,0),rotate(-${degs + (degs2)})`, element, this.EvalValue);
             let TextSVG = WRender.createElementNS({
                 type: "text",
                 class: "circleText",

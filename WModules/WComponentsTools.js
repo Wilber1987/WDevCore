@@ -242,7 +242,7 @@ class WRender {
             }
             return element;
         } catch (error) {
-
+            console.log(error);
         }
     }
     /**
@@ -586,7 +586,7 @@ class WArrayF {
                     NewElement[prop] = element[prop]
                 }
                 //console.log(element);
-                if (element.hasOwnProperty("count")) {
+                if (!element.hasOwnProperty("count")) {
                     element.count = 1;
                     NewElement.count = 1;
                 }
