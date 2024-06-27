@@ -272,7 +272,8 @@ class WTableComponent extends HTMLElement {
         const up = WRender.Create({
             tagName: 'input', type: 'button',
             className: 'sort-up ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "ASC") ? "sort-active" : ""),
-            onclick: async () => {
+            onclick: async (ev) => {
+                ev.target.disabled = true;
                 const sort = new OrderData({ OrderType: "ASC", PropName: prop });
                 const findSort = this.Sorts.find(s => s.PropName == prop);
                 if (findSort) {
@@ -289,14 +290,17 @@ class WTableComponent extends HTMLElement {
                     this.Sorts.push(sort);
                     up.className = "sort-up sort-active";
                     down.className = "sort-down";
-                }
-                this.FilterOptions.filterFunction(this.Sorts);
+                }              
+                await this.FilterOptions.filterFunction(this.Sorts); 
+                ev.target.disabled = false;             
+                
             }
         });
         const down = WRender.Create({
             tagName: 'input', type: 'button',
             className: 'sort-down ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "DESC") ? "sort-active" : ""),
-            onclick: async () => {
+            onclick: async (ev) => {
+                ev.target.disabled = true;
                 const sort = new OrderData({ OrderType: "DESC", PropName: prop });
                 const findSort = this.Sorts.find(s => s.PropName == prop);
                 if (findSort) {
@@ -314,7 +318,8 @@ class WTableComponent extends HTMLElement {
                     up.className = "sort-up";
                     down.className = "sort-down sort-active";
                 }
-                this.FilterOptions.filterFunction(this.Sorts);
+                await this.FilterOptions.filterFunction(this.Sorts);
+                ev.target.disabled = false;
             }
         });
         return { up, down };
