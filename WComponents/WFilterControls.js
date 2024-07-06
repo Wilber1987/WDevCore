@@ -1,7 +1,7 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 // @ts-ignore
-import { FilterData, ModelProperty } from "../WModules/CommonModel.js";
+import { FilterData, ModelProperty, OrderData } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";
 import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -11,6 +11,7 @@ import { MultiSelect } from "./WMultiSelect.js";
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset  
     * @property {Function} FilterFunction
+    * @property {Array<OrderData>} Sorts
     * @property {Boolean} [Display]
     * @property {Boolean} [AutoFilter]
     * @property {Boolean} [AutoSetDate]
@@ -40,6 +41,8 @@ class WFilterOptions extends HTMLElement {
         this.shadowRoot?.append(WRender.createElement(this.styles));
         this.shadowRoot?.append(this.FilterContainer);
         this.DrawFilter();
+        /**@type {Array<OrderData>} */
+        this.Sorts = Config.Sorts;
     }
     connectedCallback() {
         this.shadowRoot?.addEventListener("click", (e) => this.undisplayMultiSelects(e));
@@ -150,10 +153,10 @@ class WFilterOptions extends HTMLElement {
     */
     filterFunction = async (sorts) => {
         const Model = this.EntityModel ?? this.ModelObject;
-        if (Model.Get || this.Config.AutoFilter == false) {           
+        if (Model.Get || this.Config.AutoFilter == false) {
             this.ModelObject.FilterData = [];
             this.ModelObject.OrderData = [];
-            if(sorts){
+            if (sorts) {
                 sorts.forEach(sort => {
                     this.ModelObject.OrderData.push(sort);
                 });
@@ -179,8 +182,8 @@ class WFilterOptions extends HTMLElement {
                         case "DATE": case "FECHA": case "HORA": case "NUMBER":
                             /**TODO */
                             filterType = "BETWEEN"
-                            const inputs = control.querySelectorAll("input");                           
-                            
+                            const inputs = control.querySelectorAll("input");
+
                             if (inputs[0].value != '' || inputs[1].value != '') {
                                 values = []
                                 if (inputs[0].value != '') {
@@ -380,7 +383,7 @@ class WFilterOptions extends HTMLElement {
         })
         options.unshift(WRender.Create({ tagName: "option", value: "", innerText: "Seleccionar" }));
         let InputControl = WRender.Create({
-            tagName: "select", className: prop, onchange: this.filterFunction, id: prop,
+            tagName: "select", className: prop, onchange: ()=> this.filterFunction(this.Sorts), id: prop,
             children: options
         });
 
@@ -397,7 +400,7 @@ class WFilterOptions extends HTMLElement {
             className: prop,
             id: prop,
             placeholder: WOrtograficValidation.es(prop),
-            onchange: (ev) => { this.filterFunction() }
+            onchange: (ev) => { this.filterFunction(this.Sorts) }
         });
         return InputControl;
     }
@@ -417,7 +420,7 @@ class WFilterOptions extends HTMLElement {
                     // @ts-ignore
                     value: this.Config.AutoSetDate == true ? new Date().subtractDays(30).toISO() : undefined,
                     placeholder: prop,
-                    onchange: (ev) => { this.filterFunction() }
+                    onchange: (ev) => { this.filterFunction(this.Sorts) }
                 }, {
                     tagName: "input",
                     type: "date",
@@ -426,7 +429,7 @@ class WFilterOptions extends HTMLElement {
                     value: this.Config.AutoSetDate == true ? new Date().addDays(1).toISO() : undefined,
                     id: prop + "second",
                     placeholder: prop,
-                    onchange: (ev) => { this.filterFunction() }
+                    onchange: (ev) => { this.filterFunction(this.Sorts) }
                 }
             ]
         });
@@ -442,14 +445,14 @@ class WFilterOptions extends HTMLElement {
                     className: prop + " firstNumber",
                     id: prop + "first",
                     placeholder: WOrtograficValidation.es(prop),
-                    onchange: (ev) => { this.filterFunction() }
+                    onchange: (ev) => { this.filterFunction(this.Sorts) }
                 }, {
                     tagName: "input",
                     type: "number",
                     className: prop + " secondNumber",
                     id: prop + "second",
                     placeholder: WOrtograficValidation.es(prop),
-                    onchange: (ev) => { this.filterFunction() }
+                    onchange: (ev) => { this.filterFunction(this.Sorts) }
                 }
             ]
         });
@@ -464,7 +467,7 @@ class WFilterOptions extends HTMLElement {
             id: prop,
             FullDetail: true,
             action: () => {
-                this.filterFunction();
+                this.filterFunction(this.Sorts);
             }
         });
         InputControl.onclick = async () => {
@@ -502,7 +505,7 @@ class WFilterOptions extends HTMLElement {
 
         .OptionContainer {
             display: grid;
-            width: 100%;
+            width: -webkit-fill-available;
             grid-template-columns: repeat(4,calc(25% - 12px));
             grid-gap: 15px;
             padding: 0px 5px;
@@ -555,12 +558,7 @@ class WFilterOptions extends HTMLElement {
             font-size: 11px;
         }
 
-        .OptionContainer input,
-        .OptionContainer select {
-            margin: 0px;
-            padding: 5px 10px;
-        }
-
+       
         .multi-control-container, .w-multi-select-container {
             grid-column: span 2;
         }

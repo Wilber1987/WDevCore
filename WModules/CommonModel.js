@@ -81,7 +81,7 @@ function ModelFunction() { }
     * @property {Array} [fileType]
     * @property {Array} [ControlAction] botones adicionales que se le agregan al control 
     * @property {String} [pattern]
-    * @property {String} [defaultValue]
+    * @property {any} [defaultValue]
     * @property {String} [placeholder]
     * @property {Boolean} [hiddenFilter]
     * @property {String | Number} [min] para rangos de tipo number y date

@@ -6,6 +6,7 @@ class EntityClass {
         this.ApiMethods = {
             ApiRoute: window.origin + "/api/",
             Get: "Api" + Namespace + "/get" + this.__proto__.constructor.name.replace("_ModelComponent", ""),
+            Find: "Api" + Namespace + "/find" + this.__proto__.constructor.name.replace("_ModelComponent", ""),
             Set: "Api" + Namespace + "/save" + this.__proto__.constructor.name.replace("_ModelComponent", ""),
             Update: "Api" + Namespace + "/update" + this.__proto__.constructor.name.replace("_ModelComponent", ""),
             Delete: "Api" + Namespace + "/delete" + this.__proto__.constructor.name.replace("_ModelComponent", "")
@@ -17,9 +18,20 @@ class EntityClass {
      * @param {String} Param 
      * @returns {Array}
      */
-    Get = async (Param = "") => {
+    Get = async () => {
         let Data = await this.GetData(this.ApiMethods.Get);
         return Data;
+    }
+    /**
+     * @param {String} Param 
+     * @returns {any}
+     */
+    Find = async () => {
+        let FindObject = await this.GetData(this.ApiMethods.Find);
+        if (FindObject) {
+            return (new this.constructor(FindObject));
+        }
+        return null;
     }
     /**
     * @param {String} paramName 
@@ -88,6 +100,7 @@ class EntityClass {
         }        
     }
     SaveData = async (Path, Data) => {
+        console.log(this.ApiMethods.ApiRoute + Path, Data);
         return await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, Data)
     }
     replacer(value) {
