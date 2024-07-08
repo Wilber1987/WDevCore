@@ -472,7 +472,7 @@ const MainMenu = css`
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
-        min-height: 18px;
+        min-height: 25px;
         width: calc(100% - 30px);
         overflow-x: auto;
     }

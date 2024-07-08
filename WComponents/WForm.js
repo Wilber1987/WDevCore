@@ -360,11 +360,14 @@ class WForm extends HTMLElement {
         const ModelProperty = Model[prop];
         let InputControl;
         ModelProperty.require = ModelProperty.require ?? true;
+        /**@type {Boolean} */
+        // @ts-ignore
+        let { require, disabled } = await this.newMethod(ModelProperty, ObjectF);
         const actionFunction = ModelProperty.action ?? null;
         ObjectF[prop] = ObjectF[prop] ?? ModelProperty.defaultValue;
         switch (ModelProperty.type?.toUpperCase()) {
             case "TITLE":
-                ModelProperty.require = false;
+                require = false;
                 ObjectF[prop] = undefined;
                 ControlLabel.className += " formHeader";
                 ControlLabel.innerHTML = ModelProperty.label ?? "";
@@ -375,7 +378,7 @@ class WForm extends HTMLElement {
             case "IMG": case "IMAGE": case "IMAGES":
                 const Multiple = ModelProperty.type.toUpperCase() == "IMAGES" ? true : false;
                 InputControl = this.CreateImageControl(val, ControlContainer, prop, Multiple, onChangeEvent);
-                if (ModelProperty.disabled) {
+                if (disabled) {
                     InputControl.style.pointerEvents = "none";
                 }
                 if (Multiple) {
@@ -392,7 +395,7 @@ class WForm extends HTMLElement {
                         ObjectF[prop] = image;
                     }
                 });
-                if (ModelProperty.disabled) {
+                if (disabled) {
                     InputControl.style.pointerEvents = "none";
                 }
                 ControlContainer.className += " imgPhoto";
@@ -416,7 +419,7 @@ class WForm extends HTMLElement {
                     //id: "ControlValue" + prop,
                     className: prop, type: type,
                     placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
-                    disabled: ModelProperty.disabled,
+                    disabled: disabled,
                     //min: ModelProperty.min ?? defaulMin,
                     //max: ModelProperty.max ?? defaulMax,
                     onchange: onChangeEvent
@@ -439,7 +442,7 @@ class WForm extends HTMLElement {
                 InputControl = WRender.Create({
                     tagName: "input", className: prop, type: "time",
                     placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
-                    disabled: ModelProperty.disabled,
+                    disabled: disabled,
                     min: ModelProperty.min,
                     max: ModelProperty.max,
                     onchange: onChangeEvent
@@ -450,7 +453,7 @@ class WForm extends HTMLElement {
                 break;
             case "SELECT":
                 InputControl = this.CreateSelect(prop, ObjectF, ModelProperty.Dataset, onChangeEvent);
-                InputControl.disabled = ModelProperty.disabled ?? false;
+                InputControl.disabled = disabled ?? false;
                 ObjectF[prop] = InputControl.value;
 
                 Form.appendChild(ControlContainer);
@@ -479,7 +482,7 @@ class WForm extends HTMLElement {
                     }
 
                 }
-                if ((ObjectF[prop] == null || ObjectF[prop] == undefined) && ModelProperty.require != false &&
+                if ((ObjectF[prop] == null || ObjectF[prop] == undefined) && require != false &&
                     ModelProperty.Dataset &&
                     ModelProperty.Dataset?.length > 0) {
                     ObjectF[prop] = ModelProperty?.Dataset[0];
@@ -487,7 +490,7 @@ class WForm extends HTMLElement {
                 val = ObjectF[prop];
                 const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop);
                 InputControl = await this.CreateWSelect(InputControl, DataseFilter, prop, ObjectF, Model);
-                if (ModelProperty.disabled) {
+                if (disabled) {
                     InputControl.style.pointerEvents = "none";
                 }
                 this.FindObjectMultiselect(val, InputControl);
@@ -510,7 +513,7 @@ class WForm extends HTMLElement {
                         }
                     }, Dataset: Datasetilt, ModelObject: ModelProperty.ModelObject
                 });
-                if (ModelProperty.disabled) {
+                if (disabled) {
                     InputControl.style.pointerEvents = "none";
                 }
                 this.FindObjectMultiselect(val, InputControl);
@@ -523,8 +526,8 @@ class WForm extends HTMLElement {
                     className: prop, value: val, type: ModelProperty.type,
                     placeholder: "Ejem.: me@email.com",
                     pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$",
-                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
-                    disabled: ModelProperty.disabled
+                    onchange: disabled ? undefined : onChangeEvent,
+                    disabled: disabled
                 });
                 Form.appendChild(ControlContainer);
                 break;
@@ -535,8 +538,8 @@ class WForm extends HTMLElement {
                     placeholder: "Ejem.: 88888888",
                     //pattern: "[+]{1}[0-9]{2,3}[-]{1}[0-9]{3,4}[0-9]{4,5}",
                     pattern: "[0-9]{4}[0-9]{4}",
-                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
-                    disabled: ModelProperty.disabled
+                    onchange: disabled ? undefined : onChangeEvent,
+                    disabled: disabled
                 });
                 Form.appendChild(ControlContainer);
                 break;
@@ -546,8 +549,8 @@ class WForm extends HTMLElement {
                     className: prop, value: val, type: ModelProperty.type,
                     placeholder: "Ejem.: https://site.com",
                     pattern: "https?://.+",
-                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
-                    disabled: ModelProperty.disabled
+                    onchange: disabled ? undefined : onChangeEvent,
+                    disabled: disabled
                 });
                 Form.appendChild(ControlContainer);
                 break;
@@ -596,7 +599,7 @@ class WForm extends HTMLElement {
                         }
                     }
                 });
-                if (ModelProperty.disabled) {
+                if (disabled) {
                     InputControl.style.pointerEvents = "none";
                 }
                 ComplexForm.appendChild(ControlContainer);
@@ -616,7 +619,7 @@ class WForm extends HTMLElement {
                     ModelObject: await WArrayF.isModelFromFunction(Model, prop),
                     Options: false
                 });
-                if (ModelProperty.disabled) {
+                if (disabled) {
                     InputControl.style.pointerEvents = "none";
                 }
                 Form.appendChild(ControlContainer);
@@ -626,8 +629,8 @@ class WForm extends HTMLElement {
                     tagName: "input", className: prop, value: val, type: ModelProperty.type,
                     style: { display: "none" },
                     placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
-                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
-                    disabled: ModelProperty.disabled
+                    onchange: disabled ? undefined : onChangeEvent,
+                    disabled: disabled
                 });
                 const label = WRender.Create({ tagName: 'label', id: "labelFile" + prop, innerText: '' });
                 const content = WRender.Create({
@@ -639,7 +642,7 @@ class WForm extends HTMLElement {
                             htmlFor: "ControlValue" + prop, children: [
                                 WRender.Create({ tagName: 'img', src: WIcons.upload, class: 'labelIcon' })
                             ],
-                            disabled: ModelProperty.disabled
+                            disabled: disabled
                         }), label
                     ]
                 })
@@ -672,9 +675,9 @@ class WForm extends HTMLElement {
                                     name: prop,
                                     checked: val == radioElement,
                                     value: radioElement,
-                                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                                    onchange: disabled ? undefined : onChangeEvent,
                                     type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
-                                    disabled: ModelProperty.disabled
+                                    disabled: disabled
                                 }
                             ]
                         })
@@ -695,9 +698,9 @@ class WForm extends HTMLElement {
                     value: ObjectF[prop],
                     // @ts-ignore
                     checked: typeof val === "boolean" ? val : false,
-                    onchange: ModelProperty.disabled ? undefined : onChangeEvent,
+                    onchange: disabled ? undefined : onChangeEvent,
                     type: ModelProperty.type, placeholder: WArrayF.Capitalize(WOrtograficValidation.es(prop)),
-                    disabled: ModelProperty.disabled
+                    disabled: disabled
                 });
                 Form.appendChild(ControlContainer);
                 break;
@@ -709,8 +712,8 @@ class WForm extends HTMLElement {
                 ControlContainer.style.height = "auto";
                 InputControl = WRender.Create({
                     tagName: "textarea", style: { height: "calc(100% - 12px)", borderRadius: "10px" },
-                    className: prop, value: val, onchange: ModelProperty.disabled ? undefined : onChangeEvent,
-                    disabled: ModelProperty.disabled
+                    className: prop, value: val, onchange: disabled ? undefined : onChangeEvent,
+                    disabled: disabled
                 });
                 Form.appendChild(ControlContainer);
                 break;
@@ -726,11 +729,11 @@ class WForm extends HTMLElement {
                 val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
                 const placeholderp = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 const pass = WRender.Create({
-                    tagName: "input", id: "ControlPass1" + prop, className: prop, value: val, disabled: ModelProperty.disabled,
+                    tagName: "input", id: "ControlPass1" + prop, className: prop, value: val, disabled: disabled,
                     type: ModelProperty.type, placeholder: placeholderp, onchange: onChangeEvent
                 })
                 const pass2 = WRender.Create({
-                    tagName: "input", id: "ControlPass2" + prop, className: prop, value: val, disabled: ModelProperty.disabled,
+                    tagName: "input", id: "ControlPass2" + prop, className: prop, value: val, disabled: disabled,
                     type: ModelProperty.type, placeholder: placeholderp, onchange: () => {
                         // @ts-ignore
                         if (pass.value != pass2.value) {
@@ -762,8 +765,8 @@ class WForm extends HTMLElement {
                     min: ModelProperty.min,
                     max: ModelProperty.max,
                     placeholder: placeholder,
-                    //onchange: ModelProperty.disabled ? undefined : onChangeEvent,
-                    disabled: ModelProperty.disabled
+                    //onchange: disabled ? undefined : onChangeEvent,
+                    disabled: disabled
                 });
                 Form.appendChild(ControlContainer);
                 break;
@@ -772,7 +775,7 @@ class WForm extends HTMLElement {
             Model[ModelProperty.fieldRequire].require = true;
         }
         if (ModelProperty.pattern) InputControl.pattern = ModelProperty.pattern;
-        ControlLabel.innerHTML += ModelProperty.require == true ? "*" : "";
+        ControlLabel.innerHTML += require == true ? "*" : "";
         if (ModelProperty.ControlAction != undefined) {
             ModelProperty.ControlAction.forEach(action => {
                 ControlContainer.append(WRender.Create({
@@ -793,7 +796,7 @@ class WForm extends HTMLElement {
         InputControl.id = "ControlValue" + prop;
 
         InputControl.addEventListener("change", async (ev) => {
-            if (!ModelProperty.disabled) {
+            if (!disabled) {
                 await onChangeEvent(ev)
                 if (actionFunction != null) {
                     actionFunction(ObjectF, this, InputControl, prop)
@@ -803,6 +806,24 @@ class WForm extends HTMLElement {
 
         return InputControl;
     }
+    async newMethod(ModelProperty, ObjectF) {
+        let require = ModelProperty.require?.__proto__ == Function.prototype
+            // @ts-ignore
+            || ModelProperty.require?.__proto__.constructor.name == 'AsyncFunction'
+            // @ts-ignore
+            ? await ModelProperty.require(ObjectF, this)
+            : ModelProperty.require;
+        /**@type {Boolean} */
+        // @ts-ignore
+        let disabled = ModelProperty.disabled?.__proto__ == Function.prototype
+            // @ts-ignore
+            || ModelProperty.disabled?.__proto__.constructor.name == 'AsyncFunction'
+            // @ts-ignore
+            ? await ModelProperty.disabled(ObjectF, this)
+            : ModelProperty.disabled;
+        return { require, disabled };
+    }
+
     createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
         InputControl = new WCalendarComponent({
             CalendarFunction: Model[prop].CalendarFunction,

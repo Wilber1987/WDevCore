@@ -73,9 +73,9 @@ function ModelFunction() { }
     * @property {Boolean} [hidden] desabilita la propiedad y la oculta
     * @property {Object} [Options] 
     * @property {Boolean} [hiddenInTable] oculta en la tabla
-    * @property {Boolean} [require]
+    * @property {Boolean|Function} [require]
     * @property {Boolean} [primary]
-    * @property {Boolean} [disabled]
+    * @property {Boolean|Function} [disabled]
     * @property {String} [label]
     * @property {String} [ForeignKeyColumn] nombre de la llave foranea que enlaza el ModelObject de esta propiedad con la propiedad padre
     * @property {Array} [fileType]
