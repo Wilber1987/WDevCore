@@ -30,6 +30,7 @@ class WForm extends HTMLElement {
             this[p] = Config[p];
         }
         this.Config = Config;
+        this.ModelObject = this.Config.ModelObject;
         this.ImageUrlPath = Config.ImageUrlPath;
         this.Options = this.Options ?? true;
         this.DataRequire = this.DataRequire ?? true;
@@ -1193,7 +1194,10 @@ class WForm extends HTMLElement {
             const ModalCheck = this.ModalCheck(ObjectF, true);
             this.shadowRoot?.append(ModalCheck)
         } else {
-            this.Config.SaveFunction(ObjectF);
+            const loadinModal = new LoadinModal();
+            this.shadowRoot?.append(loadinModal);
+            await this.Config.SaveFunction(ObjectF);
+            loadinModal.close();
         }
     }
     Validate = (ObjectF = this.FormObject) => {
@@ -1314,12 +1318,13 @@ class WForm extends HTMLElement {
     ModalCheck(ObjectF, withModel = false) {
         const modalCheckFunction = async (/** @type {LoadinModal} */ LoadinModal) => {
             try {
+                this.shadowRoot?.append(LoadinModal);
                 if (withModel) {
                     const response = await this.Config.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
-                    this.ExecuteSaveFunction(ObjectF, response);
+                    await this.ExecuteSaveFunction(ObjectF, response);
                 } else if (this.Config.ObjectOptions?.Url != undefined) {
                     const response = await WAjaxTools.PostRequest(this.Config.ObjectOptions?.Url, ObjectF);
-                    this.ExecuteSaveFunction(ObjectF, response);
+                    await this.ExecuteSaveFunction(ObjectF, response);
                 }
                 LoadinModal.close();
                 ModalCheck.close();
@@ -1360,11 +1365,11 @@ class WForm extends HTMLElement {
         });
         return ModalCheck;
     }
-    ExecuteSaveFunction(ObjectF, response) {
+    async ExecuteSaveFunction(ObjectF, response) {
         if (this.Config.SaveFunction != undefined) {
-            this.Config.SaveFunction(ObjectF, response);
+            await this.Config.SaveFunction(ObjectF, response);
         } else if (this.Config.ObjectOptions?.SaveFunction != undefined) {
-            this.Config.ObjectOptions?.SaveFunction(ObjectF, response);
+            await this.Config.ObjectOptions?.SaveFunction(ObjectF, response);
         }
     }
 

@@ -432,7 +432,7 @@ class LoadinModal extends HTMLElement {
             justify-content: center;
             align-items: center;
             z-index: 20001;
-            transition: 1s all;
+            transition: 0.2s all;
             opacity: 0;
         }
         .loading.show {
@@ -474,7 +474,7 @@ class LoadinModal extends HTMLElement {
         ComponentsManager.modalFunction(this);
         setTimeout(() => {
             this.parentNode.removeChild(this);
-        }, 1000);
+        }, 200);
     }
     FormStyle = () => {
         return css`

@@ -214,8 +214,8 @@ const StylesControlsV2 = css`
     textarea{
         width: 100%;
         background-color: #f7f4f4 !important;
-        border-radius: 10px;
-        padding: 5px 10px;
+        border-radius: 5px;
+        padding: 10px;
         outline: none;
         border: none;
         line-height: 1;
