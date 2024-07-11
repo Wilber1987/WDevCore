@@ -1,9 +1,11 @@
+//@ts-check
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
 import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV1 } from "../StyleModules/WStyleComponents.js";
 import { WModalForm } from "./WModalForm.js";
 import { WIcons, WIconsPath } from "../WModules/WIcons.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
+// @ts-ignore
 import { FilterData } from "../WModules/CommonModel.js";
 import { WCardTable } from "./WTableComponent.js";
 
@@ -30,7 +32,6 @@ class MultiSelect extends HTMLElement {
     constructor(Config = (new ConfigMS()), Style = null) {
         super();
         this.Config = Config;
-        this.id = Config.id;
         this.Dataset = this.Config.Dataset ?? [];
         this.ModelObject = this.Config.ModelObject ?? undefined;
         this.attachShadow({ mode: 'open' });
@@ -87,26 +88,34 @@ class MultiSelect extends HTMLElement {
                 }
             }
         });
-        this.shadowRoot.append(
+        this.shadowRoot?.append(
             this.LabelMultiselect,
             StyleScrolls.cloneNode(true),
             MainMenu.cloneNode(true)
         );
         if (Config.Mode == "SELECT_BOX") {
-            this.shadowRoot.append(selectBoxStyle.cloneNode(true));
+            this.shadowRoot?.append(selectBoxStyle.cloneNode(true));
         }
+        // @ts-ignore
         if (Style != null && Style.__proto__ == WStyledRender.prototype) {
-            this.shadowRoot.append(Style);
+            this.shadowRoot?.append(Style);
         }
-        this.shadowRoot.append(this.SetOptions());
-        this.LabelMultiselect.onclick = this.DisplayOptions;
+        //this.shadowRoot?.append(
+        this.SetOptions()
+        this.LabelMultiselect.onclick = () => {
+            if (!this.tool?.isConnected) {
+                this.DisplayOptions();
+            } else {
+                this.tool?.remove();
+            }
+        }
     }
 
     DrawFilterData(Dataset, ev) {
         if (Dataset.length == 0 && this.Config.AddObject == true) {
             const targetControl = ev.target;
             const addBtn = this.addBtn(targetControl);
-            this.tool.append(addBtn);
+            this.tool?.append(addBtn);
         } else {
             this.Draw(Dataset);
         }
@@ -158,8 +167,8 @@ class MultiSelect extends HTMLElement {
 
     connectedCallback() {
         this.Draw();
-        this.parentNode.addEventListener("click", (e) => this.undisplayMultiSelects(e));
-        this.parentNode.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
+        this.parentNode?.addEventListener("click", (e) => this.undisplayMultiSelects(e));
+        this.parentNode?.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
     }
 
     Draw = (Dataset = this.Dataset) => {
@@ -202,11 +211,12 @@ class MultiSelect extends HTMLElement {
                         this.Config.action(this.selectedItems);
                     }
                     this.DrawLabel();
+                    if (!this.MultiSelect) {
+                        this.tool?.remove();
+                    }
                 }
             });
-            if (!this.MultiSelect) {
-                Option.onclick = this.DisplayOptions;
-            }
+
             const SubContainer = WRender.Create({ className: "SubMenu" });
             if (element.SubOptions != undefined && element.SubOptions.__proto__ == Array.prototype) {
                 element.SubMultiSelect = new MultiSelect({
@@ -235,12 +245,12 @@ class MultiSelect extends HTMLElement {
     }
     SetOptions = () => {
         if (this.Config.IsFilterControl) {
-            this.shadowRoot.append(this.SearchControl);
+            this.shadowRoot?.append(this.SearchControl);
             this.SearchControl.style.borderRadius = "0 10px 10px 0";
             this.SearchControl.onfocus = () => {
-                if (!this.tool.className.includes("toolActive")) {
+                if (!this.tool?.className.includes("active")) {
                     this.LabelMultiselect.querySelector("span").className = "btnSelect spanActive"
-                    this.tool.className = "toolActive";
+                    this.tool.className = "active";
                 }
             }
             this.tool = new WToolTip([
@@ -291,19 +301,20 @@ class MultiSelect extends HTMLElement {
             //console.log(labelsWidth);
             const selectedsContainer = this.LabelMultiselect.querySelector(".selecteds");
             if (sum == 0) {
-                selectedsContainer.append(LabelM);
+                selectedsContainer?.append(LabelM);
                 labelsWidth = labelsWidth + LabelM.offsetWidth;
                 add++;
             }
             //console.log(labelsWidth + 100);
-            if (selectedsContainer.offsetWidth <= labelsWidth + 100) {
+            // @ts-ignore
+            if (selectedsContainer?.offsetWidth <= labelsWidth + 100) {
                 sum++;
             }
             //console.log(selectedsContainer.offsetWidth, labelsWidth);
 
         });
         if (this.selectedItems.length - add > 0) {
-            this.LabelMultiselect.querySelector(".selecteds").append(WRender.Create({
+            this.LabelMultiselect.querySelector(".selecteds")?.append(WRender.Create({
                 tagName: "label",
                 innerText: "+" + (this.selectedItems.length - add).toString()
             }))
@@ -333,13 +344,14 @@ class MultiSelect extends HTMLElement {
         return element[this.DisplayName] ?? "Element" + index;
     }
     DisplayOptions = () => {
-        if (this.tool.className.includes("toolActive")) {
+        this.tool?.DisplayOptions(this)
+        /*if (this.tool.className.includes("active")) {
             this.LabelMultiselect.querySelector("span").className = "btnSelect"
-            this.tool.className = "toolInactive";
+            this.tool.className = w-tooltip";
         } else {
             this.LabelMultiselect.querySelector("span").className = "btnSelect spanActive"
-            this.tool.className = "toolActive";
-        }
+            this.tool.className = "active";
+        }*/
     }
     BuilDetail = (element) => {
         const elementDetail = WRender.Create({ className: "ElementDetail" });
@@ -372,9 +384,9 @@ class MultiSelect extends HTMLElement {
     undisplayMultiSelects = (e) => {
         // @ts-ignore
         if (!e.target.tagName.includes("W-MULTI-SELECT")) {
-            document.querySelectorAll("w-multi-select").forEach(m => {
-                // @ts-ignore
-                m.tool.className = "toolInactive";
+            // @ts-ignore
+            document.querySelectorAll("w-multi-select").forEach((/**@type {MultiSelect} */ m) => {
+                m.tool?.remove();
                 m.LabelMultiselect.querySelector("span").className = "btnSelect";
             })
         }
@@ -436,15 +448,20 @@ class WToolTip extends HTMLElement {
                 background-color: #fff;
                 overflow: hidden;  
                 left: 0;      
-                top: 100%;       
+                top: 0;       
             }
             w-tooltip.active {
-                max-height: 600px;
-                overflow: auto;                
+                max-height: 400px;
+                overflow: auto;            
             }
         `)
     }
-    connectedCallback() { }
+    connectedCallback() {
+        this.Display()
+    }
+    disconnectedCallback() {
+        this.className = "";
+    }
     Display = async () => {
         setTimeout(() => {
             if (this.className == "active") {
@@ -454,6 +471,29 @@ class WToolTip extends HTMLElement {
             }
         }, 100);
     }
+    DisplayOptions = (node) => {
+        if (!node.querySelector("w-tooltip") || (node.shadowRoot && node.shadowRoot.querySelector("w-tooltip") == null)) {
+            if (node.shadowRoot) {
+                node.shadowRoot.append(this)
+                const tooltipRect = this.getBoundingClientRect();
+                console.log(tooltipRect, this.offsetHeight, window.innerHeight);
+                const viewportHeight = window.innerHeight;
+                if (tooltipRect.bottom + 400> viewportHeight) {
+                    // @ts-ignore
+                    this.style = 'top: auto !important ; bottom : 100%';
+                } else {
+                    //this.style.top = '100%';
+                    //this.style.bottom = 'auto';
+                }
+            } else {
+                node.append(this)
+            }
+        }
+        else {
+            this.remove();
+        }
+    }
+    
 }
 customElements.define('w-tooltip', WToolTip);
 export { WToolTip }
@@ -482,13 +522,10 @@ const MainMenu = css`
         overflow-y: hidden;
     }  
    
-    .toolActive {       
+    .active {       
         border: solid 1px #e4e3e3;
-        max-height: 600px;
+        max-height: 400px;
         min-width: 300px;
-    }
-    .toolInactive {
-        max-height: 0px !important;
     }
     .LabelMultiselect label {
         padding: 2px 5px;
@@ -558,8 +595,8 @@ const MainMenu = css`
         max-height: 500px;
     }
     .txtControl {
-        width: calc(100% - 30px);
-        padding: 5px 10px;
+        width: -webkit-fill-available;
+        padding: 10px;
         border: none;
         outline: none;
     }
@@ -610,16 +647,13 @@ const MainMenu = css`
         border-radius: 5px;
         font-size: 9px;
     }
-    .ToolTip {
-        position: absolute;
-        padding: 5px 15px;
+    w-tooltip {
         border-radius: 0.3cm;
         font-size: 10px;
         font-weight: 500;
-        color: rgb(227, 0, 0);
-        top: 7px;
-        right: 50px;
+        top: 32px !important;
     }
+
 `
 const SubMenu = {
     ClassList: [

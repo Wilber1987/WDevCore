@@ -215,7 +215,7 @@ const StylesControlsV2 = css`
         width: 100%;
         background-color: #f7f4f4 !important;
         border-radius: 5px;
-        padding: 10px;
+        padding: 8px 10px;
         outline: none;
         border: none;
         line-height: 1;
@@ -226,6 +226,7 @@ const StylesControlsV2 = css`
         cursor: pointer;
         box-shadow: 0 0 5px #c1c1c1;
         display: block;
+        min-height: 30px;
     }
     input[type=color] {
         padding: 5px;

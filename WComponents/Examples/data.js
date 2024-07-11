@@ -992,7 +992,15 @@ const data = [
         year: 2017,
         mes: "abril",
         trimestre: "segundo",
-        secretBase: "Base 2",
+        secretBase: [{
+            name: "test",
+            year: 2017,
+            value: 4
+        }, {
+            name: "test  2",
+            year: 2017,
+            value: 4
+        }],
         active: true,
         value: 4
     }

@@ -12,6 +12,7 @@ import { EntityClass } from '../WModules/EntityClass.js';
 // @ts-ignore
 import { FormConfig, ModelProperty } from '../WModules/CommonModel.js';
 import { WImageCapture } from './WImageCapture.js';
+import { WRichText } from './WRichText.js';
 let photoB64;
 const ImageArray = [];
 
@@ -59,7 +60,10 @@ class WForm extends HTMLElement {
         if (!e.target.tagName.includes("W-MULTI-SELECT")) {
             this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
                 // @ts-ignore
-                m.tool.className = "toolInactive";
+                if (m.tool) {
+                    // @ts-ignore
+                    m.tool.className = "toolInactive";
+                }
             })
         }
     }
@@ -363,12 +367,13 @@ class WForm extends HTMLElement {
         ModelProperty.require = ModelProperty.require ?? true;
         /**@type {Boolean} */
         // @ts-ignore
-        let { require, disabled } = await this.newMethod(ModelProperty, ObjectF);
+        let { require, disabled } = await this.buildDataForm(ModelProperty, ObjectF);
         const actionFunction = ModelProperty.action ?? null;
         ObjectF[prop] = ObjectF[prop] ?? ModelProperty.defaultValue;
         switch (ModelProperty.type?.toUpperCase()) {
             case "TITLE":
                 require = false;
+                ModelProperty.require = false;
                 ObjectF[prop] = undefined;
                 ControlLabel.className += " formHeader";
                 ControlLabel.innerHTML = ModelProperty.label ?? "";
@@ -718,6 +723,21 @@ class WForm extends HTMLElement {
                 });
                 Form.appendChild(ControlContainer);
                 break;
+            case "RICHTEXT":
+                ControlContainer.classList.add("textAreaContainer");
+                ControlContainer.style.height = "auto";
+                InputControl = new WRichText({
+                    value: val,
+                    activeAttached: false,
+                    action: (value) => {
+                        ObjectF[prop] = value;
+                        console.log(ObjectF[prop]);
+                    }
+                });
+                //console.log(InputControl.value.length);
+                ObjectF[prop] = InputControl.value;
+                Form.appendChild(ControlContainer);
+                break;
             case "CALENDAR":
                 ObjectF[prop] = ObjectF[prop]?.__proto__ == Array.prototype ? ObjectF[prop] : [];
                 ControlContainer.classList.add("tableContainer");
@@ -807,7 +827,7 @@ class WForm extends HTMLElement {
 
         return InputControl;
     }
-    async newMethod(ModelProperty, ObjectF) {
+    async buildDataForm(ModelProperty, ObjectF) {
         let require = ModelProperty.require?.__proto__ == Function.prototype
             // @ts-ignore
             || ModelProperty.require?.__proto__.constructor.name == 'AsyncFunction'
@@ -1405,7 +1425,8 @@ class WForm extends HTMLElement {
                 gap: 15px;
             }
             .divComplexForm {
-                display: flex;
+                display: grid;
+                grid-template-columns: calc(50% - 10px) calc(50% - 10px);
                 gap: 15px;
                 margin-top: 20px;
             }
@@ -1677,6 +1698,9 @@ class WForm extends HTMLElement {
                 box-shadow: inset 1em 1em var(--form-control-color);
                 transform-origin: bottom left;
                 clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            }
+            w-rich-text {
+                display: block;
             }
 
             input[type=radio]:checked::before {

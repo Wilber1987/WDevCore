@@ -11,10 +11,19 @@ class ModelFiles {
     Value = "";
     Type = "";
 }
+/**
+ * @typedef {Object} Config 
+    * @property {String} [value]
+    * @property {Function} [action]
+    * @property {Boolean} [activeAttached]
+**/
 class WRichText extends HTMLElement {
-    constructor() {
+    /**
+    * @param {Config} [Config] 
+    */
+    constructor(Config = { value: "", action: (value) => { } }) {
         super();
-        this.value = "";
+        this.value = Config?.value ?? "";
         /**
          * @type {Array<ModelFiles>}
          */
@@ -23,6 +32,7 @@ class WRichText extends HTMLElement {
         this.style.padding = "5px";
         this.style.borderRadius = "5px";
         this.style.border = "1px solid rgb(222 222 222)"
+        this.Config = Config;
         this.DrawComponent();
     }
     connectedCallback() {
@@ -35,14 +45,33 @@ class WRichText extends HTMLElement {
             // @ts-ignore
             contentEditable: true,
             class: "WREditor",
+            innerHTML: this.value,
             oninput: () => {
                 // @ts-ignore
-                this.value = this.querySelector(".WREditor").innerHTML;
+                this.clearInnerHtml(this.Divinput.innerText);
+                // @ts-ignore
+                this.value = this.Divinput.innerHTML;
+                // @ts-ignore
+                this.Config?.action(this.value);
             }
         })
+        this.clearInnerHtml(this.Divinput.innerText);
         this.append(this.Divinput);
         this.DrawAttached();
     }
+    clearInnerHtml(contenido) {
+        // @ts-ignore
+        //let contenido = this.querySelector(".WREditor")?.innerText;
+        // Expresión regular para detectar caracteres invisibles de HTML
+        let regex = /^[\u200B-\u200D\uFEFF\n]*$/;
+        // Verificar si la cadena contiene <br> o caracteres invisibles
+        if (regex.test(contenido)) {
+            // @ts-ignore
+            this.Divinput.innerHTML = "";
+            this.value = "";
+        }
+    }
+
     DrawOptions() {
         const OptionsSection = WRender.Create({
             tagName: "section", class: "WOptionsSection"
@@ -74,6 +103,9 @@ class WRichText extends HTMLElement {
     }
 
     DrawAttached() {
+        if (this.Config.activeAttached != true) {
+            return;
+        }
         this.AttachedSection = WRender.Create({
             tagName: "section", class: "InputFileSection", children: []
         })

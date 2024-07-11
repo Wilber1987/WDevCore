@@ -11,8 +11,9 @@ import { MultiSelect } from "./WMultiSelect.js";
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset  
     * @property {Function} FilterFunction
-    * @property {Array<OrderData>} Sorts
+    * @property {Array<OrderData>} [Sorts]
     * @property {Boolean} [Display]
+    * @property {Boolean} [UseEntityMethods]
     * @property {Boolean} [AutoFilter]
     * @property {Boolean} [AutoSetDate]
     * @property {Object} [ModelObject]
@@ -42,7 +43,7 @@ class WFilterOptions extends HTMLElement {
         this.shadowRoot?.append(this.FilterContainer);
         this.DrawFilter();
         /**@type {Array<OrderData>} */
-        this.Sorts = Config.Sorts;
+        this.Sorts = Config.Sorts ?? [];
     }
     connectedCallback() {
         this.shadowRoot?.addEventListener("click", (e) => this.undisplayMultiSelects(e));
@@ -87,7 +88,7 @@ class WFilterOptions extends HTMLElement {
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({
                             className: this.ModelObject[prop].type.toUpperCase() == "DATE"
-                                || this.ModelObject[prop].type.toUpperCase() == "NUMBER" || this.ModelObject[prop].type.toUpperCase() == "WSELECT"
+                                || this.ModelObject[prop].type.toUpperCase() == "MONEY" || this.ModelObject[prop].type.toUpperCase() == "WSELECT"
                                 || this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" ? "multi-control-container" : "",
                             children: [WOrtograficValidation.es(prop), filterControl]
                         }));
@@ -99,6 +100,9 @@ class WFilterOptions extends HTMLElement {
                     this.FilterControls.push(filterControl);
                 }
             }
+        }
+        if (this.Config.AutoFilter == true) {
+            await this.filterFunction(this.Sorts);
         }
         this.FilterContainer.append(WRender.createElement(ControlOptions));
     }
@@ -112,14 +116,14 @@ class WFilterOptions extends HTMLElement {
     CreateModelControl = async (Model, prop, Dataset) => {
         const ModelProperty = Model[prop];
         switch (ModelProperty.type?.toUpperCase()) {
-            case "TEXT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
+            case "TEXT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA": case "NUMBER":
                 return this.CreateTextControl(prop);
             case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                 break;
             case "DATE": case "FECHA": case "HORA":
                 /**TODO */
                 return this.CreateDateControl(prop);
-            case "NUMBER":
+            case "MONEY":
                 return this.CreateNumberControl(prop);
             case "SELECT":
                 return this.CreateSelectControl(prop, Dataset);
@@ -153,7 +157,7 @@ class WFilterOptions extends HTMLElement {
     */
     filterFunction = async (sorts) => {
         const Model = this.EntityModel ?? this.ModelObject;
-        if (Model.Get || this.Config.AutoFilter == false) {
+        if (Model.Get || this.Config.UseEntityMethods == false) {
             this.ModelObject.FilterData = [];
             this.ModelObject.OrderData = [];
             if (sorts) {
@@ -171,7 +175,7 @@ class WFilterOptions extends HTMLElement {
                     const ModelProperty = this.ModelObject[control.id];
                     let propiertyName = control.id;
                     switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
+                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA": case "NUMBER":
                             if (control.value != null && control.value != undefined && control.value != "") {
                                 filterType = "LIKE"
                                 values = [control.value];
@@ -179,7 +183,7 @@ class WFilterOptions extends HTMLElement {
                             break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                             break;
-                        case "DATE": case "FECHA": case "HORA": case "NUMBER":
+                        case "DATE": case "FECHA": case "HORA": 
                             /**TODO */
                             filterType = "BETWEEN"
                             const inputs = control.querySelectorAll("input");
@@ -260,17 +264,20 @@ class WFilterOptions extends HTMLElement {
                     })
                 }
             });
-            if (this.Config.AutoFilter == false) {
+            if (this.Config.UseEntityMethods == false
+                && this.Config.FilterFunction != undefined) {
                 this.Config.FilterFunction(Model.FilterData);
                 return;
+            } else if (this.Config.UseEntityMethods == true) {
+                this.Config.Dataset = await Model.Get();
+                if (this.Config.FilterFunction != undefined) {
+                    this.Config.FilterFunction(this.Config.Dataset);
+                } else {
+                    console.log(this.Config.Dataset);
+                }
+                return;
             }
-            this.Config.Dataset = await Model.Get();
-            if (this.Config.FilterFunction != undefined) {
-                this.Config.FilterFunction(this.Config.Dataset);
-            } else {
-                console.log(this.Config.Dataset);
-            }
-            return;
+
         }
 
         const DFilt = this.Config.Dataset.filter(obj => {
@@ -383,7 +390,7 @@ class WFilterOptions extends HTMLElement {
         })
         options.unshift(WRender.Create({ tagName: "option", value: "", innerText: "Seleccionar" }));
         let InputControl = WRender.Create({
-            tagName: "select", className: prop, onchange: ()=> this.filterFunction(this.Sorts), id: prop,
+            tagName: "select", className: prop, onchange: () => this.filterFunction(this.Sorts), id: prop,
             children: options
         });
 

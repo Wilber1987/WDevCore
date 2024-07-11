@@ -1,5 +1,4 @@
 //@ts-check
-//@ts-check
 import { WRender, ComponentsManager, WAjaxTools, WArrayF } from "../WModules/WComponentsTools.js";
 import { StylesControlsV2, StylesControlsV3, StyleScrolls } from "../StyleModules/WStyleComponents.js"
 import { css } from "../WModules/WStyledRender.js";
@@ -29,14 +28,26 @@ class WReportComponent extends HTMLElement {
             StylesControlsV2.cloneNode(true),
             StyleScrolls.cloneNode(true),
             StylesControlsV3.cloneNode(true),
+            this.CustomStyle,
             this.OptionContainer,
             this.MainContainer
         );
+        this.Pages = [];
+
+    }
+    connectedCallback() {
         this.Draw();
+
     }
     Draw = async () => {
         this.SetOption();
-
+        this.DrawReportHeader();
+        this.CreateTable(this.Config.Dataset, true);
+        /*this.Pages.forEach(page => {
+            this.MainContainer.appendChild(page);
+        });*/
+    }
+    DrawReportHeader() {
         if (this.Config.Logo) {
             this.Header.append(WRender.Create({
                 tagName: "img", src: this.Config.Logo,
@@ -57,78 +68,158 @@ class WReportComponent extends HTMLElement {
                 innerText: this.Config.SubHeader
             }));
         }
-
-        this.MainContainer.append(this.CreateTable(this.Config.Dataset, true));
     }
+
     CreateTable(data, page = false) {
-        const container = WRender.Create({ className: "container " + (page ? "pageA4" : "") });
-        if (page) {
-            container.append(this.CustomStyle);
-            container.append(this.Header);
-        }
-        const divHeader = WRender.Create({ className: "report-title" });
-        const divFooter = WRender.Create({ className: "report-footer" });
-        container.append(divHeader);
-         /**@type {Object}*/const consolidado = WArrayF.Consolidado(data);       
-        data = data.map(d => WArrayF.replacer(d));
+        if (!this.Config.Dataset) return;
+        this.MainContainer.innerHTML = "";
+
+
+        let currentPage = this.createPage();
+        //const divHeader = WRender.Create({ className: "report-title" });
+        //const divFooter = WRender.Create({ className: "report-footer" });
+
+        //currentPage.append(this.Header, divHeader)
+        this.Pages.push(currentPage);
+        this.MainContainer.appendChild(currentPage);
+
+        //container.append(divHeader);
+
+         /**@type {Object}*/const consolidado = WArrayF.Consolidado(data);
+
+        //data = data.map(d => WArrayF.replacer(d));
+
+
+        //this.Page.push(currentPage);
 
         data.forEach((dato, index) => {
-            const div = WRender.Create({ className: "report-container" + (page ? " father" : " child")  });
+            if (index == 0) {
+                for (const prop in dato) {
+                    currentPage.append( WRender.Create({
+                        className: "row-title",
+                        children: [prop]
+                    }))                   
+                }
+            }
             if (dato.__proto__ == Object.prototype) {
                 for (const prop in dato) {
+                    let div = undefined;//this.CreateElement(dato)//WRender.Create({ className: "report-container" + (page ? " father" : " child") });
                     if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
                         continue;
                     }
-                    let header;
-                    let footer;
-                    if (index == 0) {
-                        header = WRender.Create({
-                            className: "row-title",
-                            children: [prop]
-                        })
-                        divHeader.append(header);
-                    }
-                    if (index == data.length - 1) {
-                        footer = WRender.Create({
-                            className: consolidado[prop].Suma != undefined ?
-                                "row-number row-title" : "row-title",
-                            children: [(consolidado[prop].Suma != undefined ?
-                                "Total: " + consolidado[prop].Suma?.toFixed(2) : "-")]
-                        });
-                    }
-                    if (dato[prop].__proto__ == Object.prototype) {
-                        const findArray = Object.keys(data[prop])
-                            .find(prop => data[prop](prop).__proto__ == Array.prototype);
-                        if (findArray != null) {
-                            div.className = div.className + (page && index > 0 ? " container-break-page" : "")
+                    //console.log(prop);
+                    div = this.BuildRow(dato, prop);
+                    if (!this.elementFitsInPage(currentPage, div)) {
+                        currentPage = this.createPage();
+                        for (const prop in dato) {
+                            currentPage.append( WRender.Create({
+                                className: "row-title",
+                                children: [prop]
+                            }))                   
                         }
-                    } else if (dato[prop].__proto__ == Array.prototype) {
-                        div.className = div.className + (page && index > 0 ? " container-break-page" : "")
+                        this.Pages.push(currentPage);
+                        this.MainContainer.appendChild(currentPage)
                     }
-                    div.append(this.BuildRow(dato, prop, header, footer));
-                    if (index == data.length - 1) {
-                        divFooter.append(footer ?? "")
-                    }
-
+                    currentPage.append(div);
                 }
             }
             else {
-                div.append(this.BuildSimpleRow(dato));
+                //div = this.BuildSimpleRow(dato);
             }
-            container.append(div);
         });
-        container.append(divFooter);
-        return container;
+        //currentPage.append(divFooter);
+        return currentPage;
+    }
+    /**
+     * @param {{ [x: string]: { __proto__: any[]; }; }} dato
+     * @param {number} index
+     * @param {HTMLElement} divHeader
+     * @param {number} length
+     * @param {{ [x: string]: { Suma: number; }; }} consolidado
+     * @param {HTMLElement} div
+     * @param {HTMLElement} divFooter
+     */
+    CreateElement(dato) {
+        for (const prop in dato) {
+            if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
+                continue;
+            }
+            // let header;
+            // let footer;
+            // if (index == 0) {
+            //     header = WRender.Create({
+            //         className: "row-title",
+            //         children: [prop]
+            //     });
+            //     //divHeader.append(header);
+            // }
+            // if (index == length) {
+            //     //console.log(prop, consolidado[prop], consolidado, dato);
+            //     footer = WRender.Create({
+            //         className: consolidado[prop].Suma != undefined ?
+            //             "row-number row-title" : "row-title",
+            //         children: [(consolidado[prop].Suma != undefined ?
+            //             "Total: " + consolidado[prop].Suma?.toFixed(2) : "-")]
+            //     });
+            // }
+            // /*if (dato[prop].__proto__ == Object.prototype) {
+            //     const findArray = Object.keys(data[prop])
+            //         .find(prop => data[prop](prop).__proto__ == Array.prototype);
+            //     if (findArray != null) {
+            //         div.className = div.className + (page && index > 0 ? " container-break-page" : "");
+            //     }
+            // } else if (dato[prop].__proto__ == Array.prototype) {
+            //     div.className = div.className + (page && index > 0 ? " container-break-page" : "");
+            // }*/
+            // //div.append(this.BuildRow(dato, prop, header, footer, consolidado));
+            // if (index == length) {
+            //     //divFooter.append(footer ?? "");
+            // }
+            console.log(prop);
+            return this.BuildRow(dato, prop)
+        }
+    }
+
+    createPage() {
+        // Create a new A4 page container
+        return WRender.Create({
+            className: "container pageA4",
+            style: { gridTemplateColumns: "repeat(8, auto)" }
+        });
+    }
+
+    /**
+    * @param {HTMLElement} page 
+    * @param {HTMLElement} element 
+    * @returns {Boolean}
+    */
+    elementFitsInPage(page, element) {
+        page.appendChild(element);
+        const computedStyle = getComputedStyle(page);
+        // console.log(parseFloat(computedStyle.paddingTop), computedStyle.paddingTop, computedStyle.paddingBottom, page.clientHeight);
+        // console.log(page.scrollHeight <= page.clientHeight, page.scrollHeight, page.clientHeight, element.offsetHeight);
+        const pageHeight = page.clientHeight
+            - parseFloat(computedStyle.paddingTop)
+            - parseFloat(computedStyle.paddingBottom);
+        // console.log(pageHeight, page.scrollHeight);
+        const scrollHeight = page.scrollHeight
+            - parseFloat(computedStyle.paddingTop)
+            - parseFloat(computedStyle.paddingBottom);
+        console.log(scrollHeight, pageHeight, scrollHeight <= pageHeight);
+
+        const fits = scrollHeight <= pageHeight;
+        page.removeChild(element);
+        return fits;
     }
     isNotDrawable(prop, ModelObject, element) {
-        if ((ModelObject[prop]?.type == undefined
+        if (ModelObject != undefined && ((ModelObject[prop]?.type == undefined
             || ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             || ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
             || ModelObject[prop]?.primary == true
             || ModelObject[prop]?.hidden == true
             || ModelObject[prop]?.hiddenInTable == true)
             || element[prop]?.__proto__ == Function.prototype
-            || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
+            || element[prop]?.__proto__.constructor.name == "AsyncFunction")) {
             return true;
         }
         return (prop == "get" || prop == "set") ||
@@ -146,9 +237,10 @@ class WReportComponent extends HTMLElement {
             element[prop].__proto__.constructor.name == "AsyncFunction";
     }
 
-    BuildRow(dato, prop, titleHeader, footer, container, page = false) {
+    BuildRow(dato, prop, page = false) {
         //console.log("object", prop,dato[prop].__proto__ == Object.prototype);
         //console.log("array", prop,dato[prop].__proto__ == Array.prototype);
+        //console.log(prop, dato[prop], dato[prop]?.__proto__ == Array.prototype);
         if (typeof dato[prop] == "string") {
             return WRender.Create({ className: "row-string", children: [dato[prop]] });
         } else if (typeof dato[prop] == "number") {
@@ -156,9 +248,37 @@ class WReportComponent extends HTMLElement {
         } else if (dato[prop]?.__proto__ == Object.prototype) {
             return this.BuildRow(WArrayF.replacer((dato[prop])));
         } else if (dato[prop]?.__proto__ == Array.prototype) {
-            if (titleHeader != undefined) titleHeader.style.flex = 8;
-            if (footer != undefined) footer.style.flex = 8;
-            return this.CreateTable(dato[prop]);
+            //if (titleHeader != undefined) titleHeader.style.flex = 8;
+            //if (footer != undefined) footer.style.flex = 8;
+            /**@type {Object}*/const consolidadoProp = WArrayF.Consolidado(dato[prop]);
+            //console.log(consolidadoProp);
+            const div = WRender.Create({ className: "container child" });
+            const divHeader = WRender.Create({ className: "report-title" });
+            const divFooter = WRender.Create({ className: "report-footer" });
+            //div.appendChild(divHeader);
+            dato[prop].forEach((element, datoIndex) => {
+                const divContainer = WRender.Create({ className: "report-container" + (page ? " father" : " child") });
+                this.CreateElement(
+                    element,
+                    //datoIndex, 
+                    //divHeader,
+                    ///dato[prop].length - 1,
+                    //consolidadoProp,
+                    //divContainer,
+                    //divFooter
+                );
+                div.appendChild(this.CreateElement(
+                    element,
+                    //datoIndex, 
+                    //divHeader,
+                    ///dato[prop].length - 1,
+                    //consolidadoProp,
+                    //divContainer,
+                    //divFooter
+                ))
+            });
+            //div.appendChild(divFooter)
+            return div;
         } else {
             //console.log(dato[prop]);
             return WRender.Create({ className: "row-string", children: [dato[prop].toString()] });
@@ -208,14 +328,17 @@ class WReportComponent extends HTMLElement {
             overflow-y: auto;
         }
         .pageA4{
-            width: 80%;
-            min-width: 210mm;
-            /* height: 297mm; */
             padding: 60px 60px;
             border: 1px solid #D2D2D2;
             background: #fff;
-            margin:  10PX auto;
             box-shadow: 0 2px 5px 0px rgba(0,0,0,0.3);
+            width: 210mm;
+            height: 297mm;
+            border: 1px solid #000;
+            box-sizing: border-box;
+            margin: 5mm auto;
+            overflow: hidden;
+            position: relative;
         }
         .row-title, .row-number, .row-string, 
         .report-container, .report-footer, .report-title {
@@ -224,17 +347,23 @@ class WReportComponent extends HTMLElement {
            font-size: 10px;
            font-family: "Open Sans", sans-serif;
            border-right: 1px #cdcbcb solid;
-           border-bottom: 1px #cdcbcb solid;
+           border-bottom: 1px #cdcbcb solid;          
         }  
-        .row-title:last-child,
+        .row-title, .row-number, .row-string {
+            padding: 5px 10px;
+        }
+        .report-footer, .report-title {
+            max-height: 30px;
+        }
+
+        /* .row-title:last-child,
         .row-number:last-child,
         .row-string:last-child,
-        .report-container:last-child,
         .report-footer:last-child,
-        .report-title, .container .report-container  {       
+        .report-title  {       
            border-right: none;
            border-bottom:none;
-        }  
+        }   */
         .row-title {
             color: #fff;
             text-transform: capitalize;
@@ -248,7 +377,7 @@ class WReportComponent extends HTMLElement {
 
         .container {
             flex: 8;
-            display: flex;
+            display: grid;
             flex-direction: column;            
             border: 1px #cdcbcb solid;
             

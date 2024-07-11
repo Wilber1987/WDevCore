@@ -20,11 +20,30 @@ class ControlBuilder {
     });
     return image;
   }
-  static BuildProgressBar(value = 0, total = 100, barColor = "#737b83cc", progressColor = "#2c3e50") {
-    return html`<div class="progressDivContainer">   
-        <h3>${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%</h3>     
+  static BuildProgressBar(value = 0, total = 100, barColor = "#b7b7b7cc", progressColor = "#3576bb") {
+    return new ProgessBar(value, total, barColor, progressColor);
+  }
+}
+export { ControlBuilder }
+
+class ProgessBar extends HTMLElement {
+  constructor(value = 0, total = 100, barColor = "#b7b7b7cc", progressColor = "#3551bb") {
+    super();
+    this.attachShadow({ mode: 'open' });
+    //this.shadowRoot?.append(this.CustomStyle);
+    this.Draw(value, total, barColor, progressColor);
+  }
+  connectedCallback() { }
+
+  update() {
+    this.Draw();
+  }
+  Draw(value = 0, total = 100, barColor = "#b7b7b7cc", progressColor = "#3551bb") {
+    this.shadowRoot.append(html`<div class="progressDivContainer">
         <div class="progressDiv">        
-          <div class="progress" style="width:${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%;"></div>
+          <div class="progress" style="">
+            <h3>${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%</h3>     
+          </div>
         </div>       
         <style>        
           .progressDivContainer{
@@ -34,13 +53,21 @@ class ControlBuilder {
             width: 100%;  height: 20px;  background: ${barColor}; overflow: hidden; border-radius: 15px;
           }          
           .progressDivContainer > .progressDiv > .progress{
-            height: 20px;  background: ${progressColor}; border-radius: 15px;
+            height: 20px;  background: ${progressColor}; border-radius: 15px; text-align: center; animation: progress 1s forwards; width: 0px
           }          
-          .progressDivContainer > h3{
-            margin: 2px 10px; font-size: 16px; font-family: sans-serif; color: #fff; position: absolute; top: 0
+          .progress  h3{
+            margin: 4px 10px; font-size: 12px; font-family: sans-serif; color: #fff; position: absolute; top: 0
+          }
+          @keyframes progress {
+            to {
+              width:${(value / (total > 0 ? total : 1) * 100).toFixed(2)}%;
+            }
           }
         </style>
-      </div>`;
+      </div>`);
   }
 }
-export { ControlBuilder }
+
+customElements.define('w-progress-bar', ProgessBar);
+
+export { ProgessBar }

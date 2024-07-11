@@ -1,56 +1,4 @@
-/**
- * @typedef {Object} WNode
-     * @property {String} [tagName]
-     * @property {String} [id]
-     * @property {String} [type]
-     * @property {ElementStyle | String} [style]
-     * @property {String} [className]
-     * @property {String} [class]
-     * @property {String} [name]
-     * @property {String} [htmlFor]
-     * @property {Boolean} [selected]
-     * @property {Boolean} [checked]
-     * @property {Boolean} [multiple]
-     * @property {Boolean} [disabled]
-     * @property {String} [src]
-     * @property {String} [innerText]    
-     * @property {String | Number} [min]
-     * @property {String | Number} [max]   
-     * @property {String | Number} [value]
-     * @property {String} [innerHTML]
-     * @property {String} [placeholder]
-     * @property {String} [pattern]
-     * @property {Array<HTMLElement | String | WNode | Object>} [children]
-     * @property {Function} [onclick] 
-     * @property {Function} [ondragover]
-     * @property {Boolean} [draggable]
-     * @property {Function} [onchange]
-     * @property {Function} [onkeyup]
-     * @property {Function} [ondrop]
-     * @property {Function} [onkeydown]
-     * @property {Function} [onkeypress]
-     * @property {Function} [onload]
- **/
-class WNode {
-    /**
-     * 
-     * @param {*} props 
-     */
-    constructor(props = {}) {
-        for (const prop in props) {
-            this[prop] = props[prop]
-        }
-    }
-    tagName = "div";
-    type = new String();
-    style = new ElementStyle();
-    className = new String();
-    innerText = new String();
-    value = new String();
-    innerHTML = new String();
-    children = [];
-    onclick = () => { }
-}
+
 /**
  * @typedef {Object} ObjectOptions 
  *  * @property {Boolean} [AddObject]
@@ -318,8 +266,50 @@ class FormConfig { };
      * @property {?String | undefined} [gridRow]
      * @property {?String | undefined} [gridGap]
      */
-class ElementStyle {
-
+class ElementStyle {}
+/**
+ * @typedef {Object} WNode
+     * @property {String} [tagName]
+     * @property {String} [id]
+     * @property {String} [type]
+     * @property {Partial<CSSStyleDeclaration> | String} [style]
+     * @property {String} [className]
+     * @property {String} [class]
+     * @property {String} [name]
+     * @property {String} [htmlFor]
+     * @property {Boolean} [selected]
+     * @property {Boolean} [checked]
+     * @property {Boolean} [multiple]
+     * @property {Boolean} [disabled]
+     * @property {String} [src]
+     * @property {String} [innerText]    
+     * @property {String | Number} [min]
+     * @property {String | Number} [max]   
+     * @property {String | Number} [value]
+     * @property {String} [innerHTML]
+     * @property {String} [placeholder]
+     * @property {String} [pattern]
+     * @property {Array<HTMLElement | String | WNode | Object>} [children]
+     * @property {Function} [onclick] 
+     * @property {Function} [ondragover]
+     * @property {Boolean} [draggable]
+     * @property {Function} [onchange]
+     * @property {Function} [onkeyup]
+     * @property {Function} [ondrop]
+     * @property {Function} [onkeydown]
+     * @property {Function} [onkeypress]
+     * @property {Function} [onload]
+ **/
+class WNode {
+    /**
+     * 
+     * @param {*} props 
+     */
+    constructor(props = {}) {
+        for (const prop in props) {
+            this[prop] = props[prop]
+        }
+    }
 }
 /**
  * @typedef {Object} Actions 
