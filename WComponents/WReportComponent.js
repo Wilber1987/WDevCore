@@ -9,6 +9,7 @@ import { css } from "../WModules/WStyledRender.js";
  * @property {String} [Header]
  * @property {String} [SubHeader]
  * @property {String} [Logo]
+ * @property {String} [PageType]
  */
 class WReportComponent extends HTMLElement {
     /**
@@ -33,14 +34,18 @@ class WReportComponent extends HTMLElement {
             this.MainContainer
         );
         this.Pages = [];
+        this.countProps = 0;
+        this.Config.PageType = this.Config.PageType ?? "A4"
 
     }
     connectedCallback() {
         this.Draw();
-
     }
     Draw = async () => {
+        if (!this.Config.Dataset) return;
+        this.MainContainer.innerHTML = "";
         this.SetOption();
+        this.countProps = Object.keys(this.Config.Dataset[0]).length;
         this.DrawReportHeader();
         this.CreateTable(this.Config.Dataset, true);
         /*this.Pages.forEach(page => {
@@ -48,6 +53,7 @@ class WReportComponent extends HTMLElement {
         });*/
     }
     DrawReportHeader() {
+        this.Header.style.gridColumn = `span ${this.countProps}`
         if (this.Config.Logo) {
             this.Header.append(WRender.Create({
                 tagName: "img", src: this.Config.Logo,
@@ -70,121 +76,93 @@ class WReportComponent extends HTMLElement {
         }
     }
 
-    CreateTable(data, page = false) {
-        if (!this.Config.Dataset) return;
-        this.MainContainer.innerHTML = "";
-
+    CreateTable(data, isPage = true) {
 
         let currentPage = this.createPage();
-        //const divHeader = WRender.Create({ className: "report-title" });
-        //const divFooter = WRender.Create({ className: "report-footer" });
-
-        //currentPage.append(this.Header, divHeader)
+        if (isPage) {
+            currentPage.append(this.Header.cloneNode(true))
+        }
         this.Pages.push(currentPage);
         this.MainContainer.appendChild(currentPage);
-
-        //container.append(divHeader);
 
          /**@type {Object}*/const consolidado = WArrayF.Consolidado(data);
 
         //data = data.map(d => WArrayF.replacer(d));
 
-
-        //this.Page.push(currentPage);
-
         data.forEach((dato, index) => {
-            if (index == 0) {
-                for (const prop in dato) {
-                    currentPage.append( WRender.Create({
-                        className: "row-title",
-                        children: [prop]
-                    }))                   
-                }
-            }
-            if (dato.__proto__ == Object.prototype) {
-                for (const prop in dato) {
-                    let div = undefined;//this.CreateElement(dato)//WRender.Create({ className: "report-container" + (page ? " father" : " child") });
-                    if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
-                        continue;
-                    }
-                    //console.log(prop);
-                    div = this.BuildRow(dato, prop);
-                    if (!this.elementFitsInPage(currentPage, div)) {
-                        currentPage = this.createPage();
-                        for (const prop in dato) {
-                            currentPage.append( WRender.Create({
-                                className: "row-title",
-                                children: [prop]
-                            }))                   
-                        }
-                        this.Pages.push(currentPage);
-                        this.MainContainer.appendChild(currentPage)
-                    }
-                    currentPage.append(div);
-                }
-            }
-            else {
-                //div = this.BuildSimpleRow(dato);
-            }
+            currentPage = this.BuildContent(index, dato, currentPage, isPage, data, consolidado);
         });
-        //currentPage.append(divFooter);
         return currentPage;
     }
     /**
-     * @param {{ [x: string]: { __proto__: any[]; }; }} dato
-     * @param {number} index
-     * @param {HTMLElement} divHeader
-     * @param {number} length
-     * @param {{ [x: string]: { Suma: number; }; }} consolidado
-     * @param {HTMLElement} div
-     * @param {HTMLElement} divFooter
+     * @param {number} [index]
+     * @param {{ __proto__: Object; } | undefined} [dato]
+     * @param {HTMLElement} [currentPage]
+     * @param {boolean | undefined} [isPage]
+     * @param { Array } [data]
+     * @param {Object} [consolidado]
+     * @return {HTMLElement}
      */
-    CreateElement(dato) {
-        for (const prop in dato) {
-            if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
-                continue;
+    BuildContent(index, dato, currentPage, isPage, data, consolidado) {
+        if (index == 0) {
+            for (const prop in dato) {
+                currentPage?.append(WRender.Create({
+                    className: "row-title",
+                    children: [prop]
+                }));
             }
-            // let header;
-            // let footer;
-            // if (index == 0) {
-            //     header = WRender.Create({
-            //         className: "row-title",
-            //         children: [prop]
-            //     });
-            //     //divHeader.append(header);
-            // }
-            // if (index == length) {
-            //     //console.log(prop, consolidado[prop], consolidado, dato);
-            //     footer = WRender.Create({
-            //         className: consolidado[prop].Suma != undefined ?
-            //             "row-number row-title" : "row-title",
-            //         children: [(consolidado[prop].Suma != undefined ?
-            //             "Total: " + consolidado[prop].Suma?.toFixed(2) : "-")]
-            //     });
-            // }
-            // /*if (dato[prop].__proto__ == Object.prototype) {
-            //     const findArray = Object.keys(data[prop])
-            //         .find(prop => data[prop](prop).__proto__ == Array.prototype);
-            //     if (findArray != null) {
-            //         div.className = div.className + (page && index > 0 ? " container-break-page" : "");
-            //     }
-            // } else if (dato[prop].__proto__ == Array.prototype) {
-            //     div.className = div.className + (page && index > 0 ? " container-break-page" : "");
-            // }*/
-            // //div.append(this.BuildRow(dato, prop, header, footer, consolidado));
-            // if (index == length) {
-            //     //divFooter.append(footer ?? "");
-            // }
-            console.log(prop);
-            return this.BuildRow(dato, prop)
         }
+        if (dato?.__proto__ == Object.prototype) {
+            for (const prop in dato) {
+                let div = undefined; //this.CreateElement(dato)//WRender.Create({ className: "report-container" + (page ? " father" : " child") });
+                if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
+                    continue;
+                }
+                //console.log(prop);
+                div = this.BuildRow(dato, prop);
+                if (currentPage != undefined && !this.elementFitsInPage(currentPage, div) && isPage) {
+                    currentPage = this.createPage();
+                    for (const prop in dato) {
+                        currentPage.append(WRender.Create({
+                            className: "row-title",
+                            children: [prop]
+                        }));
+                    }
+                    this.Pages.push(currentPage);
+                    this.MainContainer.appendChild(currentPage);
+                }
+                currentPage?.append(div);
+            }
+        }
+        // @ts-ignore
+        if (index + 1 == data?.length ) {
+            for (const prop in dato) {
+                const div = WRender.Create({
+                    className: consolidado[prop].Suma != undefined ?
+                        "row-number row-title" : "row-title",
+                    children: [(consolidado[prop].Suma != undefined ?
+                        "Total: " + consolidado[prop].Suma?.toFixed(2) : "-")]
+                });
+                // @ts-ignore
+                if (!this.elementFitsInPage(currentPage, div) && isPage) {
+                    currentPage = this.createPage();
+                    this.Pages.push(currentPage);
+                    this.MainContainer.appendChild(currentPage);
+                }
+                currentPage?.append(div);
+            }
+        }
+        // @ts-ignore
+        return currentPage;
     }
-
+    /**
+    * @returns {HTMLElement}
+    */
     createPage() {
         // Create a new A4 page container
         return WRender.Create({
-            className: "container pageA4",
-            style: { gridTemplateColumns: "repeat(8, auto)" }
+            className: `container ${this.Config.PageType}`,
+            style: { gridTemplateColumns: `repeat(${this.countProps}, auto)` }
         });
     }
 
@@ -237,10 +215,7 @@ class WReportComponent extends HTMLElement {
             element[prop].__proto__.constructor.name == "AsyncFunction";
     }
 
-    BuildRow(dato, prop, page = false) {
-        //console.log("object", prop,dato[prop].__proto__ == Object.prototype);
-        //console.log("array", prop,dato[prop].__proto__ == Array.prototype);
-        //console.log(prop, dato[prop], dato[prop]?.__proto__ == Array.prototype);
+    BuildRow(dato, prop) {
         if (typeof dato[prop] == "string") {
             return WRender.Create({ className: "row-string", children: [dato[prop]] });
         } else if (typeof dato[prop] == "number") {
@@ -248,39 +223,16 @@ class WReportComponent extends HTMLElement {
         } else if (dato[prop]?.__proto__ == Object.prototype) {
             return this.BuildRow(WArrayF.replacer((dato[prop])));
         } else if (dato[prop]?.__proto__ == Array.prototype) {
-            //if (titleHeader != undefined) titleHeader.style.flex = 8;
-            //if (footer != undefined) footer.style.flex = 8;
             /**@type {Object}*/const consolidadoProp = WArrayF.Consolidado(dato[prop]);
-            //console.log(consolidadoProp);
-            const div = WRender.Create({ className: "container child" });
-            const divHeader = WRender.Create({ className: "report-title" });
-            const divFooter = WRender.Create({ className: "report-footer" });
-            //div.appendChild(divHeader);
-            dato[prop].forEach((element, datoIndex) => {
-                const divContainer = WRender.Create({ className: "report-container" + (page ? " father" : " child") });
-                this.CreateElement(
-                    element,
-                    //datoIndex, 
-                    //divHeader,
-                    ///dato[prop].length - 1,
-                    //consolidadoProp,
-                    //divContainer,
-                    //divFooter
-                );
-                div.appendChild(this.CreateElement(
-                    element,
-                    //datoIndex, 
-                    //divHeader,
-                    ///dato[prop].length - 1,
-                    //consolidadoProp,
-                    //divContainer,
-                    //divFooter
-                ))
+            const div = WRender.Create({
+                className: "container child",
+                style: { gridTemplateColumns: `repeat(${Object.keys(dato[prop][0]).length},auto)` }
             });
-            //div.appendChild(divFooter)
+            dato[prop].forEach((element, index) => {
+                this.BuildContent(index, element, div, false, dato[prop], consolidadoProp);
+            });
             return div;
         } else {
-            //console.log(dato[prop]);
             return WRender.Create({ className: "row-string", children: [dato[prop].toString()] });
         }
     }
@@ -299,19 +251,18 @@ class WReportComponent extends HTMLElement {
             return WRender.Create({ className: "row-string", children: [dato] });
         }
     }
-
     SetOption() {
         this.OptionContainer.append(WRender.Create({
             tagName: 'button', className: 'Block-Primary', innerText: 'Imprimir',
             onclick: async () => {
                 const ventimp = window.open(' ', 'popimpr');
-                ventimp?.document.write(this.MainContainer.querySelector(".pageA4")?.innerHTML ?? "no data");
+                ventimp?.document.write(this.MainContainer.innerHTML
+                    + `<style>${this.CustomStyle.innerHTML}</style>` ?? "no data");
                 ventimp?.focus();
                 setTimeout(() => {
                     ventimp?.print();
                     ventimp?.close();
                 }, 100)
-
             }
         }))
     }
@@ -322,12 +273,13 @@ class WReportComponent extends HTMLElement {
             border-collapse: collapse;
         }
         .MainContainer{
-            background-color: #313131;
+            background-color: #afabab;
             max-height: calc(100vh - 50px);
             border: solid 1px #313131;
             overflow-y: auto;
         }
-        .pageA4{
+        .A4, .A4-horizontal,  .carta, .oficio, .carta-horizontal,
+        .oficio-horizontal {
             padding: 60px 60px;
             border: 1px solid #D2D2D2;
             background: #fff;
@@ -339,37 +291,54 @@ class WReportComponent extends HTMLElement {
             margin: 5mm auto;
             overflow: hidden;
             position: relative;
+            page-break-after: always;
         }
+        .A4-horizontal {
+            width: 297mm;
+            height: 210mm;
+        }
+        /* Tamaño carta (8.5in x 11in) */
+        .carta {
+            width: 8.5in;
+            height: 11in;
+        }
+
+        /* Tamaño oficio (8.5in x 14in) */
+        .oficio {
+            width: 8.5in;
+            height: 14in;
+        }
+
+        /* Tamaño carta horizontal (11in x 8.5in) */
+        .carta-horizontal {
+            width: 11in;
+            height: 8.5in;
+        }
+
+        /* Tamaño oficio vertical (14in x 8.5in) */
+        .oficio-horizontal {
+            width: 14in;
+            height: 8.5in;
+        }
+
         .row-title, .row-number, .row-string, 
         .report-container, .report-footer, .report-title {
            display: flex;
            flex: 1;
            font-size: 10px;
            font-family: "Open Sans", sans-serif;
-           border-right: 1px #cdcbcb solid;
-           border-bottom: 1px #cdcbcb solid;          
+           border: 1px #cdcbcb solid;
+           border: 1px #cdcbcb solid;          
         }  
         .row-title, .row-number, .row-string {
             padding: 5px 10px;
-        }
-        .report-footer, .report-title {
-            max-height: 30px;
-        }
-
-        /* .row-title:last-child,
-        .row-number:last-child,
-        .row-string:last-child,
-        .report-footer:last-child,
-        .report-title  {       
-           border-right: none;
-           border-bottom:none;
-        }   */
+        }       
         .row-title {
             color: #fff;
             text-transform: capitalize;
             background-color: #0d959a;
-        }
-        
+            max-height: 40px;
+        }        
         .row-number {
             justify-content: flex-end;
             align-items: center;
@@ -379,8 +348,7 @@ class WReportComponent extends HTMLElement {
             flex: 8;
             display: grid;
             flex-direction: column;            
-            border: 1px #cdcbcb solid;
-            
+            border: 1px #cdcbcb solid;            
         }   
         .container label { padding: 5px; }      
         .header-container {
@@ -407,13 +375,12 @@ class WReportComponent extends HTMLElement {
             border-left: 1px solid #D2D2D2;
         }
         @media print{
-            .pageA4{
-                width: 210mm;
-                /* height: 297mm; */
-                padding: 60px 60px;
-                background: #fff;
-                margin:  10PX auto;
-                box-shadow: 0 2px 5px 0px rgba(0,0,0,0.3);
+            .A4{
+                border: none; /* Optional: Remove border for printing */
+                margin: 0;
+                padding: 0;
+                box-shadow: none; /* Optional: Remove any shadow for printing */
+                page-break-after: always; /* Ensure each .page-container starts on a new page */
             }
             
             .container-break-page {
@@ -425,3 +392,13 @@ class WReportComponent extends HTMLElement {
 }
 customElements.define('w-component', WReportComponent);
 export { WReportComponent }
+
+const PageType = {
+    A4: "A4",
+    A4_HORIZONTAL: "A4-horizontal",
+    CARTA: "carta",
+    CARTA_HORIZONTAL: "carta",
+    OFICIO: "oficio",
+    OFICIO_HORIZONTAL: "oficio-horizontal"
+}
+export { PageType }

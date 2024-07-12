@@ -10,7 +10,7 @@
 <body>
     <main></main>
     <script type="module">
-        import { WReportComponent } from "../WReportComponent.js";
+        import { WReportComponent, PageType } from "../WReportComponent.js";
         import { data } from "./data.js";
         const datas = [
             {
@@ -103,7 +103,8 @@
                 Dataset: data,
                 Header: "HEADER",
                 SubHeader: "SUB HEADER - Test propierty...",
-                Logo: "../../../Media/Image/logo.png"
+                Logo: "../../../Media/Image/logo.png",
+                PageType: PageType.A4
              })
         )
     </script>

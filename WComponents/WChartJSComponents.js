@@ -35,6 +35,7 @@ class ColumChart extends HTMLElement {
         this.ProcessData = [];
         this.IconsGroupColores = ["#ffc700", "#01a503", "#285a76", "#4640a3", "#8640a3"]
         this.MainChart = { type: "section", props: { class: "SectionBars" }, children: [] };
+        this.GroupsProcessData = [];
         this.attachShadow({ mode: "open" });
     }
     attributeChangedCallBack() {
@@ -86,7 +87,7 @@ class ColumChart extends HTMLElement {
         this.EvalArray = WArrayF.GroupBy(this.ChartInstance.Dataset, this.AttNameEval);
         if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
             this.EvalArray.forEach(Eval => {
-                const stackedValue = WArrayF.SumValAtt(this.Totals.filter(t => t[this.AttNameEval] == Eval[this.AttNameEval]), this.EvalValue);                
+                const stackedValue = WArrayF.SumValAtt(this.Totals.filter(t => t[this.AttNameEval] == Eval[this.AttNameEval]), this.EvalValue);
                 if (this.MaxVal < stackedValue) {
                     this.MaxVal = stackedValue
                 }
@@ -115,6 +116,7 @@ class ColumChart extends HTMLElement {
             object[groupParam] = "";
             this.GroupsData.push(WArrayF.GroupByObject(Dataset, object))
         });
+        this.GroupsProcessData = this.ChargeBy(Dataset);
         return this.DrawGroupBars(this.ChargeGroup(this.GroupsData));
     }
     ChargeGroup = (Groups, inicio = 0) => {
@@ -130,6 +132,31 @@ class ColumChart extends HTMLElement {
             //sumValue: WArrayF.SumValue(WArrayF.GroupBy(Groups[0], this.EvalValue) , "count"),
         }
         return ObjGroup;
+    }
+    ChargeBy = (data,properties = this.groupParams) => {
+        //let ObjGroup = Object.groupBy(Groups, (groupData) => groupData[this.groupParams[inicio]]);
+        
+        //return ObjGroup;
+        if (properties.length === 0) {
+            return data;
+        }
+        
+        const [firstProperty, ...remainingProperties] = properties;
+        
+        const groupedData = data.reduce((acc, item) => {
+            const key = item[firstProperty];
+            if (!acc[key]) {
+                acc[key] = [];
+            }
+            acc[key].push(item);
+            return acc;
+        }, {});
+        
+        for (const key in groupedData) {
+            groupedData[key] = this.ChargeBy(groupedData[key], remainingProperties);
+        }
+        
+        return groupedData;
     }
     DrawGroupBars = (Groups, div = this.MainChart, arrayP = {}, GroupIndex = 0) => {
         if (Groups == null) {
@@ -159,11 +186,11 @@ class ColumChart extends HTMLElement {
                 groupBar.children.push(this.DrawBackgroundLine(false));
                 if (this.EvalArray != null) {
                     let index = 0;
-
-
                     this.EvalArray.forEach(Eval => {
                         arrayP[this.AttNameEval] = Eval[this.AttNameEval];
-                        const stackedValue = WArrayF.SumValAtt(this.Totals.filter(t => t[this.AttNameEval] == arrayP[this.AttNameEval]), this.EvalValue);
+                        const stackedValue = WArrayF.SumValAtt(this.Totals.filter(t => t[this.AttNameEval]
+                            == arrayP[this.AttNameEval]),
+                            this.EvalValue);
                         if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
                             //console.log(stackedValue);
                         }
@@ -172,9 +199,9 @@ class ColumChart extends HTMLElement {
                             groupBar.children.push(this.DrawBar(
                                 Data,
                                 index,
-                                arrayP[this.AttNameEval],                                
-                               // this.ChartInstance.percentCalc == true ? Group.count :
-                                 this.MaxVal,
+                                arrayP[this.AttNameEval],
+                                // this.ChartInstance.percentCalc == true ? Group.count :
+                                this.MaxVal,
                                 Group[Groups.groupParam]
                             ));
                         }
@@ -439,14 +466,14 @@ class RadialChart extends HTMLElement {
         this.shadowRoot.append(WRender.createElement(WChartStyle(this.ChartInstance)));
         this.DrawChart();
     }
-    InitializeDataset() {       
+    InitializeDataset() {
         if (this.EvalValue == null && this.ChartInstance.Dataset?.length != 0) {
             //this.Dataset = WArrayF.GroupByObject(this.Dataset, this.Dataset[0]);
             this.EvalValue = "count";
         }
         this.Dataset = WArrayF.GroupBy(this.ChartInstance.Dataset,
             this.AttNameEval, this.EvalValue);
-        
+
 
     }
     DrawChart = async () => {
@@ -526,7 +553,7 @@ class RadialChart extends HTMLElement {
                     //"stroke-linecap": "round"
                 },
             });
-           
+
             //texto
             let degs = (360 * porcentajeF) / 100;
             let degs2 = (((360 * porcentaje) / 100) / 2) - 12;
@@ -544,7 +571,7 @@ class RadialChart extends HTMLElement {
                     transform: `translate(0,0),rotate(-${degs + (degs2)})`,
                 }
             })
-          
+
             if (this.ChartInstance.percentCalc == true) {
                 TextSVG.append(document.createTextNode(porcentaje + "%"));
             } else {
@@ -584,13 +611,13 @@ class RadialChart extends HTMLElement {
         circle.style.strokeDasharray = Perimetro;
         let progress = value / 100;
         let dashoffset = (Perimetro * (1 - progress)) - val;
-        circle.style.strokeDashoffset =  Perimetro;//dado que es animado este parametro lo define el to 
+        circle.style.strokeDashoffset = Perimetro;//dado que es animado este parametro lo define el to 
         circle.appendChild(WRender.createElementNS({
             type: "animate",
             props: {
                 attributeName: "stroke-dashoffset",
                 //attributeName: "stroke-dasharray",
-                from: `${ circle.style.strokeDasharray}` ,                
+                from: `${circle.style.strokeDasharray}`,
                 to: `${dashoffset < 0 ? 0 : dashoffset - 6}`,
                 dur: "1s",
                 fill: "freeze",
