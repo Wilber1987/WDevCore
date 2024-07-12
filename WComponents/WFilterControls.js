@@ -286,14 +286,14 @@ class WFilterOptions extends HTMLElement {
                 if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
                     const ModelProperty = this.ModelObject[control.id];
                     switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL":
+                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL":  case "NUMBER":
                             if (control.value != null && control.value != undefined && control.value != "") {
                                 findByValue(control);
                             }
                             break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES": case "HORA": case "PASSWORD":
                             break;
-                        case "DATE": case "FECHA": case "HORA": case "NUMBER":
+                        case "DATE": case "FECHA": case "HORA":
                             /**TODO */
                             const inputs = control.querySelectorAll("input");
                             findElementByDate(inputs[0].value, inputs[1].value);

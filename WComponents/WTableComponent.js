@@ -40,6 +40,7 @@ class WTableComponent extends HTMLElement {
             Sorts: this.Sorts,
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
             Display: Config.Options?.FilterDisplay ?? false,
+            UseEntityMethods: true,
             FilterFunction: (DFilt) => {
                 this.withFilter = true;
                 this.DrawTable(DFilt);

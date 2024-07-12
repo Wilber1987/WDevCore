@@ -786,7 +786,7 @@ class WForm extends HTMLElement {
                     min: ModelProperty.min,
                     max: ModelProperty.max,
                     placeholder: placeholder,
-                    //onchange: disabled ? undefined : onChangeEvent,
+                    onchange: disabled ? undefined : onChangeEvent,
                     disabled: disabled
                 });
                 Form.appendChild(ControlContainer);
