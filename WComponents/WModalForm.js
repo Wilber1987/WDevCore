@@ -199,7 +199,7 @@ class WModalForm extends HTMLElement {
                         "text-align": "center",
                         font: "400 13.3333px !important"
                     }), new WCssClass(`.ModalContent`, {
-                        //"overflow-y": "auto",
+                        "overflow-y": "auto",
                         display: "block",
                         padding: 30
                     }),

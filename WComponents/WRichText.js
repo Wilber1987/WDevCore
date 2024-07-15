@@ -183,7 +183,7 @@ class WRichText extends HTMLElement {
         { commandName: "italic", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "italic", label: "I" },
         { commandName: "underline", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "underline", label: "U" },
         { commandName: "insertUnorderedList", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "list", label: "" },
-        { commandName: "createLink", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "link", label: "" },
+        //{ commandName: "createLink", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "link", label: "" },
         //{ commandName: "uppercase", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "bold", label: "A" },
         //{ commandName: "insertOrderedList", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "list", label: "" },
         //{ commandName: "copy", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
@@ -219,13 +219,14 @@ class WRichText extends HTMLElement {
 
 const WRichTextStyle = css` 
     w-rich-text .WREditor {
-        height: 100px;
+        height: 200px;
         border: solid 1px #c5c5c5;
         display: block;
         margin: 0px;
         margin-top: 10px;
         padding: 10px;
         border-radius: 6px;
+        overflow-y: auto;
     }
     .WREditor:focus-visible  {
         outline-color : #d4d4d4;

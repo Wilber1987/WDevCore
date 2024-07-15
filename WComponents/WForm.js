@@ -1727,6 +1727,9 @@ class WForm extends HTMLElement {
                 .ObjectModalContainer {
                     max-height: calc(100% - 80px);
                 }
+                .divComplexForm {
+                    grid-template-columns: calc(100% - 20px);
+                }
                
             }`;
         const wstyle = new WStyledRender({
