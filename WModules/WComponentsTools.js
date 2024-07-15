@@ -116,6 +116,7 @@ class WAjaxTools {
         return {};
     }
 }
+export { WAjaxTools }
 /** 
  * @returns {HTMLElement}
  * @param {any} strings
@@ -309,14 +310,14 @@ class WRender {
     }
     static isHTMLElement(node) {
         let currentProto = Object.getPrototypeOf(node);
-        
+
         while (currentProto !== null) {
             if (currentProto === HTMLElement.prototype) {
                 return true;
             }
             currentProto = Object.getPrototypeOf(currentProto);
         }
-        
+
         return false;
     }
     /**
@@ -330,6 +331,7 @@ class WRender {
     }
 
 }
+export { WRender }
 /**
  * @typedef {Object} ConfigDOMManager
      * @property {Boolean} [SPAManage]
@@ -910,6 +912,7 @@ class WArrayF {
         return replacerElement;
     }
 }
+export { WArrayF }
 //METODOS VARIOS
 const GenerateColor = () => {
     var hexadecimal = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
@@ -920,7 +923,7 @@ const GenerateColor = () => {
     }
     return color_aleatorio
 }
-export { WAjaxTools, WRender, ComponentsManager, WArrayF, GenerateColor }
+export { ComponentsManager, GenerateColor }
 
 //Date UTILITYS
 function pad(number) {
@@ -937,14 +940,21 @@ function pad(number) {
  * @returns 
 **/
 Date.prototype.toISO = function () {
-    return this.getUTCFullYear() +
-        '-' + pad(this.getUTCMonth() + 1) +
-        '-' + pad(this.getUTCDate()) /* +
+    const year = this.getFullYear();
+    const month = pad(this.getMonth() + 1);
+    const day = pad(this.getDate());
+    return `${year}-${month}-${day}`;
+   /* + return this.getUTCFullYear() +   '-' + pad(this.getUTCMonth() + 1) + '-' + pad(this.getUTCDate()) 
       'T' + pad(this.getUTCHours()) +
       ':' + pad(this.getUTCMinutes()) +
       ':' + pad(this.getUTCSeconds()) +
       '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
       'Z' */;
+};
+
+String.prototype.toISO = function () {
+    const date = new Date(this).toISO();   
+    return date;
 };
 Date.prototype.toStartDate = function () {
     return new Date(this.getUTCFullYear() +

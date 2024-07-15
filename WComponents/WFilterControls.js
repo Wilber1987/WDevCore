@@ -175,10 +175,16 @@ class WFilterOptions extends HTMLElement {
                     const ModelProperty = this.ModelObject[control.id];
                     let propiertyName = control.id;
                     switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA": case "NUMBER":
+                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
                             if (control.value != null && control.value != undefined && control.value != "") {
                                 filterType = "LIKE"
                                 values = [control.value];
+                            }
+                            break;
+                        case "NUMBER":
+                            if (control.value != null && control.value != undefined && control.value != "") {
+                                filterType = "="
+                                values = [ control.value];
                             }
                             break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES":

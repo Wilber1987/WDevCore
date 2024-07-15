@@ -244,6 +244,9 @@ class MultiSelect extends HTMLElement {
             }
         });
         this.DrawLabel();
+        if (this.Config.IsFilterControl) { 
+            this.DisplayOptions();
+        }
     }
     SetOptions = () => {
         if (this.Config.IsFilterControl) {
@@ -557,7 +560,6 @@ const MainMenu = css`
         padding: 0px 5px;
     }
     .OptionsContainer {
-        max-height: 500px;
         overflow-y: auto; overflow-y: overlay;
         transition: all .1s;
         width: 100%;
