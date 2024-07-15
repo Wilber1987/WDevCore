@@ -1,10 +1,8 @@
 //@ts-check
-import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
+import { StyleScrolls } from "../StyleModules/WStyleComponents.js";
+import { WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
-import { StyleScrolls, StylesControlsV1 } from "../StyleModules/WStyleComponents.js";
-import { WModalForm } from "./WModalForm.js";
-import { WIcons, WIconsPath } from "../WModules/WIcons.js";
-import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
+
 // @ts-ignore
 import { FilterData } from "../WModules/CommonModel.js";
 import { WCardTable } from "./WTableComponent.js";
@@ -14,22 +12,27 @@ import { WCardTable } from "./WTableComponent.js";
  *  * @property {Array} Dataset
     * @property {Array} [selectedItems]
     * @property {Function} [action]
+    * @property {Function} [ValidateFunction]
     * @property {String} [id]
     * @property {Boolean} [IsFilterControl]
     * @property {Object} [ModelObject]
+    * @property {Object} [EntityModel]
     * @property {Boolean} [MultiSelect]
     * @property {Boolean} [FullDetail]
     * @property {Boolean} [AddObject]
+    * @property {Boolean} [AutoSave]
     * @property {String} [AddPatern]
-    * @property {String} [Mode]  SELECT_BOX, SELECT
+    * @property {Object} [CrudOptions]
+    * @property {String} [Mode]  SELECT_BOX, SELECT ImageUrlPath
+    * @property {String} [ImageUrlPath]   
 **/
 
 class MultiSelect extends HTMLElement {
     /**
      * @param {ConfigMS} Config 
-     * @param {HTMLElement} [Style] 
+     * @param {HTMLElement|null} [Style] 
      */
-    constructor(Config = (new ConfigMS()), Style = null) {
+    constructor(Config, Style = null) {
         super();
         this.Config = Config;
         this.Dataset = this.Config.Dataset ?? [];
@@ -125,7 +128,7 @@ class MultiSelect extends HTMLElement {
         const addBtn = WRender.Create({
             tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async () => {
                 if (this.ModelObject != undefined) {
-                    this.ModalCRUD(undefined, targetControl, addBtn)
+                    this.ModalCRUD(undefined, targetControl, addBtn);
                 } else {
                     let regex = this.Config?.AddPatern ? new RegExp(this.Config?.AddPatern) : undefined;
                     if (this.Config?.AddPatern == undefined || regex?.test(targetControl.value)) {
@@ -144,7 +147,6 @@ class MultiSelect extends HTMLElement {
                         this.createAlertToolTip(targetControl, `Formato inválido`);
                     }
                 }
-
             }
         });
         return addBtn;
@@ -221,7 +223,7 @@ class MultiSelect extends HTMLElement {
             if (element.SubOptions != undefined && element.SubOptions.__proto__ == Array.prototype) {
                 element.SubMultiSelect = new MultiSelect({
                     Dataset: element.SubOptions,
-                    SubFunction: () => {
+                    action: () => {
                         //pendiente
                     }
                 }, new WStyledRender(SubMenu));
@@ -248,8 +250,10 @@ class MultiSelect extends HTMLElement {
             this.shadowRoot?.append(this.SearchControl);
             this.SearchControl.style.borderRadius = "0 10px 10px 0";
             this.SearchControl.onfocus = () => {
-                if (!this.tool?.className.includes("active")) {
+                if (!this.tool?.className.includes("active") ) {
+                    // @ts-ignore
                     this.LabelMultiselect.querySelector("span").className = "btnSelect spanActive"
+                    // @ts-ignore
                     this.tool.className = "active";
                 }
             }
@@ -266,6 +270,7 @@ class MultiSelect extends HTMLElement {
         return this.tool
     }
     DrawLabel = () => {
+        // @ts-ignore
         this.LabelMultiselect.querySelector(".selecteds").innerHTML =
             this.selectedItems.length == 0 ? "Seleccionar: " : "";
         let sum = 0;
@@ -273,6 +278,7 @@ class MultiSelect extends HTMLElement {
         let labelsWidth = 0;
         this.selectedItems.forEach((element, index) => {
             if (!this.MultiSelect) {
+                // @ts-ignore
                 this.LabelMultiselect.querySelector(".selecteds").innerHTML = "";
             }
             const LabelM = WRender.Create({
@@ -341,7 +347,7 @@ class MultiSelect extends HTMLElement {
                 break;
             }
         }
-        return element[this.DisplayName] ?? "Element" + index;
+        return element[this.DisplayName ?? ""] ?? "Element" + index;
     }
     DisplayOptions = () => {
         this.tool?.DisplayOptions(this)
@@ -387,25 +393,27 @@ class MultiSelect extends HTMLElement {
             // @ts-ignore
             document.querySelectorAll("w-multi-select").forEach((/**@type {MultiSelect} */ m) => {
                 m.tool?.remove();
+                // @ts-ignore
                 m.LabelMultiselect.querySelector("span").className = "btnSelect";
             })
         }
     }
-    ModalCRUD(element, targetControl, addBtn) {
+    async ModalCRUD(element, targetControl, addBtn) {
+        const { WModalForm } = await import("./WModalForm.js");
         this.shadowRoot?.append(
             new WModalForm({
                 ModelObject: this.ModelObject,
-                EntityModel: this.EntityModel,
+                EntityModel: this.Config.EntityModel,
                 AutoSave: this.Config.AutoSave ?? false,
-                ParentModel: this.Config.ParentModel,
-                ParentEntity: this.Config.ParentEntity,
+                //ParentModel: this.Config.ParentModel,
+                //ParentEntity: this.Config.ParentEntity, //TODO RESVISAR LO DEL PARENT ENTITY SI AL DIA DE HOY TIENE SENTIDO
                 EditObject: element,
-                icon: this.Config.icon,
+                //icon: this.Config.icon,
                 ImageUrlPath: this.Config.ImageUrlPath,
                 title: element ? "Editar" : "Nuevo",
                 ValidateFunction: this.Config.ValidateFunction,
                 ObjectOptions: {
-                    Url: element ? this.Options?.UrlUpdate : this.Options?.UrlAdd,
+                    Url: element ? this.Config.CrudOptions?.UrlUpdate : this.Config.CrudOptions?.UrlAdd,
                     AddObject: element ? false : true,
                     SaveFunction: async (NewObject) => {
                         this.Dataset.push(NewObject);
@@ -431,7 +439,8 @@ class MultiSelect extends HTMLElement {
     }
 }
 customElements.define("w-multi-select", MultiSelect);
-export { MultiSelect }
+export { MultiSelect };
+export { WToolTip };
 
 class WToolTip extends HTMLElement {
     constructor(Element) {
@@ -478,7 +487,7 @@ class WToolTip extends HTMLElement {
                 const tooltipRect = this.getBoundingClientRect();
                 console.log(tooltipRect, this.offsetHeight, window.innerHeight);
                 const viewportHeight = window.innerHeight;
-                if (tooltipRect.bottom + 400> viewportHeight) {
+                if (tooltipRect.bottom + 400 > viewportHeight) {
                     // @ts-ignore
                     this.style = 'top: auto !important ; bottom : 100%';
                 } else {
@@ -493,10 +502,9 @@ class WToolTip extends HTMLElement {
             this.remove();
         }
     }
-    
+
 }
 customElements.define('w-tooltip', WToolTip);
-export { WToolTip }
 
 
 const MainMenu = css`

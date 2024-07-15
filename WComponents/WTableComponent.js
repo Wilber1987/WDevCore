@@ -1,14 +1,12 @@
 //@ts-check
 // @ts-ignore
-import { FilterData, OrderData, TableConfig } from "../WModules/CommonModel.js";
+import { OrderData, TableConfig } from "../WModules/CommonModel.js";
 import { ConvertToMoneyString, WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
-import { WDetailObject } from "./WDetailObject.js";
 import { WFilterOptions } from "./WFilterControls.js";
-import { ModalVericateAction } from "./WForm.js";
-import { LoadinModal, WModalForm } from "./WModalForm.js";
+import { LoadinModal } from "./LoadinModal.js";
 
 
 class WTableComponent extends HTMLElement {
@@ -34,7 +32,7 @@ class WTableComponent extends HTMLElement {
         this.divTableContainer = WRender.Create({ type: "div", class: "tableContainer", children: [this.Table] });
         this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);
          /**@type {Array<OrderData>} */
-         this.Sorts = [];
+        this.Sorts = [];
         this.FilterOptions = new WFilterOptions({
             Dataset: this.Dataset,
             Sorts: this.Sorts,
@@ -463,7 +461,8 @@ class WTableComponent extends HTMLElement {
         }
     }
 
-    DeleteBTN = (Options, element, tr) => {
+    DeleteBTN = async (Options, element, tr) => {
+       
         if (this.Options?.Delete != undefined && this.Options.Delete == true) {
             Options.append(WRender.Create({
                 tagName: "button",
@@ -471,6 +470,7 @@ class WTableComponent extends HTMLElement {
                 class: "BtnTableA",
                 type: "button",
                 onclick: async () => {
+                    const { ModalVericateAction } = await import("./WForm.js");
                     this.shadowRoot?.append(ModalVericateAction(() => {
                         const index = this.Dataset.indexOf(element);
                         if (WArrayF.FindInArray(element, this.Dataset) == true) {
@@ -520,6 +520,8 @@ class WTableComponent extends HTMLElement {
                 class: "BtnTable",
                 type: "button",
                 onclick: async () => {
+                    const { WModalForm } = await import("./WModalForm.js");
+                    const { WDetailObject } = await import("./WDetailObject.js");
                     this.shadowRoot?.append(new WModalForm({
                         icon: this.TableConfig.icon,
                         ImageUrlPath: this.TableConfig.ImageUrlPath,
@@ -565,7 +567,8 @@ class WTableComponent extends HTMLElement {
             }));
         }
     }
-    ModalCRUD(element, tr) {
+   async ModalCRUD(element, tr) {
+        const { WModalForm } = await import("./WModalForm.js");
         this.shadowRoot?.append(
             new WModalForm({
                 ModelObject: this.ModelObject,

@@ -2,7 +2,8 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools, ConvertToMoneyString } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
-import { WModalForm, WSimpleModalForm } from './WModalForm.js';
+import { WModalForm } from './WModalForm.js';
+import { WSimpleModalForm } from "./WSimpleModalForm.js";
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { WIcons } from '../WModules/WIcons.js';
 import { WTableComponent } from './WTableComponent.js';

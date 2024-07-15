@@ -2,17 +2,15 @@
 import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
-import { LoadinModal, WModalForm, WSimpleModalForm } from './WModalForm.js';
+import { WSimpleModalForm } from "./WSimpleModalForm.js";
+
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { WIcons } from '../WModules/WIcons.js';
-import { WTableComponent } from './WTableComponent.js';
-import { WCalendar, WCalendarComponent } from './WCalendar.js';
-import { WDetailObject } from './WDetailObject.js';
 import { EntityClass } from '../WModules/EntityClass.js';
 // @ts-ignore
 import { FormConfig, ModelProperty } from '../WModules/CommonModel.js';
-import { WImageCapture } from './WImageCapture.js';
-import { WRichText } from './WRichText.js';
+
+
 let photoB64;
 const ImageArray = [];
 
@@ -135,15 +133,6 @@ class WForm extends HTMLElement {
             }
         }
         return OriginalObject;
-    }
-
-    /**
-     * 
-     * @param {Object} ObjectF 
-     * @returns {HTMLElement}
-     */
-    ShowFormDetail(ObjectF = this.Config.ObjectDetail) {
-        return new WDetailObject({ ObjectDetail: ObjectF });
     }
     /**
     * 
@@ -394,6 +383,7 @@ class WForm extends HTMLElement {
                 Form.appendChild(ControlContainer);
                 break;
             case "IMAGECAPTURE":
+                const { WImageCapture } = await import('./WImageCapture.js');
                 InputControl = new WImageCapture({
                     value: ObjectF[prop],
                     action: (image) => {
@@ -562,6 +552,7 @@ class WForm extends HTMLElement {
                 break;
             case "MASTERDETAIL":
                 const masterDetailModel = await WArrayF.isModelFromFunction(Model, prop);
+                const { WTableComponent } = await import('./WTableComponent.js');
                 ControlLabel.className += " formHeader";
                 ControlContainer.classList.add("tableContainer");
                 ObjectF[prop] = ObjectF[prop] != "" && ObjectF[prop] != undefined && ObjectF[prop] != null && ObjectF[prop].__proto__ == Array.prototype ?
@@ -571,7 +562,7 @@ class WForm extends HTMLElement {
                     Dataset: ObjectF[prop],
                     AddItemsFromApi: false,
                     ModelObject: masterDetailModel,
-                    ParentModel: Model,
+                    //ParentModel: Model,
                     ParentEntity: ObjectF,
                     ImageUrlPath: this.Config.ImageUrlPath,
                     Options: {
@@ -724,6 +715,7 @@ class WForm extends HTMLElement {
                 Form.appendChild(ControlContainer);
                 break;
             case "RICHTEXT":
+                const { WRichText } = await import('./WRichText.js');
                 ControlContainer.classList.add("textAreaContainer");
                 ControlContainer.style.height = "auto";
                 InputControl = new WRichText({
@@ -742,7 +734,7 @@ class WForm extends HTMLElement {
                 ObjectF[prop] = ObjectF[prop]?.__proto__ == Array.prototype ? ObjectF[prop] : [];
                 ControlContainer.classList.add("tableContainer");
                 ControlContainer.style.height = "auto";
-                InputControl = this.createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model);
+                InputControl = await this.createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model);
                 ComplexForm.appendChild(ControlContainer);
                 break;
             case "PASSWORD":
@@ -845,7 +837,8 @@ class WForm extends HTMLElement {
         return { require, disabled };
     }
 
-    createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
+    async createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
+        const { WCalendarComponent } = await import('./WCalendar.js');
         InputControl = new WCalendarComponent({
             CalendarFunction: Model[prop].CalendarFunction,
             SelectedBlocks: ObjectF[prop],
@@ -1208,12 +1201,13 @@ class WForm extends HTMLElement {
             return;
         }
         if (this.Config.ObjectOptions?.Url != undefined || this.Config.SaveFunction == undefined) {
-            const ModalCheck = this.ModalCheck(ObjectF, this.Config.SaveFunction == undefined);
+            const ModalCheck = await this.ModalCheck(ObjectF, this.Config.SaveFunction == undefined);
             this.shadowRoot?.append(ModalCheck)
         } else if (this.Config.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
-            const ModalCheck = this.ModalCheck(ObjectF, true);
+            const ModalCheck = await this.ModalCheck(ObjectF, true);
             this.shadowRoot?.append(ModalCheck)
         } else {
+            const { LoadinModal } = await import("./LoadinModal.js");
             const loadinModal = new LoadinModal();
             this.shadowRoot?.append(loadinModal);
             await this.Config.SaveFunction(ObjectF);
@@ -1335,10 +1329,11 @@ class WForm extends HTMLElement {
         control.focus();
     }
 
-    ModalCheck(ObjectF, withModel = false) {
-        const modalCheckFunction = async (/** @type {LoadinModal} */ LoadinModal) => {
+    async ModalCheck(ObjectF, withModel = false) {
+        const { LoadinModal } = await import("./LoadinModal.js");
+        const modalCheckFunction = async (loadinModal) => {
             try {
-                this.shadowRoot?.append(LoadinModal);
+                this.shadowRoot?.append(loadinModal);
                 if (withModel) {
                     const response = await this.Config.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
                     await this.ExecuteSaveFunction(ObjectF, response);
@@ -1346,7 +1341,7 @@ class WForm extends HTMLElement {
                     const response = await WAjaxTools.PostRequest(this.Config.ObjectOptions?.Url, ObjectF);
                     await this.ExecuteSaveFunction(ObjectF, response);
                 }
-                LoadinModal.close();
+                loadinModal.close();
                 ModalCheck.close();
                 // if (this.Config.SaveFunction != undefined) {
                 //     console.log("HEARE");
@@ -1355,12 +1350,13 @@ class WForm extends HTMLElement {
                 //     this.Config.ObjectOptions?.SaveFunction(ObjectF);
                 // }
             } catch (error) {
-                LoadinModal.close();
+                loadinModal.close();
                 ModalCheck.close();
                 console.log(error);
                 this.shadowRoot?.append(ModalMessege(error));
             }
         }
+        const { WModalForm } = await import('./WModalForm.js');
         const ModalCheck = new WModalForm({
             ObjectModal: WRender.Create({
                 tagName: "div", children: [
