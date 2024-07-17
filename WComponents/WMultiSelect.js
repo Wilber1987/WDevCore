@@ -243,21 +243,15 @@ class MultiSelect extends HTMLElement {
                 }
             }
         });
-        this.DrawLabel();
-        if (this.Config.IsFilterControl) { 
-            this.DisplayOptions();
-        }
+        this.DrawLabel();        
     }
     SetOptions = () => {
         if (this.Config.IsFilterControl) {
             this.shadowRoot?.append(this.SearchControl);
             this.SearchControl.style.borderRadius = "0 10px 10px 0";
             this.SearchControl.onfocus = () => {
-                if (!this.tool?.className.includes("active") ) {
-                    // @ts-ignore
-                    this.LabelMultiselect.querySelector("span").className = "btnSelect spanActive"
-                    // @ts-ignore
-                    this.tool.className = "active";
+                if (this.Config.IsFilterControl) { 
+                    this.DisplayOptions();
                 }
             }
             this.tool = new WToolTip([

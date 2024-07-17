@@ -860,12 +860,14 @@ class WArrayF {
     }
     /**
      * @param {Array} Array Arreglo para ordenar 
+     * @param {Object} [Model] Arreglo para ordenar 
      * @returns {Object}
      */
-    static Consolidado(Array) {
+    static Consolidado(Array, Model) {
+        Model = Model ?? Array[0];
         const consolidado = {};
-        for (const prop in Array[0]) {
-            if (typeof Array[0][prop] === "number") {
+        for (const prop in Model) {
+            if (typeof Model[prop] === "number") {
                 const suma = this.SumValAtt(Array, prop);
                 consolidado[prop] = {
                     Type: "NUMBER",
