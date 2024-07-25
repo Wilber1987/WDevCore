@@ -1,7 +1,8 @@
 //@ts-check
-import { WRender, ComponentsManager, WArrayF, html } from "../WModules/WComponentsTools.js";
+import { WRender, ComponentsManager, html } from "../WModules/WComponentsTools.js";
 import { StylesControlsV2, StylesControlsV3, StyleScrolls } from "../StyleModules/WStyleComponents.js"
 import { css } from "../WModules/WStyledRender.js";
+import {WArrayF} from "../WModules/WArrayF";
 /**
  * @typedef {Object} ReportConfig
  * @property {Array} [Dataset]

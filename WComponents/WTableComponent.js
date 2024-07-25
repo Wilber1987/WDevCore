@@ -1,12 +1,14 @@
 //@ts-check
 // @ts-ignore
 import { OrderData, TableConfig } from "../WModules/CommonModel.js";
-import { ConvertToMoneyString, WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
+import { ConvertToMoneyString, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
 import { WFilterOptions } from "./WFilterControls.js";
 import { LoadinModal } from "./LoadinModal.js";
+import {WArrayF} from "../WModules/WArrayF";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 
 
 class WTableComponent extends HTMLElement {

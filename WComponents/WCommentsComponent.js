@@ -1,10 +1,12 @@
 //@ts-check
 import { StylesControlsV2, StyleScrolls } from "../StyleModules/WStyleComponents.js";
-import { WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
+import { WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
 import { WRichText } from "./WRichText.js";
 import { WModalForm } from "./WModalForm.js";
 import { MultiSelect } from "./WMultiSelect.js";
+import {WArrayF} from "../WModules/WArrayF";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 
 class WCommentsComponent extends HTMLElement {
     constructor(props) {

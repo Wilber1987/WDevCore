@@ -1,4 +1,6 @@
-import { ComponentsManager, WAjaxTools, WArrayF, WRender } from "../WModules/WComponentsTools.js";
+import { ComponentsManager, WRender } from "../WModules/WComponentsTools.js";
+import {WArrayF} from "../WModules/WArrayF";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 //import { WModalForm } from "../WComponents/WModalForm.js";
 // import "../WComponents/WLoginTemplate.js";
 

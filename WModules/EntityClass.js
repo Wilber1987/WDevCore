@@ -1,5 +1,6 @@
 import { FilterData } from "./CommonModel.js";
-import { WAjaxTools } from "./WComponentsTools.js";
+
+import {WAjaxTools} from "./WAjaxTools";
 
 class EntityClass {
     constructor(props, Namespace) {

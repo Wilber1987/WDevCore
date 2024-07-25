@@ -7,9 +7,10 @@ import { WDetailObject } from '../WComponents/WDetailObject.js';
 import { ModalVericateAction, WForm } from "../WComponents/WForm.js";
 import { WModalForm } from "../WComponents/WModalForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
-import { ComponentsManager, WAjaxTools, WRender } from '../WModules/WComponentsTools.js';
+import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
 import { WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { Tbl_Profile } from './Tbl_Profile.js';
+import {WAjaxTools} from "../WModules/WAjaxTools";
 
 const OnLoad = async () => {
     Aside.append(WRender.Create({ tagName: "h3", innerText: "Administración de perfiles" }));

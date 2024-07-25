@@ -1,11 +1,13 @@
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
-import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
+import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../WModules/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 import { ModalVericateAction } from "./WForm.js";
 import { WModalForm } from "./WModalForm.js";
 import { WToolTip } from "./WMultiSelect.js";
+import {WArrayF} from "../WModules/WArrayF";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 class PaginatorConfig {
     Dataset = [];
     ModelObject = {};

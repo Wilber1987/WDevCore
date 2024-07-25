@@ -1,7 +1,8 @@
-import { WRender, WAjaxTools, ComponentsManager } from "../WModules/WComponentsTools.js";
+import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { ModalConfig } from "../WModules/CommonModel.js";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 
 
 class WModalForm extends HTMLElement {

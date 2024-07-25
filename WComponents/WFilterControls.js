@@ -3,10 +3,11 @@ import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents
 // @ts-ignore
 import { FilterData, ModelProperty, OrderData } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";
-import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
+import { WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
+import {WArrayF} from "../WModules/WArrayF";
 /**
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset  

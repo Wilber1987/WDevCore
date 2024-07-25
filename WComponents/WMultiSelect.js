@@ -1,11 +1,12 @@
 //@ts-check
 import { StyleScrolls } from "../StyleModules/WStyleComponents.js";
-import { WArrayF, WRender } from "../WModules/WComponentsTools.js";
+import { WRender } from "../WModules/WComponentsTools.js";
 import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 
 // @ts-ignore
 import { FilterData } from "../WModules/CommonModel.js";
 import { WCardTable } from "./WTableComponent.js";
+import {WArrayF} from "../WModules/WArrayF";
 
 /**
  * @typedef {Object} ConfigMS 

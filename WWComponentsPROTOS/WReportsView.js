@@ -1,6 +1,7 @@
-import { WRender, WArrayF } from "../WModules/WComponentsTools.js";
+import { WRender } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import "../WDeprecateComponents/WTableComponents.js";
+import {WArrayF} from "../WModules/WArrayF";
 const TableId = "tableReport"
 
 //facturas de empresa ligadas al usuario y y por sesiones de empresa

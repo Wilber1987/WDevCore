@@ -3,9 +3,10 @@ import { WAppNavigator } from "../WComponents/WAppNavigator.js";
 import { WFilterOptions } from "../WComponents/WFilterControls.js";
 import { WModalForm } from "../WComponents/WModalForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
-import { ComponentsManager, WAjaxTools, WRender } from '../WModules/WComponentsTools.js';
+import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
 import { ChangePasswordModel, ChangeRolesModel, ChangeStateModel, Security_Permissions, Security_Roles, Security_Users } from "./SecurityModel.js";
 import { Tbl_Profile } from "./Tbl_Profile.js";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 window.addEventListener("load", async () => {
     const DOMManager = new ComponentsManager({ MainContainer: Main });
     const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});

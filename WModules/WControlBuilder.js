@@ -1,4 +1,5 @@
-import { WArrayF, WRender, html } from "./WComponentsTools.js";
+import { WRender, html } from "./WComponentsTools.js";
+import {WArrayF} from "./WArrayF";
 
 class ControlBuilder {
   static BuildImage(value = "", urlPath) {

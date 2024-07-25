@@ -1,6 +1,5 @@
 
 //@ts-check
-import { Cat_Dependencias, Tbl_Servicios } from '../../ModelProyect/ProyectDataBaseModel.js';
 import { activityStyle } from '../../Proyect/style.js';
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
 import { WFilterOptions } from '../WComponents/WFilterControls.js';
@@ -10,6 +9,7 @@ import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
 import { css } from '../WModules/WStyledRender.js';
 import { Tbl_Profile } from './Tbl_Profile.js';
+import {Cat_Dependencias} from "../../Proyect/FrontModel/Cat_Dependencias";
 
 const OnLoad = async () => {
     // @ts-ignore

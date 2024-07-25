@@ -1,5 +1,5 @@
 
-import { WRender, WArrayF, ComponentsManager, WAjaxTools, ConvertToMoneyString } from '../WModules/WComponentsTools.js';
+import { WRender, ComponentsManager, ConvertToMoneyString } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WModalForm } from './WModalForm.js';
@@ -9,6 +9,8 @@ import { WIcons } from '../WModules/WIcons.js';
 import { WTableComponent } from './WTableComponent.js';
 import { WAppNavigator } from './WAppNavigator.js';
 import { ControlBuilder } from '../WModules/WControlBuilder.js';
+import {WArrayF} from "../WModules/WArrayF";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 let photoB64;
 class Config {
     DOMManager = undefined;

@@ -1,9 +1,11 @@
-﻿import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../../WDevCore/WModules/WComponentsTools.js';
+﻿import { WRender, ComponentsManager } from '../../WDevCore/WModules/WComponentsTools.js';
 import { WCssClass, WStyledRender } from '../../WDevCore/WModules/WStyledRender.js';
 import { WCardCarousel, WCard } from '../../WDevCore/WComponents/WCardCarousel.js';
 import { StylesControlsV2 } from "../../WDevCore/StyleModules/WStyleComponents.js";
 import "../../WDevCore/WComponents/WTableComponent.js";
 import { ChargeInvestigacion } from '../Home.js';
+import {WArrayF} from "../WModules/WArrayF";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 
 class WProfileInvestigador extends HTMLElement {
     constructor(response, Options = {}) {

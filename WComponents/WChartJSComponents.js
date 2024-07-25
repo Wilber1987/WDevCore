@@ -1,5 +1,6 @@
-import { WRender, WArrayF, html } from "../WModules/WComponentsTools.js";
+import { WRender, html } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
+import {WArrayF} from "../WModules/WArrayF";
 
 class ChartConfig {
     // TypeChart = 0;

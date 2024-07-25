@@ -1,4 +1,4 @@
-import { WRender, WArrayF, ComponentsManager, WAjaxTools } from "../WModules/WComponentsTools.js";
+import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 import "./WChartJSComponents.js";
 import { WModalForm } from "./WModalForm.js";
@@ -8,6 +8,8 @@ import { ColumChart, RadialChart } from "./WChartJSComponents.js";
 import { StyleScrolls } from "../StyleModules/WStyleComponents.js";
 import { ModelProperty } from "../WModules/CommonModel.js";
 import { WForm } from "./WForm.js";
+import {WArrayF} from "../WModules/WArrayF";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 class DinamicConfigModel {
     constructor(/**@type {Function}*/ action) {
         this.action = action

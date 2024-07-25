@@ -1,5 +1,5 @@
 //@ts-check
-import { WRender, WArrayF, ComponentsManager, WAjaxTools } from '../WModules/WComponentsTools.js';
+import { WRender, ComponentsManager } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WSimpleModalForm } from "./WSimpleModalForm.js";
@@ -9,6 +9,8 @@ import { WIcons } from '../WModules/WIcons.js';
 import { EntityClass } from '../WModules/EntityClass.js';
 // @ts-ignore
 import { FormConfig, ModelProperty } from '../WModules/CommonModel.js';
+import {WArrayF} from "../WModules/WArrayF";
+import {WAjaxTools} from "../WModules/WAjaxTools";
 
 
 let photoB64;
