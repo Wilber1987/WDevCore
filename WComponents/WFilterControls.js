@@ -90,7 +90,7 @@ class WFilterOptions extends HTMLElement {
                             className: this.ModelObject[prop].type.toUpperCase() == "DATE"
                                 || this.ModelObject[prop].type.toUpperCase() == "MONEY" || this.ModelObject[prop].type.toUpperCase() == "WSELECT"
                                 || this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" ? "multi-control-container" : "",
-                            children: [WOrtograficValidation.es(prop), filterControl]
+                            children: [this.ModelObject[prop].label ? WOrtograficValidation.es(this.ModelObject[prop].label) :  WOrtograficValidation.es(prop), filterControl]
                         }));
                         this.FilterControls.push(filterControl);
                     }
@@ -539,6 +539,7 @@ class WFilterOptions extends HTMLElement {
         .OptionContainer label {
             padding: 10px;
             display: block;
+            text-transform: capitalize;
         }
         .options {
             font-size: 11px;
