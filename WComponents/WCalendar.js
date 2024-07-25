@@ -1,6 +1,6 @@
 import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 let photoB64;
 class CalendarConfig {
     DetailDay = false;

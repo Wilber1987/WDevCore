@@ -1,6 +1,5 @@
-import { FilterData } from "./CommonModel.js";
-
-import {WAjaxTools} from "./WAjaxTools";
+import { FilterData, OrderData } from "./CommonModel.js";
+import { WAjaxTools } from "./WAjaxTools.js";
 
 class EntityClass {
     constructor(props, Namespace) {
@@ -15,6 +14,8 @@ class EntityClass {
     }
     /**@type {Array<FilterData>} */
     FilterData = []
+    /**@type {Array<OrderData>} */
+    OrderData = []
     /**
      * @param {String} Param 
      * @returns {Array}
@@ -68,12 +69,12 @@ class EntityClass {
      * @returns {ResponseServices}
      */
     Update = async () => {
-        return await this.SaveData(this.ApiMethods.Update, this);        
+        return await this.SaveData(this.ApiMethods.Update, this);
     }
-     /**
-     * @param {String} Param 
-     * @returns {Array}
-     */
+    /**
+    * @param {String} Param 
+    * @returns {Array}
+    */
     Delete = async (Param = "") => {
         let Data = await this.GetData(this.ApiMethods.Delete);
         return Data;
@@ -95,10 +96,10 @@ class EntityClass {
     }
     SaveWithModel = async (Object, Edit = false) => {
         if (Edit == false) {
-          return  await this.SaveData(this.ApiMethods.Set, Object);
+            return await this.SaveData(this.ApiMethods.Set, Object);
         } else {
-           return await this.SaveData(this.ApiMethods.Update, Object);
-        }        
+            return await this.SaveData(this.ApiMethods.Update, Object);
+        }
     }
     SaveData = async (Path, Data) => {
         console.log(this.ApiMethods.ApiRoute + Path, Data);

@@ -9,8 +9,8 @@ import { WIcons } from '../WModules/WIcons.js';
 import { EntityClass } from '../WModules/EntityClass.js';
 // @ts-ignore
 import { FormConfig, ModelProperty } from '../WModules/CommonModel.js';
-import {WArrayF} from "../WModules/WArrayF";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WArrayF} from "../WModules/WArrayF.js";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 
 
 let photoB64;
@@ -233,11 +233,11 @@ class WForm extends HTMLElement {
         return (Model[prop]?.__proto__ == Object.prototype &&
             (Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
             || Model[prop]?.__proto__ == Function.prototype
-            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData";
+            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData" || prop == "OrderData";
     }
     isMethod(Model, prop) {
         return Model[prop]?.__proto__ == Function.prototype
-            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "ApiMethods" || prop == "FilterData";
+            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "ApiMethods" || prop == "FilterData" || prop == "OrderData";
     }
     /**
     * 

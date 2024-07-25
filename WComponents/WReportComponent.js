@@ -2,7 +2,7 @@
 import { WRender, ComponentsManager, html } from "../WModules/WComponentsTools.js";
 import { StylesControlsV2, StylesControlsV3, StyleScrolls } from "../StyleModules/WStyleComponents.js"
 import { css } from "../WModules/WStyledRender.js";
-import {WArrayF} from "../WModules/WArrayF";
+import {WArrayF} from "../WModules/WArrayF.js";
 /**
  * @typedef {Object} ReportConfig
  * @property {Array} [Dataset]
@@ -230,16 +230,16 @@ class WReportComponent extends HTMLElement {
         }*/
         return (prop == "get" || prop == "set") ||
             prop == "ApiMethods" ||
-            prop == "FilterData" ||
+            prop == "FilterData" || 
             prop == "Get" ||
             prop == "GetByProps" ||
             prop == "FindByProps" ||
             prop == "Save" ||
             prop == "Update" ||
             prop == "GetData" ||
-            prop == "SaveData" ||
+            prop == "SaveData" ||            
             element[prop]?.__proto__ == Function.prototype ||
-            element[prop]?.__proto__.constructor.name == "AsyncFunction";
+            element[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "OrderData";
     }
 
     BuildRow(dato, prop) {
@@ -460,7 +460,7 @@ class WReportComponent extends HTMLElement {
                 value[prop] == undefined ||
                 value[prop].__proto__.constructor.name == "AsyncFunction" ||
                 // value[prop]?.__proto__ == Object.prototype ||
-                value[prop]?.__proto__ == Function.prototype) {
+                value[prop]?.__proto__ == Function.prototype || prop == "OrderData") {
                 continue;
             }
             replacerElement[prop] = value[prop]

@@ -4,8 +4,8 @@ import { WCardCarousel, WCard } from '../../WDevCore/WComponents/WCardCarousel.j
 import { StylesControlsV2 } from "../../WDevCore/StyleModules/WStyleComponents.js";
 import "../../WDevCore/WComponents/WTableComponent.js";
 import { ChargeInvestigacion } from '../Home.js';
-import {WArrayF} from "../WModules/WArrayF";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WArrayF} from "../WModules/WArrayF.js";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 
 class WProfileInvestigador extends HTMLElement {
     constructor(response, Options = {}) {

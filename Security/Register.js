@@ -5,7 +5,7 @@ import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
 import { Tbl_Profile } from "./Tbl_Profile.js";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 
 const OnLoad = async () => {
     //const { WRender, WAjaxTools } = await import("./WDevCore/WModules/WComponentsTools.js");

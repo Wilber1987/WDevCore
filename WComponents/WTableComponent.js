@@ -7,8 +7,8 @@ import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
 import { WFilterOptions } from "./WFilterControls.js";
 import { LoadinModal } from "./LoadinModal.js";
-import {WArrayF} from "../WModules/WArrayF";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WArrayF} from "../WModules/WArrayF.js";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 
 
 class WTableComponent extends HTMLElement {

@@ -10,7 +10,7 @@ import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
 import { WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { Tbl_Profile } from './Tbl_Profile.js';
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 
 const OnLoad = async () => {
     Aside.append(WRender.Create({ tagName: "h3", innerText: "Administración de perfiles" }));

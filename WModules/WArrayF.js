@@ -1,4 +1,4 @@
-import {EntityClass} from "./EntityClass";
+import {EntityClass} from "./EntityClass.js";
 
 class WArrayF {
 
@@ -490,7 +490,7 @@ class WArrayF {
                 value[prop].__proto__.constructor.name == "AsyncFunction" ||
                 value[prop]?.__proto__ == Object.prototype ||
                 value[prop]?.__proto__ == Function.prototype ||
-                value[prop]?.__proto__ == Array.prototype) {
+                value[prop]?.__proto__ == Array.prototype || prop == "OrderData") {
                 continue;
             }
             replacerElement[prop] = value[prop]

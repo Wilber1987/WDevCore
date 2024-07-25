@@ -6,8 +6,8 @@ import { css, WCssClass } from "../WModules/WStyledRender.js";
 import { ModalVericateAction } from "./WForm.js";
 import { WModalForm } from "./WModalForm.js";
 import { WToolTip } from "./WMultiSelect.js";
-import {WArrayF} from "../WModules/WArrayF";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WArrayF} from "../WModules/WArrayF.js";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 class PaginatorConfig {
     Dataset = [];
     ModelObject = {};

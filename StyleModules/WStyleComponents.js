@@ -1,7 +1,7 @@
 import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
-import {WArrayF} from "../WModules/WArrayF";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WArrayF} from "../WModules/WArrayF.js";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 //#region  GENERIC STYLESSS#####################################################################################
 const StyleScrolls = css`
      *::-webkit-scrollbar {

@@ -7,7 +7,7 @@ import { WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
-import {WArrayF} from "../WModules/WArrayF";
+import {WArrayF} from "../WModules/WArrayF.js";
 /**
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset  

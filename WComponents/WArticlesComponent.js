@@ -2,8 +2,8 @@ import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import {StyleScrolls, StylesControlsV1} from "../StyleModules/WStyleComponents.JS";
 import "./WModalForm.js";
-import {WArrayF} from "../WModules/WArrayF";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WArrayF} from "../WModules/WArrayF.js";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 
 class WArticlesComponent extends HTMLElement {
     constructor(WArticlesConfig = {}) {

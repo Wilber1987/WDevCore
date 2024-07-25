@@ -299,6 +299,7 @@ class ElementStyle {}
      * @property {Function} [onkeydown]
      * @property {Function} [onkeypress]
      * @property {Function} [onload]
+     * @property {Object} [object]
  **/
 class WNode {
     /**

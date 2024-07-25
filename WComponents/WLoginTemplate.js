@@ -1,7 +1,7 @@
 ﻿import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import "../WComponents/WModalForm.js";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 let photoB64;
 class WLoginTemplate extends HTMLElement {
     constructor() {

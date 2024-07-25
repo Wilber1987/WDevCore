@@ -6,7 +6,7 @@ import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
 import { ChangePasswordModel, ChangeRolesModel, ChangeStateModel, Security_Permissions, Security_Roles, Security_Users } from "./SecurityModel.js";
 import { Tbl_Profile } from "./Tbl_Profile.js";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 window.addEventListener("load", async () => {
     const DOMManager = new ComponentsManager({ MainContainer: Main });
     const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});

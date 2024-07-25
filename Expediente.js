@@ -1,8 +1,8 @@
 import { WRender, ComponentsManager } from "./WModules/WComponentsTools.js";
 import { WCssClass } from "./WModules/WStyledRender.js";
 import "./WComponents/WTableComponents.js";
-import {WArrayF} from "./WModules/WArrayF";
-import {WAjaxTools} from "./WModules/WAjaxTools";
+import {WArrayF} from "./WModules/WArrayF.js";
+import {WAjaxTools} from "./WModules/WAjaxTools.js";
 class Expediente extends HTMLElement {
     constructor() {
         super();

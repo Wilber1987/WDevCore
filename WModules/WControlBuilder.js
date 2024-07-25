@@ -1,5 +1,5 @@
 import { WRender, html } from "./WComponentsTools.js";
-import {WArrayF} from "./WArrayF";
+import { WArrayF } from "./WArrayF.js";
 
 class ControlBuilder {
   static BuildImage(value = "", urlPath) {

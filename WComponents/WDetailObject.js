@@ -9,8 +9,8 @@ import { WIcons } from '../WModules/WIcons.js';
 import { WTableComponent } from './WTableComponent.js';
 import { WAppNavigator } from './WAppNavigator.js';
 import { ControlBuilder } from '../WModules/WControlBuilder.js';
-import {WArrayF} from "../WModules/WArrayF";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WArrayF} from "../WModules/WArrayF.js";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 let photoB64;
 class Config {
     DOMManager = undefined;
@@ -303,7 +303,7 @@ class ProfileCard extends HTMLElement {
         return (Model[prop]?.__proto__ == Object.prototype &&
             (Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
             || Model[prop]?.__proto__ == Function.prototype
-            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData";
+            || Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData" || prop == "OrderData";
     }
 
     createPropDetail(ObjectDetail, prop, Model) {

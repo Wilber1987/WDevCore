@@ -3,8 +3,8 @@ import { WCssClass } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV1 } from "../StyleModules/WStyleComponents.JS";
 import "./WSlide.js";
 import "./WModalForm.js";
-import {WArrayF} from "../WModules/WArrayF";
-import {WAjaxTools} from "../WModules/WAjaxTools";
+import {WArrayF} from "../WModules/WArrayF.js";
+import {WAjaxTools} from "../WModules/WAjaxTools.js";
 
 const DOMManager = new ComponentsManager();
 class WTestConfig {

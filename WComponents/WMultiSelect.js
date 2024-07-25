@@ -6,7 +6,7 @@ import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 // @ts-ignore
 import { FilterData } from "../WModules/CommonModel.js";
 import { WCardTable } from "./WTableComponent.js";
-import {WArrayF} from "../WModules/WArrayF";
+import {WArrayF} from "../WModules/WArrayF.js";
 
 /**
  * @typedef {Object} ConfigMS 
