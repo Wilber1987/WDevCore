@@ -1,10 +1,10 @@
-import { WRender, html } from "./WComponentsTools.js";
+import { WArrayF, WRender, html } from "./WComponentsTools.js";
 
 class ControlBuilder {
   static BuildImage(value = "", urlPath) {
     let cadenaB64 = "";
     var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-    if (base64regex.test(value.replace("data:image/png;base64,", ""))) {
+    if (base64regex.test(WArrayF.replacer("data:image/png;base64,", ""))) {
       cadenaB64 = !value.includes("data:image/png;base64,") ? "data:image/png;base64," : "";
     } else if (urlPath != undefined && urlPath != "") {
       cadenaB64 = urlPath + "/";

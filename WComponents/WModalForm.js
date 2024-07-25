@@ -54,8 +54,7 @@ class WModalForm extends HTMLElement {
             props: {
                 ClassList: [
                     new WCssClass(".ModalContentWModal", {
-                        "opacity": "0",
-                        display: "none",
+                        "opacity": "0",                       
                         "background-color": "rgba(0, 0, 0, 0.5) !important",
                         "width": "100%",
                         "position": "fixed !important",
@@ -176,16 +175,16 @@ class WModalForm extends HTMLElement {
                         "grid-template-rows": "70px calc(100% - 70px)",
                         //"overflow": "hidden",
                         "margin": "auto",
-                        "margin-top": this.StyleForm == "FullScreen" ? 30 : 30,
+                        "margin-top": this.StyleForm == "FullScreen" ? 20 : 20,
                         "background-color": this.DarkMode ? "#444444" : "#fff",
                         "width": this.WidthContainer,
-                        // "max-height": "calc(100vh - 120px)",
+                        "max-height": "calc(100% - 10px)",
                         //"overflow-y": "auto",
                         // "min-height": this.StyleForm == "FullScreen" ? "100vh" : 200,
                         "border-radius": "0.3cm",
                         "position": "relative",
                         "box-shadow": "0 0px 3px 0px #000",
-                        padding: "0 0 10px 0",
+                        padding: "0 0 20px 0",
                         //height: "calc(100% - 50px)"//"fit-content"
                     }), new WCssClass(" .ContainerFormWModal h2", {
                         "padding": "10px",

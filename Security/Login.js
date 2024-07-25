@@ -123,9 +123,9 @@ const GetLoginLayout = (loginForm, registerForm) => {
             <div class="panel left-panel">
                 <div class="content">
                     <img class="logo" src="/Media/img/logo.png"/>
-                    <h3>HELPDESK</h3>
+                    <h3>${localStorage.getItem("TITULO")}</h3>
                     <p>
-                        Gestión de casos
+                        ${localStorage.getItem("SUB_TITULO")}
                     </p>
                     <!-- <button class="btn transparent" id="sign-up-btn">
                         Sign up

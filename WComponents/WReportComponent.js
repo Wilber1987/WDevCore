@@ -1,5 +1,5 @@
 //@ts-check
-import { WRender, ComponentsManager, WAjaxTools, WArrayF } from "../WModules/WComponentsTools.js";
+import { WRender, ComponentsManager, WArrayF, html } from "../WModules/WComponentsTools.js";
 import { StylesControlsV2, StylesControlsV3, StyleScrolls } from "../StyleModules/WStyleComponents.js"
 import { css } from "../WModules/WStyledRender.js";
 /**
@@ -46,7 +46,7 @@ class WReportComponent extends HTMLElement {
         this.MainContainer.innerHTML = "";
         this.SetOption();
         this.Config.Dataset = this.Config.Dataset.map(d => this.replacer(d));
-        /**@type {Object}*/const consolidado = WArrayF.Consolidado(this.Config.Dataset);
+        /**@type {Object}*/const consolidado = WArrayF.Consolidado(this.Config.Dataset, this.Config.ModelObject);
         console.log(consolidado);
         this.countProps = Object.keys(consolidado).length;
         this.DrawReportHeader();
@@ -80,21 +80,14 @@ class WReportComponent extends HTMLElement {
     }
 
     CreateTable(data, isPage = true) {
-
         let currentPage = this.createPage();
         if (isPage) {
             currentPage.append(this.Header.cloneNode(true))
         }
         this.Pages.push(currentPage);
         this.MainContainer.appendChild(currentPage);
-
-         /**@type {Object}*/const consolidado = WArrayF.Consolidado(data, this.Config.ModelObject);
-
-        //data = data.map(d => this.replacer(d));
-        console.log(data);
-
+        /**@type {Object}*/const consolidado = WArrayF.Consolidado(data, this.Config.ModelObject);
         data.forEach((dato, index) => {
-            
             currentPage = this.BuildContent(index, dato, currentPage, isPage, data, consolidado);
         });
         return currentPage;
@@ -111,6 +104,12 @@ class WReportComponent extends HTMLElement {
     BuildContent(index, dato, currentPage, isPage, data, consolidado) {
         if (index == 0) {
             for (const prop in consolidado) {
+                if (!consolidado[prop]) {
+                    continue;
+                }
+                if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
+                    continue;
+                }
                 currentPage?.append(WRender.Create({
                     className: "row-title",
                     children: [prop]
@@ -118,11 +117,11 @@ class WReportComponent extends HTMLElement {
             }
         }
         if (dato?.__proto__ == Object.prototype) {
-            console.log(dato);
-            for (const prop in consolidado) {               
+            const rowElements = [];
+            for (const prop in consolidado) {
                 if (!consolidado[prop]) {
                     continue;
-                }                
+                }
                 let div = undefined; //this.CreateElement(dato)//WRender.Create({ className: "report-container" + (page ? " father" : " child") });
                 if (dato[prop] == undefined && dato[prop] == null) {
                     dato[prop] = "";
@@ -133,8 +132,9 @@ class WReportComponent extends HTMLElement {
                 }
                 //console.log(prop, index);
                 div = this.BuildRow(dato, prop);
-              
-                if (currentPage != undefined && !this.elementFitsInPage(currentPage, div) && isPage) {
+                rowElements.push(div);
+
+                if (isPage && currentPage != undefined && !this.elementFitsInPage(currentPage, div)) {
                     currentPage = this.createPage();
                     for (const prop in dato) {
                         currentPage.append(WRender.Create({
@@ -145,13 +145,23 @@ class WReportComponent extends HTMLElement {
                     this.Pages.push(currentPage);
                     this.MainContainer.appendChild(currentPage);
                 }
-                currentPage?.append(div);
+                //currentPage?.append(div);
             }
+            rowElements.forEach(div => {
+                currentPage?.append(div);
+            });
         }
 
         // @ts-ignore
         if (index + 1 == data?.length) {
             for (const prop in consolidado) {
+                if (!consolidado[prop]) {
+                    continue;
+                }
+                if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
+                    //console.log(dato[prop], prop, false);
+                    continue;
+                }
                 const div = WRender.Create({
                     className: consolidado[prop].Suma != undefined ?
                         "row-number row-footer" : "row-footer",
@@ -159,7 +169,7 @@ class WReportComponent extends HTMLElement {
                         "Total: " + consolidado[prop].Suma?.toFixed(2) : "-")]
                 });
                 // @ts-ignore
-                if (!this.elementFitsInPage(currentPage, div) && isPage) {
+                if (isPage && !this.elementFitsInPage(currentPage, div)) {
                     currentPage = this.createPage();
                     this.Pages.push(currentPage);
                     this.MainContainer.appendChild(currentPage);
@@ -189,15 +199,15 @@ class WReportComponent extends HTMLElement {
     elementFitsInPage(page, element) {
         page.appendChild(element);
         const computedStyle = getComputedStyle(page);
-        // console.log(parseFloat(computedStyle.paddingTop), computedStyle.paddingTop, computedStyle.paddingBottom, page.clientHeight);
+        //console.log(element, computedStyle.paddingTop, computedStyle.paddingBottom, page.clientHeight);
         // console.log(page.scrollHeight <= page.clientHeight, page.scrollHeight, page.clientHeight, element.offsetHeight);
         const pageHeight = page.clientHeight
-            - parseFloat(computedStyle.paddingTop)
-            - parseFloat(computedStyle.paddingBottom);
+            - parseFloat(computedStyle.paddingTop == "" ? "0" : computedStyle.paddingTop)
+            - parseFloat(computedStyle.paddingBottom == "" ? "0" : computedStyle.paddingBottom);
         // console.log(pageHeight, page.scrollHeight);
         const scrollHeight = page.scrollHeight
-            - parseFloat(computedStyle.paddingTop)
-            - parseFloat(computedStyle.paddingBottom);
+            - parseFloat(computedStyle.paddingTop == "" ? "0" : computedStyle.paddingTop)
+            - parseFloat(computedStyle.paddingBottom == "" ? "0" : computedStyle.paddingBottom);
         //console.log(scrollHeight, pageHeight, scrollHeight <= pageHeight);
 
         const fits = scrollHeight <= pageHeight;
@@ -205,17 +215,16 @@ class WReportComponent extends HTMLElement {
         return fits;
     }
     isNotDrawable(prop, ModelObject, element) {
-     
+
         /*if (ModelObject != undefined && ((ModelObject[prop]?.type == undefined
             //|| ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             //|| ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
             || ModelObject[prop]?.primary == true
             || ModelObject[prop]?.hidden == true
-           // || ModelObject[prop]?.hiddenInTable == true
+            || ModelObject[prop]?.hiddenInTable == true
         )
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction")) {
-                console.log(ModelObject);
             return true;
         }*/
         return (prop == "get" || prop == "set") ||
@@ -228,8 +237,8 @@ class WReportComponent extends HTMLElement {
             prop == "Update" ||
             prop == "GetData" ||
             prop == "SaveData" ||
-            element[prop].__proto__ == Function.prototype ||
-            element[prop].__proto__.constructor.name == "AsyncFunction";
+            element[prop]?.__proto__ == Function.prototype ||
+            element[prop]?.__proto__.constructor.name == "AsyncFunction";
     }
 
     BuildRow(dato, prop) {
@@ -240,9 +249,19 @@ class WReportComponent extends HTMLElement {
         } else if (typeof dato[prop] == "number") {
             return WRender.Create({ className: "row-number", innerHTML: dato[prop].toFixed(2) });
         } else if (dato[prop]?.__proto__ == Object.prototype) {
-            return this.BuildRow(WArrayF.replacer((dato[prop])));
+
+            const div = WRender.Create({
+                className: "container child-object",
+                style: { gridTemplateColumns: `repeat(${Object.keys(dato[prop]).length},auto)` }
+            });
+            for (const key in dato[prop]) {
+                div.append(html`<div>${key}: ${typeof dato[prop][key] === "number" ? dato[prop][key].toFixed(2) : dato[prop][key]}</div>`);
+                //this.BuildContent(0, dato[prop], div, false, dato[prop], dato[prop]);
+            }
+            return div;
         } else if (dato[prop]?.__proto__ == Array.prototype) {
-            /**@type {Object}*/const consolidadoProp = WArrayF.Consolidado(dato[prop]);
+            /**@type {Object}*/const consolidadoProp = WArrayF.Consolidado(dato[prop],
+            this.Config.ModelObject ? this.Config.ModelObject[prop]?.ModelObject : undefined);
             const div = WRender.Create({
                 className: "container child",
                 style: { gridTemplateColumns: `repeat(${Object.keys(consolidadoProp).length},auto)` }
@@ -293,7 +312,6 @@ class WReportComponent extends HTMLElement {
         }
         .MainContainer{
             background-color: #afabab;
-            max-height: calc(100vh - 50px);
             border: solid 1px #313131;
             overflow-y: auto;
         }
@@ -349,18 +367,16 @@ class WReportComponent extends HTMLElement {
         .row-title, .row-footer, .row-number, .row-string {
             padding: 5px 10px;
             font-size: 12px;
+            border: 1px solid #dadada;
         }       
         .row-title, .row-footer {
             padding: 5px 10px;
             color: #5D6975;
-            border-bottom: 1px solid #C1CED9;
+            background-color: #f1f1f1;
             white-space: nowrap;
             font-weight: normal;
-            border-top: 1px solid #C1CED9;
             text-transform: uppercase;
-        }     
-        .row-footer {
-            border-top: 1px solid #C1CED9;
+            font-weight: bold;
         }   
         .row-number {
             justify-content: flex-end;
@@ -386,6 +402,7 @@ class WReportComponent extends HTMLElement {
         }
         .header, .sub-header {
             margin: 0px;
+            font-weight: bold;
         }
         .report-container {
             border-collapse: collapse;
@@ -393,12 +410,21 @@ class WReportComponent extends HTMLElement {
         }
         .child {
             border: none;
+            padding: 0px;  
+        }
+        .child-object{
+            display: flex;
+            flex-direction: column;            
+            gap: 10px;
+            padding: 5px 10px;  
+            font-size: 12px;
         }
         .report-container:first-child {
             border-left: 1px solid #D2D2D2;
         }
         @media print{
-            .A4{
+            .A4, .A4-horizontal,  .carta, .oficio, .carta-horizontal,
+            .oficio-horizontal{
                 border: none; /* Optional: Remove border for printing */
                 margin: 0;
                 padding: 0;
@@ -422,6 +448,7 @@ class WReportComponent extends HTMLElement {
                 prop == "ApiMethods" ||
                 prop == "FilterData" ||
                 prop == "Get" ||
+                prop == "Find" ||
                 prop == "GetByProps" ||
                 prop == "FindByProps" ||
                 prop == "Save" ||
@@ -431,7 +458,7 @@ class WReportComponent extends HTMLElement {
                 value[prop] == null ||
                 value[prop] == undefined ||
                 value[prop].__proto__.constructor.name == "AsyncFunction" ||
-                value[prop]?.__proto__ == Object.prototype ||
+                // value[prop]?.__proto__ == Object.prototype ||
                 value[prop]?.__proto__ == Function.prototype) {
                 continue;
             }
@@ -441,7 +468,7 @@ class WReportComponent extends HTMLElement {
         return replacerElement;
     }
 }
-customElements.define('w-component', WReportComponent);
+customElements.define('w-report', WReportComponent);
 export { WReportComponent }
 
 const PageType = {

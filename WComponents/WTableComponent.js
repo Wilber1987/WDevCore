@@ -1165,7 +1165,8 @@ class WCardTable extends HTMLElement {
             value = this.Element[prop];
         }
         if (this.IsDrawableProp(this.Element, prop)) {
-            switch (Model[prop].type.toUpperCase()) {
+           
+            switch (Model[prop]?.type?.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG": case "IMAGECAPTURE":
                     this.CardTableContainer.style.gridTemplateColumns = "auto auto";
                     this.CardTableContainer.append(ControlBuilder.BuildImage(value, this.Config.ImageUrlPath));
@@ -1189,6 +1190,7 @@ class WCardTable extends HTMLElement {
                 case "Date":
                     break;
                 default:
+                    
                     this.CardTableContainer.append(
                         WRender.Create({
                             tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)

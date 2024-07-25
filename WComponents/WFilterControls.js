@@ -59,7 +59,7 @@ class WFilterOptions extends HTMLElement {
             })
         }
     }
-    DrawFilter = async () => {
+    DrawFilter =  () => {
         this.FilterContainer.innerHTML = "";
         const ControlOptions = WRender.Create({ class: "OptionContainer " + (this.Display ? "OptionContainerActive" : "") })
         this.FilterContainer.append(WRender.Create({
@@ -84,7 +84,7 @@ class WFilterOptions extends HTMLElement {
             const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop).map(s => s[prop]);
             if (this.isDrawable(this.ModelObject, prop)) {
                 if (this.ModelObject[prop].__proto__ == Object.prototype) {
-                    const filterControl = await this.CreateModelControl(this.ModelObject, prop, this.ModelObject[prop].Dataset ?? SelectData);
+                    const filterControl =  this.CreateModelControl(this.ModelObject, prop, this.ModelObject[prop].Dataset ?? SelectData);
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({
                             className: this.ModelObject[prop].type.toUpperCase() == "DATE"
@@ -95,14 +95,14 @@ class WFilterOptions extends HTMLElement {
                         this.FilterControls.push(filterControl);
                     }
                 } else {
-                    const filterControl = await this.CreateWSelect(SelectData, prop);
+                    const filterControl =  this.CreateWSelect(SelectData, prop);
                     ControlOptions.append(WRender.Create({ children: [WOrtograficValidation.es(prop), filterControl] }));
                     this.FilterControls.push(filterControl);
                 }
             }
         }
         if (this.Config.AutoFilter == true) {
-            await this.filterFunction(this.Sorts);
+             this.filterFunction(this.Sorts);
         }
         this.FilterContainer.append(WRender.createElement(ControlOptions));
     }
@@ -113,7 +113,7 @@ class WFilterOptions extends HTMLElement {
      * @param {Array} Dataset 
      * @returns 
      */
-    CreateModelControl = async (Model, prop, Dataset) => {
+    CreateModelControl =  (Model, prop, Dataset) => {
         const ModelProperty = Model[prop];
         switch (ModelProperty.type?.toUpperCase()) {
             case "TEXT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA": case "NUMBER":
@@ -128,7 +128,7 @@ class WFilterOptions extends HTMLElement {
             case "SELECT":
                 return this.CreateSelectControl(prop, Dataset);
             case "WSELECT": case "MULTISELECT":
-                return await this.CreateWSelect(ModelProperty, prop);
+                return this.CreateWSelect(ModelProperty, prop);
             case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA": case "PASSWORD":
                 break;
             case "RADIO": case "CHECKBOX":
@@ -166,6 +166,7 @@ class WFilterOptions extends HTMLElement {
                 });
             }
             this.FilterControls.forEach(control => {
+               
                 if (this.ModelObject[control.id]) {
                     let values;
                     let filterType;
@@ -193,6 +194,7 @@ class WFilterOptions extends HTMLElement {
                             /**TODO */
                             filterType = "BETWEEN"
                             const inputs = control.querySelectorAll("input");
+                            console.log(inputs);
 
                             if (inputs[0].value != '' || inputs[1].value != '') {
                                 values = []
@@ -471,7 +473,7 @@ class WFilterOptions extends HTMLElement {
         });
         return InputControl;
     }
-    async CreateWSelect(ModelProperty, prop) {
+ CreateWSelect(ModelProperty, prop) {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
             Dataset: ModelProperty.Dataset,

@@ -572,6 +572,39 @@ class WArrayF {
         return Array;
     }
     /**
+     * Agrupa un arreglo por medio de una lista de parametros y evalua 
+     * @param {Array} DataArray arreglo original
+     * @param {String} param propiedad por la cual se va a evaluar el arreglo agrupado
+     * @param {String} sumParam parametro a sumar
+     * @returns {Array} Arreglo agrupado por parametro con su contador y suma
+     */
+    static GroupArray(DataArray, GroupPropertys = [], EvalParams = [], index = 0) {
+        if (!GroupPropertys[index]) {
+            return undefined;
+        }
+        let DataArraySR = []        
+        const groupedData = Object.groupBy(DataArray, (groupData) => groupData[GroupPropertys[index]]);
+        for (const key in groupedData) {
+            const group = {};
+            group[GroupPropertys[index]] = key;
+            const consolidadoModel = groupedData[key].find(m => m[GroupPropertys[index]] != null && m[GroupPropertys[index]] != undefined)
+            WArrayF.ConsolidateProp(consolidadoModel, GroupPropertys[index], DataArray, group, { filterProp: GroupPropertys[index], value: key })            
+            EvalParams.forEach(evalParam => {
+                const Model = groupedData[key][0]//.find(m => m[evalParam] != null && m[evalParam] != undefined)
+
+                if (!Model || WArrayF.isNotConsolidable(evalParam, Model)) {
+                    return;
+                }
+                WArrayF.ConsolidateProp(Model, evalParam, DataArray, group, { filterProp: GroupPropertys[index], value: key });
+            });
+            if (GroupPropertys[index + 1]) {
+                group.Data = WArrayF.GroupArray(groupedData[key], GroupPropertys, EvalParams, index + 1);
+            }
+            DataArraySR.push(group);
+        }
+        return DataArraySR;
+    }
+    /**
      * Agrupa un arreglo por medio de un parametros
      * @param {Array} DataArray arreglo original
      * @param {String} param propiedad por la cual se va a evaluar el arreglo agrupado
@@ -713,6 +746,23 @@ class WArrayF {
         }
         return Maxvalue;
     }
+    /**
+    * 
+    * @param {*} DataArry 
+    * @param {*} EvalValue 
+    * @returns {Number}
+    */
+    static CountValues(DataArry, EvalValue) {//retorna la suma 
+        var Maxvalue = 0;
+        for (let index = 0; index < DataArry.length; index++) {
+            if (!DataArry[index].hasOwnProperty(EvalValue)) {
+                DataArry[index][EvalValue] = 1;
+            }
+            Maxvalue = Maxvalue + parseFloat(DataArry[index][EvalValue]);
+        }
+        return Maxvalue;
+    }
+
     static SumValAttByProp(DataArry, Atrib, EvalValue) {
         var Maxvalue = 0;
         for (let index = 0; index < DataArry.length; index++) {
@@ -866,24 +916,47 @@ class WArrayF {
     static Consolidado(Array, Model) {
         Model = Model ?? Array[0];
         const consolidado = {};
+
         for (const prop in Model) {
-            if (typeof Model[prop] === "number") {
-                const suma = this.SumValAtt(Array, prop);
-                consolidado[prop] = {
-                    Type: "NUMBER",
-                    Suma: suma,
-                    Average: suma / Array.length,
-                    Max: this.MaxValue(Array, prop),
-                    Min: this.MinValue(Array, prop)
-                }
-            } else {
-                consolidado[prop] = {
-                    Type: "TEXT"
-                }
+            if (WArrayF.isNotConsolidable(prop, Model)) {
+                continue;
             }
+            WArrayF.ConsolidateProp(Model, prop, Array, consolidado);
         }
         return consolidado;
     }
+    static isNotConsolidable = (prop, ModelObject) => {
+        if (ModelObject != undefined && ModelObject[prop]?.type != undefined && (
+            //|| ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+            //|| ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
+            ModelObject[prop]?.primary == true
+            || ModelObject[prop]?.hidden == true
+            || ModelObject[prop]?.hiddenInTable == true
+        )
+            || ModelObject[prop]?.__proto__ == Function.prototype
+            || ModelObject[prop]?.__proto__.constructor.name == "AsyncFunction") {
+            return true;
+        };
+    }
+
+    static ConsolidateProp(Model, prop, Array, consolidado, filterData) {
+        //{ filterProp: Propertys[index], value: key }
+        //console.log(filterData);
+        const FilterArray = !filterData ? Array : Array.filter(dato => dato[filterData.filterProp] == filterData.value)
+        //console.log(FilterArray, typeof Model[prop] === "number");
+        consolidado[prop] = {};
+
+        if (Model[prop] == undefined || typeof Model[prop] === "number") {
+            const sumaCantidad = this.CountValues(FilterArray, prop);
+            consolidado[prop].Cantidad = sumaCantidad;
+            consolidado[prop].Porcentaje = sumaCantidad / Array.length * 100;
+            //consolidado[prop].Max = this.MaxValue(FilterArray, prop);
+            //consolidado[prop].Min = this.MinValue(FilterArray, prop);
+        } else {
+            consolidado[prop].Valor = Model[prop];
+        }
+    }
+
     static replacer(value) {
         if (value == null) {
             return null;
@@ -955,7 +1028,7 @@ Date.prototype.toISO = function () {
 };
 
 String.prototype.toISO = function () {
-    const date = new Date(this).toISO();   
+    const date = new Date(this).toISO();
     return date;
 };
 Date.prototype.toStartDate = function () {

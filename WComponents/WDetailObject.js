@@ -18,6 +18,9 @@ class Config {
     ObjectDetail = {};
 }
 class WDetailObject extends HTMLElement {
+    /**
+    * @param {Partial<Config>} Config 
+    */
     constructor(Config = new Config()) {
         super();
         this.attachShadow({ mode: 'open' });
@@ -241,12 +244,8 @@ class WDetailObject extends HTMLElement {
             flex-wrap: wrap;
             min-height: 36px;
             overflow: hidden;
-            border-right: 1px solid #d9d9d9;
             border-radius: 0 8px 8px 0;
             transition: all .5s;
-        }
-        .DataContainer:hover {           
-            border-right: 1px solid #575757;
         }
 
         @media (max-width: 800px) {
@@ -340,7 +339,7 @@ class ProfileCard extends HTMLElement {
                         ]
                     }));
                     break;
-                case "TEXTAREA":
+                case "TEXTAREA": case "RICHTEXT":
                     this.container.append(WRender.Create({
                         tagName: 'div', class: 'DataContainer TextArea', children: [
                             (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",

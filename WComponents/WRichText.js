@@ -219,7 +219,7 @@ class WRichText extends HTMLElement {
 
 const WRichTextStyle = css` 
     w-rich-text .WREditor {
-        height: 200px;
+        height: 170px;
         border: solid 1px #c5c5c5;
         display: block;
         margin: 0px;

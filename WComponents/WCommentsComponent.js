@@ -34,7 +34,9 @@ class WCommentsComponent extends HTMLElement {
             ]
         })
 
-        this.RitchInput = new WRichText();
+        this.RitchInput = new WRichText({
+            activeAttached: true
+        });
         this.RitchOptionContainer = WRender.Create({
             className: "RichOptionContainer", style: { display: "none" }, children: [
                 this.RitchInput,
@@ -192,7 +194,7 @@ class WCommentsComponent extends HTMLElement {
             overflow: hidden;
             overflow-y: auto;  
             min-width: 380px;
-            min-height: 350px;
+            min-height: 280px;
             background-color: #e9e9e9;     
             height: calc(100%  - 150px);
             border-radius: 10px;
