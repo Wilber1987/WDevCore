@@ -1,7 +1,7 @@
 
 //@ts-check
-import { Cat_Dependencias } from "../../Proyect/FrontModel/Cat_Dependencias";
-import { Tbl_Servicios } from "../../Proyect/FrontModel/Tbl_Servicios.js";
+import { Cat_Dependencias_ModelComponent } from "../../Proyect/FrontModel/Cat_Dependencias";
+import { Tbl_Servicios_ModelComponent } from "../../Proyect/FrontModel/Tbl_Servicios.js";
 import { activityStyle } from '../../Proyect/style.js';
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
 import { WFilterOptions } from '../WComponents/WFilterControls.js';
@@ -114,8 +114,8 @@ class PerfilManagerComponent extends HTMLElement {
                     DNI: { type: "text", hidden: true },
                     Correo_institucional: { type: "text", hidden: true },
                     Estado: { type: "text", hidden: true },
-                    Tbl_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias() },
-                    Tbl_Servicios: { type: 'Wselect', ModelObject: () => new Tbl_Servicios(), hidden: true }
+                    Tbl_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias_ModelComponent() },
+                    Tbl_Servicios: { type: 'Wselect', ModelObject: () => new Tbl_Servicios_ModelComponent(), hidden: true }
                 }), ObjectOptions: {
                     SaveFunction: async (profile) => {
                         this.shadowRoot?.append(ModalVericateAction(async () => {

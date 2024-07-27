@@ -1,29 +1,26 @@
 
-import { WRender, ComponentsManager, ConvertToMoneyString } from '../WModules/WComponentsTools.js';
-import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
-import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
-import { WModalForm } from './WModalForm.js';
-import { WSimpleModalForm } from "./WSimpleModalForm.js";
-import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
-import { WIcons } from '../WModules/WIcons.js';
-import { WTableComponent } from './WTableComponent.js';
-import { WAppNavigator } from './WAppNavigator.js';
+import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { ComponentsManager, ConvertToMoneyString, WRender } from '../WModules/WComponentsTools.js';
 import { ControlBuilder } from '../WModules/WControlBuilder.js';
-import {WArrayF} from "../WModules/WArrayF.js";
-import {WAjaxTools} from "../WModules/WAjaxTools.js";
+import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
+import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
+import { WAppNavigator } from './WAppNavigator.js';
+import { WTableComponent } from './WTableComponent.js';
 let photoB64;
-class Config {
-    DOMManager = undefined;
-    EntityModel = undefined;
-    ModelObject = undefined;
-    ImageUrlPath = undefined;
-    ObjectDetail = {};
-}
+
+/**
+ * @typedef {Object} Config 
+    * @property {ComponentsManager} [DOMManager]
+    *  @property {Object} [EntityModel]
+    *  @property {Object} [ModelObject]
+    *  @property {String} [ImageUrlPath]
+    *  @property {Object} [ObjectDetail]
+**/
 class WDetailObject extends HTMLElement {
     /**
     * @param {Partial<Config>} Config 
     */
-    constructor(Config = new Config()) {
+    constructor(Config) {
         super();
         this.attachShadow({ mode: 'open' });
         this.id = "ProfileInvestigador";
@@ -310,7 +307,7 @@ class ProfileCard extends HTMLElement {
         ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop];
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
-                case "TEXT":
+                case "TEXT": case "SELECT":
                     this.container.append(WRender.Create({
                         tagName: 'div', class: 'DataContainer', children: [
                             (Model[prop].label ?? WOrtograficValidation.es(prop)) + ": ",
@@ -357,4 +354,4 @@ class ProfileCard extends HTMLElement {
 }
 customElements.define('w-detail-card', ProfileCard);
 customElements.define('w-view-detail', WDetailObject);
-export { WDetailObject, ProfileCard }
+export { ProfileCard, WDetailObject };
