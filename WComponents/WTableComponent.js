@@ -854,12 +854,8 @@ class WTableComponent extends HTMLElement {
             input[type=text],
             input[type=string],
             input[type=number],
-            input[type=date] {
-                padding: 10px;
-                border: 2px solid rgba(0, 0, 0, 0.2);
+            input[type=date] {                
                 width: 300px;
-                font-size: 15px;
-                border-radius: 10px;
             }
 
             input:active,
