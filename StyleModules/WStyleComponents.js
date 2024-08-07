@@ -1,7 +1,5 @@
-import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
-import { css, WCssClass } from "../WModules/WStyledRender.js";
-import {WArrayF} from "../WModules/WArrayF.js";
-import {WAjaxTools} from "../WModules/WAjaxTools.js";
+
+import { css } from "../WModules/WStyledRender.js";
 //#region  GENERIC STYLESSS#####################################################################################
 const StyleScrolls = css`
      *::-webkit-scrollbar {
@@ -27,72 +25,73 @@ const StyleScrolls = css`
         background-clip: content-box;
     }
 `;
-const StylesControlsV1 = {
-    type: 'w-style', props: {
-        id: '', ClassList: [
-            //BOTONES
-            new WCssClass(`.BtnAlert,.BtnPrimary, .BtnSuccess,.BtnSecundary,.Btn`, {
-                "font-weight": "bold",
-                "border": "none",
-                "padding": "10px",
-                "text-align": "center",
-                "display": "inline-block",
-                "min-width": "100px",
-                "cursor": "pointer",
-                "background-color": "#09f",
-                "font-size": "12px",
-                "color": "#fff",
-                //"border-right": "rgb(3, 106, 175) 5px solid",
-                "border-radius": "0.2cm",
-                "max-height": 40
-            }), new WCssClass(`.BtnPrimary`, {
-                "color": "#fff",
-                "background-color": "#007bff",
-                //"border-right": "rgb(3, 106, 175) 5px solid",
-            }), new WCssClass(`.BtnAlert`, {
-                "color": "#fff",
-                "background-color": "#dc3545",
-                //"border-right": "#7e1b25 5px solid",
-            }), new WCssClass(`.BtnSuccess`, {
-                "color": "#fff",
-                "background-color": "#28a745",
-                //"border-right": "#165c26 5px solid",
-            }), new WCssClass(`.BtnSecundary`, {
-                "color": "#fff",
-                "background-color": "#17a2b8",
-                //"border-right": "#0f5964 5px solid",
-            }), new WCssClass(`.Btn[type=checkbox]`, {
-                "height": "20px",
-                "min-width": "20px",
-                "margin": "5px",
-            }),
-            //INPUTS
-            new WCssClass(`input[type=text], 
+const StylesControlsV1 = css`
+            .BtnAlert,.BtnPrimary, .BtnSuccess,.BtnSecundary,.Btn {
+                font-weight: bold;
+                border: none;
+                padding: 10px;
+                text-align: center;
+                display: inline-block;
+                min-width: 100px;
+                cursor: pointer;
+                background-color: #09f;
+                font-size: 12px;
+                color: #fff;
+
+                border-radius: 0.2cm;
+                max-height: 4;
+            }
+            .BtnPrimary {
+                color: #fff;
+                background-color: #007bff;
+
+            }
+            .BtnAlert {
+                color: #fff;
+                background-color: #dc3545;
+
+            }
+            .BtnSuccess {
+                color: #fff;
+                background-color: #28a745;
+
+            }
+            .BtnSecundary {
+                color: #fff;
+                background-color: #17a2b8;
+
+            }
+            .Btn[type=checkbox] {
+                height: 20px;
+                min-width: 20px;
+                margin: 5px;
+            }
+            input[type=text], 
             input[type=string], 
             input[type=password], 
             input[type=number],
             input[type=color], input[type=email], 
             input[type=date],  input[type=time],select, textarea,
-            input:-internal-autofill-selected`, {
-                padding: 10,
-                border: "none",
-                border: "2px solid #dddada",
-                width: "calc(100%)",
-                //height: "100%",
-                "font-size": "15px",
-                "border-radius": "0.2cm",
-                "box-sizing": "border-box",
-                "border-radius": 10,
-                cursor: "pointer"
-            }), new WCssClass(`input[type=color]`, {
+            input:-internal-autofill-selected {
+                padding: 10px;
+                border: none;
+                border: 2px solid #dddada;
+                width: calc(100%);
+                //height: 100%;
+                font-size: 15px;
+                border-radius: 0.2cm;
+                box-sizing: border-box;
+                border-radius: 10;
+                cursor: pointer;
+            }
+            input[type=color] {
                 padding: 5
-            }), new WCssClass(`input:active, input:focus, select:active, select:focus`, {
-                "border-bottom": "2px solid #0099cc",
-                outline: "none",
-            })
-        ]
-    }
-}
+            }
+            input:active, input:focus, select:active, select:focus {
+                border-bottom: 2px solid #0099cc;
+                outline: none;
+            }`;
+
 const StylesControlsV2 = css`
     .Btn-Mini, .Btn-Mini-Alert, .Btn-Mini-Success {
         background-color: #1c4786;
@@ -121,7 +120,7 @@ const StylesControlsV2 = css`
     }
 
     .BtnClose::before {
-        content: " ";
+        content: "" ;
         margin-right: 8px;
         height: 15px;
         width: 15px;
@@ -142,7 +141,7 @@ const StylesControlsV2 = css`
     }
 
     .BtnReturn::before {
-        content: " ";
+        content:  "";
         margin-right: 8px;
         height: 15px;
         width: 15px;
