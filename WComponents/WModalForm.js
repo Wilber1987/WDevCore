@@ -3,6 +3,7 @@ import { WCssClass } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { ModalConfig } from "../WModules/CommonModel.js";
 import {WAjaxTools} from "../WModules/WAjaxTools.js";
+import { WModalStyle } from "./ComponentsStyles/WModalStyle.mjs";
 
 
 class WModalForm extends HTMLElement {
@@ -167,121 +168,7 @@ class WModalForm extends HTMLElement {
     }
     //STYLES----------------------------------------------------------------->
     FormStyle = () => {
-        const Style = {
-            type: "w-style",
-            props: {
-                ClassList: [
-                    new WCssClass(" .ContainerFormWModal", {
-                        "display": "grid",
-                        "grid-template-rows": "70px calc(100% - 70px)",
-                        //"overflow": "hidden",
-                        "margin": "auto",
-                        "margin-top": this.StyleForm == "FullScreen" ? 20 : 20,
-                        "background-color": this.DarkMode ? "#444444" : "#fff",
-                        "width": this.WidthContainer,
-                        "max-height": "calc(100% - 10px)",
-                        //"overflow-y": "auto",
-                        // "min-height": this.StyleForm == "FullScreen" ? "100vh" : 200,
-                        "border-radius": "0.3cm",
-                        "position": "relative",
-                        "box-shadow": "0 0px 3px 0px #000",
-                        padding: "0 0 20px 0",
-                        //height: "calc(100% - 50px)"//"fit-content"
-                    }), new WCssClass(" .ContainerFormWModal h2", {
-                        "padding": "10px",
-                        "margin": "0px",
-                        "background": "#09f",
-                    }), new WCssClass(` .ContainerFormWModal h1,
-                         .ContainerFormWModal h3,
-                         .ContainerFormWModal h4, .ContainerFormWModal h5`, {
-                        display: "block",
-                        padding: "10px",
-                        "text-align": "center",
-                        font: "400 13.3333px !important"
-                    }), new WCssClass(`.ModalContent`, {
-                        "overflow-y": "auto",
-                        display: "block",
-                        padding: 30
-                    }),
-                    //encabezado
-                    new WCssClass(` .ModalHeader`, {
-                        "color": this.DarkMode ? "#fff" : "#444",
-                        "font-weight": "bold",
-                        "font-size": "20px",
-                        "display": "flex",
-                        "justify-content": "center",
-                        "align-items": "center",
-                        padding: "40px 30px 20px 30px",
-                        "margin-bottom": "20px",
-                        "text-transform": "uppercase",
-                        position: "relative"
-                    }), new WCssClass(` .ModalElement`, {
-                        "background-color": "#4da6ff",
-                        padding: 10,
-                        "border-radius": 5
-                    }), new WCssClass(` .BtnClose`, {
-                        "font-size": "18pt",
-                        position: "absolute",
-                        "color": "#b9b2b3",
-                        "cursor": "pointer",
-                        "width": "30px",
-                        "border-radius": "10px",
-                        "display": "flex",
-                        "justify-content": "center",
-                        "align-items": "center",
-                        border: "none",
-                        "background-color": "unset",
-                        top: 10,
-                        right: 20,
-                    }), new WCssClass(` .HeaderIcon`, {
-                        "height": "50px",
-                        "width": "50px",
-                        "position": "relative",
-                        "left": "-10px;",
-                    }), new WCssClass(`.ObjectModalContainer`, {
-                        "max-height": "calc(100vh - 120px)",
-                        height: "100%",
-                        width: "90%",
-                        margin: "0px auto",
-                        "margin-bottom": 20,
-                        display: "block",   
-                        "justify-content": "center",                 
-                        padding: 5,
-                        "overflow-y": "auto" 
-                    }),
-                ], MediaQuery: [{
-                    condicion: "(max-width: 1200px)",
-                    ClassList: [new WCssClass(" .ContainerFormWModal", {
-                        width: "90%"
-                    })]
-                }, {
-                    condicion: "(max-width: 800px)",
-                    ClassList: [new WCssClass(" .ContainerFormWModal", {
-                        position: "fixed",
-                        top: 0, left: 0, right: 0, bottom: 0,
-                        height: "100%"
-                    }), new WCssClass(" divForm", {
-                        padding: "20px",
-                        "display": "grid",
-                        "grid-gap": "1rem",
-                        "grid-template-columns": "calc(100% - 20px) !important",
-                        "grid-template-rows": "auto",
-                        "justify-content": "center"
-                    }), new WCssClass(" .ContainerFormWModal", {
-                        "margin-top": "0px",
-                        "width": "100%",
-                        "max-height": "calc(100vh - 0px)",
-                        "height": "calc(100vh - 0px)",
-                        "border-radius": "0cm",
-                    }), new WCssClass("", {
-                        "padding-bottom": "0px",
-                    }), new WCssClass(`.ObjectModalContainer`, {
-                        "max-height": "calc(100% - 80px)"
-                    }),
-                    ]
-                }]
-            }
-        }
+        const Style = WModalStyle.cloneNode(true)
         return Style;
     }
 }
