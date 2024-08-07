@@ -93,6 +93,7 @@ const StylesControlsV1 = css`
             }`;
 
 const StylesControlsV2 = css`
+    @import url(/css/variables.css);
     .Btn-Mini, .Btn-Mini-Alert, .Btn-Mini-Success {
         background-color: #1c4786;
         border: none;
@@ -154,42 +155,101 @@ const StylesControlsV2 = css`
     .BtnPrimary,
     .BtnSuccess,
     .BtnSecundary,
-    .Btn {
-        min-width: 150px;
-        background-color: #5995fd;
-        border: none;
-        outline: none;
-        height: 40px;
-        border-radius: 49px;
-        color: #fff;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin: 10px 5px;
-        padding: 0 15px;
+    .btn-secondary,
+    .btn-success,
+    .btn-danger,
+    .btn-info,
+    .Btn {       
+        --bs-btn-padding-x: 0.75rem;
+        --bs-btn-padding-y: 0.47rem;
+        --bs-btn-font-size: 0.925rem;
+        --bs-btn-font-weight: 400;
+        --bs-btn-line-height: 1.5;
+        --bs-btn-color: var(--bs-body-color);
+        --bs-btn-bg: transparent;
+        --bs-btn-border-width: var(--bs-border-width);
+        --bs-btn-border-color: transparent;
+        --bs-btn-border-radius: var(--bs-border-radius);
+        --bs-btn-hover-border-color: transparent;
+        --bs-btn-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+        --bs-btn-disabled-opacity: 0.65;
+        --bs-btn-focus-box-shadow: 0 0 0 0 rgba(var(--bs-btn-focus-shadow-rgb), .5);
+        display: inline-block;
+        padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+        font-family: var(--bs-btn-font-family);
+        font-size: var(--bs-btn-font-size);
+        font-weight: var(--bs-btn-font-weight);
+        line-height: var(--bs-btn-line-height);
+        color: var(--bs-btn-color);
+        text-align: center;
+        vertical-align: middle;
         cursor: pointer;
-        transition: 0.5s;
-        width: 100%;
-        max-width: 250px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
+        border-radius: var(--bs-btn-border-radius);
+        background-color: var(--bs-btn-bg);
+        -webkit-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        color: #fff;
+        background-color: #1f58c7;
+        border-color: transparent;
+    }
+    .Btn:active, .Btn:focus, .Btn:hover {
+        color: #fff;
+        background-color: #1c4fb3 !important;
+        border-color: transparent !important;
+    }   
+
+   
+    .btn-secondary, .BtnSecundary {
+        color: #fff;
+        background-color: #a4a9b4;
+        border-color: transparent;
+    }
+    .BtnSecundary:active, .BtnSecundary:focus, .BtnSecundary:hover,
+    .btn-secondary:active, .btn-secondary:focus, .btn-secondary:hover {
+        color: #fff;
+        background-color: #9498a2 !important;
+        border-color: transparent !important;
     }
 
-    .BtnPrimary {
+    .btn-success,  .BtnSuccess  {
         color: #fff;
-        background-color: #007bff;
+        background-color: #28b765;
+        border-color: transparent;
+    }
+    .BtnSuccess:active, .BtnSuccess:focus, .BtnSuccess:hover ,
+    .btn-success:active, .btn-success:focus, .btn-success:hover {
+        color: #fff;
+        background-color: #24a55b !important;
+        border-color: transparent !important;
+    }
+    .btn-danger, .BtnAlert {
+        color: #fff;
+        background-color: #ed5555;
+        border-color: transparent;
+    }
+    .BtnAlert:active, .BtnAlert:focus, .BtnAlert:hover,
+    .btn-danger:active, .btn-danger:focus, .btn-danger:hover {
+        color: #fff;
+        background-color: #d54d4d !important;
+        border-color: transparent !important;
     }
 
-    .BtnAlert {
+    .btn-info {
         color: #fff;
-        background-color: #dc3545;
+        background-color: #52c6ea;
+        border-color: transparent;
     }
-
-    .BtnSuccess {
+    .btn-info:active, .btn-info:focus, .btn-info:hover {
         color: #fff;
-        background-color: #28a745;
-    }
-
-    .BtnSecundary {
-        color: #fff;
-        background-color: #17a2b8;
+        background-color: #4ab2d3 !important;
+        border-color: transparent !important;
     }
 
     .Btn[type=checkbox] {
@@ -213,22 +273,51 @@ const StylesControlsV2 = css`
     w-multi-select,
     select,
     textarea{
-        width: 100%;
-        background-color: #f7f4f4 !important;
-        border-radius: 5px;
-        padding: 8px 10px;
-        outline: none;
-        border: none;
-        line-height: 1;
-        font-weight: 600 !important;
-        font-size: 12px !important;
-        color: #333 !important;
-        box-sizing: border-box;
-        cursor: pointer;
-        box-shadow: 0 0 5px #c1c1c1;
         display: block;
-        min-height: 30px;
+        width: calc(100% - 1.40rem) ;
+        padding: .47rem .75rem;
+        font-size: .925rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--bs-body-color);
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: var(--bs-secondary-bg);
+        background-clip: padding-box;
+        border: var(--bs-border-width) solid var(--bs-border-color);
+        border-radius: var(--bs-border-radius);
+        -webkit-transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+    }    
+    select {
+        --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231f2224' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        display: block;
+        width: 100%;
+        padding: .47rem 1.75rem .47rem .75rem;
+        font-size: .925rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--bs-body-color);
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: var(--bs-secondary-bg);
+        background-image: var(--bs-form-select-bg-img),var(--bs-form-select-bg-icon,none);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+        border: var(--bs-border-width) solid var(--bs-border-color);
+        border-radius: var(--bs-border-radius);
+        -webkit-transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
     }
+    
+
     input[type=color] {
         padding: 5px;
     }
@@ -237,9 +326,7 @@ const StylesControlsV2 = css`
         color: #6a6a6a !important;
         pointer-events: none;
     }
-    w-multi-select{
-        padding: 0px;
-    }
+    
 
     input:active,
     input:focus,
@@ -247,8 +334,14 @@ const StylesControlsV2 = css`
     select:focus,
     textarea:focus,
     textarea:focus {
-        box-shadow: 0 0 5px #4894aa;
+        color: var(--bs-body-color);
+        background-color: var(--bs-secondary-bg);
+        border-color: #8face3;
+        outline: 0;
+        -webkit-box-shadow: 0 0 0 0 rgba(31, 88, 199, .25);
+        box-shadow: 0 0 0 0 rgba(31, 88, 199, .25);
     }
+    
 `
 
 const StylesControlsV3 = css`    

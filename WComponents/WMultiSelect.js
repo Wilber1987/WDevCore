@@ -49,8 +49,7 @@ class MultiSelect extends HTMLElement {
             position: "relative",
             boxShadow: "0 0 5px #c1c1c1;",
             fontSize: "12px",
-            height: "initial",
-            padding: "0"
+            height: "initial"           
         });
 
         this.MultiSelect = this.Config.MultiSelect ?? true;
@@ -249,6 +248,7 @@ class MultiSelect extends HTMLElement {
     SetOptions = () => {
         if (this.Config.IsFilterControl) {
             this.shadowRoot?.append(this.SearchControl);
+            this.style.padding = "0px";
             this.SearchControl.style.borderRadius = "0 10px 10px 0";
             this.SearchControl.onfocus = () => {
                 if (this.Config.IsFilterControl) { 
