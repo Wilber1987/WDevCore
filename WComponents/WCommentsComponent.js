@@ -180,10 +180,11 @@ class WCommentsComponent extends HTMLElement {
             });
             this.CommentsContainer.insertBefore(WRender.Create({
                 tagName: "div",
-                className: comment.Id_User == this.User.UserId ? "commentSelf" : "comment",
+                className: (comment.Id_User == this.User.UserId ? "commentSelf" : "comment") 
+                    + (comment.Leido == true ? "leido" : ""),
                 children: [
-                    { tagName: "label", className: "nickname", innerHTML: comment.NickName },
-                    { tagName: "p", innerHTML: comment.Body }, attachs,
+                    { tagName: "label", className: "nickname", innerHTML: comment.NickName ?? comment.remitente },
+                    { tagName: "p", innerHTML: comment.Body ?? comment.mensaje }, attachs,
                     { tagName: "label", innerHTML: comment.Fecha.toDateFormatEs() }
                 ]
             }), this.CommentsContainer.firstChild);

@@ -1,5 +1,5 @@
 class ModelObject {
-    /**@type {ModelProperty}*/ squadName = { type: 'text' };
+    /**@type {ModelProperty}*/ squadName = { type: 'draw' };
     /**@type {ModelProperty}*/ homeTown = { type: 'text' };
     /**@type {ModelProperty}*/ year = { type: 'select' };
     /**@type {ModelProperty}*/ mes = { type: 'select' };
