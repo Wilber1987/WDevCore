@@ -6,7 +6,7 @@ import { css, WCssClass } from "../WModules/WStyledRender.js";
 
 const OnLoad = async () => {
     const UserData = {
-        user: "",
+        mail: "",
         password: ""
     }
     // @ts-ignore
@@ -31,7 +31,7 @@ const OnLoad = async () => {
                             placeholder: 'Usuario', 
                             className: 'form-control',
                             onchange: (ev) => {
-                                UserData.user = ev.target.value;
+                                UserData.mail = ev.target.value;
                             }
                         }
                     ]
