@@ -323,6 +323,7 @@ class WNode {
  *  * @property {Boolean} [AddObject]
     * @property {Boolean} [Show]
     * @property {Boolean} [Filter]
+    * @property {Boolean} [AutoSetDate]
     * @property {Boolean} [Edit]
     * @property {Boolean} [FilterDisplay]
     * @property {Boolean} [Delete]

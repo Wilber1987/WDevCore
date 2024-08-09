@@ -39,11 +39,13 @@ class WTableComponent extends HTMLElement {
         this.Sorts = [];
         this.FilterOptions = new WFilterOptions({
             Dataset: this.Dataset,
+            AutoSetDate: Config.Options?.AutoSetDate ?? true,
             Sorts: this.Sorts,
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
             Display: Config.Options?.FilterDisplay ?? false,
             UseEntityMethods: true,
             FilterFunction: (DFilt) => {
+                console.log("filter...");
                 this.withFilter = true;
                 this.DrawTable(DFilt);
             }
@@ -134,7 +136,9 @@ class WTableComponent extends HTMLElement {
         if ((Dataset.length == 0 || Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
             if (isWithtUrl) {
                 Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
-            } else if (isWithtModel) {
+            }  else if (this.Options?.Filter == true){
+                await this.FilterOptions.filterFunction(this.Sorts)
+            }  else if (isWithtModel) {
                 const model = this.TableConfig.EntityModel ?? this.TableConfig.ModelObject;
                 Dataset = await model.Get();
             }
@@ -218,8 +222,7 @@ class WTableComponent extends HTMLElement {
         if (Dataset == undefined) {
             Dataset = [{ Description: "No Data!!!" }];
         }
-        Dataset.slice((this.ActualPage - 1) * this.maxElementByPage,
-            this.ActualPage * this.maxElementByPage)
+        Dataset?.slice((this.ActualPage - 1) * this.maxElementByPage, this.ActualPage * this.maxElementByPage)
             .forEach((element, DatasetIndex) => {
                 let tr = WRender.Create({ tagName: "tr" });
                 this.DrawTRow(tr, element);
