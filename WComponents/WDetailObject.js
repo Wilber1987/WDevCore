@@ -180,6 +180,7 @@ class WDetailObject extends HTMLElement {
             color: #09f;
         }
         .ImageCards {
+            align-self: center;
             max-width: 300px;
         }
 
