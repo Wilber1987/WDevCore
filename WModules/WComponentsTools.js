@@ -1,4 +1,4 @@
-import {ElementStyle, WNode} from "./CommonModel.js";
+import { ElementStyle, WNode } from "./CommonModel.js";
 
 
 /** 
@@ -7,32 +7,91 @@ import {ElementStyle, WNode} from "./CommonModel.js";
  * @param {any[]} values
  */
 function html(strings, ...values) {
-    // @ts-ignore
     // Unir las partes de la plantilla de cadena
     const result = strings.reduce((accumulator, currentString, index) => {
         accumulator += currentString;
+
         if (index < values.length) {
             const value = values[index];
-            if (typeof value === 'function') {
-                // Extraer el nombre del evento y el manejador
-                const match = currentString.match(/(\s*on\w+)=/);
-                if (match && match[1]) {
-                    const eventName = match[1];
-                    accumulator += `${eventName}="${value.toString()}"`;
-                } else {
-                    accumulator += value;
+
+            if (value instanceof HTMLElement) {
+                // Si el valor es un nodo HTML, lo añadimos al wrapper
+                const placeholder = document.createElement('div');
+                placeholder.setAttribute('data-placeholder', index); // Marcador de posición
+                accumulator += placeholder.outerHTML;
+            } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement)) {
+                // Si el valor es un array de nodos HTML, creamos un marcador para cada uno
+                value.forEach((_, i) => {
+                    const placeholder = document.createElement('div');
+                    placeholder.setAttribute('data-placeholder', `${index}-${i}`);
+                    accumulator += placeholder.outerHTML;
+                });
+            } else if (typeof value === 'function') {
+                // Insertamos un marcador de posición para la función
+                let placeholder = ``;
+                // Expresión regular para detectar las combinaciones al final del string
+                const patron = /(onclick=['"]|onload=['"]|onchange=['"])$/;
+                // Buscar la coincidencia al final del string
+                const coincidencia = accumulator.match(patron);
+                //console.log(accumulator);
+
+                if (coincidencia) {
+                    // Almacenar el fragmento que se va a reemplazar en una constante
+                    const fragmentoAReemplazar = coincidencia[0];
+                    const patronEvent = /(onclick|onload|onchange)=['"]$/;
+                    const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
+                    // Almacenar solo la palabra (onclick, onload, onchange) en una constante
+                    const event = coincidenciaEvent[1];
+                    if (fragmentoAReemplazar.contain == "'") {
+                        placeholder = `data-function-placeholder-${index}='${event}`;
+                    } else {
+                        placeholder = `data-function-placeholder-${index}="${event}`;
+                    }
+                    // Si pasa la validación, se realiza el reemplazo
+                    accumulator = accumulator.replace(patron, "");
                 }
+                accumulator += placeholder;
             } else {
                 accumulator += value;
             }
         }
+
         return accumulator;
     }, '');
+
     const wrapper = document.createElement('div');
     wrapper.innerHTML = result;
 
-    return WRender.CreateStringNode(result);
+    // Reemplazar los marcadores de posición con los nodos HTML reales o asociar funciones a eventos
+    values.forEach((value, index) => {
+        if (value instanceof HTMLElement) {
+            const placeholder = wrapper.querySelector(`[data-placeholder="${index}"]`);
+            if (placeholder) {
+                placeholder.replaceWith(value); // Reemplaza el marcador de posición con el nodo real
+            }
+        } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement)) {
+            // Si es un array de nodos, los insertamos secuencialmente
+            value.forEach((node, i) => {
+                const placeholder = wrapper.querySelector(`[data-placeholder="${index}-${i}"]`);
+                if (placeholder) {
+                    placeholder.replaceWith(node);
+                }
+            });
+        } else if (typeof value === 'function') {
+            // Asociamos la función al evento correspondiente
+            //const placeholder = wrapper.innerHTML.indexOf(`data-function-placeholder-${index}`);
+            const element = wrapper.querySelector(`[data-function-placeholder-${index}]`);
+            const event = element.getAttribute(`data-function-placeholder-${index}`);
+            element[event] = value
+         
+
+        }
+    });
+
+    return wrapper.childNodes.length > 1 ? wrapper.childNodes : wrapper.firstChild;
 }
+
+
 export { html }
 class WRender {
     /**
