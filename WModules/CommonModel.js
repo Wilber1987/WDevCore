@@ -16,7 +16,7 @@ function ModelFunction() { }
  * @typedef {Object} ModelProperty 
     * @property {String} type - RADIO | DRAW | PASSWORD |
     CHECKBOX | TEXT | IMG | NUMBER | DATE | EMAIL | FILE | 
-    TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | 
+    TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | imagecapture 
     CALENDAR | OPERATION (requiere un action para funcionar)
     * @property {Boolean} [hidden] desabilita la propiedad y la oculta
     * @property {Object} [Options] 
@@ -323,6 +323,7 @@ class WNode {
  *  * @property {Boolean} [AddObject]
     * @property {Boolean} [Show]
     * @property {Boolean} [Filter]
+    * @property {Boolean} [AutoSetDate]
     * @property {Boolean} [Edit]
     * @property {Boolean} [FilterDisplay]
     * @property {Boolean} [Delete]
