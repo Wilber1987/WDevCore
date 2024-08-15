@@ -32,7 +32,7 @@ class WDetailObject extends HTMLElement {
         this.SetImage(this.ObjectDetail, this.ModelObject)
         this.ProfileContainer.append(new ProfileCard(this.Config));
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
-        this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
+        this.Manager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.shadowRoot.appendChild(StylesControlsV2.cloneNode(true));
         this.append(new WStyledRender({
             ClassList: [
@@ -125,7 +125,7 @@ class WDetailObject extends HTMLElement {
                         tabElements.push({
                             name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
-                                this.TabManager.NavigateFunction(prop, new ProfileCard({
+                                this.Manager.NavigateFunction(prop, new ProfileCard({
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     ObjectDetail: ObjectDetail[prop]
 

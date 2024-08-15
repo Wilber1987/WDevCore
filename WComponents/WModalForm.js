@@ -22,7 +22,7 @@ class WModalForm extends HTMLElement {
         }
         if (this.StyleForm == "columnX1") {
             this.WidthContainer = "40%";
-            this.DivColumns = this.Config.DivColumns = "calc(100% - 20px)";
+            this.DivColumns = this.Config.DivColumns = "calc(100%)";
         } else if (this.StyleForm == "columnX3") {
             this.WidthContainer = "80%";
             this.DivColumns = this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
@@ -100,6 +100,11 @@ class WModalForm extends HTMLElement {
         this.className = "ModalContentWModal";
         this.Modal = {
             class: "ContainerFormWModal",
+            style: {
+                gridTemplateColumns: this.DivColumns,
+                width: this.WidthContainer,
+                textAling: "center"
+            },
             children: []
         };
         this.Modal.children.push(this.DrawModalHead());

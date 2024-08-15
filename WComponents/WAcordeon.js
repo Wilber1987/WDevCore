@@ -29,7 +29,7 @@ class WAcorden extends HTMLElement {
     Draw = async () => {
         // ${Object.keys(element).map(key => this.BuildPropiertyDetail(element, key))}
         this.Config.Dataset?.forEach(element => {
-            const content = html`<div class="element-content">
+            const content = html`<div class="element-content" id="${element.Descripcion?.toString().replaceAll(" ", "")}">
                 ${Object.keys(element).map(key => this.BuildPropiertyDetail(element, key))}
             </div>`;
             this.Acordeon?.append(html`<div class="element-container">
@@ -47,7 +47,7 @@ class WAcorden extends HTMLElement {
         //console.log(html`<div>${WOrtograficValidation.es(prop)}: ${ObjectF[prop]}</div>`);
 
         // return html`<div>${WOrtograficValidation.es(prop)}: ${ObjectF[prop]}</div>`;
-        switch (this.Config.ModelObject[prop].type.toUpperCase()) {
+        switch (this.Config.ModelObject[prop]?.type.toUpperCase()) {
             case "MASTERDETAIL":
                 const modelClass = this.Config.ModelObject[prop].ModelObject.__proto__ == Function.prototype ? this.Config.ModelObject[prop].ModelObject() : this.Config.ModelObject[prop].ModelObject;
                 //console.log(this.Config.ModelObject, prop, this.Config.ModelObject[prop], this.Config.ModelObject[prop].ModelObject, ObjectF[prop]);
@@ -167,8 +167,8 @@ class WAcorden extends HTMLElement {
             flex: 1;
             & .element-description {
                 flex: 1;
-                display: flex;
-                flex-direction: column;
+                display: grid;
+                grid-template-rows: 50% 50%;
             }
             & .element-details {
                 display: grid;
@@ -197,8 +197,8 @@ class WAcorden extends HTMLElement {
         .hidden {
             display: none;
         }
-        .container:nth-of-type(odd) {
-            background-color: #f1f1f1;
+        .container:nth-of-type(even) {
+            background-color: #f8f8f8;
         }
         @media (max-width: 800px) {
             .detail-content .container, .detail-content .element-details {

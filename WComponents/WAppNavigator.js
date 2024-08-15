@@ -41,8 +41,7 @@ class WAppNavigator extends HTMLElement {
     }
     connectedCallback() {
         if (this.Inicialize == true && this.InitialNav != undefined) {
-            console.log(true);
-
+            //console.log(true);
             this.InitialNav();
         }
     }
@@ -139,7 +138,7 @@ class WAppNavigator extends HTMLElement {
                 }
                 elementNav.onclick = async (ev) => {
                     this.ActiveMenu(elementNav);
-                    console.log(this.Manager);
+                    //console.log(this.Manager);
 
                     if (this.NavStyle == "tab") {
                         const object = await element.action();
