@@ -14,12 +14,12 @@ function html(strings, ...values) {
         if (index < values.length) {
             const value = values[index];
 
-            if (value instanceof HTMLElement) {
+            if (value instanceof HTMLElement || value.__proto__.__proto__ == HTMLElement.prototype) {
                 // Si el valor es un nodo HTML, lo añadimos al wrapper
                 const placeholder = document.createElement('div');
                 placeholder.setAttribute('data-placeholder', index); // Marcador de posición
                 accumulator += placeholder.outerHTML;
-            } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement)) {
+            } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement || item.__proto__.__proto__ == HTMLElement.prototype)) {
                 // Si el valor es un array de nodos HTML, creamos un marcador para cada uno
                 value.forEach((_, i) => {
                     const placeholder = document.createElement('div');

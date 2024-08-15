@@ -93,6 +93,10 @@ const StylesControlsV1 = css`
             }`;
 
 const StylesControlsV2 = css`
+    .green { background-color:rgb(36, 165, 91) }
+    .yellow { background-color:rgb(244, 194, 56) }
+    .cyan { background-color:rgb(74, 178, 211) }
+    .red { background-color:rgb(213, 77, 77) }
     .Btn-Mini, .Btn-Mini-Alert, .Btn-Mini-Success {
         background-color: #1c4786;
         border: none;

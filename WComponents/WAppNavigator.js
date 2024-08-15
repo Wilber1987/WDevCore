@@ -1,4 +1,5 @@
-import { WRender } from "../WModules/WComponentsTools.js";
+//@ts-check
+import { ComponentsManager, WRender } from "../WModules/WComponentsTools.js";
 import { WIcons } from "../WModules/WIcons.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 
@@ -6,10 +7,12 @@ import { css, WCssClass } from "../WModules/WStyledRender.js";
 /**
  * @typedef {Object} NavConfig 
  *  * @property {Boolean} [Inicialize] 
+    * @property {String} [NavTitle] flex-end
     * @property {String} [alignItems] flex-end
     * @property {String} [DisplayMode] right
     * @property {Array} [Elements]
     * @property {Boolean} [DarkMode]
+    * @property {Boolean} [isMediaQuery]
     * @property {String} [Direction] row | column
     * @property {String} [NavStyle] nav | tab
 **/
@@ -22,9 +25,14 @@ class WAppNavigator extends HTMLElement {
         super();
         this.attachShadow({ mode: "open" });
         this.Config = Config;
-        for (const p in Config) {
-            this[p] = Config[p];
-        }
+        this.Inicialize = Config.Inicialize;
+        this.alignItems = Config.alignItems;
+        this.DisplayMode = Config.DisplayMode;
+        this.Elements = Config.Elements;
+        this.DarkMode = Config.DarkMode;
+        this.Direction = Config.Direction;
+        this.NavStyle = Config.NavStyle;
+        this.NavTitle = Config.NavTitle;
         this.DrawAppNavigator();
         this.Elements = this.Elements ?? [];
     }
@@ -33,24 +41,28 @@ class WAppNavigator extends HTMLElement {
     }
     connectedCallback() {
         if (this.Inicialize == true && this.InitialNav != undefined) {
+            console.log(true);
+
             this.InitialNav();
         }
     }
     ActiveMenu = (ev) => {
-        var navs = this.parentNode.querySelectorAll("w-app-navigator");
-        navs.forEach(nav => {
-            nav.shadowRoot.querySelectorAll(".elementNavActive").forEach(elementNavActive => {
+        var navs = this.parentNode?.querySelectorAll("w-app-navigator");
+        navs?.forEach(nav => {
+            nav.shadowRoot?.querySelectorAll(".elementNavActive").forEach(elementNavActive => {
                 elementNavActive.className = "elementNav";
             });
         });
         if (ev) {
             ev.className = "elementNavActive";
             if (this.NavStyle != "tab") {
+                // @ts-ignore
                 this.shadowRoot.querySelector("#MainNav").className = "navInactive";
             }
         }
     }
-    DrawAppNavigator() {
+    async DrawAppNavigator() {
+        // @ts-ignore
         this.shadowRoot.innerHTML = "";
         if (this.id == undefined) {
             const Rand = Math.random();
@@ -59,21 +71,25 @@ class WAppNavigator extends HTMLElement {
 
         this.DarkMode = this.DarkMode ?? false;
         this.DisplayMode = this.DisplayMode ?? "left";
-        this.shadowRoot.append(WRender.createElement(this.Style()));
-        if (this.Config.isMediaQuery == true) {
-            this.shadowRoot.append(this.MediaStyle());
-        }
+        this.shadowRoot?.append(WRender.createElement(this.Style()));
         if (this.NavStyle == undefined) {
             this.NavStyle = "nav";
         }
+        const Nav = WRender.Create({ tagName: "nav", id: "MainNav", className: this.NavStyle });
+        this.shadowRoot?.append(Nav)
+        if (this.Config.isMediaQuery == true) {
+            this.shadowRoot?.append(this.MediaStyle());
+        }
+        
         if (this.NavStyle == "nav") {
             const header = {
                 type: "header", props: {
                     onclick: () => {
-                        const nav = this.shadowRoot.querySelector("#MainNav");
-                        if (nav.className == "navActive") {
+                        const nav = this.shadowRoot?.querySelector("#MainNav");
+                        if (nav?.className == "navActive") {
                             nav.className = "navInactive";
                         } else {
+                            // @ts-ignore
                             nav.className = "navActive";
                         }
                     }
@@ -86,12 +102,15 @@ class WAppNavigator extends HTMLElement {
             }
             if (typeof this.NavTitle === "string") {
                 header.children.push({
+                    // @ts-ignore
                     type: "label", props: { class: "NavTitle", innerText: this.NavTitle }
                 });
             }
-            this.shadowRoot.appendChild(WRender.createElement(header));
+            this.shadowRoot?.appendChild(WRender.createElement(header));
+        } else {
+            this.CreateTabControllers();
         }
-        const Nav = { type: "nav", props: { id: "MainNav", className: this.NavStyle }, children: [] };
+
         this.Elements.forEach((element, Index) => {
             const elementNav = WRender.createElement({
                 type: "a",
@@ -110,7 +129,8 @@ class WAppNavigator extends HTMLElement {
                 elementNav.href = element.url
             }
 
-            Nav.children.push(elementNav);
+
+            Nav.appendChild(elementNav);
             if (element.SubNav != undefined) {
                 this.AddSubNav(Index, element, elementNav, Nav);
             } else {
@@ -119,10 +139,18 @@ class WAppNavigator extends HTMLElement {
                 }
                 elementNav.onclick = async (ev) => {
                     this.ActiveMenu(elementNav);
-                    if (element.action != undefined) {
-                        element.action();
+                    console.log(this.Manager);
+
+                    if (this.NavStyle == "tab") {
+                        const object = await element.action();
+                        this.Manager?.NavigateFunction("element" + Index, object);
+                    } else {
+                        if (element.action != undefined) {
+                            element.action();
+                        }
                     }
                 }
+
             }
             if (Index == 0 && element.SubNav == undefined) {
                 this.InitialNav = () => {
@@ -130,7 +158,11 @@ class WAppNavigator extends HTMLElement {
                 }
             }
         });
-        this.shadowRoot.append(WRender.createElement(Nav));
+    }
+    CreateTabControllers = () => {
+        this.TabContainer = WRender.Create({ className: "TabContainer", id: 'TabContainer' });
+        this.Manager = new ComponentsManager({ MainContainer: this.TabContainer, SPAManage: false });
+        this.shadowRoot?.append(this.TabContainer);
     }
     AddSubNav(Index, element, elementNav, Nav) {
         const SubMenuId = "SubMenu" + Index + this.id;
@@ -153,11 +185,12 @@ class WAppNavigator extends HTMLElement {
             });
             elementNav.onclick = (ev) => {
                 this.ActiveMenu(ev);
-                const MenuSelected = this.shadowRoot.querySelector("#" + SubMenuId);
-                if (MenuSelected.className.includes("UnDisplayMenu")) {
+                const MenuSelected = this.shadowRoot?.querySelector("#" + SubMenuId);
+                if (MenuSelected?.className.includes("UnDisplayMenu")) {
                     //console.log(this.NavStyle == "tab", this.NavStyle == "tab" ? "DisplayMenu tabSubMenu" : "DisplayMenu");
                     MenuSelected.className = this.Direction != "column" ? "DisplayMenu AbsoluteDisplay" : "DisplayMenu";
                 } else {
+                    // @ts-ignore
                     MenuSelected.className = this.Direction != "column" ? "UnDisplayMenu AbsoluteDisplay" : "UnDisplayMenu";
                 }
             };
@@ -168,7 +201,7 @@ class WAppNavigator extends HTMLElement {
     Style() {
         const style = this.querySelector("#NavStyle" + this.id);
         if (style) {
-            style.parentNode.removeChild(style);
+            style?.parentNode?.removeChild(style);
         }
         let navDirection = "row";
         if (this.Direction == "column") {
@@ -191,15 +224,17 @@ class WAppNavigator extends HTMLElement {
                 display: flex;
                 flex-direction: ${navDirection};
                 transition: all ease 1s;
-                justify-content: center;
+                justify-content: flex-start;
+                gap: 5px;
             }
         
             .tab .elementNavActive {
                 border-top: solid 1px rgba(0, 0, 0, 0);
                 border-left: solid 1px rgba(0, 0, 0, 0);
                 border-right: solid 1px rgba(0, 0, 0, 0);
-                border-radius: 0.1cm;
-                color: ${this.DarkMode ? "#4da6ff" : "#444444"};
+                border-radius: 0.3cm;
+                color: ${this.DarkMode ? "#4da6ff" : "#ffffff"};
+                background-color: #1f58c7;
             }
         
             a {
@@ -213,12 +248,13 @@ class WAppNavigator extends HTMLElement {
                 padding: 8px;
                 border: solid 1px rgb(0, 0, 0, 0);
                 border-bottom: solid 2px rgba(0, 0, 0, 0);
-                transition: all 0.6s;
+                transition: all 0.1s;
                 display: flex;
                 align-items: center;
                 cursor: pointer;
                 font-size: 12px;
                 position: relative;
+                border-radius: 0.3cm;
             }
         
             .elementNavActive {
@@ -236,9 +272,13 @@ class WAppNavigator extends HTMLElement {
             h4.elementNavActive {
                 display: none;
             }
+            .TabContainer {
+                padding: 20px 0px;
+            }
         
             .elementNav:hover {
-                border-bottom: solid 2px #444444;
+              /*   background-color:#dcdcdc; */
+                color: ${this.DarkMode ? "#4da6ff" : "#444444"};
             }
         
             header {
@@ -315,7 +355,7 @@ class WAppNavigator extends HTMLElement {
                 height: 15px;
                 width: 15px;
                 cursor: pointer;
-                filter: ${ this.DarkMode ? "invert(90%)" : "invert(0%)"};
+                filter: ${this.DarkMode ? "invert(90%)" : "invert(0%)"};
             }
         
             .navActive {
@@ -326,7 +366,7 @@ class WAppNavigator extends HTMLElement {
     MediaStyle() {
         const style = this.querySelector("#NavMediaStyle" + this.id);
         if (style) {
-            style.parentNode.removeChild(style);
+            style?.parentNode?.removeChild(style);
         }
         let navDirection = "row";
         if (this.Direction == "column") {
@@ -377,7 +417,7 @@ class WAppNavigator extends HTMLElement {
                 header {
                     display: flex;
                     align-items: center;
-                    justify-content:  ${ this.alignItems};
+                    justify-content:  ${this.alignItems};
                     box-shadow: none;
                 }
         }`;

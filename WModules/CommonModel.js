@@ -282,6 +282,7 @@ class ElementStyle {}
      * @property {Boolean} [multiple]
      * @property {Boolean} [disabled]
      * @property {String} [src]
+     * @property {String} [href]
      * @property {String} [innerText]    
      * @property {String | Number} [min]
      * @property {String | Number} [max]   

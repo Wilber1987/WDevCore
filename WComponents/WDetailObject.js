@@ -4,6 +4,7 @@ import { ComponentsManager, ConvertToMoneyString, WRender } from '../WModules/WC
 import { ControlBuilder } from '../WModules/WControlBuilder.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
+import { WAcorden } from "./WAcordeon.js";
 import { WAppNavigator } from './WAppNavigator.js';
 import { WTableComponent } from './WTableComponent.js';
 let photoB64;
@@ -97,17 +98,26 @@ class WDetailObject extends HTMLElement {
                     case "MASTERDETAIL":
                         tabElements.push({
                             name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
+                            NavStyle: "tab",
+                            Inicialize: true,
                             action: async (ev) => {
-                                ObjectDetail[prop] = ObjectDetail[prop] != "" && ObjectDetail[prop] != undefined && ObjectDetail[prop] != null && ObjectDetail[prop].__proto__ == Array.prototype ?
-                                    ObjectDetail[prop] : [];
-                                this.TabManager.NavigateFunction(prop, new WTableComponent({
+                                ObjectDetail[prop] = ObjectDetail[prop] != ""
+                                    && ObjectDetail[prop] != undefined
+                                    && ObjectDetail[prop] != null
+                                    && ObjectDetail[prop].__proto__ == Array.prototype ? ObjectDetail[prop] : [];
+                                return new WAcorden({
+                                    ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
+                                    Dataset: ObjectDetail[prop] ?? []
+                                });
+
+                                /*return new WTableComponent({
                                     Options: { Search: true, Show: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,
                                     AddItemsFromApi: false,
                                     EntityModel: this.Config.EntityModel,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
-                                }));
+                                })*/
                             }
                         });
                         break;
@@ -212,7 +222,7 @@ class WDetailObject extends HTMLElement {
        
         w-detail-card {
             width: 100%;
-        }
+        }       
 
         .cont {
             font-size: 12px;
