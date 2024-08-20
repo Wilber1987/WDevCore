@@ -168,7 +168,6 @@ class WDetailObject extends HTMLElement {
             color: #fff;
             font-weight: bold;
             border-radius: 0.4cm;
-            font-size: 12px;
         }
 
         .divRedes img {
@@ -225,7 +224,6 @@ class WDetailObject extends HTMLElement {
         }       
 
         .cont {
-            font-size: 12px;
             display: grid;
             grid-template-columns: 24.5%  24.5% 24.5% 24.5%;         
             overflow-x: hidden;
@@ -239,7 +237,7 @@ class WDetailObject extends HTMLElement {
             width: 100%;
         }  
         .DataContainer label {
-            font-size:12px;
+            font-size:16px;
         }
         .cont .label-value {          
             width: 100%;

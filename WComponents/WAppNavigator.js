@@ -33,6 +33,11 @@ class WAppNavigator extends HTMLElement {
         this.Direction = Config.Direction;
         this.NavStyle = Config.NavStyle;
         this.NavTitle = Config.NavTitle;
+        if (this.NavStyle == "tab") {
+            WRender.SetStyle(this, {
+                display: "block"
+            })
+        }
         this.DrawAppNavigator();
         this.Elements = this.Elements ?? [];
     }
@@ -79,7 +84,7 @@ class WAppNavigator extends HTMLElement {
         if (this.Config.isMediaQuery == true) {
             this.shadowRoot?.append(this.MediaStyle());
         }
-        
+
         if (this.NavStyle == "nav") {
             const header = {
                 type: "header", props: {
@@ -206,7 +211,8 @@ class WAppNavigator extends HTMLElement {
         if (this.Direction == "column") {
             navDirection = "column";
         }
-        return css` .nav,
+        return css`@import url(https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Montserrat:wght@400;500;600&amp;display=swap);
+            .nav,
             .navInactive,
             .navActive {
                 display: flex;
@@ -246,12 +252,12 @@ class WAppNavigator extends HTMLElement {
                 color: ${this.DarkMode ? "#d3d3d3" : "#444444"};
                 padding: 8px;
                 border: solid 1px rgb(0, 0, 0, 0);
-                border-bottom: solid 2px rgba(0, 0, 0, 0);
                 transition: all 0.1s;
                 display: flex;
                 align-items: center;
                 cursor: pointer;
-                font-size: 12px;
+                font-size: 0.925rem;
+                font-family: "IBM Plex Sans", sans-serif;
                 position: relative;
                 border-radius: 0.3cm;
             }
@@ -260,9 +266,9 @@ class WAppNavigator extends HTMLElement {
                 text-decoration: none;
                 color: ${this.DarkMode ? "#4da6ff" : "#444444"};
                 padding: 8px;
-                font-size: 12px;
+                font-size: 0.925rem;
+                font-family: "IBM Plex Sans", sans-serif;
                 border: solid 1px rgb(0, 0, 0, 0);
-                border-bottom: solid 2px #4da6ff;
                 transition: all 0.6s;
                 display: flex;
                 align-items: center;
@@ -326,7 +332,7 @@ class WAppNavigator extends HTMLElement {
                 top: +40px;
                 left: 0px;
                 background-color: #fff;
-                padding: 12px;
+                padding: 0.925rem;
                 box-shadow: 0 0 5px 0 #888;
                 border-radius: 15px;
             }
@@ -342,7 +348,8 @@ class WAppNavigator extends HTMLElement {
                 text-decoration: none;
                 color: ${this.DarkMode ? "#d3d3d3" : "#444444"};
                 padding: 10px;
-                font-size: 12px;
+                font-size: 0.925rem;
+                font-family: "IBM Plex Sans", sans-serif;
                 margin-bottom: 10px;
                 border-radius: 5px;
                 background-color: ${this.DarkMode ? "rgb(0,0,0,50%)" : "rgb(0,0,0,10%)"};

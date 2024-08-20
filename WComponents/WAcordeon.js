@@ -2,8 +2,8 @@
 import { html } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css } from "../WModules/WStyledRender.js";
-import { WReportComponent } from "./WReportComponent.js";
-import { WTableComponent } from "./WTableComponent.js";
+import { WReportComponent } from "../WComponents/WReportComponent.js";
+import { WTableComponent } from "../WComponents/WTableComponent.js";
 /**
  * @typedef {Object} Config 
     * @property {Object} [ModelObject]
@@ -64,11 +64,9 @@ class WAcorden extends HTMLElement {
                             ${index == 0 ? html`<span class="header">Descripción</span>` : ""} 
                             <span class="value">${instance.Descripcion}</span>
                         </div>
-                        <div class="element-details" style=" grid-template-columns: repeat(${maxDetails}, ${100 / maxDetails}%);">${instance.Details.map(detail => {
-                        return html`<div class="element-detail" >
-                                        <span class="header ${index == 0 ? "" : "hidden"}">${detail.Evaluacion}</span>
-                                        <span class="value">${detail.Resultado}</span>
-                                    </div>`
+                        <div class="element-details" style=" grid-template-columns: repeat(${maxDetails}, ${100 / maxDetails}%);">
+                            ${instance.Details.map((detail, indexDetail) => {
+                            return this.buildDetail(detail, indexDetail);
                     })}</div>
                 </div>`
                 })}</div>`;
@@ -80,6 +78,13 @@ class WAcorden extends HTMLElement {
             default:
                 return html`<div class="prop">${WOrtograficValidation.es(prop)}: ${ObjectF[prop]}</div>`;
         }
+    }
+
+    buildDetail(detail, index) {    
+        return html`<div class="element-detail" >
+            <span class="header ${index == 0 ? "" : "hidden"}">${detail.Evaluacion}</span>
+            <span class="value">${detail.Resultado}</span>
+        </div>`;
     }
 
     update() {

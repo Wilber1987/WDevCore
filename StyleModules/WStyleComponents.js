@@ -92,7 +92,7 @@ const StylesControlsV1 = css`
                 outline: none;
             }`;
 
-const StylesControlsV2 = css`
+const StylesControlsV2 = css`@import url(https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Montserrat:wght@400;500;600&amp;display=swap);
     .green { background-color:rgb(36, 165, 91) }
     .yellow { background-color:rgb(244, 194, 56) }
     .cyan { background-color:rgb(74, 178, 211) }

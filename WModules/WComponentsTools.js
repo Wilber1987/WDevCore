@@ -12,8 +12,10 @@ function html(strings, ...values) {
         accumulator += currentString;
 
         if (index < values.length) {
-            const value = values[index];
-
+            let value = values[index];           
+            if (value == undefined) {
+                value = "";
+            }           
             if (value instanceof HTMLElement || value.__proto__.__proto__ == HTMLElement.prototype) {
                 // Si el valor es un nodo HTML, lo añadimos al wrapper
                 const placeholder = document.createElement('div');
