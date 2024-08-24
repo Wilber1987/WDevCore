@@ -102,7 +102,16 @@ class EntityClass {
         }
     }
     SaveData = async (Path, Data) => {
-        console.log(this.ApiMethods.ApiRoute + Path, Data);
+        //console.log(this.ApiMethods.ApiRoute + Path, Data);
+        return await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, Data)
+    }
+    /**
+    * @param {String} Path 
+    * @param {Object} Data 
+    * @returns {any}
+    */
+    Post = async (Path, Data) => {
+        //console.log(this.ApiMethods.ApiRoute + Path, Data);
         return await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, Data)
     }
     replacer(value) {

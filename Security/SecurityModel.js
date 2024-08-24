@@ -1,18 +1,20 @@
+import { EntityClass } from "../WModules/EntityClass.js";
 import { Tbl_Profile } from "./Tbl_Profile.js";
 
 //@ts-check
-class Security_Roles {
+class Security_Roles extends EntityClass {
 	constructor(props) {
+		super(props, "EntitySECURITY");
 		for (const prop in props) {
 			this[prop] = props[prop];
 		}
 	}
 	Id_Role = { type: "number", primary: true };
-	Descripcion = { type: "text" };
-	Estado = { type: "Select", Dataset: ["ACTIVO", "INACTIVO"] };
+	Descripcion = { type: "text" };	
 	Security_Permissions_Roles = {
 		type: "MULTISELECT",  ModelObject:new Security_Permissions(), Dataset: [{ Descripcion: "Permission 1" }]
 	};
+	Estado = { type: "Select", Dataset: ["ACTIVO", "INACTIVO"] };
 }
 export { Security_Roles }
 class Security_Permissions {

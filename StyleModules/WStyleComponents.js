@@ -92,8 +92,13 @@ const StylesControlsV1 = css`
                 outline: none;
             }`;
 
-const StylesControlsV2 = css`
-    @import url(/css/variables.css);
+
+const StylesControlsV2 = css`@import url(/css/variables.css); 
+  @import url(https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Montserrat:wght@400;500;600&amp;display=swap);
+    .green { background-color:rgb(36, 165, 91) }
+    .yellow { background-color:rgb(244, 194, 56) }
+    .cyan { background-color:rgb(74, 178, 211) }
+    .red { background-color:rgb(213, 77, 77) }
     .Btn-Mini, .Btn-Mini-Alert, .Btn-Mini-Success {
         background-color: #1c4786;
         border: none;
@@ -341,7 +346,31 @@ const StylesControlsV2 = css`
         -webkit-box-shadow: 0 0 0 0 rgba(31, 88, 199, .25);
         box-shadow: 0 0 0 0 rgba(31, 88, 199, .25);
     }
-    
+
+    .btn-go {
+        margin: 0px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    .btn-go *{
+        margin: 0px;
+    }
+    .btn-go::after {
+        content: "";    
+        transition: all 0.3s; /* Transición para el hover */
+        clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
+        background-color: #033da7;
+        fill: #000;
+        height: 10px;
+        width: 15px;
+        transform: rotate(-90deg);
+        margin-left: 10px;
+    }
+
+    .btn-go:hover::after {
+        margin-left: 15px; /* Desplaza la flecha 5px hacia la derecha en el hover */
+    }
 `
 
 const StylesControlsV3 = css`    

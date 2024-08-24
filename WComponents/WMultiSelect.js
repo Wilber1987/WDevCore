@@ -34,7 +34,10 @@ class MultiSelect extends HTMLElement {
      * @param {HTMLElement|null} [Style] 
      */
     constructor(Config, Style = null) {
-        super();
+        super();        
+        for (const prop in Config) {
+            this[prop] = Config[prop]
+        }
         this.Config = Config;
         this.Dataset = this.Config.Dataset ?? [];
         this.ModelObject = this.Config.ModelObject ?? undefined;

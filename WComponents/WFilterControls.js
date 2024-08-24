@@ -7,11 +7,12 @@ import { WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
-import {WArrayF} from "../WModules/WArrayF.js";
+import { WArrayF } from "../WModules/WArrayF.js";
 /**
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset  
     * @property {Function} FilterFunction
+    * @property {String} DateRange
     * @property {Array<OrderData>} [Sorts]
     * @property {Boolean} [Display]
     * @property {Boolean} [UseEntityMethods]
@@ -60,7 +61,7 @@ class WFilterOptions extends HTMLElement {
             })
         }
     }
-    DrawFilter =  () => {
+    DrawFilter = () => {
         this.FilterContainer.innerHTML = "";
         const ControlOptions = WRender.Create({ class: "OptionContainer " + (this.Display ? "OptionContainerActive" : "") })
         this.FilterContainer.append(WRender.Create({
@@ -85,25 +86,25 @@ class WFilterOptions extends HTMLElement {
             const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop).map(s => s[prop]);
             if (this.isDrawable(this.ModelObject, prop)) {
                 if (this.ModelObject[prop].__proto__ == Object.prototype) {
-                    const filterControl =  this.CreateModelControl(this.ModelObject, prop, this.ModelObject[prop].Dataset ?? SelectData);
+                    const filterControl = this.CreateModelControl(this.ModelObject, prop, this.ModelObject[prop].Dataset ?? SelectData);
                     if (filterControl != null) {
                         ControlOptions.append(WRender.Create({
                             className: this.ModelObject[prop].type.toUpperCase() == "DATE"
                                 || this.ModelObject[prop].type.toUpperCase() == "MONEY" || this.ModelObject[prop].type.toUpperCase() == "WSELECT"
                                 || this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" ? "multi-control-container" : "",
-                            children: [this.ModelObject[prop].label ? WOrtograficValidation.es(this.ModelObject[prop].label) :  WOrtograficValidation.es(prop), filterControl]
+                            children: [this.ModelObject[prop].label ? WOrtograficValidation.es(this.ModelObject[prop].label) : WOrtograficValidation.es(prop), filterControl]
                         }));
                         this.FilterControls.push(filterControl);
                     }
                 } else {
-                    const filterControl =  this.CreateWSelect(SelectData, prop);
+                    const filterControl = this.CreateWSelect(SelectData, prop);
                     ControlOptions.append(WRender.Create({ children: [WOrtograficValidation.es(prop), filterControl] }));
                     this.FilterControls.push(filterControl);
                 }
             }
         }
         if (this.Config.AutoFilter == true) {
-             this.filterFunction(this.Sorts);
+            this.filterFunction(this.Sorts);
         }
         this.FilterContainer.append(WRender.createElement(ControlOptions));
     }
@@ -114,7 +115,7 @@ class WFilterOptions extends HTMLElement {
      * @param {Array} Dataset 
      * @returns 
      */
-    CreateModelControl =  (Model, prop, Dataset) => {
+    CreateModelControl = (Model, prop, Dataset) => {
         const ModelProperty = Model[prop];
         switch (ModelProperty.type?.toUpperCase()) {
             case "TEXT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA": case "NUMBER":
@@ -167,7 +168,6 @@ class WFilterOptions extends HTMLElement {
                 });
             }
             this.FilterControls.forEach(control => {
-               
                 if (this.ModelObject[control.id]) {
                     let values;
                     let filterType;
@@ -186,12 +186,12 @@ class WFilterOptions extends HTMLElement {
                         case "NUMBER":
                             if (control.value != null && control.value != undefined && control.value != "") {
                                 filterType = "="
-                                values = [ control.value];
+                                values = [control.value];
                             }
                             break;
                         case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
                             break;
-                        case "DATE": case "FECHA": case "HORA": 
+                        case "DATE": case "FECHA": case "HORA":
                             /**TODO */
                             filterType = "BETWEEN"
                             const inputs = control.querySelectorAll("input");
@@ -217,8 +217,8 @@ class WFilterOptions extends HTMLElement {
                                 }
                                 //TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
                                 let foraingKeyName = null;
-                                const foreynKeyExist = ModelProperty.ForeignKeyColumn && this.ModelObject.hasOwnProperty(ModelProperty.ForeignKeyColumn);
-                                console.log(foreynKeyExist);
+                                const foreynKeyExist = ModelProperty.ForeignKeyColumn != undefined;
+                                console.log(foreynKeyExist, ModelProperty.ForeignKeyColumn);
                                 if (!foreynKeyExist) {
                                     for (const propiedad in ModelProperty.ModelObject) {
                                         const keyNameSames = ModelProperty.ModelObject[propiedad].primary
@@ -295,7 +295,7 @@ class WFilterOptions extends HTMLElement {
                 if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
                     const ModelProperty = this.ModelObject[control.id];
                     switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL":  case "NUMBER":
+                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "NUMBER":
                             if (control.value != null && control.value != undefined && control.value != "") {
                                 findByValue(control);
                             }
@@ -432,9 +432,9 @@ class WFilterOptions extends HTMLElement {
                     tagName: "input",
                     type: "date",
                     className: prop + " firstDate",
-                    id: prop + "first",
-                    // @ts-ignore
-                    value: this.Config.AutoSetDate == true ? new Date().subtractDays(30).toISO() : undefined,
+                    id: prop + "first",                   
+                    value: this.Config.AutoSetDate == true ?  // @ts-ignore
+                        (this.Config.DateRange == FilterDateRange.YEAR ? new Date().subtractDays(865).toISO() : new Date().subtractDays(30).toISO()) : undefined,
                     placeholder: prop,
                     onchange: (ev) => { this.filterFunction(this.Sorts) }
                 }, {
@@ -474,7 +474,7 @@ class WFilterOptions extends HTMLElement {
         });
         return InputControl;
     }
- CreateWSelect(ModelProperty, prop) {
+    CreateWSelect(ModelProperty, prop) {
         const InputControl = new MultiSelect({
             //MultiSelect: false,
             Dataset: ModelProperty.Dataset,
@@ -643,3 +643,6 @@ class WFilterOptions extends HTMLElement {
 }
 customElements.define("w-filter-option", WFilterOptions);
 export { WFilterOptions }
+export const FilterDateRange = {
+    YEAR: "YEAR", MOUNT: "MOUNT"
+}

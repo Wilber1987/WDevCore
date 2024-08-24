@@ -4,6 +4,7 @@ import { ComponentsManager, ConvertToMoneyString, WRender } from '../WModules/WC
 import { ControlBuilder } from '../WModules/WControlBuilder.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
+import { WAcorden } from "./WAcordeon.js";
 import { WAppNavigator } from './WAppNavigator.js';
 import { WTableComponent } from './WTableComponent.js';
 let photoB64;
@@ -31,7 +32,7 @@ class WDetailObject extends HTMLElement {
         this.SetImage(this.ObjectDetail, this.ModelObject)
         this.ProfileContainer.append(new ProfileCard(this.Config));
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
-        this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
+        this.Manager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.shadowRoot.appendChild(StylesControlsV2.cloneNode(true));
         this.append(new WStyledRender({
             ClassList: [
@@ -97,17 +98,26 @@ class WDetailObject extends HTMLElement {
                     case "MASTERDETAIL":
                         tabElements.push({
                             name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
+                            NavStyle: "tab",
+                            Inicialize: true,
                             action: async (ev) => {
-                                ObjectDetail[prop] = ObjectDetail[prop] != "" && ObjectDetail[prop] != undefined && ObjectDetail[prop] != null && ObjectDetail[prop].__proto__ == Array.prototype ?
-                                    ObjectDetail[prop] : [];
-                                this.TabManager.NavigateFunction(prop, new WTableComponent({
+                                ObjectDetail[prop] = ObjectDetail[prop] != ""
+                                    && ObjectDetail[prop] != undefined
+                                    && ObjectDetail[prop] != null
+                                    && ObjectDetail[prop].__proto__ == Array.prototype ? ObjectDetail[prop] : [];
+                                return new WAcorden({
+                                    ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
+                                    Dataset: ObjectDetail[prop] ?? []
+                                });
+
+                                /*return new WTableComponent({
                                     Options: { Search: true, Show: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,
                                     AddItemsFromApi: false,
                                     EntityModel: this.Config.EntityModel,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
-                                }));
+                                })*/
                             }
                         });
                         break;
@@ -115,7 +125,7 @@ class WDetailObject extends HTMLElement {
                         tabElements.push({
                             name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
-                                this.TabManager.NavigateFunction(prop, new ProfileCard({
+                                this.Manager.NavigateFunction(prop, new ProfileCard({
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     ObjectDetail: ObjectDetail[prop]
 
@@ -158,7 +168,6 @@ class WDetailObject extends HTMLElement {
             color: #fff;
             font-weight: bold;
             border-radius: 0.4cm;
-            font-size: 12px;
         }
 
         .divRedes img {
@@ -180,6 +189,7 @@ class WDetailObject extends HTMLElement {
             color: #09f;
         }
         .ImageCards {
+            align-self: center;
             max-width: 300px;
         }
 
@@ -211,10 +221,9 @@ class WDetailObject extends HTMLElement {
        
         w-detail-card {
             width: 100%;
-        }
+        }       
 
         .cont {
-            font-size: 12px;
             display: grid;
             grid-template-columns: 24.5%  24.5% 24.5% 24.5%;         
             overflow-x: hidden;
@@ -228,7 +237,7 @@ class WDetailObject extends HTMLElement {
             width: 100%;
         }  
         .DataContainer label {
-            font-size:12px;
+            font-size:16px;
         }
         .cont .label-value {          
             width: 100%;
