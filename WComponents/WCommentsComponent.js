@@ -5,17 +5,33 @@ import { css } from "../WModules/WStyledRender.js";
 import { WRichText } from "./WRichText.js";
 import { WModalForm } from "./WModalForm.js";
 import { MultiSelect } from "./WMultiSelect.js";
-import {WArrayF} from "../WModules/WArrayF.js";
-import {WAjaxTools} from "../WModules/WAjaxTools.js";
+import { WArrayF } from "../WModules/WArrayF.js";
+import { WAjaxTools } from "../WModules/WAjaxTools.js";
 
-class WCommentsComponent extends HTMLElement {
+class WCommentsComponent extends HTMLElement {   
+    /**
+     * @param {{ 
+     * Dataset: any[]; 
+     * ModelObject: Object;
+     * User: any; 
+     * UserIdProp?: string;
+     * CommentsIdentify: Number; 
+     * CommentsIdentifyName: string; 
+     * UrlSearch: string; 
+     * UrlAdd: string; 
+     * AddObject: boolean;
+     * UseDestinatarios?: boolean; 
+     * }} props
+     */
     constructor(props) {
         super();
         this.Dataset = props.Dataset ?? [];
+        //this.Destinatarios = props.Destinatarios ?? [];
         this.ModelObject = props.ModelObject;
-        this.AddObject = props.AddObject;
+        this.AddObject = props.AddObject ?? false;
         this.UrlSearch = props.UrlSearch;
         this.UrlAdd = props.UrlAdd;
+        this.UseDestinatarios = props.UseDestinatarios ?? true;
         this.User = props.User;
         this.CommentsIdentify = props.CommentsIdentify;
         this.CommentsIdentifyName = props.CommentsIdentifyName;
@@ -78,7 +94,7 @@ class WCommentsComponent extends HTMLElement {
         this.MailsSelect = new MultiSelect({
             Dataset: this.Mails,
             selectedItems: this.SelectedMails,
-            AddObject: this.AddObject, 
+            AddObject: this.AddObject,
             AddPatern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"//patron de correo
         });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true), StylesControlsV2.cloneNode(true),
@@ -90,13 +106,13 @@ class WCommentsComponent extends HTMLElement {
     saveComment = async () => {
         // @ts-ignore
         if (this.MessageInput.value.length < 3) {
-            return; 
-        }
+            return;
+        }        
         const Message = {
             // @ts-ignore
             Body: this.MessageInput.value,
             Id_User: this.User.UserId,
-            Mails: this.MailsSelect.selectedItems
+            Mails: this.UseDestinatarios == true ? undefined :this.MailsSelect.selectedItems
         }
         Message[this.CommentsIdentifyName] = this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlAdd, Message);
@@ -116,13 +132,15 @@ class WCommentsComponent extends HTMLElement {
         this.RitchInput.FunctionClear();
         this.update();
     }
-    update = async () => {
+    update = async (inicialize = false) => {
         const Message = {}
         Message[this.CommentsIdentifyName] = this.CommentsIdentify
         const response = await WAjaxTools.PostRequest(this.UrlSearch, Message);
         //console.log(response);
         this.Dataset = response;
-        this.DrawWCommentsComponent();
+        if (!inicialize) {
+            this.DrawWCommentsComponent();
+        }        
     }
     connectedCallback() {
         const scrollToBottom = () => {
@@ -137,8 +155,12 @@ class WCommentsComponent extends HTMLElement {
     disconnectedCallback() {
         this.Interval = null;
     }
+    GetDestinatarios() {
+       // return this.Destinatarios;
+    }
     DrawWCommentsComponent = async () => {
         this.CommentsContainer.innerHTML = "";
+        await this.update(true)
         //console.log(this.Dataset);
         this.Dataset.forEach(comment => {
             const attachs = WRender.Create({ className: "attachs" });
@@ -180,7 +202,7 @@ class WCommentsComponent extends HTMLElement {
             });
             this.CommentsContainer.insertBefore(WRender.Create({
                 tagName: "div",
-                className: (comment.Id_User == this.User.UserId ? "commentSelf" : "comment") 
+                className: (comment.Id_User == this.User.UserId ? "commentSelf" : "comment")
                     + (comment.Leido == true ? "leido" : ""),
                 children: [
                     { tagName: "label", className: "nickname", innerHTML: comment.NickName ?? comment.remitente },
@@ -287,3 +309,16 @@ class WCommentsComponent extends HTMLElement {
 }
 customElements.define('w-coment-component', WCommentsComponent);
 export { WCommentsComponent }
+
+class Destinatario {
+    /**@type {Number} */
+    Id_User;
+    /**@type {String} */
+    Correo;
+    /**@type {String} */
+    Nombre;
+    /**@type {Boolean} */
+    Enviado;
+    /**@type {Boolean} */
+    Leido;
+}

@@ -253,6 +253,30 @@ const StylesControlsV2 = css`@import url(https://fonts.googleapis.com/css2?famil
     textarea:focus {
         box-shadow: 0 0 5px #4894aa;
     }
+    .btn-go {
+        margin: 0px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    .btn-go *{
+        margin: 0px;
+    }
+    .btn-go::after {
+        content: "";    
+        transition: all 0.3s; /* Transición para el hover */
+        clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
+        background-color: #033da7;
+        fill: #000;
+        height: 10px;
+        width: 15px;
+        transform: rotate(-90deg);
+        margin-left: 10px;
+    }
+
+    .btn-go:hover::after {
+        margin-left: 15px; /* Desplaza la flecha 5px hacia la derecha en el hover */
+    }
 `
 
 const StylesControlsV3 = css`    
