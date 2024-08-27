@@ -26,74 +26,74 @@ const StyleScrolls = css`
     }
 `;
 const StylesControlsV1 = css`
-            .BtnAlert,.BtnPrimary, .BtnSuccess,.BtnSecundary,.Btn {
-                font-weight: bold;
-                border: none;
-                padding: 10px;
-                text-align: center;
-                display: inline-block;
-                min-width: 100px;
-                cursor: pointer;
-                background-color: #09f;
-                font-size: 12px;
-                color: #fff;
+    .BtnAlert,.BtnPrimary, .BtnSuccess,.BtnSecundary,.Btn {
+        font-weight: bold;
+        border: none;
+        padding: 10px;
+        text-align: center;
+        display: inline-block;
+        min-width: 100px;
+        cursor: pointer;
+        background-color: #09f;
+        font-size: 12px;
+        color: #fff;
 
-                border-radius: 0.2cm;
-                max-height: 4;
-            }
-            .BtnPrimary {
-                color: #fff;
-                background-color: #007bff;
+        border-radius: 0.2cm;
+        max-height: 4;
+    }
+    .BtnPrimary {
+        color: #fff;
+        background-color: #007bff;
 
-            }
-            .BtnAlert {
-                color: #fff;
-                background-color: #dc3545;
+    }
+    .BtnAlert {
+        color: #fff;
+        background-color: #dc3545;
 
-            }
-            .BtnSuccess {
-                color: #fff;
-                background-color: #28a745;
+    }
+    .BtnSuccess {
+        color: #fff;
+        background-color: #28a745;
 
-            }
-            .BtnSecundary {
-                color: #fff;
-                background-color: #17a2b8;
+    }
+    .BtnSecundary {
+        color: #fff;
+        background-color: #17a2b8;
 
-            }
-            .Btn[type=checkbox] {
-                height: 20px;
-                min-width: 20px;
-                margin: 5px;
-            }
-            input[type=text], 
-            input[type=string], 
-            input[type=password], 
-            input[type=number],
-            input[type=color], input[type=email], 
-            input[type=date],  input[type=time],select, textarea,
-            input:-internal-autofill-selected {
-                padding: 10px;
-                border: none;
-                border: 2px solid #dddada;
-                width: calc(100%);
-                //height: 100%;
-                font-size: 15px;
-                border-radius: 0.2cm;
-                box-sizing: border-box;
-                border-radius: 10;
-                cursor: pointer;
-            }
-            input[type=color] {
-                padding: 5
-            }
-            input:active, input:focus, select:active, select:focus {
-                border-bottom: 2px solid #0099cc;
-                outline: none;
-            }`;
+    }
+    .Btn[type=checkbox] {
+        height: 20px;
+        min-width: 20px;
+        margin: 5px;
+    }
+    input[type=text], 
+    input[type=string], 
+    input[type=password], 
+    input[type=number],
+    input[type=color], input[type=email], 
+    input[type=date],  input[type=time],select, textarea,
+    input:-internal-autofill-selected {
+        padding: 10px;
+        border: none;
+        border: 2px solid #dddada;
+        width: calc(100%);
+        //height: 100%;
+        font-size: 15px;
+        border-radius: 0.2cm;
+        box-sizing: border-box;
+        border-radius: 10;
+        cursor: pointer;
+    }
+    input[type=color] {
+        padding: 5
+    }
+    input:active, input:focus, select:active, select:focus {
+        border-bottom: 2px solid #0099cc;
+        outline: none;
+    }`;
 
 
-const StylesControlsV2 = css`@import url(/css/variables.css); 
+const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.css);
   @import url(https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Montserrat:wght@400;500;600&amp;display=swap);
     .green { background-color:rgb(36, 165, 91) }
     .yellow { background-color:rgb(244, 194, 56) }
@@ -103,7 +103,7 @@ const StylesControlsV2 = css`@import url(/css/variables.css);
         background-color: #1c4786;
         border: none;
         outline: none;
-        border-radius: 10px;
+        border-radius: 8px;
         color: #fff;
         font-weight: 600;
         margin: 0px;
@@ -164,23 +164,9 @@ const StylesControlsV2 = css`@import url(/css/variables.css);
     .btn-success,
     .btn-danger,
     .btn-info,
-    .Btn {       
-        --bs-btn-padding-x: 0.75rem;
-        --bs-btn-padding-y: 0.47rem;
-        --bs-btn-font-size: 0.925rem;
-        --bs-btn-font-weight: 400;
-        --bs-btn-line-height: 1.5;
-        --bs-btn-color: var(--bs-body-color);
-        --bs-btn-bg: transparent;
-        --bs-btn-border-width: var(--bs-border-width);
-        --bs-btn-border-color: transparent;
-        --bs-btn-border-radius: var(--bs-border-radius);
-        --bs-btn-hover-border-color: transparent;
-        --bs-btn-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
-        --bs-btn-disabled-opacity: 0.65;
-        --bs-btn-focus-box-shadow: 0 0 0 0 rgba(var(--bs-btn-focus-shadow-rgb), .5);
+    .Btn {     
         display: inline-block;
-        padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+        padding: 10px;
         font-family: var(--bs-btn-font-family);
         font-size: var(--bs-btn-font-size);
         font-weight: var(--bs-btn-font-weight);
@@ -194,7 +180,7 @@ const StylesControlsV2 = css`@import url(/css/variables.css);
         -ms-user-select: none;
         user-select: none;
         border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
-        border-radius: var(--bs-btn-border-radius);
+        border-radius: 8px;
         background-color: var(--bs-btn-bg);
         -webkit-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
         transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
@@ -284,14 +270,14 @@ const StylesControlsV2 = css`@import url(/css/variables.css);
         font-size: .925rem;
         font-weight: 400;
         line-height: 1.5;
-        color: var(--bs-body-color);
+        color: #202020;
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
-        background-color: var(--bs-secondary-bg);
+        background-color: #fff;
         background-clip: padding-box;
-        border: var(--bs-border-width) solid var(--bs-border-color);
-        border-radius: var(--bs-border-radius);
+        border: 1px solid #d3d3d3;
+        border-radius: 8px;
         -webkit-transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
         transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -305,17 +291,16 @@ const StylesControlsV2 = css`@import url(/css/variables.css);
         font-size: .925rem;
         font-weight: 400;
         line-height: 1.5;
-        color: var(--bs-body-color);
+        color: #202020;
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
-        background-color: var(--bs-secondary-bg);
+        background-color: #fff;
         background-image: var(--bs-form-select-bg-img),var(--bs-form-select-bg-icon,none);
         background-repeat: no-repeat;
         background-position: right .75rem center;
         background-size: 16px 12px;
-        border: var(--bs-border-width) solid var(--bs-border-color);
-        border-radius: var(--bs-border-radius);
+        border-radius: 8px;
         -webkit-transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
         transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
         transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
@@ -339,8 +324,8 @@ const StylesControlsV2 = css`@import url(/css/variables.css);
     select:focus,
     textarea:focus,
     textarea:focus {
-        color: var(--bs-body-color);
-        background-color: var(--bs-secondary-bg);
+        color: #202020;
+        background-color: #fff;
         border-color: #8face3;
         outline: 0;
         -webkit-box-shadow: 0 0 0 0 rgba(31, 88, 199, .25);
@@ -435,42 +420,42 @@ const StylesControlsV3 = css`
     }
 `
 const basicButtons = css`      
-        .btn {
-            padding: 8px;
-            font-size: 12px;
-            max-width: 120px;
-            min-width: 80px;
-            background-color: #335888;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            margin-left: 10px;
-            cursor:pointer;
-        }
-        .btn-alert {
-            padding: 8px;
-            font-size: 12px;
-            max-width: 120px;
-            min-width: 80px;
-            background-color: #6e1515;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            margin-left: 10px;
-            cursor:pointer;
-        }
-        .btn-secundary {
-            padding: 8px;
-            font-size: 12px;
-            max-width: 120px;
-            min-width: 80px;
-            background-color: #156e49;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            margin-left: 10px;
-            cursor:pointer;
-        }
+    .btn {
+        padding: 8px;
+        font-size: 12px;
+        max-width: 120px;
+        min-width: 80px;
+        background-color: #335888;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        margin-left: 10px;
+        cursor:pointer;
+    }
+    .btn-alert {
+        padding: 8px;
+        font-size: 12px;
+        max-width: 120px;
+        min-width: 80px;
+        background-color: #6e1515;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        margin-left: 10px;
+        cursor:pointer;
+    }
+    .btn-secundary {
+        padding: 8px;
+        font-size: 12px;
+        max-width: 120px;
+        min-width: 80px;
+        background-color: #156e49;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        margin-left: 10px;
+        cursor:pointer;
+    }
 `
 //#endregion  #################################################################################################
 

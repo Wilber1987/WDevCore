@@ -12,7 +12,7 @@ import { WArrayF } from "../WModules/WArrayF.js";
  * @typedef {Object} FilterConfig 
  *  * @property {Array} Dataset  
     * @property {Function} FilterFunction
-    * @property {String} DateRange
+    * @property {String} [DateRange]
     * @property {Array<OrderData>} [Sorts]
     * @property {Boolean} [Display]
     * @property {Boolean} [UseEntityMethods]
