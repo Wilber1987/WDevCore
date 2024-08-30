@@ -507,16 +507,12 @@ class WFilterOptions extends HTMLElement {
             margin: 10px;
         }
 
-        .filter-container {    
-            margin-top:10px;        
-            margin-bottom: 20px;
-            padding: 5px 10px;
+        .filter-container {  
+            padding: 10px;
             display: flex;
             justify-content: center;
             flex-direction: column;
-            border: 2px solid #e4e4e4;
             border-radius: 10px;
-            container-type: inline-size;
         }
 
         .OptionContainer {

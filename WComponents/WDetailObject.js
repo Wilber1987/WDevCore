@@ -72,7 +72,7 @@ class WDetailObject extends HTMLElement {
         let isImg = false;
         const ImageCards = WRender.createElement({ type: 'div', props: { class: 'ImageCards' } });
         for (const prop in Model) {
-            if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
+            if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type && Model[prop].hidden != true) {
                 switch (Model[prop].type.toUpperCase()) {
                     case "IMG": case "IMAGECAPTURE":
                         isImg = true;

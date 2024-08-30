@@ -71,11 +71,8 @@ class WPrintExportToolBar extends HTMLElement {
         .toolbar {
             display: flex;
             gap: 10px;
-            background-color: #ffffff;
             justify-content: flex-end;
             padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0px 5px rgba(0, 0, 0, 0.1);
         }
         .toolbar-button {
             background-color: #e7e7e7;

@@ -1,5 +1,5 @@
 //@ts-check
-import { WRender } from "../WModules/WComponentsTools.js"
+import { html, WRender } from "../WModules/WComponentsTools.js"
 import { css } from "../WModules/WStyledRender.js"
 class ModelFiles {
     constructor(name, value, type) {
@@ -29,8 +29,8 @@ class WRichText extends HTMLElement {
          */
         this.Files = [];
         this.style.backgroundColor = "#fff";
-        this.style.padding = "5px";
-        this.style.borderRadius = "5px";
+        //this.style.padding = "5px";
+        this.style.borderRadius = "10px";
         this.style.border = "1px solid rgb(222 222 222)"
         this.Config = Config;
         this.DrawComponent();
@@ -78,13 +78,13 @@ class WRichText extends HTMLElement {
         })
         this.Commands.forEach(command => {
             let CommandBtn = WRender.Create({
-                tagName: "input",
-                className: "ROption tooltip " + command.class,
+                tagName: "button",
+                className: "ROption tooltip tooltipBtn " + command.class,
                 type: command.type,
                 id: "ROption" + command.commandName,
                 // @ts-ignore
                 title: command.commandName,
-                value: command.label
+                innerText: command.label
             });
             CommandBtn[command.event] = () => {
                 const ROption = this.querySelector("#ROption" + command.commandName);
@@ -97,7 +97,9 @@ class WRichText extends HTMLElement {
                 children: [CommandBtn, { tagName: "span", class: "tooltiptext", children: [command.commandName] }]
             }))
         });
-
+        OptionsSection.append(html`<button class="tableBtn ROption tooltip tooltipBtn">${this.tableBuilder}
+            <svg class="" viewBox="0 0 20 20"><path d="M3 6v3h4V6H3zm0 4v3h4v-3H3zm0 4v3h4v-3H3zm5 3h4v-3H8v3zm5 0h4v-3h-4v3zm4-4v-3h-4v3h4zm0-4V6h-4v3h4zm1.5 8a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 17V4c.222-.863 1.068-1.5 2-1.5h13c.932 0 1.778.637 2 1.5v13zM12 13v-3H8v3h4zm0-4V6H8v3h4z"></path></svg>
+            <svg class="ck ck-icon ck-reset_all-excluded ck-icon_inherit-color ck-dropdown__arrow" viewBox="0 0 10 10"><path d="M.941 4.523a.75.75 0 1 1 1.06-1.06l3.006 3.005 3.005-3.005a.75.75 0 1 1 1.06 1.06l-3.549 3.55a.75.75 0 0 1-1.168-.136L.941 4.523z"></path></svg></button>`)
         this.append(OptionsSection);
 
     }
@@ -215,31 +217,32 @@ class WRichText extends HTMLElement {
         //{ commandName: "undo", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
         //{ commandName: "unlink", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
     ];
+    tableBuilder = html``
 }
+
 
 const WRichTextStyle = css` 
     w-rich-text .WREditor {
         height: 170px;
-        border: solid 1px #c5c5c5;
         display: block;
         margin: 0px;
-        margin-top: 10px;
         padding: 10px;
-        border-radius: 6px;
         overflow-y: auto;
     }
     .WREditor:focus-visible  {
-        outline-color : #d4d4d4;
+        outline-color : #b1d7f0;
     }
 
     w-rich-text .WOptionsSection {
-        border: solid 1px #c5c5c5;
         margin: 0px;
         border-radius: 4px;
+        padding: 10px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         flex-wrap: wrap;
+        background-color: #f5f2f2;
+        position: relative;
     }
 
     w-rich-text .InputFileSection {
@@ -260,6 +263,39 @@ const WRichTextStyle = css`
         border-radius: 4px;
         padding: 5px;
         text-align: right;
+    }
+    .tableBuilder {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #fff;
+        box-shadow: #c5c5c5 0 0 5px 0;
+        padding: 10px;
+    }
+    .tableBuilder .btn-container{
+        display: grid;
+        grid-template-columns: repeat(10, 15px);
+        grid-template-rows: repeat(10, 15px);
+    }
+    .tableBuilder .btn-container button{
+        overflow: hidden;
+        border:none;
+    }
+    .tableBuilder .btn-container button span{
+        display: none;
+        position: absolute;
+    }
+    .tableBuilder .btn-container button:hover{
+        background-color: #92c5e6;
+    }
+    .tableBuilder .btn-container button:hover > span{
+        display: block;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .AttachBtn {
@@ -306,7 +342,6 @@ const WRichTextStyle = css`
         position: relative;
         display: inline-block;
         padding: 0px;
-        margin: 5px;
     }
 
     .tooltiptext {
@@ -339,9 +374,10 @@ const WRichTextStyle = css`
         visibility: visible;
     } 
 
-    input {
+    input, .tooltipBtn {
         cursor: pointer;
-        width: 50px;
+        width: 40px;
+        height: 40px;
         padding: 10px 20px;
         border: none;
         background-color: #f5f5f5;
@@ -350,25 +386,25 @@ const WRichTextStyle = css`
         transition: background-color 0.3s ease;
     }
     
-      input[type="file"]::file-selector-button {
+    input[type="file"]::file-selector-button {
         border-radius: 4px;
-        padding: 0 16px;
+        padding: 0 18px;
         height: 40px;
         cursor: pointer;
         background-color: white;
         border: 1px solid rgba(0, 0, 0, 0.16);
         box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
-        margin-right: 16px;
+        margin-right: 18px;
         transition: background-color 200ms;
-      }
+    }
       
-      input[type="file"]::file-selector-button:hover {
+    input[type="file"]::file-selector-button:hover {
         background-color: #f3f4f6;
-      }
+    }
       
-      input[type="file"]::file-selector-button:active {
+    input[type="file"]::file-selector-button:active {
         background-color: #e5e7eb;
-      } 
+    } 
       
     .inputfile {
         cursor: pointer;
@@ -390,9 +426,8 @@ const WRichTextStyle = css`
         min-height: 35px;
         max-height: 35px;
         margin: 5px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
         transition: transform .2s ease-out;
-        background-color: #fff;
+        background-color: unset;
         color: #000;
         border-radius: 5px;
         font-size: 14px;
@@ -405,46 +440,58 @@ const WRichTextStyle = css`
 
     .list {
         border: none;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
         background-repeat: no-repeat;
         background-position: center;
-        background-size: 16px;
+        background-size: 18px;
         background-image: url("/WDevCore/Icons/list.png");
     }
 
     .link {
         border: none;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
         background-repeat: no-repeat;
         background-position: center;
-        background-size: 16px;
+        background-size: 18px;
         background-image: url("/WDevCore/Icons/globe.png");
+    }
+
+    .tableBtn {
+        display: flex !important;
+        gap: 5px;
+        width: 50px;
+        align-items: center;
+        position: relative;
+    }
+
+    .tableBtn svg{
+        height: 20px;
+        width: 20px;
+    }
+    .tableBtn svg:last-child(){
+        height: 10px;
+        width: 10px;
     }
 
     .center {
         border: none;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
         background-repeat: no-repeat;
         background-position: center;
-        background-size: 16px;
+        background-size: 18px;
         background-image: url("/WDevCore/Icons/align-center.png");
     }
 
     .right {
         border: none;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
         background-repeat: no-repeat;
         background-position: center;
-        background-size: 16px;
+        background-size: 18px;
         background-image: url("/WDevCore/Icons/symbol.png");
     }
 
     .left {
         border: none;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
         background-repeat: no-repeat;
         background-position: center;
-        background-size: 16px;
+        background-size: 18px;
         background-image: url("/WDevCore/Icons/align-left.png");
     }
 
@@ -452,24 +499,21 @@ const WRichTextStyle = css`
         border: none;
         font-family: "Times New Roman";
         font-weight: bold;
-        font-size: 12px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+        font-size: 18px;
     }
     .italic {
         border: none;
         font-family: "Times New Roman";
         font-weight: bold;
         font-style: italic;
-        font-size: 12px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+        font-size: 18px;
     }
     .underline {
         border: none;
         font-family: "Times New Roman";
         font-weight: bold;
         text-decoration: underline;
-        font-size: 12px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+        font-size: 18px;
     }
     `
 
