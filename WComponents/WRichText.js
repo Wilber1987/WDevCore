@@ -18,6 +18,7 @@ class ModelFiles {
     * @property {Boolean} [activeAttached]
 **/
 class WRichText extends HTMLElement {
+
     /**
     * @param {Config} [Config] 
     */
@@ -34,6 +35,7 @@ class WRichText extends HTMLElement {
         this.style.border = "1px solid rgb(222 222 222)"
         this.Config = Config;
         this.DrawComponent();
+        this.MaxColumns = 10;
     }
     connectedCallback() {
     }
@@ -97,11 +99,18 @@ class WRichText extends HTMLElement {
                 children: [CommandBtn, { tagName: "span", class: "tooltiptext", children: [command.commandName] }]
             }))
         });
-        OptionsSection.append(html`<button class="tableBtn ROption tooltip tooltipBtn">${this.tableBuilder}
+        OptionsSection.append(html`<button onclick="${() => this.DisplayTableBuilder()}" class="tableBtn ROption tooltip tooltipBtn">${this.tableBuilder}
             <svg class="" viewBox="0 0 20 20"><path d="M3 6v3h4V6H3zm0 4v3h4v-3H3zm0 4v3h4v-3H3zm5 3h4v-3H8v3zm5 0h4v-3h-4v3zm4-4v-3h-4v3h4zm0-4V6h-4v3h4zm1.5 8a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 17V4c.222-.863 1.068-1.5 2-1.5h13c.932 0 1.778.637 2 1.5v13zM12 13v-3H8v3h4zm0-4V6H8v3h4z"></path></svg>
             <svg class="ck ck-icon ck-reset_all-excluded ck-icon_inherit-color ck-dropdown__arrow" viewBox="0 0 10 10"><path d="M.941 4.523a.75.75 0 1 1 1.06-1.06l3.006 3.005 3.005-3.005a.75.75 0 1 1 1.06 1.06l-3.549 3.55a.75.75 0 0 1-1.168-.136L.941 4.523z"></path></svg></button>`)
         this.append(OptionsSection);
 
+    }
+    DisplayTableBuilder() {
+        if (this.tableBuilder.className.includes("active")) {
+            this.tableBuilder.classList.remove("active")
+        } else {
+            this.tableBuilder.classList.add("active")
+        }        
     }
 
     DrawAttached() {
@@ -175,8 +184,9 @@ class WRichText extends HTMLElement {
     FunctionClear() {
         // @ts-ignore
         this.value = this.Divinput.innerHTML = "";
-        // @ts-ignore
-        this.AttachedSection.innerHTML = "";
+        if (this.AttachedSection) {
+            this.AttachedSection.innerHTML = "";
+        }
         this.Files = [];
     }
     Commands = [
@@ -217,7 +227,109 @@ class WRichText extends HTMLElement {
         //{ commandName: "undo", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
         //{ commandName: "unlink", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
     ];
-    tableBuilder = html``
+    tableBuilder = html`<div class="tableBuilder" tabindex="-1">
+        <div class="ck">
+            <div class="btn-container">
+                ${this.BuildBtnTableMap(10)}    
+            </div>
+        </div>        
+        <style>
+            .tableBuilder {
+                position: absolute;
+                display: none;
+                flex-direction: column;
+                top: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #fff;
+                box-shadow: #c5c5c5 0 0 5px 0;
+                padding: 10px 10px 20px 10px;
+            }
+            .tableBuilder.active {
+                display: flex;
+            }
+            .tableBuilder .btn-container{
+                display: grid;
+                grid-template-columns: repeat(10, 15px);
+                grid-template-rows: repeat(10, 15px);
+                gap: 2px;
+            }
+            .tableBuilder .btn-container button{
+                overflow: hidden;
+                border:none;
+            }
+            .tableBuilder .btn-container button span{
+                display: none;
+                position: absolute;
+            }
+            .tableBuilder .btn-container button:hover{
+                background-color: #92c5e6;
+            }
+            .tableBuilder .btn-container button:hover > span{
+                display: block;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        </style>
+    </div>`
+    CreateTable(ev) {        
+        this.Divinput.append(this.CreateHtmlTable(ev));
+    }
+    CreateHtmlTable(event) {
+        const button = event.target;
+        const sizeString = button.querySelector('span').textContent;
+        const [rows, cols] = sizeString.split(' × ').map(Number);
+        const table = html`<table class="my-table"> <style>
+             .my-table  {      
+                font-family: Verdana, Geneva, Tahoma, sans-serif;  
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .my-table th,  .my-table td  {
+                border: solid 1px #c5c5c5;
+                padding: 5px;
+                line-height: 15px;
+                font-size: 15px;
+                min-height: 25px;
+                margin: 0px;
+                word-wrap: break-word; 
+                word-break: break-all; 
+                white-space: normal;  
+            }
+            .my-table th  {
+                font-weight: bold;
+            }   
+            .my-table th label::first-letter {
+                text-transform: uppercase;
+            }
+            .my-table tr:nth-child(odd) {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+        </style></table>`;
+        for (let i = 0; i < rows; i++) {
+            const row = WRender.Create({ tagName: "tr" });
+            for (let j = 0; j < cols; j++) {
+                if (i == 0) {
+                    row.append(WRender.Create({ tagName: "th" }));
+                } else {
+                    row.append(WRender.Create({ tagName: "td" }));
+                }
+            }
+            table.appendChild(row);
+        }
+        return table;
+    }
+    BuildBtnTableMap(num) {
+        const BtnArray = [];
+        for (let indexCol = 1; indexCol <= num; indexCol++) {
+            for (let indexRow = 1; indexRow <= num; indexRow++) {
+                BtnArray.push(html`<button onclick="${(ev) => { this.CreateTable(ev) }}"><span>${indexCol} × ${indexRow}</span></button>`);
+            }
+        }
+        return BtnArray
+    }
+
 }
 
 
@@ -226,12 +338,12 @@ const WRichTextStyle = css`
         height: 170px;
         display: block;
         margin: 0px;
-        padding: 10px;
+        padding: 20px;
         overflow-y: auto;
     }
     .WREditor:focus-visible  {
         outline-color : #b1d7f0;
-    }
+    }   
 
     w-rich-text .WOptionsSection {
         margin: 0px;
@@ -264,40 +376,6 @@ const WRichTextStyle = css`
         padding: 5px;
         text-align: right;
     }
-    .tableBuilder {
-        position: absolute;
-        display: flex;
-        flex-direction: column;
-        top: 40px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #fff;
-        box-shadow: #c5c5c5 0 0 5px 0;
-        padding: 10px;
-    }
-    .tableBuilder .btn-container{
-        display: grid;
-        grid-template-columns: repeat(10, 15px);
-        grid-template-rows: repeat(10, 15px);
-    }
-    .tableBuilder .btn-container button{
-        overflow: hidden;
-        border:none;
-    }
-    .tableBuilder .btn-container button span{
-        display: none;
-        position: absolute;
-    }
-    .tableBuilder .btn-container button:hover{
-        background-color: #92c5e6;
-    }
-    .tableBuilder .btn-container button:hover > span{
-        display: block;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
     .AttachBtn {
         padding: 5px;
         cursor: pointer;

@@ -112,7 +112,7 @@ class WCommentsComponent extends HTMLElement {
             this.shadowRoot?.append(this.MailsSelect)
         }
         this.shadowRoot?.append(this.OptionContainer, this.RitchOptionContainer)
-        this.DrawWCommentsComponent();
+        
 
     }
     saveComment = async () => {
@@ -150,24 +150,9 @@ class WCommentsComponent extends HTMLElement {
             await this.update();
             this.scrollToBottom();
         }, 10000)
-        setTimeout(() => { this.scrollToBottom() }, 100)
-    }
-    scrollToBottom = () => {
-        if (this.autoScroll) {
-            this.CommentsContainer.scrollTo({
-                top: this.CommentsContainer.scrollHeight,
-                behavior: 'smooth' // Desplazamiento suave
-            });
-        }
-    }
-    disconnectedCallback() {
-        this.Interval = null;
-    }
-    GetDestinatarios() {
-        // return this.Destinatarios;
-    }
-    DrawWCommentsComponent = async () => {
-        // Variable para evitar múltiples solicitudes
+        setTimeout(async () => { 
+            await this.update(false)
+            this.scrollToBottom() }, 100);
         let isLoading = false;
 
         // Definir la función de manejo de scroll por separado
@@ -202,8 +187,24 @@ class WCommentsComponent extends HTMLElement {
 
             };
         }
-
-        await this.update(true)
+        
+    }
+    scrollToBottom = () => {
+        if (this.autoScroll) {
+            this.CommentsContainer.scrollTo({
+                top: this.CommentsContainer.scrollHeight,
+                behavior: 'smooth' // Desplazamiento suave
+            });
+        }
+    }
+    disconnectedCallback() {
+        this.Interval = null;
+    }
+    GetDestinatarios() {
+        // return this.Destinatarios;
+    }
+    DrawWCommentsComponent = async () => {
+        // Variable para evitar múltiples solicitudes        
         //console.log(this.Dataset);
         this.Dataset.forEach(comment => {
             const idMessage = comment.Id_mensaje ?? comment.Id_Comentario;
@@ -256,7 +257,7 @@ class WCommentsComponent extends HTMLElement {
                 children: [
                     { tagName: "label", className: "nickname", innerHTML: comment.NickName ?? comment.Remitente },
                     { tagName: "p", innerHTML: comment.Body ?? comment.mensaje }, attachs,
-                    { tagName: "label", innerHTML: comment.Fecha?.toDateFormatEs() ?? comment.Created_at?.toDateFormatEs() }
+                    { tagName: "label", className: "date",innerHTML: comment.Fecha?.toDateTimeFormatEs() ?? comment.Created_at?.toDateTimeFormatEs() }
                 ]
             });
             const commentWrapper = html`<div id="MessageId${idMessage}"  class="message-wrapper ${commentIdUser == this.User.UserId ? "wraperSelf" : "wrapper"}">
@@ -329,14 +330,16 @@ class WCommentsComponent extends HTMLElement {
         .OptionContainer {     
             margin: 10px 0px;       
             display: grid;
-            grid-template-columns: calc(100% - 70px) 60px;
-            gap: 10px;
+            grid-template-columns: calc(100% - 120px) 100px;
+            gap: 20px;
             min-width: 400px;
         }
         .RichOptionContainer {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+            justify-content: flex-end;
+            gap: 10px;
         }        
         p {
             margin: 5px 0px;
@@ -403,6 +406,20 @@ class WCommentsComponent extends HTMLElement {
         .comment label, .commentSelf label, .comment p, .commentSelf p {
             display: block;
             text-align: left;
+        }
+        .commentSelf p, .comment p {
+            font-size: 14px;
+        }
+        .commentSelf p::first-letter, .comment p::first-letter {
+            text-transform: uppercase;
+        }
+        label.date {
+            font-size: 11px;
+            text-align: end;
+        }
+        .Btn-Mini {
+            width: 100px;
+            justify-self: right;
         }
         w-rich-text {
             margin-top: 10px;

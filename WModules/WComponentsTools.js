@@ -553,6 +553,18 @@ String.prototype.toDateFormatEs = function () {
         + ' de ' + fecha.getUTCFullYear();
 };
 
+String.prototype.toDateTimeFormatEs = function () {
+    if (this == null || this == undefined || this == "") return "";
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const dias_semana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const fecha = new Date(this);
+    return dias_semana[fecha.getDay()]
+        + ', ' + fecha.getDate()
+        + ' de ' + meses[fecha.getMonth()]
+        + ' de ' + fecha.getUTCFullYear()
+        + ' ' + pad(fecha.getHours()) + ':' + pad(fecha.getMinutes());
+};
+
 String.prototype.getMonthFormatEs = function () {
     if (this == null || this == undefined || this == "") return "";
     const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
