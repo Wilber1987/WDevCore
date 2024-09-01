@@ -141,7 +141,7 @@ class WAppNavigator extends HTMLElement {
                 if (elementNav.url == undefined) {
                     elementNav.url = "#" + this.id;
                 }
-                elementNav.onclick = async (ev) => {
+                elementNav.onclick = async (ev) => {                    
                     this.ActiveMenu(elementNav);
                     //console.log(this.Manager);
 
@@ -158,7 +158,7 @@ class WAppNavigator extends HTMLElement {
             }
             if (Index == 0 && element.SubNav == undefined) {
                 this.InitialNav = () => {
-                    elementNav.onclick();
+                    elementNav.onclick();     
                 }
             }
         });

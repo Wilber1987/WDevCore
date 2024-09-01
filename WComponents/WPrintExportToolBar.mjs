@@ -11,7 +11,7 @@ import { css } from "../WModules/WStyledRender.js";
     * @property {Function} [UploadAction]
 **/
 
-class WPrintExportToolBar extends HTMLElement {
+class WPrintExportToolBar extends HTMLElement {    
     /**
     * @param {Config} Config 
     */
@@ -66,6 +66,33 @@ class WPrintExportToolBar extends HTMLElement {
     }
     update() {
         this.Draw();
+    }
+    /**
+     * @param {HTMLElement} body
+     */
+    ExportPdf(body) {
+        const options = {
+            margin: 0,
+            filename: `file${Date.now}.pdf`,
+            image: { type: 'jpeg', quality: 1.0 },
+            html2canvas: { scale: 4, logging: true, dpi: 192, letterRendering: true },
+            jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+        };                      
+        // @ts-ignore
+        html2pdf().set(options).from(body).save();   
+    }
+    /**
+     * @param {HTMLElement} body
+     */
+    Print(body) {
+        //this.append(body); return;
+        const ventimp = window.open(' ', 'popimpr');
+        ventimp?.document.write(body.innerHTML);
+        ventimp?.focus();
+        setTimeout(() => {
+            ventimp?.print();
+            ventimp?.close();
+        }, 100)
     }
     CustomStyle = css`
         .toolbar {
