@@ -83,7 +83,7 @@ class WFilterOptions extends HTMLElement {
         }));
         this.ModelObject = this.ModelObject ?? this.Config.Dataset[0];
         for (const prop in this.ModelObject) {
-            const SelectData = WArrayF.GroupBy(this.Config.Dataset, prop).map(s => s[prop]);
+            const SelectData = WArrayF.GroupBy(this.Config.Dataset ?? [], prop).map(s => s[prop]);
             if (this.isDrawable(this.ModelObject, prop)) {
                 if (this.ModelObject[prop].__proto__ == Object.prototype) {
                     const filterControl = this.CreateModelControl(this.ModelObject, prop, this.ModelObject[prop].Dataset ?? SelectData);
@@ -218,7 +218,6 @@ class WFilterOptions extends HTMLElement {
                                 //TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
                                 let foraingKeyName = null;
                                 const foreynKeyExist = ModelProperty.ForeignKeyColumn != undefined;
-                                console.log(foreynKeyExist, ModelProperty.ForeignKeyColumn);
                                 if (!foreynKeyExist) {
                                     for (const propiedad in ModelProperty.ModelObject) {
                                         const keyNameSames = ModelProperty.ModelObject[propiedad].primary
@@ -250,7 +249,7 @@ class WFilterOptions extends HTMLElement {
                                 }
                             }
                             break;
-                        case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA": case "PASSWORD":
+                        case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "PASSWORD":
                             break;
                         case "RADIO": case "CHECKBOX":
                             /**TODO */

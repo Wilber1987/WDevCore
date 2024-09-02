@@ -6,7 +6,7 @@ import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 // @ts-ignore
 import { FilterData } from "../WModules/CommonModel.js";
 import { WCardTable } from "./WTableComponent.js";
-import {WArrayF} from "../WModules/WArrayF.js";
+import { WArrayF } from "../WModules/WArrayF.js";
 
 /**
  * @typedef {Object} ConfigMS 
@@ -34,7 +34,7 @@ class MultiSelect extends HTMLElement {
      * @param {HTMLElement|null} [Style] 
      */
     constructor(Config, Style = null) {
-        super();        
+        super();
         for (const prop in Config) {
             this[prop] = Config[prop]
         }
@@ -52,7 +52,7 @@ class MultiSelect extends HTMLElement {
             position: "relative",
             boxShadow: "0 0 5px #c1c1c1;",
             fontSize: "12px",
-            height: "initial"           
+            height: "initial"
         });
 
         this.MultiSelect = this.Config.MultiSelect ?? true;
@@ -82,8 +82,12 @@ class MultiSelect extends HTMLElement {
                         if (this.ModelObject[prop].hiddenFilter == true) {
                             continue;
                         }
-                        if (this.ModelObject[prop].type?.toUpperCase() == "TEXT") {
+                        if ((this.ModelObject[prop].type?.toUpperCase() == "TEXT")
+                            && ev.target.value.replaceAll(" ", "") != "") {
                             filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
+                        } else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER")
+                            && ev.target.value.replaceAll(" ", "") != "") {
+                            filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })
                         }
                     }
                     const responseDataset = await new this.ModelObject.constructor({ FilterData: [{ FilterType: "or", Filters: filterData }] }).Get();
@@ -246,7 +250,7 @@ class MultiSelect extends HTMLElement {
                 }
             }
         });
-        this.DrawLabel();        
+        this.DrawLabel();
     }
     SetOptions = () => {
         if (this.Config.IsFilterControl) {
@@ -254,7 +258,7 @@ class MultiSelect extends HTMLElement {
             this.style.padding = "0px";
             this.SearchControl.style.borderRadius = "0 10px 10px 0";
             this.SearchControl.onfocus = () => {
-                if (this.Config.IsFilterControl) { 
+                if (this.Config.IsFilterControl) {
                     this.DisplayOptions();
                 }
             }

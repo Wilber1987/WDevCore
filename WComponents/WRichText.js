@@ -311,9 +311,9 @@ class WRichText extends HTMLElement {
             const row = WRender.Create({ tagName: "tr" });
             for (let j = 0; j < cols; j++) {
                 if (i == 0) {
-                    row.append(WRender.Create({ tagName: "th" }));
+                    row.append(WRender.Create({ tagName: "th", innerHTML: "&nbsp;" }));
                 } else {
-                    row.append(WRender.Create({ tagName: "td" }));
+                    row.append(WRender.Create({ tagName: "td", innerHTML: "&nbsp;" }));
                 }
             }
             table.appendChild(row);

@@ -1,4 +1,4 @@
-import {EntityClass} from "./EntityClass.js";
+import { EntityClass } from "./EntityClass.js";
 
 class WArrayF {
 
@@ -96,29 +96,58 @@ class WArrayF {
         }
         return DataArraySR;
     }
+    /**
+     * @typedef {Object} Consolidado 
+        * @property {String} EvalProperty
+        * @property {Number} Max
+        * @property {Number} Min
+        * @property {Number} count
+        * @property {Number} rate
+        * @property {Number} sum
+        * @property {Number} avg
+        * @property {Array<Object>} Data
+    **/
 
     /**
      * Agrupa un arreglo por medio de un parametros
      * @param {Array} DataArray arreglo original
      * @param {String} param propiedad por la cual se va a evaluar el arreglo agrupado
-     * @param {String} sumParam parametro a sumar
-     * @returns Arreglo agrupado por parametro con su contador y suma
+     * @param {String} [sumProperty] parametro a sumar
+     * @returns {Array<Consolidado>} Arreglo agrupado por parametro con su contador, rate, avg, max, min y suma los ultimos 4 solo se retornan si sumProperty esta definido
      */
-    static GroupBy(DataArray, Property, sumProperty = null) {
-        let DataArraySR = []
+    static GroupBy(DataArray, Property, sumProperty) {
+        let DataArraySR = [];
+        let GroupData = {};
+        if (Property && sumProperty) {
+            GroupData = Object.groupBy(DataArray, (type) => type[Property]);
+        }
         DataArray?.forEach(element => {
             const DFilt = DataArraySR.find(x => x[Property] == element[Property]);
             if (!DFilt) {
                 const NewElement = {};
-                for (const prop in element) {
-                    NewElement[prop] = element[prop]
+                if (Property) {
+                    NewElement[Property] = element[Property];
+                    NewElement.EvalProperty = element[Property];
                 }
+                if (GroupData[NewElement[Property]]) {
+                    NewElement.Max = this.MaxValue(GroupData[NewElement[Property]], sumProperty)
+                    NewElement.Min = this.MinValue(GroupData[NewElement[Property]], sumProperty)
+                    NewElement.Data = GroupData[NewElement[Property]]
+                }
+                /*for (const prop in element) {
+                    NewElement[prop] = element[prop]
+                }*/
                 //console.log(element);
                 if (!element.hasOwnProperty("count")) {
                     element.count = 1;
                     NewElement.count = 1;
                 }
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
+                if (sumProperty != null && sumProperty != undefined && sumProperty != "count") {
+                    NewElement[sumProperty] = element[sumProperty] ?? 0;
+                    NewElement.sum = element[sumProperty] ?? 0;
+                    NewElement.avg = NewElement.sum / NewElement.count;
+                }
                 DataArraySR.push(NewElement)
             } else {
                 if (!element.count) {
@@ -128,8 +157,10 @@ class WArrayF {
                     DFilt.count = DFilt.count + element.count;
                 }
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
-                if (sumProperty != null && sumProperty != "count") {
+                if (sumProperty != null && sumProperty != undefined && sumProperty != "count") {
                     DFilt[sumProperty] = DFilt[sumProperty] + element[sumProperty];
+                    DFilt.sum += element[sumProperty] ?? 0;
+                    DFilt.avg = DFilt.sum / DFilt.count;
                 }
             }
         });
@@ -163,12 +194,14 @@ class WArrayF {
                 NewElement.count = element.count ?? 1;
                 //console.log(NewElement);
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
+                DFilt.avg = DFilt.count / DataArray.length;
                 DataArraySR.push(NewElement)
             } else {
                 //console.log(DFilt);
                 const countVal = element.count ?? 1;
                 DFilt.count = DFilt.count + countVal;
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
+                DFilt.avg = DFilt.count / DataArray.length;
                 if (sumParam != null && element[sumParam] != null && element[sumParam] != undefined) {
                     DFilt[sumParam] = DFilt[sumParam] + element[sumParam];
                 }
@@ -438,12 +471,12 @@ class WArrayF {
 
     static isNotConsolidable = (prop, ModelObject) => {
         if (ModelObject != undefined && ModelObject[prop]?.type != undefined && (
-                //|| ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
-                //|| ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
-                ModelObject[prop]?.primary == true
-                || ModelObject[prop]?.hidden == true
-                || ModelObject[prop]?.hiddenInTable == true
-            )
+            //|| ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+            //|| ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
+            ModelObject[prop]?.primary == true
+            || ModelObject[prop]?.hidden == true
+            || ModelObject[prop]?.hiddenInTable == true
+        )
             || ModelObject[prop]?.__proto__ == Function.prototype
             || ModelObject[prop]?.__proto__.constructor.name == "AsyncFunction") {
             return true;
@@ -500,4 +533,4 @@ class WArrayF {
     }
 }
 
-export {WArrayF};
+export { WArrayF };
