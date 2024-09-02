@@ -1,6 +1,6 @@
 import { data } from "./datos.js";
 
-import { ColumChart } from "../WComponents/WChartJSComponents.js";
+import { ColumChart, RadialChart } from "../WComponents/WChartJSComponents.js";
 
 function processFormResponses(responses) {
     const result = {};
@@ -78,9 +78,19 @@ result.forEach(res => {
         Title: res.question,
         Dataset: res.answers,
         //AttNameEval: "value",
-        EvalValue: "
-        ",
+        percentCalc: true,
+        MaxVal : 322,
+        EvalValue: "count",
         groupParams: ["value"]
-    }))
+    })),
+    app.append(new RadialChart({
+      Title: res.question,
+      Dataset: res.answers,
+      //AttNameEval: "value",
+      percentCalc: true,
+      MaxVal : 322,
+      EvalValue: "count",
+      AttNameEval: "value"
+  }))
 })
 

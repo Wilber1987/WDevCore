@@ -1,6 +1,6 @@
 import { WRender, html } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
-import {WArrayF} from "../WModules/WArrayF.js";
+import { WArrayF } from "../WModules/WArrayF.js";
 
 class ChartConfig {
     // TypeChart = 0;
@@ -20,9 +20,10 @@ class ChartConfig {
  * * @property {String} [AttNameEval]
  * * @property {String} [EvalValue]
  * * @property {String} [Title]
+ * * @property {Number} [MaxVal]
  * * @property {Array} [groupParams] 
  */
-const ColorsList = ["#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4", "#00bff3", "#e63da4", "#6a549f"];
+const ColorsList = ["#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4", "#065e76", "#e63da4", "#6a549f"];
 class ColumChart extends HTMLElement {
     /**
      * 
@@ -37,6 +38,13 @@ class ColumChart extends HTMLElement {
         this.IconsGroupColores = ["#ffc700", "#01a503", "#285a76", "#4640a3", "#8640a3"]
         this.MainChart = { type: "section", props: { class: "SectionBars" }, children: [] };
         this.GroupsProcessData = [];
+        this.ChartTable = html`<table>
+            <thead><th>${this.ChartInstance.Title}</th></thead>   
+        </table>`
+        this.ChartJson = {
+            title: this.ChartInstance.Title,
+            data: []
+        }
         this.attachShadow({ mode: "open" });
     }
     attributeChangedCallBack() {
@@ -65,6 +73,9 @@ class ColumChart extends HTMLElement {
             this.ChartInstance.DirectionChart = "row";
         }
         this.DrawChart();
+        //console.log(this.ChartTable);
+        console.log(this.ChartInstance.Title);
+        console.table(this.ChartJson.data);
     }
     InitializeDataset() {
         if (this.EvalValue == null && this.Dataset.length != 0) {
@@ -83,7 +94,8 @@ class ColumChart extends HTMLElement {
         });
         this.Totals = WArrayF.GroupByObject(this.ChartInstance.Dataset, object, this.EvalValue);
 
-        this.MaxVal = WArrayF.MaxValue(this.Totals, this.EvalValue);
+
+        this.MaxVal = this.ChartInstance.MaxVal ?? WArrayF.MaxValue(this.Totals, this.EvalValue);
         this.MinVal = WArrayF.MinValue(this.Totals, this.EvalValue);
         this.EvalArray = WArrayF.GroupBy(this.ChartInstance.Dataset, this.AttNameEval);
         if (this.ChartInstance.TypeChart?.toUpperCase() == "STACKED") {
@@ -134,16 +146,16 @@ class ColumChart extends HTMLElement {
         }
         return ObjGroup;
     }
-    ChargeBy = (data,properties = this.groupParams) => {
+    ChargeBy = (data, properties = this.groupParams) => {
         //let ObjGroup = Object.groupBy(Groups, (groupData) => groupData[this.groupParams[inicio]]);
-        
+
         //return ObjGroup;
         if (properties.length === 0) {
             return data;
         }
-        
+
         const [firstProperty, ...remainingProperties] = properties;
-        
+
         const groupedData = data.reduce((acc, item) => {
             const key = item[firstProperty];
             if (!acc[key]) {
@@ -152,11 +164,11 @@ class ColumChart extends HTMLElement {
             acc[key].push(item);
             return acc;
         }, {});
-        
+
         for (const key in groupedData) {
             groupedData[key] = this.ChargeBy(groupedData[key], remainingProperties);
         }
-        
+
         return groupedData;
     }
     DrawGroupBars = (Groups, div = this.MainChart, arrayP = {}, GroupIndex = 0) => {
@@ -232,10 +244,13 @@ class ColumChart extends HTMLElement {
             if (!color) {
                 Colors.push(GenerateColor());
             }
-            SectionLabels.appendChild(WRender.CreateStringNode(
-                `<label style="${style}"><span style="background:${Colors[index]}">
+            if (this.AttNameEval) {
+                SectionLabels.appendChild(WRender.CreateStringNode(
+                    `<label style="${style}"><span style="background:${Colors[index]}">
                 </span>${element[this.AttNameEval]}</label>`
-            ));
+                ));
+            }
+
             index++;
         })
         return SectionLabels;
@@ -260,6 +275,17 @@ class ColumChart extends HTMLElement {
                     ${labelCol}
                 </label>                
             </Bars>`;
+        this.ChartTable.appendChild(WRender.Create({
+            tagName: "tr", children: [
+                { tagName: "td", innerHTML: GroupName },
+                { tagName: "td", innerHTML: labelCol }
+            ]
+        }));
+        this.ChartJson.data.push({
+            descripcion: GroupName,
+            valor: DataValue,
+            porcentaje: labelCol
+        })
 
         if (this.ChartInstance.TypeChart == "Line") {
             WRender.SetStyle(Bars, {
@@ -482,17 +508,18 @@ class RadialChart extends HTMLElement {
             this.ChartInstance = new ChartConfig(this.data);
         }
         let ChartFragment = document.createElement("div");
-        ChartFragment.className = "WChartContainer";
+        ChartFragment.className = "WChartContainer WChartContainerRadial";
         if (this.ChartInstance.Title) {
             ChartFragment.append(this._AddSectionTitle(this.ChartInstance.Title));
         }
+
+        ChartFragment.append(this._AddSectionData(this.ChartInstance, WRender.createElementNS));
         ChartFragment.append(
             this.DrawSeries(
                 this.Dataset,
                 this.ChartInstance.Colors
             )
         );
-        ChartFragment.append(this._AddSectionData(this.ChartInstance, WRender.createElementNS));
         this.shadowRoot.append(ChartFragment);
     }
     _AddSectionTitle(Title) {
@@ -536,7 +563,7 @@ class RadialChart extends HTMLElement {
         let index = 0;
         let porcentajeF = 0;
         this.Dataset.forEach((element) => {
-            let porcentaje = parseInt((element[this.EvalValue] / total) * 100);
+            let porcentaje = (element[this.EvalValue] / total) * 100;
             //console.log(porcentaje, this.EvalValue, element[this.EvalValue], total);
             let color = element.color;
             if (this.ChartInstance.Colors) {
@@ -574,9 +601,9 @@ class RadialChart extends HTMLElement {
             })
 
             if (this.ChartInstance.percentCalc == true) {
-                TextSVG.append(document.createTextNode(porcentaje + "%"));
+                TextSVG.append(document.createTextNode(porcentaje.toFixed(1) + "%"));
             } else {
-                TextSVG.append(document.createTextNode(element[this.EvalValue]));
+                TextSVG.append(document.createTextNode(element[this.EvalValue].toFixed(1)));
             }
             let g = WRender.createElementNS({
                 type: "g",
@@ -653,6 +680,20 @@ const WChartStyle = (ChartInstance) => {
             position: relative;
             font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
+        .WChartContainerRadial {
+            display: grid;
+            grid-template-columns: calc(100% - 300px) 300px;
+            gap: 20px;
+        }
+        .WChartContainerRadial h3 {
+            grid-column: span 2;
+        }
+        .WChartContainerRadial .SectionLabels {
+            flex-direction: column;
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+        }
 
         .WChartContainer h3 {
             color: #444;
@@ -706,6 +747,12 @@ const WChartStyle = (ChartInstance) => {
         .SectionBars label {
             padding: 5px;
             min-height: 12px;
+            max-width: 120px;
+            box-sizing: border-box;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+
         }
 
         .GroupSection {
@@ -868,7 +915,7 @@ const WChartStyle = (ChartInstance) => {
             text-align: center;
             display: block;
             width: 100%;
-            height: 220px;
+            max-height: 300px;
         }
 
         .RadialDataBackground {
