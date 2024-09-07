@@ -184,7 +184,11 @@ class WFilterOptions extends HTMLElement {
                             }
                             break;
                         case "NUMBER":
-                            if (control.value != null && control.value != undefined && control.value != "") {
+                            if (control.value != null 
+                                && control.value != undefined 
+                                && control.value != ""
+                                && !isNaN(control.value)
+                            ) {
                                 filterType = "="
                                 values = [control.value];
                             }

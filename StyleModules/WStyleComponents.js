@@ -265,7 +265,8 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
     select,
     textarea{
         display: block;
-        width: calc(100% - 1.40rem) ;
+        width: calc(100%);        
+        box-sizing: border-box;
         padding: .47rem .75rem;
         font-size: .925rem;
         font-weight: 400;
