@@ -101,7 +101,7 @@ class WModalForm extends HTMLElement {
         this.Modal = {
             class: "ContainerFormWModal",
             style: {
-               // gridTemplateColumns: this.DivColumns,
+                gridTemplateColumns: this.DivColumns,
                 width: this.WidthContainer,
                 textAling: "center"
             },
