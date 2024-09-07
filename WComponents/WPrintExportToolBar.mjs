@@ -27,7 +27,7 @@ class WPrintExportToolBar extends HTMLElement {
         this.shadowRoot?.append(html`<div class="toolbar">
             ${this.Confg.PrintAction ? html`<button class="toolbar-button green" onclick="${(ev) => {
                 // @ts-ignore
-                this.Confg.PrintAction(ev)
+                this.Confg.PrintAction(this)
             }}">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
                     <path d="M6 2v6h12V2H6zm10 4H8V4h8v2zM4 8v8h16V8h2v12H2V8h2zm2 8h2v2H6v-2zm12-6v6H8v-6h10zm-8 4h6v-2H10v2zm6 6v-2h2v2h-2z"/>
@@ -37,7 +37,7 @@ class WPrintExportToolBar extends HTMLElement {
            
             ${this.Confg.ExportPdfAction ? html`<button class="toolbar-button yellow" onclick="${(ev) => {
                 // @ts-ignore
-                this.Confg.ExportPdfAction(ev)
+                this.Confg.ExportPdfAction(this)
             }}">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
                     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM5 19V5h14v14H5zm4-6h6v2H9v-2zm0-4h6v2H9V9z"/>
