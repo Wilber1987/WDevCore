@@ -73,7 +73,7 @@ class WPrintExportToolBar extends HTMLElement {
     ExportPdf(body) {
         const options = {
             margin: 0,
-            filename: `file${Date.now}.pdf`,
+            filename: `filename_${new Date()}.pdf`,
             image: { type: 'jpeg', quality: 1.0 },
             html2canvas: { scale: 4, logging: true, dpi: 192, letterRendering: true },
             jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }

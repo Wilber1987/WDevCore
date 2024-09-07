@@ -141,6 +141,8 @@ class WArrayF {
                 if (!element.hasOwnProperty("count")) {
                     element.count = 1;
                     NewElement.count = 1;
+                }else {
+                    NewElement.count = element.count;
                 }
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
                 if (sumProperty != null && sumProperty != undefined && sumProperty != "count") {
@@ -194,14 +196,12 @@ class WArrayF {
                 NewElement.count = element.count ?? 1;
                 //console.log(NewElement);
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
-                DFilt.avg = DFilt.count / DataArray.length;
                 DataArraySR.push(NewElement)
             } else {
                 //console.log(DFilt);
                 const countVal = element.count ?? 1;
                 DFilt.count = DFilt.count + countVal;
                 DFilt.rate = ((DFilt.count / DataArray.length) * 100).toFixed(2) + "%";
-                DFilt.avg = DFilt.count / DataArray.length;
                 if (sumParam != null && element[sumParam] != null && element[sumParam] != undefined) {
                     DFilt[sumParam] = DFilt[sumParam] + element[sumParam];
                 }

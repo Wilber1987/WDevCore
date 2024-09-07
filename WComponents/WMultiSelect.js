@@ -85,7 +85,7 @@ class MultiSelect extends HTMLElement {
                         if ((this.ModelObject[prop].type?.toUpperCase() == "TEXT")
                             && ev.target.value.replaceAll(" ", "") != "") {
                             filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
-                        } else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER")
+                        } else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER" &&  !isNaN(ev.target.value))
                             && ev.target.value.replaceAll(" ", "") != "") {
                             filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })
                         }

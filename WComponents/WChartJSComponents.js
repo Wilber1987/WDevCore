@@ -603,7 +603,7 @@ class RadialChart extends HTMLElement {
             if (this.ChartInstance.percentCalc == true) {
                 TextSVG.append(document.createTextNode(porcentaje.toFixed(1) + "%"));
             } else {
-                TextSVG.append(document.createTextNode(element[this.EvalValue].toFixed(1)));
+                TextSVG.append(document.createTextNode(element[this.EvalValue]?.toFixed(1)));
             }
             let g = WRender.createElementNS({
                 type: "g",
@@ -682,7 +682,7 @@ const WChartStyle = (ChartInstance) => {
         }
         .WChartContainerRadial {
             display: grid;
-            grid-template-columns: calc(100% - 300px) 300px;
+            grid-template-columns: 70% 30%;
             gap: 20px;
         }
         .WChartContainerRadial h3 {
@@ -693,6 +693,7 @@ const WChartStyle = (ChartInstance) => {
             display: flex;
             align-items: flex-start;
             gap: 5px;
+            max-width: 300px;
         }
 
         .WChartContainer h3 {
@@ -810,6 +811,7 @@ const WChartStyle = (ChartInstance) => {
             overflow: hidden;
             color: #fff;
             padding: 0px;
+            max-width: unset;
         }
 
         .BackGrounLineX {
@@ -967,6 +969,7 @@ const WChartStyle = (ChartInstance) => {
 
         .RadialChart {
             height: 100%;
+            max-width: 100%;
         }
 
         .circle {

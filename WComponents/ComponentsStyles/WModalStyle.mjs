@@ -88,7 +88,9 @@ export const WModalStyle = css`
        display: block;
        justify-content: center;
        padding: 5px;
-       overflow-y: auto;
+  }
+  .ObjectModalElementContainer {
+     overflow-y: auto;
   }
 
   @media (max-width: 1200px) {

@@ -148,7 +148,10 @@ class WForm extends HTMLElement {
         //sino es asi le asigna el valor de un objeto existente
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const Form = WRender.Create({ className: 'divForm' });
-        const ComplexForm = WRender.Create({ className: 'divComplexForm' });
+        const ModelComplexElements = Object.keys(this.Config.ModelObject).filter(o => this.Config.ModelObject[o]?.type?.toUpperCase() == "MASTERDETAIL" 
+        || this.Config.ModelObject[o]?.type?.toUpperCase() == "CALENDAR")
+        
+        const ComplexForm = WRender.Create({ className: 'divComplexForm', style: ModelComplexElements.length <= 1 ? "grid-template-columns: unset": "" });
         for (const prop in Model) {
             try {
                 Model[prop] = Model[prop] != null ? Model[prop] : undefined;
