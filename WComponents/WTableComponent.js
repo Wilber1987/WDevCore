@@ -42,6 +42,7 @@ class WTableComponent extends HTMLElement {
             AutoSetDate: Config.Options?.AutoSetDate ?? true,
             Sorts: this.Sorts,
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
+            EntityModel: Config.EntityModel, 
             Display: Config.Options?.FilterDisplay ?? false,
             UseEntityMethods: true,
             FilterFunction: (DFilt) => {
@@ -216,6 +217,8 @@ class WTableComponent extends HTMLElement {
      * @returns {Promise<HTMLElement>}
      */
     DrawTBody = async (Dataset = this.Dataset) => {
+        console.log(Dataset);
+        
         this.Table?.querySelector("tbody")?.remove();
         let tbody = WRender.Create({ tagName: "tbody" });
 

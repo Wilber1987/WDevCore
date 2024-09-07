@@ -90,8 +90,8 @@ class WCommentsComponent extends HTMLElement {
                 }
             ]
         })
-        this.Mails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.Mail);
-        this.SelectedMails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.Mail);
+        this.Mails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.EvalProperty);
+        this.SelectedMails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.EvalProperty);
 
 
 
