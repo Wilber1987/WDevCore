@@ -167,6 +167,15 @@ class WFilterOptions extends HTMLElement {
                     this.ModelObject.OrderData.push(sort);
                 });
             }
+            if (this.EntityModel) {
+                this.EntityModel.FilterData = [];
+                this.EntityModel.OrderData = [];
+                if (sorts) {
+                    sorts.forEach(sort => {
+                        this.EntityModel.OrderData.push(sort);
+                    });
+                }
+            }
             this.FilterControls.forEach(control => {
                 if (this.ModelObject[control.id]) {
                     let values;
@@ -184,8 +193,8 @@ class WFilterOptions extends HTMLElement {
                             }
                             break;
                         case "NUMBER":
-                            if (control.value != null 
-                                && control.value != undefined 
+                            if (control.value != null
+                                && control.value != undefined
                                 && control.value != ""
                                 && !isNaN(control.value)
                             ) {
@@ -235,7 +244,6 @@ class WFilterOptions extends HTMLElement {
                                     foraingKeyName = ModelProperty.ForeignKeyColumn;
                                 }
                                 if (foraingKeyName != null) {
-                                    console.log(foraingKeyName);
                                     values = []
                                     filterType = "IN";
                                     propiertyName = foraingKeyName;
@@ -250,6 +258,7 @@ class WFilterOptions extends HTMLElement {
                                         // @ts-ignore
                                         values.push(element[primaryKey]?.toString())
                                     });
+                                    //console.log(foraingKeyName, primaryKey, control.selectedItems, values);                                    
                                 }
                             }
                             break;
@@ -264,11 +273,13 @@ class WFilterOptions extends HTMLElement {
                         default:
                             break;
                     }
-                    /*console.log({
-                        PropName: control.id,
-                        FilterType: filterType,
-                        Values: values
-                    });*/
+                    if (this.EntityModel) {
+                        this.EntityModel.FilterData.push({
+                            PropName: propiertyName,
+                            FilterType: filterType,
+                            Values: values
+                        })
+                    }
                     this.ModelObject.FilterData.push({
                         PropName: propiertyName,
                         FilterType: filterType,
@@ -435,7 +446,7 @@ class WFilterOptions extends HTMLElement {
                     tagName: "input",
                     type: "date",
                     className: prop + " firstDate",
-                    id: prop + "first",                   
+                    id: prop + "first",
                     value: this.Config.AutoSetDate == true ?  // @ts-ignore
                         (this.Config.DateRange == FilterDateRange.YEAR ? new Date().subtractDays(865).toISO() : new Date().subtractDays(30).toISO()) : undefined,
                     placeholder: prop,

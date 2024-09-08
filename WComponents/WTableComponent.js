@@ -134,11 +134,13 @@ class WTableComponent extends HTMLElement {
         const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
         const isWithtModel = this.TableConfig.ModelObject?.Get != undefined
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
+        let chargeWithFilter = false;
         if ((Dataset.length == 0 || Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
             if (isWithtUrl) {
                 Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             }  else if (this.Options?.Filter == true){
-                await this.FilterOptions.filterFunction(this.Sorts)
+                await this.FilterOptions.filterFunction(this.Sorts);
+                chargeWithFilter = true;
             }  else if (isWithtModel) {
                 const model = this.TableConfig.EntityModel ?? this.TableConfig.ModelObject;
                 Dataset = await model.Get();
@@ -146,7 +148,10 @@ class WTableComponent extends HTMLElement {
         }
         this.withFilter = false;
         loadinModal.close();
-        const tbody = await this.DrawTBody(Dataset);
+        if (!chargeWithFilter) {
+            await this.DrawTBody(Dataset);
+        }
+        
         //this.Table.append(tbody);
         /*tbody.forEach(tb => {
             this.Table.append(WRender.createElement(tb));
@@ -217,7 +222,7 @@ class WTableComponent extends HTMLElement {
      * @returns {Promise<HTMLElement>}
      */
     DrawTBody = async (Dataset = this.Dataset) => {
-        console.log(Dataset);
+        //console.log(Dataset);
         
         this.Table?.querySelector("tbody")?.remove();
         let tbody = WRender.Create({ tagName: "tbody" });
@@ -258,7 +263,7 @@ class WTableComponent extends HTMLElement {
             if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
                     if (Action == null || (Action.rendered != undefined && Action.rendered(element) == true)) {
-                        console.log();
+                        //console.log();
                         return;
                     }
                     Options.append(WRender.Create({
@@ -269,7 +274,6 @@ class WTableComponent extends HTMLElement {
                         onclick: async (ev) => {
                             Action.action(element, ev.target);
                         }
-
                     }))
                 });
             }
