@@ -105,19 +105,19 @@ class WDetailObject extends HTMLElement {
                                     && ObjectDetail[prop] != undefined
                                     && ObjectDetail[prop] != null
                                     && ObjectDetail[prop].__proto__ == Array.prototype ? ObjectDetail[prop] : [];
-                                return new WAcorden({
+                                /*return new WAcorden({
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
-                                });
+                                });*/
 
-                                /*return new WTableComponent({
+                                return new WTableComponent({
                                     Options: { Search: true, Show: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,
                                     AddItemsFromApi: false,
                                     EntityModel: this.Config.EntityModel,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
-                                })*/
+                                })
                             }
                         });
                         break;

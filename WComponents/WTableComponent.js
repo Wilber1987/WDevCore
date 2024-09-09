@@ -128,7 +128,7 @@ class WTableComponent extends HTMLElement {
         //console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
         this.Table.innerHTML = "";
-        this.Table.append(WRender.createElement(this.DrawTHead()));
+       
         const loadinModal = new LoadinModal();
         this.shadowRoot?.append(loadinModal);
         const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
@@ -148,7 +148,9 @@ class WTableComponent extends HTMLElement {
         }
         this.withFilter = false;
         loadinModal.close();
+       
         if (!chargeWithFilter) {
+            this.Table.append(WRender.createElement(this.DrawTHead(Dataset.length > 0 ? Dataset[0] : this.ModelObject)));
             await this.DrawTBody(Dataset);
         }
         
@@ -193,10 +195,11 @@ class WTableComponent extends HTMLElement {
         }
         return null;
     }
-    DrawTHead = (element = this.ModelObject) => {
+    DrawTHead = (element) => {
         const thead = WRender.Create({ tagName: "thead" });
         let tr = WRender.Create({ tagName: "tr" })
-        for (const prop in element) {
+      
+        for (const prop in this.ModelObject) {
             if (this.IsDrawableRow(element, prop)) {
                 const { up, down } = this.CreateSortOptions(prop);
                 const th = WRender.Create({
@@ -357,11 +360,12 @@ class WTableComponent extends HTMLElement {
         if (this.TableConfig.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
             return true;
         }
-        else if ((this.ModelObject[prop]?.type == undefined
+        const hidden = typeof   this.ModelObject[prop]?.hidden === "function" ? this.ModelObject[prop]?.hidden(element)  : this.ModelObject[prop]?.hidden;
+        if ((this.ModelObject[prop]?.type == undefined
             || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             || this.ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
             || this.ModelObject[prop]?.primary == true
-            || this.ModelObject[prop]?.hidden == true
+            || hidden
             || this.ModelObject[prop]?.hiddenInTable == true)
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
