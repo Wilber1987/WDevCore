@@ -34,6 +34,9 @@ class WDetailObject extends HTMLElement {
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
         this.Manager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.shadowRoot.appendChild(StylesControlsV2.cloneNode(true));
+        this.style.height = "100%";
+        this.style.display = "block";
+        this.style.overflowY = "auto";
         this.append(new WStyledRender({
             ClassList: [
                 new WCssClass(`w-view-profile`, {
