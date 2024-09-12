@@ -20,18 +20,19 @@ class WModalForm extends HTMLElement {
         for (const p in Config) {
             this[p] = Config[p];
         }
+        this.DivColumns =  "calc(100%)";
         if (this.StyleForm == "columnX1") {
             this.WidthContainer = "40%";
-            this.DivColumns = this.Config.DivColumns = "calc(100%)";
+            this.Config.DivColumns = "calc(100%)";
         } else if (this.StyleForm == "columnX3") {
             this.WidthContainer = "80%";
-            this.DivColumns = this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
+            this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
         } else if (this.StyleForm == "FullScreen") {
             this.WidthContainer = "95%";
-            this.DivColumns = this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
+            this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
         } else {
             this.WidthContainer = "80%";
-            this.DivColumns = this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
+            this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
         }
     }
     attributeChangedCallBack() {

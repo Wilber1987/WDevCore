@@ -42,6 +42,7 @@ class WTableComponent extends HTMLElement {
             AutoSetDate: Config.Options?.AutoSetDate ?? true,
             Sorts: this.Sorts,
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
+            EntityModel: Config.EntityModel, 
             Display: Config.Options?.FilterDisplay ?? false,
             UseEntityMethods: true,
             FilterFunction: (DFilt) => {
@@ -127,17 +128,19 @@ class WTableComponent extends HTMLElement {
         //console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
         this.Table.innerHTML = "";
-        this.Table.append(WRender.createElement(this.DrawTHead()));
+       
         const loadinModal = new LoadinModal();
         this.shadowRoot?.append(loadinModal);
         const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
         const isWithtModel = this.TableConfig.ModelObject?.Get != undefined
         this.AddItemsFromApi = this.TableConfig.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
+        let chargeWithFilter = false;
         if ((Dataset.length == 0 || Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
             if (isWithtUrl) {
                 Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             }  else if (this.Options?.Filter == true){
-                await this.FilterOptions.filterFunction(this.Sorts)
+                await this.FilterOptions.filterFunction(this.Sorts);
+                chargeWithFilter = true;
             }  else if (isWithtModel) {
                 const model = this.TableConfig.EntityModel ?? this.TableConfig.ModelObject;
                 Dataset = await model.Get();
@@ -145,7 +148,12 @@ class WTableComponent extends HTMLElement {
         }
         this.withFilter = false;
         loadinModal.close();
-        const tbody = await this.DrawTBody(Dataset);
+       
+        if (!chargeWithFilter) {
+            this.Table.append(WRender.createElement(this.DrawTHead(Dataset.length > 0 ? Dataset[0] : this.ModelObject)));
+            await this.DrawTBody(Dataset);
+        }
+        
         //this.Table.append(tbody);
         /*tbody.forEach(tb => {
             this.Table.append(WRender.createElement(tb));
@@ -187,10 +195,11 @@ class WTableComponent extends HTMLElement {
         }
         return null;
     }
-    DrawTHead = (element = this.ModelObject) => {
+    DrawTHead = (element) => {
         const thead = WRender.Create({ tagName: "thead" });
         let tr = WRender.Create({ tagName: "tr" })
-        for (const prop in element) {
+      
+        for (const prop in this.ModelObject) {
             if (this.IsDrawableRow(element, prop)) {
                 const { up, down } = this.CreateSortOptions(prop);
                 const th = WRender.Create({
@@ -216,6 +225,8 @@ class WTableComponent extends HTMLElement {
      * @returns {Promise<HTMLElement>}
      */
     DrawTBody = async (Dataset = this.Dataset) => {
+        //console.log(Dataset);
+        
         this.Table?.querySelector("tbody")?.remove();
         let tbody = WRender.Create({ tagName: "tbody" });
 
@@ -255,7 +266,7 @@ class WTableComponent extends HTMLElement {
             if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
                     if (Action == null || (Action.rendered != undefined && Action.rendered(element) == true)) {
-                        console.log();
+                        //console.log();
                         return;
                     }
                     Options.append(WRender.Create({
@@ -266,7 +277,6 @@ class WTableComponent extends HTMLElement {
                         onclick: async (ev) => {
                             Action.action(element, ev.target);
                         }
-
                     }))
                 });
             }
@@ -350,11 +360,12 @@ class WTableComponent extends HTMLElement {
         if (this.TableConfig.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
             return true;
         }
-        else if ((this.ModelObject[prop]?.type == undefined
+        const hidden = typeof   this.ModelObject[prop]?.hidden === "function" ? this.ModelObject[prop]?.hidden(element)  : this.ModelObject[prop]?.hidden;
+        if ((this.ModelObject[prop]?.type == undefined
             || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             || this.ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
             || this.ModelObject[prop]?.primary == true
-            || this.ModelObject[prop]?.hidden == true
+            || hidden
             || this.ModelObject[prop]?.hiddenInTable == true)
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction") {

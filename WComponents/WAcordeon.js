@@ -92,48 +92,7 @@ class WAcorden extends HTMLElement {
     }
     CustomStyle = css`@import url(/css/variables.css);
         *{ font-family:  Montserrat, sans-serif;}
-        .accordion-button {
-            cursor: pointer;
-            position: relative;
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            align-items: center;
-            padding: 20px 20px;
-            font-size: .925rem;
-            color: #282c2f;
-            text-align: left;
-            background-color: var(--bs-accordion-btn-bg);
-            border: 0;
-            border-radius: 0;
-            overflow-anchor: none;
-            -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
-            transition: var(--bs-accordion-transition);            
-            justify-content: space-between;
-            text-transform: uppercase;
-            font-weight: 600;
-            transition: all 0.5s;
-        }
-        .accordion-button::after {
-            -ms-flex-negative: 0;
-            flex-shrink: 0;
-            width: 14px;
-            height: 14px;
-            margin-left: auto;
-            content: "";
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23282c2f'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-size: 14px;
-            transition: all 0.5s;
-        }
-        .active-btn {
-            background-color: rgb(210, 222, 244);            
-        }
-        .active-btn::after {
-            transform: rotate(180deg)
-        }
+        
         .accordion {
             border: 1px solid #d2d2d2;
             border-radius: 20px;

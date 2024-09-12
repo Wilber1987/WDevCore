@@ -18,7 +18,7 @@ function ModelFunction() { }
     CHECKBOX | TEXT | IMG | NUMBER | DATE | EMAIL | FILE | 
     TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | imagecapture 
     CALENDAR | OPERATION (requiere un action para funcionar)
-    * @property {Boolean} [hidden] desabilita la propiedad y la oculta
+    * @property {Boolean|Function} [hidden] desabilita la propiedad y la oculta
     * @property {Object} [Options] 
     * @property {Boolean} [hiddenInTable] oculta en la tabla
     * @property {Boolean|Function} [require]

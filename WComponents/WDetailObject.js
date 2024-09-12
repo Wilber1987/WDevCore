@@ -34,6 +34,9 @@ class WDetailObject extends HTMLElement {
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
         this.Manager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.shadowRoot.appendChild(StylesControlsV2.cloneNode(true));
+        this.style.height = "100%";
+        this.style.display = "block";
+        this.style.overflowY = "auto";
         this.append(new WStyledRender({
             ClassList: [
                 new WCssClass(`w-view-profile`, {
@@ -105,19 +108,19 @@ class WDetailObject extends HTMLElement {
                                     && ObjectDetail[prop] != undefined
                                     && ObjectDetail[prop] != null
                                     && ObjectDetail[prop].__proto__ == Array.prototype ? ObjectDetail[prop] : [];
-                                return new WAcorden({
+                                /*return new WAcorden({
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
-                                });
+                                });*/
 
-                                /*return new WTableComponent({
+                                return new WTableComponent({
                                     Options: { Search: true, Show: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,
                                     AddItemsFromApi: false,
                                     EntityModel: this.Config.EntityModel,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
-                                })*/
+                                })
                             }
                         });
                         break;
