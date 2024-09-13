@@ -147,7 +147,9 @@ class WAppNavigator extends HTMLElement {
 
                     if (this.NavStyle == "tab") {
                         const object = await element.action();
-                        this.Manager?.NavigateFunction("element" + Index, object);
+                        if (object) {
+                            this.Manager?.NavigateFunction("element" + Index, object);
+                        }                       
                     } else {
                         if (element.action != undefined) {
                             element.action();

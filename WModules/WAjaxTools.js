@@ -1,57 +1,53 @@
+//@ts-check
+import { LoadinModal } from "../WComponents/LoadinModal.js";
+import { ModalMessege } from "../WComponents/WForm.js";
+
+
+class PostConfig {
+    /**
+    * @param {Partial<PostConfig>} [props] 
+    */
+    constructor(props) {
+        for (const prop in props) {
+            this[prop] = props[prop];
+        }
+    }
+    /**  @type {String} */ RequestType = "POST";
+    /**  @type {String} */ HeaderType = "json";
+    /**  @type {String} */ CSRFToken = "";
+}
 class WAjaxTools {
-    static Request = async (Url, typeRequest, Data = {}, typeHeader) => {
+    /**
+    * @param {String} Url
+    * @param {Object} [Data]
+    * @param {PostConfig} [PostConfig]
+    * @returns {Promise<any>}
+    */
+    static Request = async (Url, Data = {}, PostConfig) => {
+        const loadinModal = new LoadinModal();
         try {
-            let ContentType = "application/json; charset=utf-8";
-            let Accept = "*/*";
-            if (typeHeader == "form") {
-                ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-                Accept = "*/*";
-            }
-            let dataRequest = {
-                method: typeRequest,
-                headers: {
-                    'Content-Type': ContentType,
-                    'Accept': Accept,
-                    dataType: 'json',
-                }
-            }
-            if (Data != {}) {
-                dataRequest.body = JSON.stringify(Data);
-            }
-            let response = await fetch(Url,);
-            const ProcessRequest = await this.ProcessRequest(response, Url);
+            const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);
+            document.body.appendChild(loadinModal);
+            let response = await fetch(Url, config);
+            const ProcessRequest = await WAjaxTools.ProcessRequest(response, Url);
+            loadinModal.close();
             return ProcessRequest;
         } catch (error) {
+            loadinModal.close();
             if (error == "TypeError: Failed to fetch") {
-                return this.LocalData(Url);
+                //return WAjaxTools.LocalData(Url);
             }
         }
     }
-    static PostRequest = async (Url, Data = {}, PostConfig = {}) => {
+    /**
+    * @param {String} Url
+    * @param {Object} Data
+    * @param {PostConfig} postConfig 
+    * @returns {Promise<any>}
+    */
+    static PostRequest = async (Url, Data = {}, postConfig = new PostConfig()) => {
         try {
-            let ContentType = "application/json; charset=utf-8";
-            let Accept = "*/*";
-            if (PostConfig.typeHeader != undefined && PostConfig.typeHeader == "form") {
-                ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-                Accept = "*/*";
-            }
-            const ConfigRequest = {
-                method: 'POST',
-                //credentials: "same-origin",
-                cache: "force-cache",
-                headers: {
-                    'Content-Type': ContentType,
-                    'Accept': Accept,
-                    //"X-Requested-With": "XMLHttpRequest",
-                },
-                body: JSON.stringify(Data)
-            }
-            if (PostConfig.token != undefined && PostConfig.token != "") {
-                ConfigRequest.headers['X-CSRF-TOKEN'] = PostConfig.token
-            }
-            let response = await fetch(Url, ConfigRequest);
-            const ProcessRequest = await this.ProcessRequest(response, Url);
-            return ProcessRequest;
+            return await WAjaxTools.Request(Url, Data, postConfig);
         } catch (error) {
             console.log(error);
             throw error;
@@ -62,15 +58,7 @@ class WAjaxTools {
     }
     static GetRequest = async (Url) => {
         try {
-            let response = await fetch(Url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-            const ProcessRequest = await this.ProcessRequest(response, Url);
-            return ProcessRequest;
+            return await WAjaxTools.Request(Url);
         } catch (error) {
             console.log(error)
             if (error == "TypeError: Failed to fetch") {
@@ -82,13 +70,8 @@ class WAjaxTools {
         if (response.status == 400 || response.status == 403 || response.status == 404 || response.status == 500) {
             const messageError = await response.text();
             var lineas = messageError.split('\n');
-            alert(messageError)
-            throw new Error(this.ProcessError(lineas[0])).message;
-            if (typeof response !== "undefined" && typeof response !== "null" && response != "") {
-                return this.LocalData(Url);
-            } else {
-                return [];
-            }
+            document.body.appendChild(ModalMessege(lineas));            
+            throw new Error(this.ProcessError(lineas[0])).message;            
         } else {
             try {
                 response = await response.json(response);
@@ -96,11 +79,35 @@ class WAjaxTools {
                 return response;
             } catch (error) {
                 console.log(error);
-                console.log(response);                
-                console.log(`ocurrio un error al procesar los datos de la respuesta - ${Url}`  );
+                console.log(response);
+                console.log(`ocurrio un error al procesar los datos de la respuesta - ${Url}`);
                 return response;
             }
         }
+    }
+
+    static BuildConfigRequest(postConfig = new PostConfig(), Data) {
+        let ContentType = "application/json; charset=utf-8";
+        let Accept = "*/*";
+        if (postConfig.HeaderType == HeaderType.FORM) {
+            ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+            Accept = "*/*";
+        }
+        let dataRequest = {
+            method: postConfig.RequestType,
+            headers: {
+                'Content-Type': ContentType,
+                'Accept': Accept,
+                dataType: 'json',
+            }
+        };
+        if (postConfig.RequestType == RequestType.POST) {
+            dataRequest.body = JSON.stringify(Data ?? {});
+        }
+        if (postConfig.CSRFToken != undefined && postConfig.CSRFToken != "") {
+            dataRequest.headers['X-CSRF-TOKEN'] = postConfig.CSRFToken;
+        }
+        return dataRequest;
     }
 
     static ProcessError(/**@type {String}*/string) {
@@ -116,4 +123,15 @@ class WAjaxTools {
     }
 }
 
-export {WAjaxTools};
+export { WAjaxTools };
+
+const RequestType = {
+    GET: "GET",
+    POST: "POST",
+    PUT: "PUT",
+    DELETE: "DELETE"
+}
+const HeaderType = {
+    JSON: "json",
+    FORM: "form"
+}

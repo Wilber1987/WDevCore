@@ -62,7 +62,7 @@ class LoadinModal extends HTMLElement {
             bottom: 0;
             left: 0;
             background-color: rgba(0, 0, 0, .5);
-            z-index: 100;
+            z-index: 20000;
             opacity: 0;
             transition: all 0.3s;
         }

@@ -42,7 +42,7 @@ class WTableComponent extends HTMLElement {
             AutoSetDate: Config.Options?.AutoSetDate ?? true,
             Sorts: this.Sorts,
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
-            EntityModel: Config.EntityModel, 
+            EntityModel: Config.EntityModel,
             Display: Config.Options?.FilterDisplay ?? false,
             UseEntityMethods: true,
             FilterFunction: (DFilt) => {
@@ -128,7 +128,7 @@ class WTableComponent extends HTMLElement {
         //console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
         this.Table.innerHTML = "";
-       
+
         const loadinModal = new LoadinModal();
         this.shadowRoot?.append(loadinModal);
         const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
@@ -138,22 +138,22 @@ class WTableComponent extends HTMLElement {
         if ((Dataset.length == 0 || Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
             if (isWithtUrl) {
                 Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
-            }  else if (this.Options?.Filter == true){
+            } else if (this.Options?.Filter == true) {
                 await this.FilterOptions.filterFunction(this.Sorts);
                 chargeWithFilter = true;
-            }  else if (isWithtModel) {
+            } else if (isWithtModel) {
                 const model = this.TableConfig.EntityModel ?? this.TableConfig.ModelObject;
                 Dataset = await model.Get();
             }
         }
         this.withFilter = false;
         loadinModal.close();
-       
+
         if (!chargeWithFilter) {
             this.Table.append(WRender.createElement(this.DrawTHead(Dataset.length > 0 ? Dataset[0] : this.ModelObject)));
             await this.DrawTBody(Dataset);
         }
-        
+
         //this.Table.append(tbody);
         /*tbody.forEach(tb => {
             this.Table.append(WRender.createElement(tb));
@@ -198,7 +198,7 @@ class WTableComponent extends HTMLElement {
     DrawTHead = (element) => {
         const thead = WRender.Create({ tagName: "thead" });
         let tr = WRender.Create({ tagName: "tr" })
-      
+
         for (const prop in this.ModelObject) {
             if (this.IsDrawableRow(element, prop)) {
                 const { up, down } = this.CreateSortOptions(prop);
@@ -226,7 +226,7 @@ class WTableComponent extends HTMLElement {
      */
     DrawTBody = async (Dataset = this.Dataset) => {
         //console.log(Dataset);
-        
+
         this.Table?.querySelector("tbody")?.remove();
         let tbody = WRender.Create({ tagName: "tbody" });
 
@@ -360,7 +360,7 @@ class WTableComponent extends HTMLElement {
         if (this.TableConfig.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
             return true;
         }
-        const hidden = typeof   this.ModelObject[prop]?.hidden === "function" ? this.ModelObject[prop]?.hidden(element)  : this.ModelObject[prop]?.hidden;
+        const hidden = typeof this.ModelObject[prop]?.hidden === "function" ? this.ModelObject[prop]?.hidden(element) : this.ModelObject[prop]?.hidden;
         if ((this.ModelObject[prop]?.type == undefined
             || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             || this.ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
@@ -827,18 +827,23 @@ class WCardTable extends HTMLElement {
                     break;
                 case "MASTERDETAIL":
                     break;
-                case "Date":
+                case "MONEY":
+                    this.CardTableContainer.append(WRender.Create({
+                        tagName: "label",
+                        innerText: WOrtograficValidation.es(prop) + ": " + (value != undefined && value != null && value != "" ? `${ConvertToMoneyString(parseFloat(value))}` : "-")
+
+                    }));
                     break;
                 default:
-
-                    this.CardTableContainer.append(
-                        WRender.Create({
-                            tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)
-                        }))
+                    this.CardTableContainer.append(WRender.Create({
+                        tagName: "label",
+                        innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)
+                    }));
                     break;
             }
         }
     }
+
     CardStyle = css`
         .CardTableContainer{
             display: grid;

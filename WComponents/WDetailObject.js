@@ -82,7 +82,6 @@ class WDetailObject extends HTMLElement {
                         if (ObjectDetail[prop] != undefined && ObjectDetail[prop] != null) {
                             ImageCards.append(ControlBuilder.BuildImage(ObjectDetail[prop], this.Config.ImageUrlPath))
                         }
-
                         break;
                     default:
                         break;
@@ -128,11 +127,10 @@ class WDetailObject extends HTMLElement {
                         tabElements.push({
                             name: Model[prop].label ?? WOrtograficValidation.es(prop), url: "#",
                             action: async (ev) => {
-                                this.Manager.NavigateFunction(prop, new ProfileCard({
+                                return new ProfileCard({
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     ObjectDetail: ObjectDetail[prop]
-
-                                }));
+                                })
                             }
                         });
                         break;
