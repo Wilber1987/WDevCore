@@ -28,7 +28,7 @@ class WAppNavigator extends HTMLElement {
         this.Inicialize = Config.Inicialize;
         this.alignItems = Config.alignItems;
         this.DisplayMode = Config.DisplayMode;
-        this.Elements = Config.Elements;
+        this.Elements = Config.Elements ?? [];
         this.DarkMode = Config.DarkMode;
         this.Direction = Config.Direction;
         this.NavStyle = Config.NavStyle;

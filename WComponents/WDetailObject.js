@@ -34,7 +34,6 @@ class WDetailObject extends HTMLElement {
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
         this.Manager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.shadowRoot.appendChild(StylesControlsV2.cloneNode(true));
-        this.style.height = "100%";
         this.style.display = "block";
         this.style.overflowY = "auto";
         this.append(new WStyledRender({
@@ -69,7 +68,10 @@ class WDetailObject extends HTMLElement {
         //         }
         //     }]
         // })
-        this.shadowRoot.append(WRender.createElement(this.styleComponent), this.ProfileContainer, this.ComponentTab, this.TabContainer);
+        this.shadowRoot.append(WRender.createElement(this.styleComponent), this.ProfileContainer);
+        if (this.ComponentTab.Elements.length > 0) {
+            this.shadowRoot.append(this.ComponentTab, this.TabContainer);
+        }
     }
     SetImage = (ObjectDetail, Model) => {
         let isImg = false;
@@ -314,7 +316,11 @@ class ProfileCard extends HTMLElement {
     }
 
     createPropDetail(ObjectDetail, prop, Model) {
-        ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop];
+        const descriptor = Object.getOwnPropertyDescriptor(ObjectDetail, prop);        
+        if (descriptor && typeof descriptor.get !== 'function') {
+            ObjectDetail[prop] = ObjectDetail[prop] == null || ObjectDetail[prop] == undefined ? "" : ObjectDetail[prop];
+        }
+
         if (Model != undefined && Model[prop] != undefined && Model[prop].__proto__ == Object.prototype && Model[prop].type) {
             switch (Model[prop].type.toUpperCase()) {
                 case "TEXT": case "SELECT":
