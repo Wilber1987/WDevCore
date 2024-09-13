@@ -353,9 +353,75 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         transform: rotate(-90deg);
         margin-left: 10px;
     }
+    //BOTTON ACORDEON    
 
+    .accordion-button {
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 20px 20px;
+        font-size: .925rem;
+        color: #282c2f;
+        text-align: left;
+        background-color: var(--bs-accordion-btn-bg);
+        border: 0;
+        border-radius: 0;
+        overflow-anchor: none;
+        -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
+        transition: var(--bs-accordion-transition);     
+        justify-content: space-between;
+        text-transform: uppercase;
+        font-weight: 600;
+        transition: all 0.5s;
+    }
+    .accordion-button::after {
+        -ms-flex-negative: 0;
+        flex-shrink: 0;
+        width: 14px;
+        height: 14px;
+        margin-left: auto;
+        content: "";
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23282c2f'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+        background-repeat: no-repeat;
+        background-size: 14px;
+        transition: all 0.5s;
+    }
+    .active-btn {
+        background-color: rgb(210, 222, 244);       
+    }
+    .active-btn::after {
+        transform: rotate(180deg);
+    }
+    //BOTON ACORDEON VERTICAL
     .btn-go:hover::after {
         margin-left: 15px; /* Desplaza la flecha 5px hacia la derecha en el hover */
+    }
+    .vertical-acordeon-btn {     
+       display: flex;   
+       gap: 10px;    
+       font-size: .925rem;
+       align-items: center;
+       border: none;
+       background-color: unset;
+    }
+    .vertical-acordeon-btn::after {
+        display: block;
+        content: " ";
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23282c2f'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+        transition: all 0.3s;
+        height: 15px;
+        width: 15px;
+        background-repeat: no-repeat;
+        background-size: 14px;
+        background-position: 50% 50%;
+        transition: all 0.5s;
+        border-radius: 50%;
+        padding: 10px;
+        
+    }
+    .vertical-acordeon-btn.btnactive::after {
+        transform: rotate(-90deg);
     }
 `
 
