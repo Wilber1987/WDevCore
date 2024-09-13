@@ -69,8 +69,9 @@ class WAjaxTools {
     static ProcessRequest = async (response, Url) => {
         if (response.status == 400 || response.status == 403 || response.status == 404 || response.status == 500) {
             const messageError = await response.text();
-            var lineas = messageError.split('\n');
-            document.body.appendChild(ModalMessege(lineas));            
+            var lineas = messageError.split(/\r?\n/);
+            console.log(lineas);            
+            document.body.appendChild(ModalMessege(lineas[0]));      
             throw new Error(this.ProcessError(lineas[0])).message;            
         } else {
             try {
