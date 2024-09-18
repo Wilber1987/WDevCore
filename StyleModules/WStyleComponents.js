@@ -352,32 +352,9 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         width: 15px;
         transform: rotate(-90deg);
         margin-left: 10px;
-    }
-    //BOTTON ACORDEON    
-
-    .accordion-button {
-        cursor: pointer;
-        position: relative;
-        display: flex;
-        align-items: center;
-        padding: 20px 20px;
-        font-size: .925rem;
-        color: #282c2f;
-        text-align: left;
-        background-color: var(--bs-accordion-btn-bg);
-        border: 0;
-        border-radius: 0;
-        overflow-anchor: none;
-        -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
-        transition: var(--bs-accordion-transition);     
-        justify-content: space-between;
-        text-transform: uppercase;
-        font-weight: 600;
-        transition: all 0.5s;
-    }
-    .accordion-button::after {
-        -ms-flex-negative: 0;
-        flex-shrink: 0;
+    } 
+     /*BOTON ACORDEON HOTIZONTAL*/   
+    .accordion-button::after {      
         width: 14px;
         height: 14px;
         margin-left: auto;
@@ -386,14 +363,37 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         background-repeat: no-repeat;
         background-size: 14px;
         transition: all 0.5s;
+        transform: rotate(-90deg);
+    }    
+    .accordion-button {
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        font-size: .925rem;
+        border-radius: 10px;
+        color: #282c2f;
+        text-align: left;
+        border: 0;
+        overflow-anchor: none;
+        transition: color 0.15s ease-in-out;
+        background-color: 0.15s ease-in-out;
+        border-color: 0.15s ease-in-out;
+        box-shadow: 0.15s ease-in-outp;
+        justify-content: space-between;
+        text-transform: uppercase;
+        font-weight: 600;
+        transition: all 0.5s;
+        gap: 10px;
     }
     .active-btn {
         background-color: rgb(210, 222, 244);       
     }
-    .active-btn::after {
-        transform: rotate(180deg);
+    .accordion-button.active-btn::after {
+        transform: rotate(0deg);
     }
-    //BOTON ACORDEON VERTICAL
+    /*BOTON ACORDEON VERTICAL*/
     .btn-go:hover::after {
         margin-left: 15px; /* Desplaza la flecha 5px hacia la derecha en el hover */
     }
@@ -420,7 +420,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         padding: 10px;
         
     }
-    .vertical-acordeon-btn.btnactive::after {
+    .vertical-acordeon-btn.active-btn::after {
         transform: rotate(-90deg);
     }
 `

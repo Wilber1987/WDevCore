@@ -6,7 +6,7 @@ import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
 import { ChangePasswordModel, ChangeRolesModel, ChangeStateModel, Security_Permissions, Security_Roles, Security_Users } from "./SecurityModel.js";
 import { Tbl_Profile } from "./Tbl_Profile.js";
-import {WAjaxTools} from "../WModules/WAjaxTools.js";
+import { WAjaxTools } from "../WModules/WAjaxTools.js";
 window.addEventListener("load", async () => {
     const DOMManager = new ComponentsManager({ MainContainer: Main });
     const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});
@@ -15,14 +15,15 @@ window.addEventListener("load", async () => {
     Aside.append(WRender.Create({ tagName: "h3", innerText: "Mantenimiento de Usuarios" }));
     Aside.append(new WAppNavigator({
         DarkMode: false,
-        Direction: "column",
+        Direction: "row",
+        NavStyle: "tab",
         Elements: [
             ElementTab("Roles", DOMManager, new Security_Roles({
-                Security_Permissions_Roles: { type: "multiselect",  ModelObject: new Security_Permissions(), Dataset: Permisos }
+                Security_Permissions_Roles: { type: "multiselect", ModelObject: new Security_Permissions(), Dataset: Permisos }
             })),
             ElementTab("Permisos", DOMManager, new Security_Permissions()),
             ElementTab("Usuarios", DOMManager, new Security_Users({
-                Security_Users_Roles: { type: "multiselect", ModelObject: new Security_Roles(),  Dataset: Roles }
+                Security_Users_Roles: { type: "multiselect", ModelObject: new Security_Roles(), Dataset: Roles }
             })),
         ]
     }));
@@ -80,10 +81,9 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
                     ]
                 }
             });
-            DOMManager.NavigateFunction(Model.constructor.name,
-                WRender.Create({
-                    className: "container", children: [mainComponent]
-                }));
+            return WRender.Create({
+                className: "container", children: [mainComponent]
+            });
         }
     };
 }

@@ -141,7 +141,7 @@ class WArrayF {
                 if (!element.hasOwnProperty("count")) {
                     element.count = 1;
                     NewElement.count = 1;
-                }else {
+                } else {
                     NewElement.count = element.count;
                 }
                 NewElement.rate = ((1 / DataArray.length) * 100).toFixed(2) + "%";
@@ -530,6 +530,27 @@ class WArrayF {
 
         }
         return replacerElement;
+    }
+    /**
+     * @param {Array<OrderData>} [sorts]
+     * @param {any[]} DFilt
+     */
+    static SortArray(sorts, DFilt) {
+        if (sorts && sorts.length > 0) {
+            DFilt.sort((a, b) => {
+                for (const sort of sorts) {
+                    const { PropName, OrderType } = sort;
+                    // Verificar si la propiedad existe en los objetos
+                    if (a[PropName] < b[PropName]) {
+                        return OrderType === "ASC" ? -1 : 1;
+                    }
+                    if (a[PropName] > b[PropName]) {
+                        return OrderType === "ASC" ? 1 : -1;
+                    }
+                }
+                return 0; // Si los valores son iguales, no se cambia el orden
+            });
+        }
     }
 }
 

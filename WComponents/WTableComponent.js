@@ -29,6 +29,8 @@ class WTableComponent extends HTMLElement {
         this.attachShadow({ mode: "open" });
         this.TypeMoney = Config.TypeMoney;
         this.TableConfig = Config ?? {};
+        this.TableConfig.isActiveSorts = this.TableConfig.isActiveSorts ?? true;
+        this.TableConfig.isActiveMultiSorts = this.TableConfig.isActiveMultiSorts ?? false;
         this.Dataset = this.TableConfig.Dataset ?? [];
         this.ThOptions = WRender.Create({ class: "thOptions" });
         this.Table = WRender.Create({ tagName: "Table", className: this.TableClass, id: "MainTable" + this.id });
@@ -46,7 +48,6 @@ class WTableComponent extends HTMLElement {
             Display: Config.Options?.FilterDisplay ?? false,
             UseEntityMethods: true,
             FilterFunction: (DFilt) => {
-                console.log("filter...");
                 this.withFilter = true;
                 this.DrawTable(DFilt);
             }
@@ -137,6 +138,7 @@ class WTableComponent extends HTMLElement {
         let chargeWithFilter = false;
         if ((Dataset.length == 0 || Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
             if (isWithtUrl) {
+                // @ts-ignore
                 Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
             } else if (this.Options?.Filter == true) {
                 await this.FilterOptions.filterFunction(this.Sorts);
@@ -304,56 +306,59 @@ class WTableComponent extends HTMLElement {
             tagName: 'input', type: 'button',
             className: 'sort-up ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "ASC") ? "sort-active" : ""),
             onclick: async (ev) => {
-                ev.target.disabled = true;
-                const sort = new OrderData({ OrderType: "ASC", PropName: prop });
-                const findSort = this.Sorts.find(s => s.PropName == prop);
-                if (findSort) {
-                    if (findSort.OrderType == sort.OrderType) {
-                        this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
-                        up.className = "sort-up";
-                        down.className = "sort-down";
-                    } else {
-                        findSort.OrderType = "ASC";
-                        up.className = "sort-up sort-active";
-                        down.className = "sort-down";
-                    }
-                } else {
-                    this.Sorts.push(sort);
-                    up.className = "sort-up sort-active";
-                    down.className = "sort-down";
-                }
-                await this.FilterOptions.filterFunction(this.Sorts);
-                ev.target.disabled = false;
-
+                await this.ExecuteSort(ev, prop, up, down, "ASC");
             }
         });
         const down = WRender.Create({
             tagName: 'input', type: 'button',
             className: 'sort-down ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "DESC") ? "sort-active" : ""),
             onclick: async (ev) => {
-                ev.target.disabled = true;
-                const sort = new OrderData({ OrderType: "DESC", PropName: prop });
-                const findSort = this.Sorts.find(s => s.PropName == prop);
-                if (findSort) {
-                    if (findSort.OrderType == sort.OrderType) {
-                        this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
-                        up.className = "sort-up";
-                        down.className = "sort-down";
-                    } else {
-                        findSort.OrderType = "DESC";
-                        up.className = "sort-up";
-                        down.className = "sort-down sort-active";
-                    }
-                } else {
-                    this.Sorts.push(sort);
-                    up.className = "sort-up";
-                    down.className = "sort-down sort-active";
-                }
-                await this.FilterOptions.filterFunction(this.Sorts);
-                ev.target.disabled = false;
+               
             }
         });
         return { up, down };
+    }
+
+    async ExecuteSort(ev, prop, up, down, order) {
+        ev.target.disabled = true;
+        const sort = new OrderData({ OrderType: order, PropName: prop });
+        const findSort = this.Sorts.find(s => s.PropName == prop);
+        if (this.TableConfig.isActiveMultiSorts != true) { 
+            this.querySelectorAll(".sort-active").forEach(element => {
+                element.classList.remove("sort-active");
+            });
+        }
+        if (findSort) {
+            if (findSort.OrderType == sort.OrderType) {
+                this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
+                up.className = "sort-up";
+                down.className = "sort-down";
+            } else {
+                findSort.OrderType = order;
+                if (order == "ASC") {
+                    up.className = "sort-up sort-active";
+                    down.className = "sort-down";
+                } else {
+                    up.className = "sort-up";
+                    down.className = "sort-down sort-active";
+                }
+            }
+        } else {
+            if (this.TableConfig.isActiveMultiSorts == true) {
+                this.Sorts.push(sort);
+            } else {
+                this.Sorts = [sort];
+            }
+            if (order == "ASC") { 
+                up.className = "sort-up sort-active";
+                down.className = "sort-down";
+            } else {
+                up.className = "sort-up";
+                down.className = "sort-down sort-active";
+            }
+        }
+        await this.FilterOptions.filterFunction(this.Sorts);
+        ev.target.disabled = false;
     }
 
     IsDrawableRow(element, prop) {
@@ -481,7 +486,6 @@ class WTableComponent extends HTMLElement {
     }
 
     DeleteBTN = async (Options, element, tr) => {
-
         if (this.Options?.Delete != undefined && this.Options.Delete == true) {
             Options.append(WRender.Create({
                 tagName: "button",
@@ -629,6 +633,7 @@ class WTableComponent extends HTMLElement {
                 this.DrawTable(Dataset);
             } else {
                 const Dataset = await WAjaxTools.PostRequest(
+                    // @ts-ignore
                     this.SearchItemsFromApi.ApiUrl, { Param: ev.target.value }
                 );
                 this.DrawTable(Dataset.data);
@@ -658,6 +663,9 @@ class WTableComponent extends HTMLElement {
     }
 
     isSorteable(element, prop) {
+        if (this.TableConfig?.isActiveSorts == false) {
+            return false;
+        }
         if ((this.ModelObject[prop]?.type == undefined
             || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             || this.ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
