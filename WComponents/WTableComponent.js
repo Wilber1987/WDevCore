@@ -36,7 +36,7 @@ class WTableComponent extends HTMLElement {
         this.Table = WRender.Create({ tagName: "Table", className: this.TableClass, id: "MainTable" + this.id });
         this.Tfooter = WRender.Create({ class: "tfooter" });
         this.divTableContainer = WRender.Create({ type: "div", class: "tableContainer", children: [this.Table] });
-        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);
+        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);        
         /**@type {Array<OrderData>} */
         this.Sorts = [];
         this.FilterOptions = new WFilterOptions({
@@ -65,6 +65,9 @@ class WTableComponent extends HTMLElement {
             this.selectedItems = this.TableConfig.selectedItems;
         }
         this.Draw();
+        if (this.TableConfig.CustomStyle) {
+            this.shadowRoot?.append(this.TableConfig.CustomStyle);
+        }
         this.withFilter = false;
     }
     connectedCallback() {

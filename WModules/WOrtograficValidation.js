@@ -71,7 +71,8 @@ class WOrtograficValidation {
         { error: ["APELLIDIO"], value: "apellido" },  
         { error: ["FECHANAC"], value: "fecha de nacimiento" },    
         { error: ["EMPENO"], value: "empeño" },    
-        { error: ["VEHICULO"], value: "Vehículo" },  
+        { error: ["VEHICULO"], value: "vehículo" },  
+        { error: ["GUIA"], value: "guía" }, 
     ]
 }
 export { WOrtograficValidation }

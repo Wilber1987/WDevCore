@@ -449,9 +449,20 @@ class OrderData {
     }
 
 }
+class ModelFiles {
+    constructor(name, value, type) {
+        this.Name = name;
+        this.Type = type;
+        this.Value = value;
+    }
+    Name = "";
+    Value = "";
+    Type = "";
+}
 
 export {
     WNode,
+    ModelFiles,
     ElementStyle,
     FormConfig,
     ModelFunction,
