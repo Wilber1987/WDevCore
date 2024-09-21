@@ -1,5 +1,5 @@
 //@ts-check
-import { WRender, ComponentsManager } from '../WModules/WComponentsTools.js';
+import { WRender, ComponentsManager, html } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WSimpleModalForm } from "./WSimpleModalForm.js";
@@ -9,8 +9,8 @@ import { WIcons } from '../WModules/WIcons.js';
 import { EntityClass } from '../WModules/EntityClass.js';
 // @ts-ignore
 import { FormConfig, ModelFiles, ModelProperty } from '../WModules/CommonModel.js';
-import {WArrayF} from "../WModules/WArrayF.js";
-import {WAjaxTools} from "../WModules/WAjaxTools.js";
+import { WArrayF } from "../WModules/WArrayF.js";
+import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
 
 
@@ -96,7 +96,7 @@ class WForm extends HTMLElement {
                 target[property] = value;
                 //console.log(value);   
                 //console.log(property, Model[property]);
-                if (!["IMG", "FILE","DATE", "DATETIME"].includes(Model[property]?.type?.toUpperCase())) {
+                if (!["IMG", "FILE", "DATE", "DATETIME"].includes(Model[property]?.type?.toUpperCase())) {
                     const control = this.shadowRoot?.querySelector("#ControlValue" + property);
                     if (control) {
                         // @ts-ignore
@@ -148,10 +148,10 @@ class WForm extends HTMLElement {
         //sino es asi le asigna el valor de un objeto existente
         const Model = this.Config.ModelObject ?? this.Config.EditObject;
         const Form = WRender.Create({ className: 'divForm' });
-        const ModelComplexElements = Object.keys(this.Config.ModelObject).filter(o => this.Config.ModelObject[o]?.type?.toUpperCase() == "MASTERDETAIL" 
-        || this.Config.ModelObject[o]?.type?.toUpperCase() == "CALENDAR")
-        
-        const ComplexForm = WRender.Create({ className: 'divComplexForm', style: ModelComplexElements.length <= 1 ? "grid-template-columns: unset": "" });
+        const ModelComplexElements = Object.keys(this.Config.ModelObject).filter(o => this.Config.ModelObject[o]?.type?.toUpperCase() == "MASTERDETAIL"
+            || this.Config.ModelObject[o]?.type?.toUpperCase() == "CALENDAR")
+
+        const ComplexForm = WRender.Create({ className: 'divComplexForm', style: ModelComplexElements.length <= 1 ? "grid-template-columns: unset" : "" });
         for (const prop in Model) {
             try {
                 Model[prop] = Model[prop] != null ? Model[prop] : undefined;
@@ -292,11 +292,11 @@ class WForm extends HTMLElement {
                         if (this.shadowRoot?.querySelector("#imgControl" + prop) != null) {
                             // @ts-ignore
                             this.shadowRoot.querySelector("#imgControl" + prop).src = base64Type + fileBase64.toString();
-                        } 
+                        }
 
                         if (Model[prop].type.toUpperCase() == "FILE") {
                             // @ts-ignore
-                            const fileClass = new ModelFiles(targetControl?.files[0]?.name, fileBase64, base64Type);                            
+                            const fileClass = new ModelFiles(targetControl?.files[0]?.name, fileBase64, base64Type);
                             ObjectF[prop] = [fileClass]
                         }
                     }, 1000);
@@ -644,15 +644,9 @@ class WForm extends HTMLElement {
                 const label = WRender.Create({ tagName: 'label', id: "labelFile" + prop, innerText: '' });
                 const content = WRender.Create({
                     class: "contentLabelFile", children: [
-                        WRender.Create({
-                            tagName: "label",
-                            class: "LabelFile",
-                            innerText: "Seleccionar archivo",
-                            htmlFor: "ControlValue" + prop, children: [
-                                WRender.Create({ tagName: 'img', src: WIcons.upload, class: 'labelIcon' })
-                            ],
-                            disabled: disabled
-                        }), label
+                        html`<label class="LabelFile" for="ControlValue${prop}" disabled="${disabled}">
+                            Seleccionar archivo ${WIcons.upload}
+                        </label>`, label
                     ]
                 })
                 ControlContainer.append(content);

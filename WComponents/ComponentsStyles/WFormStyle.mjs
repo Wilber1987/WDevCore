@@ -79,6 +79,11 @@ input:-internal-autofill-selected {
     text-align: center;
 }
 
+.LabelFile  svg  {
+    
+    filter: invert(1)
+}
+
 .inputTitle, .password-container label {
     padding: 2px;
     display: block;
