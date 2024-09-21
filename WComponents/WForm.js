@@ -8,13 +8,13 @@ import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { WIcons } from '../WModules/WIcons.js';
 import { EntityClass } from '../WModules/EntityClass.js';
 // @ts-ignore
-import { FormConfig, ModelProperty } from '../WModules/CommonModel.js';
+import { FormConfig, ModelFiles, ModelProperty } from '../WModules/CommonModel.js';
 import {WArrayF} from "../WModules/WArrayF.js";
 import {WAjaxTools} from "../WModules/WAjaxTools.js";
 import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
 
 
-let photoB64;
+let fileBase64;
 const ImageArray = [];
 
 class WForm extends HTMLElement {
@@ -96,7 +96,7 @@ class WForm extends HTMLElement {
                 target[property] = value;
                 //console.log(value);   
                 //console.log(property, Model[property]);
-                if (!["IMG", "DATE", "DATETIME"].includes(Model[property]?.type?.toUpperCase())) {
+                if (!["IMG", "FILE","DATE", "DATETIME"].includes(Model[property]?.type?.toUpperCase())) {
                     const control = this.shadowRoot?.querySelector("#ControlValue" + property);
                     if (control) {
                         // @ts-ignore
@@ -286,12 +286,18 @@ class WForm extends HTMLElement {
                     }
                     await this.SelectedFile(targetControl?.files[0]);
                     setTimeout(() => {
-                        //console.log(photoB64, base64Type);
-                        ObjectF[prop] = photoB64.toString();
+                        //console.log(fileBase64, base64Type);
+                        ObjectF[prop] = fileBase64.toString();
                         //console.log("#imgControl" + prop, this.shadowRoot?.querySelector("#imgControl" + prop));                        
                         if (this.shadowRoot?.querySelector("#imgControl" + prop) != null) {
                             // @ts-ignore
-                            this.shadowRoot.querySelector("#imgControl" + prop).src = base64Type + photoB64.toString();
+                            this.shadowRoot.querySelector("#imgControl" + prop).src = base64Type + fileBase64.toString();
+                        } 
+
+                        if (Model[prop].type.toUpperCase() == "FILE") {
+                            // @ts-ignore
+                            const fileClass = new ModelFiles(targetControl?.files[0]?.name, fileBase64, base64Type);                            
+                            ObjectF[prop] = [fileClass]
                         }
                     }, 1000);
                 }
@@ -1411,7 +1417,7 @@ class WForm extends HTMLElement {
             var reader = new FileReader();
             reader.onloadend = function (e) {
                 // @ts-ignore
-                photoB64 = e.target?.result?.split("base64,")[1];
+                fileBase64 = e.target?.result?.split("base64,")[1];
             }
             reader.readAsDataURL(value);
         }

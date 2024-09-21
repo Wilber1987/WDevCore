@@ -31,7 +31,6 @@ export const WModalStyle = css`
   }
 
   .ModalContent {
-       overflow-y: auto;
        display: block;
        padding: 30px;
   }
@@ -88,6 +87,7 @@ export const WModalStyle = css`
        display: block;
        justify-content: center;
        padding: 5px;
+       overflow-y: auto;
   }
   .ObjectModalElementContainer {
      overflow-y: auto;

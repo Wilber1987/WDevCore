@@ -15,6 +15,7 @@ import { css, WCssClass } from "../WModules/WStyledRender.js";
     * @property {Boolean} [isMediaQuery]
     * @property {String} [Direction] row | column
     * @property {String} [NavStyle] nav | tab
+    * @property {HTMLStyleElement} [CustomStyle]
 **/
 class WAppNavigator extends HTMLElement {
     /**
@@ -40,6 +41,9 @@ class WAppNavigator extends HTMLElement {
         }
         this.DrawAppNavigator();
         this.Elements = this.Elements ?? [];
+        if (this.Config.CustomStyle) {
+            this.shadowRoot?.append(this.Config.CustomStyle);
+        }
     }
     attributeChangedCallBack() {
         this.DrawAppNavigator();

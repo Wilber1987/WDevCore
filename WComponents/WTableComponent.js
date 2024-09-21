@@ -157,18 +157,15 @@ class WTableComponent extends HTMLElement {
         if (!chargeWithFilter) {
             this.Table.append(WRender.createElement(this.DrawTHead(Dataset.length > 0 ? Dataset[0] : this.ModelObject)));
             await this.DrawTBody(Dataset);
+            if (this.paginate == true) {
+                this.Tfooter.innerHTML = "";
+                this.DrawTFooter(Dataset).forEach(element => {
+                    this.Tfooter.append(element);
+                });
+            }
         }
 
-        //this.Table.append(tbody);
-        /*tbody.forEach(tb => {
-            this.Table.append(WRender.createElement(tb));
-        });*/
-        if (this.paginate == true) {
-            this.Tfooter.innerHTML = "";
-            this.DrawTFooter(Dataset).forEach(element => {
-                this.Tfooter.append(element);
-            });
-        }
+      
     }
     DrawHeadOptions() {
         if (this.ThOptions.innerHTML != "") return;

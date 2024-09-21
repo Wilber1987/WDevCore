@@ -379,7 +379,9 @@ class WCommentsComponent extends HTMLElement {
             flex-direction: row-reverse;
             justify-content: flex-start;
         }
-        .wrapper{}
+        .wrapper{
+            color: #000;
+        }
         .message-avatar {
             height: 40px;
             width: 40px;
