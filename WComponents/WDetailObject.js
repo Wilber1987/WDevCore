@@ -216,7 +216,7 @@ class WDetailObject extends HTMLElement {
         }
         .TextArea {
             grid-column: span 4;
-            font-size: 11px !important;
+            font-size: 12px !important;
             text-align: justify;
             max-height: 300px;
             overflow-y: auto;

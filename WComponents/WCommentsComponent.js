@@ -416,7 +416,7 @@ class WCommentsComponent extends HTMLElement {
             text-transform: uppercase;
         }
         label.date {
-            font-size: 11px;
+            font-size: 12px;
             text-align: end;
         }
         .Btn-Mini {

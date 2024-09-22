@@ -387,7 +387,7 @@ const WRichTextStyle = css`
         align-items: center;
     }
     .AttachItem {
-        font-size: 11px;
+        font-size: 12px;
         padding: 5px;
         background-color: #f3f3f3;
         border-radius: 5px;

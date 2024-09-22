@@ -110,7 +110,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         margin-right: 5px;
         cursor: pointer;
         transition: 0.5s;
-        font-size: 11px;
+        font-size: 12px;
         padding: 8px;
     }
 
@@ -438,7 +438,7 @@ const StylesControlsV3 = css`
         background-color: #5995fd;
         border: none;
         outline: none;
-        font-size: 11px;
+        font-size: 12px;
         border-radius: 5px;
         color: #fff;
         text-transform: uppercase;

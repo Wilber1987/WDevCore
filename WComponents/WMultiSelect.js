@@ -589,7 +589,7 @@ const MainMenu = css`
         width: 100%;
         cursor: pointer;
         padding: 10px 10px;
-        font-size: 11px;
+        font-size: 12px;
         text-align: justify;
     }
     .SubMenu {
@@ -639,7 +639,7 @@ const MainMenu = css`
         background-color: #eeeeee;
         border-radius: 10px;
         margin: 10px;
-        font-size: 11px;
+        font-size: 12px;
         grid-column: span 2;
         font-weight: 500;
     }
@@ -651,7 +651,7 @@ const MainMenu = css`
         right: 10px;
         top: 5px;
         padding: 5px;
-        font-size: 11px;
+        font-size: 12px;
         color: #fff;
         border: none;
         background-color: #479207;
@@ -661,7 +661,7 @@ const MainMenu = css`
     }
     w-tooltip {
         border-radius: 0.3cm;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 500;
         top: 32px !important;
     }

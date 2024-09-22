@@ -553,7 +553,7 @@ class WFilterOptions extends HTMLElement {
             text-transform: capitalize;
         }
         .options {
-            font-size: 11px;
+            font-size: 12px;
             display: flex;
             align-items: center;
         }
@@ -568,7 +568,7 @@ class WFilterOptions extends HTMLElement {
             margin: 5px;
             outline: none;
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
             background-color: #4894aa;
             color: #fff;
@@ -582,7 +582,7 @@ class WFilterOptions extends HTMLElement {
         .OptionContainer div {
             display: grid;
             grid-template-rows: 30px auto;
-            font-size: 11px;
+            font-size: 12px;
         }
 
        
@@ -641,7 +641,7 @@ class WFilterOptions extends HTMLElement {
                 display: grid;
                 grid-template-rows: 30px 30px;
                 grid-template-columns: auto;
-                font-size: 11px;
+                font-size: 12px;
             }
         }
         @container (max-width: 700px) {

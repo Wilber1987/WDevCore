@@ -157,7 +157,7 @@ input[type=checkbox]:checked::before {
     border-radius: 0.3cm;
     left: 5px;
     bottom: -17px;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
     color: rgb(227, 0, 0);
 }
@@ -216,7 +216,7 @@ input[type=checkbox]:checked::before {
 }
 
 .listImage label {
-    font-size: 11px;
+    font-size: 12px;
     padding: 5px;
     width: 100%;
     overflow: hidden;
