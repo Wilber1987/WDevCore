@@ -1,11 +1,11 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 // @ts-ignore
-import { FilterData, ModelProperty, OrderData } from "../WModules/CommonModel.js";
+import { ModelProperty, OrderData } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";
 import { WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
-import { WCssClass, css } from "../WModules/WStyledRender.js";
+import { css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 /**
@@ -63,21 +63,20 @@ class WFilterOptions extends HTMLElement {
     }
     DrawFilter = () => {
         this.FilterContainer.innerHTML = "";
-        const ControlOptions = WRender.Create({ class: "OptionContainer " + (this.Display ? "OptionContainerActive" : "") })
+        const ControlOptions = WRender.Create({ className: "OptionContainer " + (this.Display ? "OptionContainerActive" : "") })
         this.FilterContainer.append(WRender.Create({
             class: "options", children: [
-                { tagName: "label", innerText: "Filtros" },
-                {//display
-                    tagName: 'input', style: 'transform: rotate(0deg)', class: 'BtnDinamictT', type: "button", value: '>', onclick: async (ev) => {
-                        if (ControlOptions.className == "OptionContainer") {
-                            ev.target.style["transform"] = "rotate(90deg)";
+                {
+                    tagName: "button",
+                     className: "accordion-button" + (this.Display ? " active-btn" : ""),
+                     innerText: "Filtros", onclick: async (ev) => {
+                        if (!ControlOptions.className.includes("OptionContainerActive")) {
                             ControlOptions.className = "OptionContainer OptionContainerActive";
                         } else {
-                            ev.target.style["transform"] = "rotate(0deg)";
                             ControlOptions.className = "OptionContainer";
                         }
+                        ev.target.className = ev.target.className.includes("active-btn") ? "accordion-button" : "accordion-button active-btn";
                     }
-
                 }
             ]
         }));
@@ -155,7 +154,7 @@ class WFilterOptions extends HTMLElement {
             && Model[prop].__proto__.constructor.name != "AsyncFunction";
     }
     /**
-    * @param {Array<FilterData>} [sorts] 
+    * @param {Array<OrderData>} [sorts] 
     */
     filterFunction = async (sorts) => {
         const Model = this.EntityModel ?? this.ModelObject;
@@ -389,6 +388,7 @@ class WFilterOptions extends HTMLElement {
             });
             return flagObj;
         });
+        WArrayF.SortArray(sorts, DFilt);
         if (this.Config.FilterFunction != undefined) {
             this.Config.FilterFunction(DFilt);
         } else {
@@ -553,7 +553,7 @@ class WFilterOptions extends HTMLElement {
             text-transform: capitalize;
         }
         .options {
-            font-size: 11px;
+            font-size: 12px;
             display: flex;
             align-items: center;
         }
@@ -568,7 +568,7 @@ class WFilterOptions extends HTMLElement {
             margin: 5px;
             outline: none;
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
             background-color: #4894aa;
             color: #fff;
@@ -582,7 +582,7 @@ class WFilterOptions extends HTMLElement {
         .OptionContainer div {
             display: grid;
             grid-template-rows: 30px auto;
-            font-size: 11px;
+            font-size: 12px;
         }
 
        
@@ -641,7 +641,7 @@ class WFilterOptions extends HTMLElement {
                 display: grid;
                 grid-template-rows: 30px 30px;
                 grid-template-columns: auto;
-                font-size: 11px;
+                font-size: 12px;
             }
         }
         @container (max-width: 700px) {
@@ -656,3 +656,5 @@ export { WFilterOptions }
 export const FilterDateRange = {
     YEAR: "YEAR", MOUNT: "MOUNT"
 }
+
+

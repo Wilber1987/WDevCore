@@ -379,7 +379,9 @@ class WCommentsComponent extends HTMLElement {
             flex-direction: row-reverse;
             justify-content: flex-start;
         }
-        .wrapper{}
+        .wrapper{
+            color: #000;
+        }
         .message-avatar {
             height: 40px;
             width: 40px;
@@ -414,7 +416,7 @@ class WCommentsComponent extends HTMLElement {
             text-transform: uppercase;
         }
         label.date {
-            font-size: 11px;
+            font-size: 12px;
             text-align: end;
         }
         .Btn-Mini {

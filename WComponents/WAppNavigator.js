@@ -15,6 +15,7 @@ import { css, WCssClass } from "../WModules/WStyledRender.js";
     * @property {Boolean} [isMediaQuery]
     * @property {String} [Direction] row | column
     * @property {String} [NavStyle] nav | tab
+    * @property {HTMLStyleElement} [CustomStyle]
 **/
 class WAppNavigator extends HTMLElement {
     /**
@@ -28,7 +29,7 @@ class WAppNavigator extends HTMLElement {
         this.Inicialize = Config.Inicialize;
         this.alignItems = Config.alignItems;
         this.DisplayMode = Config.DisplayMode;
-        this.Elements = Config.Elements;
+        this.Elements = Config.Elements ?? [];
         this.DarkMode = Config.DarkMode;
         this.Direction = Config.Direction;
         this.NavStyle = Config.NavStyle;
@@ -40,6 +41,9 @@ class WAppNavigator extends HTMLElement {
         }
         this.DrawAppNavigator();
         this.Elements = this.Elements ?? [];
+        if (this.Config.CustomStyle) {
+            this.shadowRoot?.append(this.Config.CustomStyle);
+        }
     }
     attributeChangedCallBack() {
         this.DrawAppNavigator();
@@ -147,7 +151,9 @@ class WAppNavigator extends HTMLElement {
 
                     if (this.NavStyle == "tab") {
                         const object = await element.action();
-                        this.Manager?.NavigateFunction("element" + Index, object);
+                        if (object) {
+                            this.Manager?.NavigateFunction("element" + Index, object);
+                        }                       
                     } else {
                         if (element.action != undefined) {
                             element.action();

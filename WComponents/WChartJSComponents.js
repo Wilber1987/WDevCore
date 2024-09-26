@@ -666,7 +666,7 @@ const WChartStyle = (ChartInstance) => {
     //console.log(ChartInstance);
     return css`
         .WChartContainer {
-            font-size: 11px;
+            font-size: 12px;
             border: #e9e6e6 solid 1px;
             padding: 20px 10px;
             overflow: hidden;

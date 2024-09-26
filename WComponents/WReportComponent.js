@@ -362,7 +362,7 @@ class WReportComponent extends HTMLElement {
         .row-title, .row-number, .row-string, .report-title {
            display: flex;
            flex: 1;
-           font-size: 10px;
+           font-size: 12px;
            font-family: "Open Sans", sans-serif;                    
         }  
         .row-title, .row-footer, .row-number, .row-string {

@@ -201,6 +201,8 @@ class WPrintExportToolBar extends HTMLElement {
             color: #ffffff;
             transition: background-color 0.3s ease;
             font-weight: bold;
+            min-width: 100px;
+            justify-content: center;
         }
         .toolbar-button svg {
             fill: #ffffff;

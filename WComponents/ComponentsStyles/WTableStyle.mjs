@@ -4,7 +4,7 @@ export const WTableStyle = css`.WTable {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     width: 100%;
     border-collapse: collapse;
-    font-size: 10px;
+    font-size: 12px;
     border: 1px rgba(10, 10, 10, 0.2) solid;
 }
 
@@ -34,13 +34,13 @@ export const WTableStyle = css`.WTable {
     text-overflow: ellipsis;
     display: block;
     overflow-y: auto;
-    font-size: 10px !important;
+    font-size: 12px !important;
     padding: 0 5px;
     max-width: 400px;
 }
 
 .WTable td label * {
-    font-size: 11px !important;
+    font-size: 12px !important;
     text-align: justify !important;
     padding: 0px !important;
     margin: 0px !important;
@@ -252,7 +252,7 @@ input[type=radio]:checked::before {
     text-align: center;
     display: inline-block;
     min-width: 20px;
-    font-size: 10px;
+    font-size: 12px;
     cursor: pointer;
     background-color: #4894aa;
     color: #fff;

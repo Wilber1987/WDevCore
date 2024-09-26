@@ -362,6 +362,8 @@ class WNode {
     * @property {Boolean} [paginate] 
     * @property {Boolean} [AddItemsFromApi]
     * @property {Boolean} [AutoSave]
+    * @property {Boolean} [isActiveSorts] permite activar los ordenamientos de las columnas
+    * @property {Boolean} [isActiveMultiSorts] funciona solo cuando select esta habilitado [isActiveSorts] y permite enviar ordenamientos multiples por peticiones ajax
     * @property {SearchItemsFromApi} [SearchItemsFromApi]
     * @property {String} [TypeMoney] Euro, Dollar, Cordoba
     * @property {Number} [maxElementByPage] 
@@ -447,9 +449,20 @@ class OrderData {
     }
 
 }
+class ModelFiles {
+    constructor(name, value, type) {
+        this.Name = name;
+        this.Type = type;
+        this.Value = value;
+    }
+    Name = "";
+    Value = "";
+    Type = "";
+}
 
 export {
     WNode,
+    ModelFiles,
     ElementStyle,
     FormConfig,
     ModelFunction,

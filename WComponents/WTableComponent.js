@@ -29,12 +29,14 @@ class WTableComponent extends HTMLElement {
         this.attachShadow({ mode: "open" });
         this.TypeMoney = Config.TypeMoney;
         this.TableConfig = Config ?? {};
+        this.TableConfig.isActiveSorts = this.TableConfig.isActiveSorts ?? true;
+        this.TableConfig.isActiveMultiSorts = this.TableConfig.isActiveMultiSorts ?? false;
         this.Dataset = this.TableConfig.Dataset ?? [];
         this.ThOptions = WRender.Create({ class: "thOptions" });
         this.Table = WRender.Create({ tagName: "Table", className: this.TableClass, id: "MainTable" + this.id });
         this.Tfooter = WRender.Create({ class: "tfooter" });
         this.divTableContainer = WRender.Create({ type: "div", class: "tableContainer", children: [this.Table] });
-        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);
+        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);        
         /**@type {Array<OrderData>} */
         this.Sorts = [];
         this.FilterOptions = new WFilterOptions({
@@ -42,11 +44,10 @@ class WTableComponent extends HTMLElement {
             AutoSetDate: Config.Options?.AutoSetDate ?? true,
             Sorts: this.Sorts,
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
-            EntityModel: Config.EntityModel, 
+            EntityModel: Config.EntityModel,
             Display: Config.Options?.FilterDisplay ?? false,
             UseEntityMethods: true,
             FilterFunction: (DFilt) => {
-                console.log("filter...");
                 this.withFilter = true;
                 this.DrawTable(DFilt);
             }
@@ -64,6 +65,9 @@ class WTableComponent extends HTMLElement {
             this.selectedItems = this.TableConfig.selectedItems;
         }
         this.Draw();
+        if (this.TableConfig.CustomStyle) {
+            this.shadowRoot?.append(this.TableConfig.CustomStyle);
+        }
         this.withFilter = false;
     }
     connectedCallback() {
@@ -128,7 +132,7 @@ class WTableComponent extends HTMLElement {
         //console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
         this.Table.innerHTML = "";
-       
+
         const loadinModal = new LoadinModal();
         this.shadowRoot?.append(loadinModal);
         const isWithtUrl = (this.TableConfig?.Options?.UrlSearch != null || this.TableConfig?.Options?.UrlSearch != undefined);
@@ -137,33 +141,31 @@ class WTableComponent extends HTMLElement {
         let chargeWithFilter = false;
         if ((Dataset.length == 0 || Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
             if (isWithtUrl) {
+                // @ts-ignore
                 Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
-            }  else if (this.Options?.Filter == true){
+            } else if (this.Options?.Filter == true) {
                 await this.FilterOptions.filterFunction(this.Sorts);
                 chargeWithFilter = true;
-            }  else if (isWithtModel) {
+            } else if (isWithtModel) {
                 const model = this.TableConfig.EntityModel ?? this.TableConfig.ModelObject;
                 Dataset = await model.Get();
             }
         }
         this.withFilter = false;
         loadinModal.close();
-       
+
         if (!chargeWithFilter) {
             this.Table.append(WRender.createElement(this.DrawTHead(Dataset.length > 0 ? Dataset[0] : this.ModelObject)));
             await this.DrawTBody(Dataset);
+            if (this.paginate == true) {
+                this.Tfooter.innerHTML = "";
+                this.DrawTFooter(Dataset).forEach(element => {
+                    this.Tfooter.append(element);
+                });
+            }
         }
-        
-        //this.Table.append(tbody);
-        /*tbody.forEach(tb => {
-            this.Table.append(WRender.createElement(tb));
-        });*/
-        if (this.paginate == true) {
-            this.Tfooter.innerHTML = "";
-            this.DrawTFooter(Dataset).forEach(element => {
-                this.Tfooter.append(element);
-            });
-        }
+
+      
     }
     DrawHeadOptions() {
         if (this.ThOptions.innerHTML != "") return;
@@ -198,7 +200,7 @@ class WTableComponent extends HTMLElement {
     DrawTHead = (element) => {
         const thead = WRender.Create({ tagName: "thead" });
         let tr = WRender.Create({ tagName: "tr" })
-      
+
         for (const prop in this.ModelObject) {
             if (this.IsDrawableRow(element, prop)) {
                 const { up, down } = this.CreateSortOptions(prop);
@@ -226,7 +228,7 @@ class WTableComponent extends HTMLElement {
      */
     DrawTBody = async (Dataset = this.Dataset) => {
         //console.log(Dataset);
-        
+
         this.Table?.querySelector("tbody")?.remove();
         let tbody = WRender.Create({ tagName: "tbody" });
 
@@ -304,63 +306,66 @@ class WTableComponent extends HTMLElement {
             tagName: 'input', type: 'button',
             className: 'sort-up ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "ASC") ? "sort-active" : ""),
             onclick: async (ev) => {
-                ev.target.disabled = true;
-                const sort = new OrderData({ OrderType: "ASC", PropName: prop });
-                const findSort = this.Sorts.find(s => s.PropName == prop);
-                if (findSort) {
-                    if (findSort.OrderType == sort.OrderType) {
-                        this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
-                        up.className = "sort-up";
-                        down.className = "sort-down";
-                    } else {
-                        findSort.OrderType = "ASC";
-                        up.className = "sort-up sort-active";
-                        down.className = "sort-down";
-                    }
-                } else {
-                    this.Sorts.push(sort);
-                    up.className = "sort-up sort-active";
-                    down.className = "sort-down";
-                }
-                await this.FilterOptions.filterFunction(this.Sorts);
-                ev.target.disabled = false;
-
+                await this.ExecuteSort(ev, prop, up, down, "ASC");
             }
         });
         const down = WRender.Create({
             tagName: 'input', type: 'button',
             className: 'sort-down ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "DESC") ? "sort-active" : ""),
             onclick: async (ev) => {
-                ev.target.disabled = true;
-                const sort = new OrderData({ OrderType: "DESC", PropName: prop });
-                const findSort = this.Sorts.find(s => s.PropName == prop);
-                if (findSort) {
-                    if (findSort.OrderType == sort.OrderType) {
-                        this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
-                        up.className = "sort-up";
-                        down.className = "sort-down";
-                    } else {
-                        findSort.OrderType = "DESC";
-                        up.className = "sort-up";
-                        down.className = "sort-down sort-active";
-                    }
-                } else {
-                    this.Sorts.push(sort);
-                    up.className = "sort-up";
-                    down.className = "sort-down sort-active";
-                }
-                await this.FilterOptions.filterFunction(this.Sorts);
-                ev.target.disabled = false;
+               
             }
         });
         return { up, down };
+    }
+
+    async ExecuteSort(ev, prop, up, down, order) {
+        ev.target.disabled = true;
+        const sort = new OrderData({ OrderType: order, PropName: prop });
+        const findSort = this.Sorts.find(s => s.PropName == prop);
+        if (this.TableConfig.isActiveMultiSorts != true) { 
+            this.querySelectorAll(".sort-active").forEach(element => {
+                element.classList.remove("sort-active");
+            });
+        }
+        if (findSort) {
+            if (findSort.OrderType == sort.OrderType) {
+                this.Sorts.splice(this.Sorts.indexOf(findSort), 1);
+                up.className = "sort-up";
+                down.className = "sort-down";
+            } else {
+                findSort.OrderType = order;
+                if (order == "ASC") {
+                    up.className = "sort-up sort-active";
+                    down.className = "sort-down";
+                } else {
+                    up.className = "sort-up";
+                    down.className = "sort-down sort-active";
+                }
+            }
+        } else {
+            if (this.TableConfig.isActiveMultiSorts == true) {
+                this.Sorts.push(sort);
+            } else {
+                this.Sorts = [sort];
+            }
+            if (order == "ASC") { 
+                up.className = "sort-up sort-active";
+                down.className = "sort-down";
+            } else {
+                up.className = "sort-up";
+                down.className = "sort-down sort-active";
+            }
+        }
+        await this.FilterOptions.filterFunction(this.Sorts);
+        ev.target.disabled = false;
     }
 
     IsDrawableRow(element, prop) {
         if (this.TableConfig.ModelObject == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
             return true;
         }
-        const hidden = typeof   this.ModelObject[prop]?.hidden === "function" ? this.ModelObject[prop]?.hidden(element)  : this.ModelObject[prop]?.hidden;
+        const hidden = typeof this.ModelObject[prop]?.hidden === "function" ? this.ModelObject[prop]?.hidden(element) : this.ModelObject[prop]?.hidden;
         if ((this.ModelObject[prop]?.type == undefined
             || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             || this.ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
@@ -481,7 +486,6 @@ class WTableComponent extends HTMLElement {
     }
 
     DeleteBTN = async (Options, element, tr) => {
-
         if (this.Options?.Delete != undefined && this.Options.Delete == true) {
             Options.append(WRender.Create({
                 tagName: "button",
@@ -629,6 +633,7 @@ class WTableComponent extends HTMLElement {
                 this.DrawTable(Dataset);
             } else {
                 const Dataset = await WAjaxTools.PostRequest(
+                    // @ts-ignore
                     this.SearchItemsFromApi.ApiUrl, { Param: ev.target.value }
                 );
                 this.DrawTable(Dataset.data);
@@ -658,6 +663,9 @@ class WTableComponent extends HTMLElement {
     }
 
     isSorteable(element, prop) {
+        if (this.TableConfig?.isActiveSorts == false) {
+            return false;
+        }
         if ((this.ModelObject[prop]?.type == undefined
             || this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             || this.ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
@@ -827,18 +835,23 @@ class WCardTable extends HTMLElement {
                     break;
                 case "MASTERDETAIL":
                     break;
-                case "Date":
+                case "MONEY":
+                    this.CardTableContainer.append(WRender.Create({
+                        tagName: "label",
+                        innerText: WOrtograficValidation.es(prop) + ": " + (value != undefined && value != null && value != "" ? `${ConvertToMoneyString(parseFloat(value))}` : "-")
+
+                    }));
                     break;
                 default:
-
-                    this.CardTableContainer.append(
-                        WRender.Create({
-                            tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)
-                        }))
+                    this.CardTableContainer.append(WRender.Create({
+                        tagName: "label",
+                        innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)
+                    }));
                     break;
             }
         }
     }
+
     CardStyle = css`
         .CardTableContainer{
             display: grid;
