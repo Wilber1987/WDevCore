@@ -541,16 +541,19 @@ const MainMenu = css`
         min-width: 300px;
     }
     .LabelMultiselect label {
-        padding: 2px 5px;
+        padding: 4px 7px;
         border-radius: 0.2cm;
-        background-color: #009f97; 
+        background-color: #1f58c7;
         color: #fff;
-        margin: 3px;  
-        font-size: 9px;
+        margin: 3px;
+        font-size: 10px;
         align-items: center;
-        overflow: hidden;        
+        overflow: hidden;
         display: flex;
         line-height: 12px;
+
+        width: fit-content;
+        height: fit-content;
     }
     .LabelMultiselect label button {
         border: none;

@@ -30,7 +30,7 @@ const OnLoad = async () => {
                     children: [{
                         class: 'position-relative input-custom-icon',
                         children: [
-                            html `<span class="bx bx-user"></span>`,
+                            html`<span class="bx bx-user"></span>`,
                             {
                                 id: 'username',
                                 tagName: 'input',
@@ -39,7 +39,7 @@ const OnLoad = async () => {
                                 className: 'form-control',
                                 onchange: (ev) => {
                                     UserData.mail = ev.target.value;
-                                }                               
+                                }
                             }
                         ]
                     }]
@@ -48,7 +48,7 @@ const OnLoad = async () => {
                     children: [{
                         class: "position-relative auth-pass-inputgroup input-custom-icon",
                         children: [
-                            html `<span class="bx bx-lock-alt"></span>`, {
+                            html`<span class="bx bx-lock-alt"></span>`, {
                                 tagName: 'input',
                                 id: "password-input",
                                 type: 'password',
@@ -59,6 +59,7 @@ const OnLoad = async () => {
                                 },
                                 onkeydown: (ev) => {
                                     if (ev.key === 'Enter') {
+                                        UserData.password = ev.target.value;
                                         WSecurity.Login(UserData);
                                     }
                                 },
@@ -68,7 +69,7 @@ const OnLoad = async () => {
                                     type: 'button',
                                     className: 'btn btn-link position-absolute h-100 end-0 top-0',
                                     children: [
-                                        html `<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
+                                        html`<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
                                     ]
                                 }]
                             }
@@ -93,7 +94,7 @@ const OnLoad = async () => {
                     }]
                 }
             ]
-        }), html `<form></form>`)
+        }), html`<form></form>`)
         // @ts-ignore
         App.appendChild(LoginForm);
         LoginForm.append(WRender.Create({
@@ -109,12 +110,15 @@ const OnLoad = async () => {
 * @returns {HTMLElement}
 */
 const GetLoginLayout = (loginForm, registerForm) => {
+    const year = new Date().getFullYear(); 
+
     const loginLayout = html`<div class="authentication-bg min-vh-100">
         <!-- <div class="bg-overlay bg-light"></div> -->
         <div class="col-md-5 svg-background">
             <div class="d-flex flex-column min-vh-100">
-                
-            </div>
+            <p class="text-white position-absolute bottom-left">
+            © <span id="year"></span> Colegio Centro América - Del Sagrado Corazón de Jesús, Nicaragua</p>
+            </div>            
         </div>  
         <div class="col-md-7 container">
             <div class="d-flex flex-column min-vh-100 px-3">
@@ -127,12 +131,11 @@ const GetLoginLayout = (loginForm, registerForm) => {
                                 <img src="/Media/img/logotipoCCA.png" alt="" height="250" class="auth-logo-light me-start">
                             </a>
                         </div>
-
                         <div class="card">
                             <div class="card-body p-4"> 
                                 <div class="text-center mt-2">
                                     <h3>${localStorage.getItem("TITULO")}</h3>
-                                    <p>${localStorage.getItem("SUB_TITULO")}</p>
+                                    <!-- <p>${localStorage.getItem("SUB_TITULO")}</p> -->
                                 </div>
                                 <div class="p-2 mt-4" id="container">
 
@@ -143,8 +146,9 @@ const GetLoginLayout = (loginForm, registerForm) => {
                 </div>
             </div>
         </div><!-- end container -->
-    </div>`;    
+    </div>`;
     loginLayout.querySelector("#container")?.append(loginForm);
+    loginLayout.querySelector('#year').innerHTML = year;
     return loginLayout;
 
 }
@@ -160,7 +164,16 @@ const MasterStyle = css`
         align-items: center;
         justify-content: center;
     }
-
+    .bottom-left {
+        position: absolute;
+        bottom: 10px; 
+        left: 10px; 
+        color: white; 
+        font-size: 16px; 
+        /* background-color: rgba(0, 0, 0, 0.5);  */
+        padding: 5px;
+        border-radius: 5px; 
+    }
     @media (max-width: 768px) {
         .svg-background {
             display: none;
