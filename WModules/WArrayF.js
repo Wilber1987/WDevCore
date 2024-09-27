@@ -1,6 +1,24 @@
 import { EntityClass } from "./EntityClass.js";
 
 class WArrayF {
+    /**
+     * Agrega o Elimina un elemento de un arreglo seg n un parametro de seleccion
+     * @param {Object} Element Elemento a agregar o eliminar
+     * @param {Array} Array Arreglo en el que se va a agregar o eliminar el elemento
+     * @param {Boolean} checked Parametro de seleccion
+     */
+    static AddOrRemove(Element, Array, checked) {
+        const index = Array.indexOf(Element);
+        if (index == -1 && checked == true) {
+            if (WArrayF.FindInArray(Element, Array) == false) {
+                Array.push(Element);
+            } else {
+                console.log("Item Existente");
+            }
+        } else {
+            Array.splice(index, 1);
+        }
+    }
 
     static JSONParse(param) {
         return JSON.parse((param).replace(/&quot;/gi, '"'));
