@@ -39,7 +39,7 @@ const OnLoad = async () => {
                                 className: 'form-control',
                                 onchange: (ev) => {
                                     UserData.mail = ev.target.value;
-                                }
+                                }                               
                             }
                         ]
                     }]
@@ -56,6 +56,11 @@ const OnLoad = async () => {
                                 className: 'form-control',
                                 onchange: (ev) => {
                                     UserData.password = ev.target.value;
+                                },
+                                onkeydown: (ev) => {
+                                    if (ev.key === 'Enter') {
+                                        WSecurity.Login(UserData);
+                                    }
                                 },
                                 children: [{
                                     id: "password-addon",
