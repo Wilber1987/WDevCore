@@ -107,16 +107,16 @@ const GetLoginLayout = (loginForm, registerForm) => {
     const loginLayout = html`<div class="authentication-bg min-vh-100">
         <!-- <div class="bg-overlay bg-light"></div> -->
         <div class="col-md-5 svg-background">
-            <div class="d-flex flex-column min-vh-100">
-                
+            <div class="d-flex flex-column min-vh-100 justify-content-end text-center text-white">
+                <p class="fs-5 fst-italic">Todos los derechos reservados CCA</p>
             </div>
         </div>  
         <div class="col-md-7 container">
             <div class="d-flex flex-column min-vh-100 px-3">
-                <div class="row justify-content-center my-auto">
+                <div class="row justify-content-center my-auto" style="margin-top:125px">
                     <div class="col-md-8 col-lg-8 col-xl-6">
 
-                        <div class="mb-4 pb-2">
+                        <div class="">
                             <a href="javascript:void(0)" class="d-block auth-logo">
                                 <img src="/Media/img/logotipoCCA.png" alt="" height="250" class="auth-logo-dark me-start">
                                 <img src="/Media/img/logotipoCCA.png" alt="" height="250" class="auth-logo-light me-start">
@@ -127,7 +127,6 @@ const GetLoginLayout = (loginForm, registerForm) => {
                             <div class="card-body p-4"> 
                                 <div class="text-center mt-2">
                                     <h3>${localStorage.getItem("TITULO")}</h3>
-                                    <p>${localStorage.getItem("SUB_TITULO")}</p>
                                 </div>
                                 <div class="p-2 mt-4" id="container">
 
