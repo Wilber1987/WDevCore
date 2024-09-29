@@ -21,7 +21,7 @@ class DocumentViewer extends HTMLElement {
             this[p] = Config[p];
         }
         this.attachShadow({ mode: 'open' });
-        this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
+        this.TabContainer = WRender.createElement({ type: 'div', props: { class: "content-container", id: "TabContainer" } });
         this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.OptionContainer = WRender.Create({ className: "OptionContainer" });
         this.DrawDocumentViewer();

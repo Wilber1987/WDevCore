@@ -12,8 +12,7 @@ import { WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { Tbl_Profile } from './Tbl_Profile.js';
 import {WAjaxTools} from "../WModules/WAjaxTools.js";
 
-const OnLoad = async () => {
-    Aside.append(WRender.Create({ tagName: "h3", innerText: "Administración de perfiles" }));
+const OnLoad = async () => {   
     const AdminPerfil = new PerfilClass();
     Aside.append(AdminPerfil.MainNav);
     Main.appendChild(AdminPerfil);
@@ -27,7 +26,7 @@ class PerfilClass extends HTMLElement {
         this.id = "PerfilClass";
         this.className = "PerfilClass DivContainer";
         this.append(this.WStyle, StylesControlsV2.cloneNode(true));
-        this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
+        this.TabContainer = WRender.createElement({ type: 'div', props: { class: "content-container", id: "TabContainer" } });
         this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.OptionContainer = WRender.Create({ className: "OptionContainer" });
         this.TabActividades = this.MainNav;

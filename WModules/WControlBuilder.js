@@ -39,10 +39,14 @@ class ControlBuilder {
          <style>
             .search-box {
               position: relative;
+              display: flex;
+            }
+            .search-box input{              
+              padding-left: 40px !important;
             }
             .search-box svg{
               position: absolute;
-              top: 7px;
+              top: 5px;
               left: 5px;
               fill: #858585;
             }

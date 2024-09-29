@@ -13,6 +13,7 @@ import { WArrayF } from "../WModules/WArrayF.js";
  *  * @property {Array} Dataset  
     * @property {Function} FilterFunction
     * @property {String} [DateRange]
+    * @property {String} [Direction]
     * @property {Array<OrderData>} [Sorts]
     * @property {Boolean} [Display]
     * @property {Boolean} [UseEntityMethods]
@@ -36,6 +37,11 @@ class WFilterOptions extends HTMLElement {
         this.EntityModel = Config.EntityModel;
         this.Display = Config.Display;
         this.FilterContainer = WRender.Create({ className: "filter-container" });
+        if (this.Config.Direction?.toLowerCase() == "row") {
+            this.FilterContainer.style.flexDirection = "row";
+            this.FilterContainer.style.alignItems = "flex-start";
+            this.FilterContainer.style.gap = "10px";
+        }
         /** @type {Array} */
         this.FilterControls = [];
         this.attachShadow({ mode: "open" });
@@ -527,6 +533,7 @@ class WFilterOptions extends HTMLElement {
             justify-content: center;
             flex-direction: column;
             border-radius: 10px;
+            gap: 10px;
         }
 
         .OptionContainer {
@@ -534,17 +541,19 @@ class WFilterOptions extends HTMLElement {
             width: -webkit-fill-available;
             grid-template-columns: repeat(4,calc(25% - 12px));
             grid-gap: 15px;
-            padding: 0px 5px;
+            padding: 10px;
             overflow: hidden;
             max-height: 0px;
             transition: all 0.3s;
+            border-radius: 10px; 
+            
         }
 
         .OptionContainerActive {
-            overflow: inherit;
             max-height: inherit;
-            padding: 5px;
+            padding: 10px;
             transition: all 0.3s;
+            border: 1px solid #d3d3d3;
         }
 
         .OptionContainer label {
@@ -580,7 +589,6 @@ class WFilterOptions extends HTMLElement {
         }
 
         .OptionContainer div {
-            display: grid;
             grid-template-rows: 30px auto;
             font-size: 12px;
         }
@@ -609,7 +617,7 @@ class WFilterOptions extends HTMLElement {
 
         input.firstDate,
         input.secondDate {
-            padding-left: 10px;
+            padding-left: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -631,10 +639,13 @@ class WFilterOptions extends HTMLElement {
             content: "Hasta: ";
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 900px) {
             .OptionContainer {
                 display: flex;
                 flex-direction: column;
+            }
+            .filter-container {
+                flex-direction: column !important;
             }
 
             .OptionContainer div {

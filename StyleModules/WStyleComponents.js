@@ -181,6 +181,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         user-select: none;
         border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
         border-radius: 8px;
+        margin-left: 5px;
         background-color: var(--bs-btn-bg);
         -webkit-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
         transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
@@ -268,7 +269,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         width: calc(100%);        
         box-sizing: border-box;
         padding: .47rem .75rem;
-        font-size: .925rem;
+        font-size: 12px;;
         font-weight: 400;
         line-height: 1.5;
         color: #202020;
@@ -289,7 +290,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         display: block;
         width: 100%;
         padding: .47rem 1.75rem .47rem .75rem;
-        font-size: .925rem;
+        font-size: 12px;;
         font-weight: 400;
         line-height: 1.5;
         color: #202020;
@@ -371,7 +372,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         display: flex;
         align-items: center;
         padding: 10px 20px;
-        font-size: .925rem;
+        font-size: 12px;;
         border-radius: 10px;
         color: #282c2f;
         text-align: left;
@@ -400,7 +401,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
     .vertical-acordeon-btn {     
        display: flex;   
        gap: 10px;    
-       font-size: .925rem;
+       font-size: 12px;;
        align-items: center;
        border: none;
        background-color: unset;

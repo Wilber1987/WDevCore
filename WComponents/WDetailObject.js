@@ -31,7 +31,7 @@ class WDetailObject extends HTMLElement {
         this.ProfileContainer = WRender.createElement({ type: 'div', props: { class: 'ProfileContainer' } });
         this.SetImage(this.ObjectDetail, this.ModelObject)
         this.ProfileContainer.append(new ProfileCard(this.Config));
-        this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
+        this.TabContainer = WRender.createElement({ type: 'div', props: { class: "content-container", id: "TabContainer" } });
         this.Manager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.shadowRoot.appendChild(StylesControlsV2.cloneNode(true));
         this.style.display = "block";

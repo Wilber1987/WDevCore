@@ -24,7 +24,7 @@ class WProfileInvestigador extends HTMLElement {
         this.ProfileContainer = WRender.createElement({ type: 'div', props: { class: 'ProfileContainer' } });
         this.ProfileContainer.append(Card);
         this.ProfileContainer.append(new ProfileCard(response));
-        this.TabContainer = WRender.createElement({ type: 'div', props: { class: 'TabContainer', id: "TabContainer" } });
+        this.TabContainer = WRender.createElement({ type: 'div', props: { class: "content-container", id: "TabContainer" } });
         this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.shadowRoot.appendChild(WRender.createElement(StylesControlsV2));
         this.append(new WStyledRender({

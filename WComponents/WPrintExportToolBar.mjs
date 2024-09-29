@@ -197,7 +197,7 @@ class WPrintExportToolBar extends HTMLElement {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
+            font-size: 12px;
             color: #ffffff;
             transition: background-color 0.3s ease;
             font-weight: bold;

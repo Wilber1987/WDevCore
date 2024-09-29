@@ -1205,7 +1205,7 @@ class GanttChart extends HTMLElement {
             display: flex;
             margin-bottom: 20px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
         }
         
 

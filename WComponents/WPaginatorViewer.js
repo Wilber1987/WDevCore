@@ -6,8 +6,8 @@ import { css, WCssClass } from "../WModules/WStyledRender.js";
 import { ModalVericateAction } from "./WForm.js";
 import { WModalForm } from "./WModalForm.js";
 import { WToolTip } from "./WMultiSelect.js";
-import {WArrayF} from "../WModules/WArrayF.js";
-import {WAjaxTools} from "../WModules/WAjaxTools.js";
+import { WArrayF } from "../WModules/WArrayF.js";
+import { WAjaxTools } from "../WModules/WAjaxTools.js";
 class PaginatorConfig {
     Dataset = [];
     ModelObject = {};
@@ -48,7 +48,6 @@ class WPaginatorViewer extends HTMLElement {
             return;
         }
         this.append(WRender.createElement(this.PaginateTOptionsStyle()), StylesControlsV2.cloneNode(true));
-        this.append(WRender.createElement(this.PaginatorStyle()));
         this.container = WRender.Create({ class: "paginator-container", id: "MainBody" });
         this.append(WRender.createElement(this.DrawHeadOptions()))
         this.append(this.container);
@@ -81,18 +80,21 @@ class WPaginatorViewer extends HTMLElement {
     }
     DrawHeadOptions() {
         const trOptions = { type: "div", props: { class: "thOptions" }, children: [] }
-        const InputOptions = {
-            type: "input",
-            props: {
-                class: "txtControl",
-                type: "text",
-                placeholder: "Buscar...",
-                onchange: async (ev) => {
-                    this.SearchFunction(ev);
+        if (this.PaginatorConfig?.Search) {
+            const InputOptions = {
+                type: "input",
+                props: {
+                    class: "txtControl",
+                    type: "text",
+                    placeholder: "Buscar...",
+                    onchange: async (ev) => {
+                        this.SearchFunction(ev);
+                    }
                 }
             }
+            trOptions.children.push(InputOptions);
         }
-        trOptions.children.push(InputOptions);
+
         return trOptions;
     }
     DrawPages = (Dataset = this.Dataset) => {
@@ -114,7 +116,7 @@ class WPaginatorViewer extends HTMLElement {
 
         });
         if (pages.length == 0) {
-            pages.push(WRender.Create({ 
+            pages.push(WRender.Create({
                 type: "h5", style: { padding: "20px" },
                 innerText: "No hay elementos que mostrar"
             }));
@@ -243,153 +245,7 @@ class WPaginatorViewer extends HTMLElement {
             }
         }
     }
-    PaginatorStyle() {
-        const style = this.querySelector("#TableStyle" + this.id);
-        if (style) {
-            style.parentNode.removeChild(style);
-        }
-        const WTableStyle = css`
-            .tableContainer {
-                overflow: auto;
-            }
-
-            .WTable {
-                font-family: Verdana, sans-serif;
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 12px;
-                border: 1px rgba(10, 10, 10, 0.2) solid;
-            }
-
-            .WTable th {
-                text-align: left;
-            }
-
-            .WTable th label::first-letter{
-                text-transform: uppercase;
-            }
-
-            .WTable td {
-                padding: 0.8rem;
-                text-align: left;
-                vertical-align: top;
-            }
-
-            .WTable .tdAction {
-                text-align: center;
-                width: 120px;
-            }
-
-            .WTable tbody tr:nth-child(odd) {
-                background-color: rgba(0, 0, 0, 0.05);
-            }
-
-            .icon {
-                height: 16px;
-                width: 16px;
-                filter: invert(1);
-            }
-
-            .orderBtn {
-                height: 14px;
-                max-width: 14px;
-                width: 10%;
-                cursor: pointer;
-                margin: 2px;
-            }
-
-            th label {
-                padding: 5px;
-                width: calc(70% - 10px);
-                display: inline-block;
-                text-align: center;
-                text-overflow: ellipsis;
-                overflow: hidden;
-            }
-
-            .tdAcordeon{
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                overflow: hidden;
-                align-items: center;
-                justify-content: flex-start;
-            }
-            .thOptions {
-                display: flex;
-                overflow: hidden;
-                padding: 10px 0px;
-                justify-content: space-between;
-            }
-
-            input[type=text],
-            input[type=string],
-            input[type=number],
-            input[type=date] {                
-                width: 300px;
-            }
-
-            input:active,
-            input:focus {
-                outline: none;
-            }
-
-            input[type=button] {
-                cursor: pointer;
-                width: calc(100% - 0px);
-            }
-
-            @media (max-width: 600px) {
-                divForm div {
-                    width: calc(100% - 10px);
-                    margin: 5px;
-                }
-
-                .WTable {
-                    display: block;
-                }
-
-                .WTable tbody {
-                    display: block;
-                }
-
-                .WTable thead {
-                    display: none;
-                }
-
-                .WTable tr {
-                    display: block;
-                    margin: 10px;
-                    border-radius: 0.3cm;
-                    overflow: hidden;
-                    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
-                }
-
-                .WTable td {
-                    display: flex;
-                    border-bottom: 1px rgba(10, 10, 10, 0.3) solid;
-                    padding: 10px;
-                }
-
-                .WTable .tdAction {
-                    display: block;
-                    justify-content: center;
-                    align-items: center;
-                    width: auto;
-                    padding: 10px;
-                }
-
-                input[type=text],
-                input[type=string],
-                input[type=number],
-                input[type=date] {
-                    padding: 5px 10px;
-                    width: calc(100% - 20px);
-                }
-            }
-        `;
-        return WTableStyle;
-    }
+   
     PaginateTOptionsStyle() {
         const style = this.querySelector("#PaginateTOptionsStyle" + this.id);
         if (style) {
@@ -429,10 +285,10 @@ class WPaginatorViewer extends HTMLElement {
 
             .tfooter {
                 display: flex;
-                border: 1px rgba(10, 10, 10, 0.2) solid;
+                border: 1px rgba(10, 10, 10, 0.1) solid;
                 justify-content: flex-end;
-                padding-left: 20px;
-                padding-right: 20px;
+                padding: 0px 30px;
+                border-radius: 0.2cm;
             }
 
             .tfooterNumbers {

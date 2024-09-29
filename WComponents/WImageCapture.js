@@ -474,7 +474,7 @@ class WImageCapture extends HTMLElement {
             color: #fff;
             text-align: center;
             border: none;
-            font-size: 14px;
+            font-size: 12px;
         }  
         *::-webkit-scrollbar-track {
             display: none;

@@ -220,7 +220,7 @@ class WReportView extends HTMLElement{
                     text-align: center;
                 }
                 h3 {
-                    font-size: 14px;
+                    font-size: 12px;
                     text-align: center;
                 }
                 </style>`;

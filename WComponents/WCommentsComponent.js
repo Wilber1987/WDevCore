@@ -41,6 +41,7 @@ class WCommentsComponent extends HTMLElement {
         this.CommentsContainer = WRender.Create({ className: "CommentsContainer" })
         this.MessageInput = WRender.Create({ tagName: 'textarea' });
         this.autoScroll = true;
+        this.updating = false;
 
         //this.style.backgroundColor = "#fff";
         this.OptionContainer = WRender.Create({
@@ -147,12 +148,16 @@ class WCommentsComponent extends HTMLElement {
 
     connectedCallback() {
         this.Interval = setInterval(async () => {
+            console.log(this.updating , " - updating...");            
+            if (this.updating == true) {
+                console.log(this.updating , " - block updating...");
+                return;            
+            }
+            this.updating = true;
             await this.update();
             this.scrollToBottom();
-        }, 10000)
-        setTimeout(async () => { 
-            await this.update(false)
-            this.scrollToBottom() }, 100);
+            this.updating = false;
+        }, 10000);        
         let isLoading = false;
 
         // Definir la función de manejo de scroll por separado
@@ -282,7 +287,7 @@ class WCommentsComponent extends HTMLElement {
             }
         });
     }
-    update = async (inicialize = false, isUpScrolling = false) => {
+    update = async (inicialize = false, isUpScrolling = false) => {       
         const Message = {}
         Message[this.CommentsIdentifyName] = this.CommentsIdentify
         this.maxMessage = 30;
@@ -410,7 +415,7 @@ class WCommentsComponent extends HTMLElement {
             text-align: left;
         }
         .commentSelf p, .comment p {
-            font-size: 14px;
+            font-size: 12px;
         }
         .commentSelf p::first-letter, .comment p::first-letter {
             text-transform: uppercase;
@@ -426,6 +431,17 @@ class WCommentsComponent extends HTMLElement {
         w-rich-text {
             margin-top: 10px;
             width: calc(100% - 12px);
+        }
+        @media only screen and (max-width: 700px) {
+            .OptionContainer {
+                grid-template-columns: 1fr;
+                min-width: unset;
+                width: 100%;
+            }
+            .RichOptionContainer {
+                align-items: center;
+                justify-content: center;
+            }
         }
        
     `
