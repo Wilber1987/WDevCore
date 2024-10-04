@@ -120,6 +120,9 @@ class WAppNavigator extends HTMLElement {
         }
 
         this.Elements.forEach((element, Index) => {
+            if (element.Disabled == false) {
+                return;
+            }
             const elementNav = WRender.createElement({
                 type: "a",
                 props: { id: "element" + (element.id ?? Index), class: "elementNav" }
@@ -293,6 +296,7 @@ class WAppNavigator extends HTMLElement {
             }
             .TabContainer {
                 padding: 20px 0px;
+                overflow-y: auto;
             }
         
             .elementNav:hover {

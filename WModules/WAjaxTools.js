@@ -12,9 +12,10 @@ class PostConfig {
             this[prop] = props[prop];
         }
     }
-    /**  @type {String} */ RequestType = "POST";
-    /**  @type {String} */ HeaderType = "json";
-    /**  @type {String} */ CSRFToken = "";
+    /**  @type {String | undefined} */ RequestType = "POST";
+    /**  @type {String | undefined} */ HeaderType = "json";
+    /**  @type {String | undefined} */ CSRFToken = "";
+    /**  @type {boolean} */ WithoutLoading = false;
 }
 class WAjaxTools {
     /**
@@ -23,11 +24,13 @@ class WAjaxTools {
     * @param {PostConfig} [PostConfig]
     * @returns {Promise<any>}
     */
-    static Request = async (Url, Data = {}, PostConfig) => {
+    static Request = async (Url, Data = {}, PostConfig) => {   
         const loadinModal = new LoadinModal();
         try {
             const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);
-            document.body.appendChild(loadinModal);
+            if (!PostConfig?.WithoutLoading) {
+                document.body.appendChild(loadinModal);
+            }
             let response = await fetch(Url, config);
             const ProcessRequest = await WAjaxTools.ProcessRequest(response, Url);
             loadinModal.close();
@@ -47,6 +50,7 @@ class WAjaxTools {
     */
     static PostRequest = async (Url, Data = {}, postConfig = new PostConfig()) => {
         try {
+            postConfig.RequestType = "POST";
             return await WAjaxTools.Request(Url, Data, postConfig);
         } catch (error) {
             console.log(error);
@@ -70,9 +74,9 @@ class WAjaxTools {
         if (response.status == 400 || response.status == 403 || response.status == 404 || response.status == 500) {
             const messageError = await response.text();
             var lineas = messageError.split(/\r?\n/);
-            console.log(lineas);            
-            document.body.appendChild(ModalMessege(lineas[0]));      
-            throw new Error(this.ProcessError(lineas[0])).message;            
+            console.log(lineas);
+            document.body.appendChild(ModalMessege(lineas[0]));
+            throw new Error(this.ProcessError(lineas[0])).message;
         } else {
             try {
                 response = await response.json(response);

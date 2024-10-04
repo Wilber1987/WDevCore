@@ -164,7 +164,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
     .btn-success,
     .btn-danger,
     .btn-info,
-    .Btn {     
+    .Btn, .btn-danger2, .BtnAlert2 {     
         display: inline-block;
         padding: 10px;
         font-family: var(--bs-btn-font-family);
@@ -200,7 +200,7 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
    
     .btn-secondary, .BtnSecundary {
         color: #fff;
-        background-color: #a4a9b4;
+        background-color: #777e8d;
         border-color: transparent;
     }
     .BtnSecundary:active, .BtnSecundary:focus, .BtnSecundary:hover,
@@ -226,6 +226,11 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
         background-color: #ed5555;
         border-color: transparent;
     }
+    .btn-danger2, .BtnAlert2 {
+        color: #fff;
+        background-color: #972b2b;
+        border-color: transparent;
+    }
     .BtnAlert:active, .BtnAlert:focus, .BtnAlert:hover,
     .btn-danger:active, .btn-danger:focus, .btn-danger:hover {
         color: #fff;
@@ -235,12 +240,12 @@ const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/variables.cs
 
     .btn-info {
         color: #fff;
-        background-color: #52c6ea;
+        background-color: #45b2d3;
         border-color: transparent;
     }
     .btn-info:active, .btn-info:focus, .btn-info:hover {
         color: #fff;
-        background-color: #4ab2d3 !important;
+        background-color: #3c98b4 !important;
         border-color: transparent !important;
     }
 

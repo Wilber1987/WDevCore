@@ -74,7 +74,7 @@ class WSecurity {
         window.location = WSecurity.LoginInView;
         return result;
     }
-    static HavePermission(/**@type {String} */ permission) {
+    static HavePermission(/**@type {String} */ permission) {        
         return this.UserData.permissions.includes(permission) || this.UserData.permissions.includes(Permissions.ADMIN_ACCESS)
     }
 }
@@ -98,6 +98,7 @@ const Permissions = {
     GESTION_VENTAS: "GESTION_VENTAS", // PERMITE HACER VENTAS
     GESTION_LOTES: "GESTION_LOTES", // PERMITE GESTIONAR LOTES
     GESTION_RECIBOS: "GESTION_RECIBOS", // PERMITE GESTIONAR RECIBOS
+    GESTOR_TAREAS: "GESTOR_TAREAS", //  PUEDE GESTIONAR TAREAS CREARLAS EDITARLAS
     //helpdesk
     GENERADOR_SOLICITUDES: "GENERADOR_SOLICITUDES", // HELPDESK - GENERADOR DE SOLICITUDES
     ADMINISTRAR_CASOS_DEPENDENCIA: "ADMINISTRAR_CASOS_DEPENDENCIA", // HELPDESK - ADMINISTRAR CASOS DEPENDENCIA

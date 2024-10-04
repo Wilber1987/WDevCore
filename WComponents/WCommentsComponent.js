@@ -93,17 +93,13 @@ class WCommentsComponent extends HTMLElement {
         })
         this.Mails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.EvalProperty);
         this.SelectedMails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.EvalProperty);
-
-
-
-
         this.shadowRoot?.append(
             StyleScrolls.cloneNode(true),
             StylesControlsV2.cloneNode(true),
             this.CustomStyle,
             this.CommentsContainer,
             this.TypeTextContainer)
-        if (this.UseDestinatarios  == true) {
+        if (this.UseDestinatarios == true) {
             this.MailsSelect = new MultiSelect({
                 Dataset: this.Mails,
                 selectedItems: this.SelectedMails,
@@ -113,7 +109,7 @@ class WCommentsComponent extends HTMLElement {
             this.shadowRoot?.append(this.MailsSelect)
         }
         this.shadowRoot?.append(this.OptionContainer, this.RitchOptionContainer)
-        
+
 
     }
     saveComment = async () => {
@@ -125,10 +121,11 @@ class WCommentsComponent extends HTMLElement {
             // @ts-ignore
             Body: this.MessageInput.value,
             Id_User: this.User.UserId,
-            Mails: this.UseDestinatarios == true ? this.MailsSelect?.selectedItems  : undefined
+            Mails: this.UseDestinatarios == true ? this.MailsSelect?.selectedItems : undefined
         }
         Message[this.CommentsIdentifyName] = this.CommentsIdentify
-        const response = await WAjaxTools.PostRequest(this.UrlAdd, Message);
+        // @ts-ignore
+        const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
         // @ts-ignore
         this.MessageInput.value = "";
         this.update();
@@ -141,23 +138,24 @@ class WCommentsComponent extends HTMLElement {
             Id_User: this.User.UserI
         }
         Message[this.CommentsIdentifyName] = this.CommentsIdentify
-        const response = await WAjaxTools.PostRequest(this.UrlAdd, Message);
+        // @ts-ignore
+        const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
         this.RitchInput.FunctionClear();
         this.update();
     }
 
     connectedCallback() {
         this.Interval = setInterval(async () => {
-            console.log(this.updating , " - updating...");            
+            console.log(this.updating, " - updating...");
             if (this.updating == true) {
-                console.log(this.updating , " - block updating...");
-                return;            
+                console.log(this.updating, " - block updating...");
+                return;
             }
             this.updating = true;
             await this.update();
             this.scrollToBottom();
             this.updating = false;
-        }, 10000);        
+        }, 30000);
         let isLoading = false;
 
         // Definir la función de manejo de scroll por separado
@@ -192,7 +190,8 @@ class WCommentsComponent extends HTMLElement {
 
             };
         }
-        
+        this.update();
+
     }
     scrollToBottom = () => {
         if (this.autoScroll) {
@@ -213,7 +212,7 @@ class WCommentsComponent extends HTMLElement {
         //console.log(this.Dataset);
         this.Dataset.forEach(comment => {
             const idMessage = comment.Id_mensaje ?? comment.Id_Comentario;
-            const date = new Date(comment.Created_at) ?? new Date(comment.Fecha);
+            const date = new Date(comment.Created_at ?? comment.Fecha);
             if (this.CommentsContainer.querySelector(`#MessageId${idMessage}`)) {
                 return;
             }
@@ -262,7 +261,7 @@ class WCommentsComponent extends HTMLElement {
                 children: [
                     { tagName: "label", className: "nickname", innerHTML: comment.NickName ?? comment.Remitente },
                     { tagName: "p", innerHTML: comment.Body ?? comment.mensaje }, attachs,
-                    { tagName: "label", className: "date",innerHTML: comment.Fecha?.toDateTimeFormatEs() ?? comment.Created_at?.toDateTimeFormatEs() }
+                    { tagName: "label", className: "date", innerHTML: comment.Fecha?.toDateTimeFormatEs() ?? comment.Created_at?.toDateTimeFormatEs() }
                 ]
             });
             const commentWrapper = html`<div id="MessageId${idMessage}"  class="message-wrapper ${commentIdUser == this.User.UserId ? "wraperSelf" : "wrapper"}">
@@ -270,24 +269,28 @@ class WCommentsComponent extends HTMLElement {
             </div>`;
             // @ts-ignore
             commentWrapper.comment = comment;
-            const primerMensaje = this.CommentsContainer.firstChild;
-            //const ultimoMensaje = this.CommentsContainer.lastChild;
-
+            let primerMensaje = null;
+            this.CommentsContainer.querySelectorAll(".message-wrapper")?.forEach(mensaje => {
+                // @ts-ignore
+                if (new Date(mensaje.comment.Created_at ?? mensaje.comment.Fecha) >= date) {
+                    primerMensaje = mensaje;
+                }
+            })
             if (primerMensaje != null) {
                 // @ts-ignore
                 const fechaPrimerMensaje = new Date(primerMensaje.comment.Created_at ?? primerMensaje.comment.Fecha);
                 // @ts-ignore
-                if (fechaPrimerMensaje > date) {
+                if (fechaPrimerMensaje >= date) {
                     this.CommentsContainer.insertBefore(commentWrapper, primerMensaje);
-                } else {
+                } else {            
                     this.CommentsContainer.appendChild(commentWrapper);
                 }
-            } else {
+            } else {                
                 this.CommentsContainer.appendChild(commentWrapper);
             }
         });
     }
-    update = async (inicialize = false, isUpScrolling = false) => {       
+    update = async (inicialize = false, isUpScrolling = false) => {
         const Message = {}
         Message[this.CommentsIdentifyName] = this.CommentsIdentify
         this.maxMessage = 30;
@@ -300,7 +303,8 @@ class WCommentsComponent extends HTMLElement {
         } else {
             Message.FilterData = [{ FilterType: "PAGINATED", Values: ["1", "30"] }]
         }
-        const response = await WAjaxTools.PostRequest(this.UrlSearch, Message);
+        // @ts-ignore
+        const response = await WAjaxTools.PostRequest(this.UrlSearch, Message, { WithoutLoading: true });
         //console.log(response);
         this.Dataset = response;
         if (!inicialize) {
