@@ -376,6 +376,10 @@ class ComponentsManager {
             if (!back) this.NavigationLog.push(IdComponent);
         }
     }
+    Exists = (IdComponent) => {
+        return this.DomComponents.find(node => node.id == IdComponent) != undefined 
+        && this.DomComponents.find(node => node.id == IdComponent) != null;
+    }
     AddComponent = async (IdComponent, ComponentsInstance, ContainerName, order = "last") => {
         if (this.MainContainer == undefined) {
             this.MainContainer = ContainerName;

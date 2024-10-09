@@ -7,17 +7,10 @@ export const WModalStyle = css`
        margin-top: 20px;
        background-color: #fff;
        width: 80%;
-       max-height: calc(100% - 10px);
        border-radius: 0.3cm;
        position: relative;
        box-shadow: 0 0px 3px 0px #000;
        padding: 0 0 20px 0;
-  }
-
-  .ContainerFormWModal h2 {
-       padding: 10px;
-       margin: 0px;
-       background: #09f;
   }
 
   .ContainerFormWModal h1,
@@ -79,7 +72,6 @@ export const WModalStyle = css`
   }
 
   .ObjectModalContainer {
-       max-height: calc(100vh - 120px);
        height: 100%;
        width: 90%;
        margin: 0px auto;

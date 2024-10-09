@@ -1,8 +1,8 @@
-import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
+import { WRender, ComponentsManager, html } from "../WModules/WComponentsTools.js";
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { ModalConfig } from "../WModules/CommonModel.js";
-import {WAjaxTools} from "../WModules/WAjaxTools.js";
+import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WModalStyle } from "./ComponentsStyles/WModalStyle.mjs";
 
 
@@ -20,18 +20,18 @@ class WModalForm extends HTMLElement {
         for (const p in Config) {
             this[p] = Config[p];
         }
-        this.DivColumns =  "calc(100%)";
+        this.DivColumns = "calc(100%)";
         if (this.StyleForm == "columnX1") {
             this.WidthContainer = "40%";
             this.Config.DivColumns = "calc(100%)";
         } else if (this.StyleForm == "columnX3") {
-            this.WidthContainer = "80%";
+            this.WidthContainer = "70%";
             this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
         } else if (this.StyleForm == "FullScreen") {
             this.WidthContainer = "95%";
             this.Config.DivColumns = "calc(30%) calc(30%) calc(30%)";
         } else {
-            this.WidthContainer = "80%";
+            this.WidthContainer = "70%";
             this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
         }
     }
@@ -57,7 +57,7 @@ class WModalForm extends HTMLElement {
             props: {
                 ClassList: [
                     new WCssClass(".ModalContentWModal", {
-                        "opacity": "0",                       
+                        "opacity": "0",
                         "background-color": "rgba(0, 0, 0, 0.5) !important",
                         "width": "100%",
                         "position": "fixed !important",
@@ -113,11 +113,11 @@ class WModalForm extends HTMLElement {
             const modalOb = this.ObjectModal.tagName ? WRender.Create(this.ObjectModal) : WRender.createElement(this.ObjectModal)
             this.Modal.children.push({ class: "ObjectModalContainer", children: [modalOb] });
         } else if (this.ObjectDetail || this.ModelObject || this.EditObject) { // MUESTRA EL DETALLE DE UN OBJETO EN UNA LISTA
-            const { WForm } = await import("./WForm.js");            
+            const { WForm } = await import("./WForm.js");
             this.Config.SaveFunction = (ObjectF, response) => {
                 if (this.ObjectOptions != undefined) {  /**TODO REVISAR */
                     if (this.ObjectOptions.SaveFunction != undefined) {
-                        this.ObjectOptions.SaveFunction(ObjectF,response);
+                        this.ObjectOptions.SaveFunction(ObjectF, response);
                     }
                 }
                 this.close(false);
@@ -133,35 +133,12 @@ class WModalForm extends HTMLElement {
         ComponentsManager.modalFunction(this)
     }
     DrawModalHead() {
-        if (this.HeadOptions == false || this.NoModal == true) {
-            return "";
-        }
-        let icon = "";
-        if (this.icon != undefined) {
-            icon = WRender.CreateStringNode(`<img src="${this.icon}" class="HeaderIcon" alt="">`)
-        }
-        const InputClose = {
-            type: 'button',
-            props: {
-                class: 'BtnClose', //class: 'Btn',
-                type: "button",
-                onclick: () => {
-                    this.close(true);
-                }, innerText: 'x'
-            }
-            //children: ['◄ Back']
-        };
-        const Section = {
-            type: 'div',
-            props: { className: "ModalHeader" },
-            children: [
-                icon, { type: "label", props: { innerText: this.title } }
-            ]
-        };
-        if (this.CloseOption != false) {
-            Section.children.push(InputClose)
-        }
-        return WRender.createElement(Section);
+        return html`<div class="ModalHeader">
+            <label>${this.title}</label>
+            ${this.CloseOption == false
+                ? "" : html`<button class="BtnClose" type="button" 
+                onclick="${() => this.close(this)}">x</button>`}
+       </div>`;
     }
     close = (RollBack = true) => {
         if (this.Form && RollBack) {
