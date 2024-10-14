@@ -845,7 +845,7 @@ class WCardTable extends HTMLElement {
                 default:
                     this.CardTableContainer.append(WRender.Create({
                         tagName: "label",
-                        innerText: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)
+                        innerHTML: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)
                     }));
                     break;
             }

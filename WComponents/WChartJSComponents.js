@@ -1198,6 +1198,7 @@ class GanttChart extends HTMLElement {
             grid-template-rows: 50px auto;
             gap: 10px;
             min-height: 500px;
+            height: 100%;
         }
         .TimeLine {
             grid-column: 2/3;

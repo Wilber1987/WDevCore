@@ -19,7 +19,7 @@ class WCommentsComponent extends HTMLElement {
      * CommentsIdentifyName: string; 
      * UrlSearch: string; 
      * UrlAdd: string; 
-     * AddObject: boolean;
+     * AddObject?: boolean;
      * UseDestinatarios?: boolean; 
      * UseAttach?: boolean;
      * }} props

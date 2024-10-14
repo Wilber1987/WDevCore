@@ -1,5 +1,6 @@
 //@ts-check
-import { ComponentsManager, WRender } from "../WModules/WComponentsTools.js";
+import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { ComponentsManager, html, WRender } from "../WModules/WComponentsTools.js";
 import { WIcons } from "../WModules/WIcons.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 
@@ -84,7 +85,8 @@ class WAppNavigator extends HTMLElement {
             this.NavStyle = "nav";
         }
         const Nav = WRender.Create({ tagName: "nav", id: "MainNav", className: this.NavStyle });
-        this.shadowRoot?.append(Nav)
+        this.shadowRoot?.append(Nav);        
+        this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         if (this.Config.isMediaQuery == true) {
             this.shadowRoot?.append(this.MediaStyle());
         }
@@ -139,8 +141,6 @@ class WAppNavigator extends HTMLElement {
             if (element.url != undefined && element.url != "#") {
                 elementNav.href = element.url
             }
-
-
             Nav.appendChild(elementNav);
             if (element.SubNav != undefined) {
                 this.AddSubNav(Index, element, elementNav, Nav);
@@ -148,15 +148,30 @@ class WAppNavigator extends HTMLElement {
                 if (elementNav.url == undefined) {
                     elementNav.url = "#" + this.id;
                 }
-                elementNav.onclick = async (ev) => {                    
+                elementNav.onclick = async (ev) => {
                     this.ActiveMenu(elementNav);
-                    //console.log(this.Manager);
-
                     if (this.NavStyle == "tab") {
+                        if (this.Manager?.Exists("element" + Index) == true) {
+                            this.Manager?.NavigateFunction("element" + Index);
+                            return;
+                        } 
                         const object = await element.action();
+                        const objectWrapper = html`<div class="ObjectWrapper">
+                            <div class="header">
+                                <h4 class="title">${element.name}</h4>
+                                <button class="zoomBtn"
+                                 onclick="${() => { this.ZoomInOrOut(objectWrapper); }}">
+                                    <svg class="btnZoomIn" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" fill="#074cbb" stroke="#074cbb" stroke-width="0.8879999999999999"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.144"></g><g id="SVGRepo_iconCarrier"><path d="M9.354 15.354L3.7 21H8v1H2v-6h1v4.285l5.646-5.639zM22 2h-6v1h4.3l-5.654 5.646.707.708L21 3.715V8h1zm-6 20h6v-6h-1v4.285l-5.646-5.639-.707.708L20.3 21H16zM8 2H2v6h1V3.715l5.646 5.639.707-.708L3.7 3H8z"></path><path fill="none" d="M0 0h24v24H0z"></path></g></svg>
+                                    <svg class="btnZoomOut" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#165ebb" stroke="#165ebb" stroke-width="1.104"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M22.154 2.554L16.707 8H21v1h-6V3h1v4.293l5.446-5.447zm-19.6 19.6L8 16.707V21h1v-6H3v1h4.293l-5.447 5.446zm19.6-.707L16.707 16H21v-1h-6v6h1v-4.293l5.446 5.446zM1.846 2.554L7.293 8H3v1h6V3H8v4.293L2.554 1.846z"></path><path fill="none" d="M0 0h24v24H0z"></path></g></svg>
+                                </button>
+                            </div>
+                            <div class="container">
+                                ${object}   
+                            </div>
+                        </div>`;
                         if (object) {
-                            this.Manager?.NavigateFunction("element" + Index, object);
-                        }                       
+                            this.Manager?.NavigateFunction("element" + Index, objectWrapper);
+                        }
                     } else {
                         if (element.action != undefined) {
                             element.action();
@@ -167,7 +182,7 @@ class WAppNavigator extends HTMLElement {
             }
             if (Index == 0 && element.SubNav == undefined) {
                 this.InitialNav = () => {
-                    elementNav.onclick();     
+                    elementNav.onclick();
                 }
             }
         });
@@ -177,6 +192,14 @@ class WAppNavigator extends HTMLElement {
         this.Manager = new ComponentsManager({ MainContainer: this.TabContainer, SPAManage: false });
         this.shadowRoot?.append(this.TabContainer);
     }
+    ZoomInOrOut(objectWrapper) {
+        if (objectWrapper.className.includes("activeZoom")) {
+            objectWrapper.className = objectWrapper.className.replace("activeZoom", "");
+        } else {
+            objectWrapper.className += " activeZoom";
+        }
+    }
+
     AddSubNav(Index, element, elementNav, Nav) {
         const SubMenuId = "SubMenu" + Index + this.id;
         const SubNav = WRender.Create({
@@ -385,7 +408,62 @@ class WAppNavigator extends HTMLElement {
             .navActive {
                 overflow: hidden;
                 max-height: 5000px;
-            }`;
+            }
+            .ObjectWrapper {
+                padding: 10px 0px;
+                display: flex;
+                flex-direction: column;
+                & .container {
+                    flex-grow: 1;
+                }
+                & .header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between; 
+                    transition: all 0.6s;
+                    border-bottom: solid 1px rgba(0, 0, 0, 0.2);
+                    margin-bottom: 20px;
+                    & button {
+                        display: flex;
+                        align-items: center;    
+                        border: none;
+                        background-color: transparent; 
+                        cursor: pointer;                       
+                    }
+                    & .zoomBtn svg {
+                        height: 25px;
+                        width: 25px;
+                    } 
+                    & .zoomBtn .btnZoomOut{
+                        display: none;
+                    }
+                    & .zoomBtn .btnZoomIn{
+                        display: block;
+                    }
+                }  
+            }
+            .ObjectWrapper.activeZoom {
+                position: fixed;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                box-sizing: border-box;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 9999;
+                padding: 50px;
+                background-color: #fff;
+                overflow-y: auto;
+                .header {
+                    & .zoomBtn .btnZoomOut{
+                        display: block
+                    }
+                    & .zoomBtn .btnZoomIn{
+                        display: none;
+                    }                    
+                }   
+            }
+            `;
     }
     MediaStyle() {
         const style = this.querySelector("#NavMediaStyle" + this.id);
