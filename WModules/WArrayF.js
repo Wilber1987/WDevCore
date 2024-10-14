@@ -10,11 +10,7 @@ class WArrayF {
     static AddOrRemove(Element, Array, checked) {
         const index = Array.indexOf(Element);
         if (index == -1 && checked == true) {
-            if (WArrayF.FindInArray(Element, Array) == false) {
-                Array.push(Element);
-            } else {
-                console.log("Item Existente");
-            }
+            Array.push(Element);
         } else {
             Array.splice(index, 1);
         }
