@@ -1,9 +1,12 @@
 class DateTime extends Date {
     /**
-    * @param {String|Date} dateTime 
+    * @param {String|Date} [dateTime] 
     */
     constructor(dateTime) {
-        if (dateTime instanceof Date) {
+        if (dateTime == undefined) {
+            super(new Date().getTime());
+            this.Date = new Date();  
+        } else  if (dateTime instanceof Date) {
             super(dateTime.getTime());
             this.Date = dateTime;
         } else {

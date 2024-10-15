@@ -865,7 +865,7 @@ class WForm extends HTMLElement {
         });
         var img = new Image();
         var ctx = InputControl.getContext("2d");
-        if (ObjectF[prop] = !undefined && ObjectF[prop] != null) {
+        if (ObjectF[prop] != undefined && ObjectF[prop] != null) {
             img.src = imgBase64;
             img.onload = function () {
                 // Dibuja la imagen en el canvas
