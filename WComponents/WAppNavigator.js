@@ -281,7 +281,7 @@ class WAppNavigator extends HTMLElement {
         
             .elementNav {
                 text-decoration: none;
-                color: ${this.DarkMode ? "#d3d3d3" : "#444444"};
+                color: var(--font-primary-color);
                 padding: 8px;
                 border: solid 1px rgb(0, 0, 0, 0);
                 transition: all 0.1s;
@@ -296,7 +296,7 @@ class WAppNavigator extends HTMLElement {
         
             .elementNavActive {
                 text-decoration: none;
-                color: ${this.DarkMode ? "#4da6ff" : "#444444"};
+                color: var(--font-primary-color);
                 padding: 8px;
                 font-size: 0.925rem;
                 font-family: "IBM Plex Sans", sans-serif;
@@ -324,7 +324,7 @@ class WAppNavigator extends HTMLElement {
         
             .elementNav:hover {
               /*   background-color:#dcdcdc; */
-                color: ${this.DarkMode ? "#4da6ff" : "#444444"};
+                color:var(--font-secundary-color);
             }
         
             header {
@@ -372,7 +372,7 @@ class WAppNavigator extends HTMLElement {
                 position: absolute;
                 top: +40px;
                 left: 0px;
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 padding: 0.925rem;
                 box-shadow: 0 0 5px 0 #888;
                 border-radius: 15px;
@@ -387,7 +387,7 @@ class WAppNavigator extends HTMLElement {
         
             .DisplayMenu a {
                 text-decoration: none;
-                color: ${this.DarkMode ? "#d3d3d3" : "#444444"};
+                color: ${this.DarkMode ? "var(--fifty-color)" : "#444444"};
                 padding: 10px;
                 font-size: 0.925rem;
                 font-family: "IBM Plex Sans", sans-serif;
@@ -452,7 +452,7 @@ class WAppNavigator extends HTMLElement {
                 background-color: rgba(0, 0, 0, 0.5);
                 z-index: 9999;
                 padding: 50px;
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 overflow-y: auto;
                 .header {
                     & .zoomBtn .btnZoomOut{
@@ -497,7 +497,7 @@ class WAppNavigator extends HTMLElement {
                     transition: all 0.6s;
                     position: fixed;
                     z-index: 999;
-                    background-color: #fff;
+                    background-color: var(--secundary-color);
                     color: #fff;
                     width: 80%;
                     height: 100vh;

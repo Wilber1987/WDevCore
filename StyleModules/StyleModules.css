@@ -104,7 +104,7 @@
     min-width: 100px;   
     cursor: pointer;
     background-color: #09f;
-    color: #fff;
+    color: var(--primary-color);
     border-right: rgb(3, 106, 175) 5px solid;
 }
 .Btn[type=checkbox]{
@@ -113,22 +113,22 @@
     margin: 5px;   
 }
 .BtnPrimary {
-    color: #fff;
+    color: var(--primary-color);
     background-color:#007bff;
     border-right: rgb(3, 106, 175) 5px solid;
 }
 .BtnAlert {
-    color: #fff;
+    color: var(--primary-color);
     background-color: #dc3545;
     border-right: #7e1b25 5px solid;
 }
 .BtnSuccess {
-    color: #fff;
+    color: var(--primary-color);
     background-color: #28a745;
     border-right: #165c26 5px solid;
 }
 .BtnSecundary {
-    color: #fff;
+    color: var(--primary-color);
     background-color: #17a2b8;
     border-right: #0f5964 5px solid;
 }
@@ -158,7 +158,7 @@
     overflow: hidden;
     margin: auto;
     margin-top: 50px;
-    background-color: #fff;
+    background-color: var(--primary-color);
     width: 70%;
     max-height: 800px;
     overflow-y: auto; overflow-y: overlay;
@@ -229,55 +229,5 @@
     max-width:100%  !important;
     transition: all 1s ease 0s;    
 }
-.WScroll{
-    overflow-y: auto; overflow-y: overlay;
-}
-.WScroll::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
-.WScroll::-webkit-scrollbar-thumb:hover {
-    background: #b3b3b3;
-    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);
-}
-.WScroll::-webkit-scrollbar-thumb:active {
-    background-color: #999999;
-}
-.WScroll::-webkit-scrollbar {
-    width: 8px;  
-    height: 8px;   
-}
 
-.WScroll::-webkit-scrollbar-track {
-    background: #e1e1e1;
-    border-radius: 4px;
-}
-.WScroll::-webkit-scrollbar-track:hover,
-.WScroll::-webkit-scrollbar-track:active {
-    background: #d4d4d4;
-}
 
-*::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
-*::-webkit-scrollbar-thumb:hover {
-    background: #b3b3b3;
-    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);
-}
-*::-webkit-scrollbar-thumb:active {
-    background-color: #999999;
-}
-*::-webkit-scrollbar {
-    width: 8px;  
-    height: 8px;   
-}
-
-*::-webkit-scrollbar-track {
-    background: #e1e1e1;
-    border-radius: 4px;
-}
-*::-webkit-scrollbar-track:hover,
-*::-webkit-scrollbar-track:active {
-    background: #d4d4d4;
-}

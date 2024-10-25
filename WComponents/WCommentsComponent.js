@@ -264,30 +264,48 @@ class WCommentsComponent extends HTMLElement {
                     { tagName: "label", className: "date", innerHTML: comment.Fecha?.toDateTimeFormatEs() ?? comment.Created_at?.toDateTimeFormatEs() }
                 ]
             });
-            const commentWrapper = html`<div id="MessageId${idMessage}"  class="message-wrapper ${commentIdUser == this.User.UserId ? "wraperSelf" : "wrapper"}">
+            const newCommentWrapper = html`<div id="MessageId${idMessage}"  class="message-wrapper ${commentIdUser == this.User.UserId ? "wraperSelf" : "wrapper"}">
                <img class="message-avatar" src="${comment.Foto ?? "/media/img/avatar.png"}"/> ${message} 
             </div>`;
             // @ts-ignore
-            commentWrapper.comment = comment;
-            let primerMensaje = null;
-            this.CommentsContainer.querySelectorAll(".message-wrapper")?.forEach(mensaje => {
+            newCommentWrapper.comment = comment;
+
+            /*const commentsWrappers = this.CommentsContainer.querySelectorAll(".message-wrapper");
+            commentsWrappers.forEach((mensaje, index) => {
                 // @ts-ignore
-                if (new Date(mensaje.comment.Created_at ?? mensaje.comment.Fecha) >= date) {
-                    primerMensaje = mensaje;
-                }
-            })
-            if (primerMensaje != null) {
+                const messageDate = new Date(mensaje.comment.Created_at ?? mensaje.comment.Fecha)
+                const beforeMessage = commentsWrappers[index - 1];
+                const afterMessage = commentsWrappers[index + 1];
+            })**/
+            // Asumiendo que newCommentWrapper es el nuevo comentario a insertar
+
+            const commentsWrappers = Array.from(this.CommentsContainer.querySelectorAll(".message-wrapper")); // Convertir NodeList a Array para manipularlo fácilmente
+
+            // Obtener la fecha del nuevo comentario
+            // @ts-ignore
+            const newCommentDate = new Date(newCommentWrapper.comment.Created_at ?? newCommentWrapper.comment.Fecha);
+
+            // Encontrar la posición correcta donde insertar el nuevo comentario
+            let insertBeforeIndex = commentsWrappers.findIndex((mensaje) => {
+                // Obtener la fecha del comentario actual
                 // @ts-ignore
-                const fechaPrimerMensaje = new Date(primerMensaje.comment.Created_at ?? primerMensaje.comment.Fecha);
-                // @ts-ignore
-                if (fechaPrimerMensaje >= date) {
-                    this.CommentsContainer.insertBefore(commentWrapper, primerMensaje);
-                } else {            
-                    this.CommentsContainer.appendChild(commentWrapper);
-                }
-            } else {                
-                this.CommentsContainer.appendChild(commentWrapper);
+                const messageDate = new Date(mensaje.comment.Created_at ?? mensaje.comment.Fecha);
+
+                // Comparar las fechas: si el nuevo comentario es más reciente, detener aquí
+                return newCommentDate < messageDate;
+            });
+
+            // Si no encuentra una posición (es el más reciente), se agrega al final
+            if (insertBeforeIndex === -1) {
+                this.CommentsContainer.appendChild(newCommentWrapper);  // Insertar al final
+            } else {
+                // Insertar el nuevo comentario en la posición correcta
+                this.CommentsContainer.insertBefore(newCommentWrapper, commentsWrappers[insertBeforeIndex]);
             }
+
+
+
+
         });
     }
     update = async (inicialize = false, isUpScrolling = false) => {
@@ -319,7 +337,7 @@ class WCommentsComponent extends HTMLElement {
             overflow: hidden;
             overflow-y: auto;  
             min-height: 280px;
-            background-color: #fff;     
+            background-color: var(--secundary-color);     
             height: calc(100%  - 150px);
             border-radius: 10px;
             padding: 10px;

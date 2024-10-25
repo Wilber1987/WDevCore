@@ -50,7 +50,6 @@ class MultiSelect extends HTMLElement {
         WRender.SetStyle(this, {
             display: this.Config.IsFilterControl == true ? "flex" : "block",
             position: "relative",
-            boxShadow: "0 0 5px #c1c1c1;",
             fontSize: "12px",
             height: "initial"
         });
@@ -456,10 +455,9 @@ class WToolTip extends HTMLElement {
                 position: absolute;
                 width:  100%;
                 z-index: 1;
-                box-shadow: 0 0 5px #e7e7e7;;
                 transition: all .1s;
                 max-height: 0px;
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 overflow: hidden;  
                 left: 0;      
                 top: 0;       
@@ -536,7 +534,7 @@ const MainMenu = css`
     }  
    
     .active {       
-        border: solid 1px #e4e3e3;
+        border: solid 1px var(--fifty-color);;
         max-height: 400px;
         min-width: 300px;
     }
@@ -560,7 +558,7 @@ const MainMenu = css`
         margin-left: 3px;
         cursor: pointer;
         font-weight: bold;
-        border-left: solid 2px #062e2c;
+        border-left: solid 2px var(--secundary-color);
         background: none;
         padding: 0px 5px;
     }
@@ -568,9 +566,8 @@ const MainMenu = css`
         overflow-y: auto; overflow-y: overlay;
         transition: all .1s;
         width: 100%;
-        background: #fff;
+        background: var(--secundary-color);
         position: relative;
-        box-shadow: 0 0 5px #c1c1c1;;
     }
     .MenuActive {
         max-height: 500px;
@@ -579,14 +576,14 @@ const MainMenu = css`
         transition: all 0.1s;
         cursor: pointer;
         display: grid;
-        background: #fff;
-        border-bottom: solid 1px #f1f1f1;
+        background: var(--secundary-color);
+        border-bottom: solid 1px var(--fifty-color);
         grid-template-columns: calc(100% - 40px) 40px;
         grid-row: auto auto;
         align-items: center;
     }
     .OContainer:hover {
-        background: #eee;
+        background: var(--secundary-color);
     }
     .OptionLabel {
         width: 100%;
@@ -628,7 +625,7 @@ const MainMenu = css`
         position: absolute;
         right: 0px;
         margin-right: 10px;
-        background: #696969;
+        background: var(--secundary-color);
         clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
         transition: all 0.1s;
         top: 50%;
@@ -639,7 +636,7 @@ const MainMenu = css`
     }
     .ElementDetail {
         padding: 10px;
-        background-color: #eeeeee;
+        background-color: var(--fourth-color);
         border-radius: 10px;
         margin: 10px;
         font-size: 12px;
@@ -647,7 +644,7 @@ const MainMenu = css`
         font-weight: 500;
     }
     .ElementDetail:hover,  .OContainer:hover > .ElementDetail {
-        background-color: #d2d2d2;
+        background-color: var(--secundary-color);
     }
     .addBtn{
         position: absolute;

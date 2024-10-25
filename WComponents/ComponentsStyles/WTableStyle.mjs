@@ -1,11 +1,15 @@
 import { css } from "../../WModules/WStyledRender.js";
 
-export const WTableStyle = css`.WTable {
+export const WTableStyle = css`@import url(/WDevCore/StyleModules/css/scrolls.css);
+.tableContainer {
+    container-type: inline-size;
+}
+.WTable {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
-    border: 1px rgba(10, 10, 10, 0.2) solid;
+    border: 1px var(--fifty-color) solid;
 }
 
 .WTable th {
@@ -14,7 +18,7 @@ export const WTableStyle = css`.WTable {
     text-transform: capitalize;
     position: relative;
     padding-right: 15px;
-    border-right: 1px #eaeaea solid;
+    border-right: 1px var(--fifty-color) solid;
 }
 
 .WTable th label::first-letter {
@@ -25,7 +29,7 @@ export const WTableStyle = css`.WTable {
     padding: 0.8rem;
     text-align: left;
     vertical-align: top;
-    border-right: 1px #eaeaea solid;
+    border-right: 1px var(--fifty-color) solid;
 }
 
 .WTable td label {
@@ -35,9 +39,13 @@ export const WTableStyle = css`.WTable {
     display: block;
     overflow-y: auto;
     font-size: 12px !important;
+    color: var(--font-primary-color) !important;
     padding: 0 5px;
     max-width: 400px;
 }
+.WTable td label * {
+    color: var(--font-primary-color) !important;
+ }
 
 .WTable td label * {
     font-size: 12px !important;
@@ -55,7 +63,7 @@ export const WTableStyle = css`.WTable {
 }
 
 .WTable tbody tr:nth-child(odd) {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: var(--fourth-color);
 }
 
 .icon {
@@ -123,7 +131,7 @@ input[type=button] {
 input[type=radio] {
     cursor: pointer;
     appearance: none;
-    background-color: #fff;
+    background-color: var(--secundary-color);
     border-radius: 50%;
     font: inherit;
     color: currentColor;
@@ -184,7 +192,7 @@ input[type=radio]:checked::before {
 .paginateBTN {
     display: inline-block;
     padding: 5px;
-    color: #888888;
+    color: var(--font-fourth-color);
     margin: 5px;
     cursor: pointer;
     border-radius: 0.2cm;
@@ -199,13 +207,13 @@ input[type=radio]:checked::before {
 
 .paginateBTNActive {
     font-weight: bold;
-    color: #444444;
+    color: var(--font-fourth-color);
 }
 
 .pagBTN {
     display: inline-block;
     padding: 5px;
-    color: #888888;
+    color: var(--font-primary-color);
     margin: 5px;
     cursor: pointer;
     border-radius: 0.2cm;
@@ -216,7 +224,7 @@ input[type=radio]:checked::before {
 
 .tfooter {
     display: flex;
-    border: 1px rgba(10, 10, 10, 0.2) solid;
+    border: 1px var(--fifty-color) solid;
     border-top: none;
     justify-content: flex-end;
     padding-left: 20px;
@@ -292,37 +300,56 @@ input[type=radio]:checked::before {
     display: block;
     margin: auto;
     object-fit: cover;
-    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 30%);
+    box-shadow: 0 2px 5px 0 var(--fifty-color);
 }
 
-*::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
+@container (width < 600px) {
+    divForm div {
+        width: calc(100% - 10px);
+        margin: 5px;
+    }
 
-*::-webkit-scrollbar-thumb:hover {
-    background: #b3b3b3;
-    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);
-}
+    .WTable {
+        display: block;
+    }
 
-*::-webkit-scrollbar-thumb:active {
-    background-color: #999999;
-}
+    .WTable tbody {
+        display: block;
+    }
 
-*::-webkit-scrollbar {
-    width: 8px;
-    height: 10px;
-    margin: 10px;
-}
+    .WTable thead {
+        display: none;
+    }
 
-*::-webkit-scrollbar-track {
-    background: #e1e1e1;
-    border-radius: 4px;
-}
+    .WTable tr {
+        display: block;
+        margin: 10px;
+        border-radius: 0.3cm;
+        overflow: hidden;
+        box-shadow: 0 0 3px 0 var(--fifty-color);
+    }
 
-*::-webkit-scrollbar-track:active,
-*::-webkit-scrollbar-track:hover {
-    background: #d4d4d4;
+    .WTable td {
+        display: flex;
+        border-bottom: 1px var(--fifty-color) solid;
+        padding: 10px;
+    }
+
+    .WTable .tdAction {
+        display: block;
+        justify-content: center;
+        align-items: center;
+        width: auto;
+        padding: 10px;
+    }
+
+    input[type=text],
+    input[type=string],
+    input[type=number],
+    input[type=date] {
+        padding: 5px 10px;
+        width: calc(100% - 20px);
+    }
 }
 
 @media (max-width: 600px) {
@@ -348,12 +375,12 @@ input[type=radio]:checked::before {
         margin: 10px;
         border-radius: 0.3cm;
         overflow: hidden;
-        box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 3px 0 var(--fifty-color);
     }
 
     .WTable td {
         display: flex;
-        border-bottom: 1px rgba(10, 10, 10, 0.3) solid;
+        border-bottom: 1px var(--fifty-color) solid;
         padding: 10px;
     }
 

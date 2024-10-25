@@ -5,7 +5,7 @@ export const WModalStyle = css`
        grid-template-rows: 70px calc(100% - 70px);
        margin: auto;
        margin-top: 20px;
-       background-color: #fff;
+       background-color: var(--secundary-color);
        width: 80%;
        border-radius: 0.3cm;
        position: relative;
@@ -33,7 +33,7 @@ export const WModalStyle = css`
   }
 
   .ModalHeader {
-       color: #444;
+       color: var(--font-fourth-color);
        font-weight: bold;
        font-size: 20px;
        display: flex;

@@ -667,7 +667,7 @@ const WChartStyle = (ChartInstance) => {
     return css`
         .WChartContainer {
             font-size: 12px;
-            border: #e9e6e6 solid 1px;
+            border: var(--fifty-color) solid 1px;
             padding: 20px 10px;
             overflow: hidden;
             height: calc(100% - 40px);
@@ -697,7 +697,7 @@ const WChartStyle = (ChartInstance) => {
         }
 
         .WChartContainer h3 {
-            color: #444;
+            color: var(--font-fourth-color);
             font-size: 18px;
             padding-bottom: 10px;
             display: flex;
@@ -742,7 +742,7 @@ const WChartStyle = (ChartInstance) => {
             padding-top: 5px;
             padding-left: 40px;
             min-height: 150px;
-            border-bottom: solid 1px #e9e6e6;
+            border-bottom: solid 1px var(--fifty-color);
         }
 
         .SectionBars label {
@@ -762,21 +762,21 @@ const WChartStyle = (ChartInstance) => {
             height: 100%;
             flex-direction: column-reverse;
             flex-grow: 1;
-            border-bottom: solid 1px #e9e6e6;
-            border-top: solid 1px #e9e6e6;
+            border-bottom: solid 1px var(--fifty-color);
+            border-top: solid 1px var(--fifty-color);
         }
 
         .groupBars {
             width: 100%;
             display: flex;
             flex-direction: column-reverse;
-            border-left: solid 1px #e9e6e6;
+            border-left: solid 1px var(--fifty-color);
             align-items: center;
             position: ${ChartInstance.TypeChart == "Line" ? "initial" : "relative"};
         }
 
         .groupBars:last-child {
-            border-right: solid 1px #e9e6e6;
+            border-right: solid 1px var(--fifty-color);
         }
 
         .ContainerBars {
@@ -786,7 +786,7 @@ const WChartStyle = (ChartInstance) => {
             align-items: flex-end;
             justify-content: flex-end;
             overflow: hidden;
-            border-bottom: 1px solid #e9e6e6;
+            border-bottom: 1px solid var(--fifty-color);
         }
 
         .ContainerBars .Bars {
@@ -835,7 +835,7 @@ const WChartStyle = (ChartInstance) => {
 
         .CharLineX {
             position: relative;
-            border-top: #e9e6e6 solid 1px;
+            border-top: var(--fifty-color) solid 1px;
             height: 100%;
             display: flex;
             align-items: flex-start;
@@ -858,36 +858,6 @@ const WChartStyle = (ChartInstance) => {
             display: block;
             text-align: right;
             padding-right: 5px;
-        }
-
-        .SectionBars::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 4px;
-        }
-
-        .SectionBars::-webkit-scrollbar-thumb:hover {
-            background: #b3b3b3;
-            box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);
-        }
-
-        .SectionBars::-webkit-scrollbar-thumb:active {
-            background-color: #999999;
-        }
-
-        .SectionBars::-webkit-scrollbar {
-            width: 4px;
-            height: 5px;
-            margin: 5px;
-        }
-
-        .SectionBars::-webkit-scrollbar-track {
-            background: #e1e1e1;
-            border-radius: 4px;
-        }
-
-        .SectionBars::-webkit-scrollbar-track:active,
-        .SectionBars::-webkit-scrollbar-track:hover {
-            background: #e9e6e6;
         }
 
         .IconsGroup {

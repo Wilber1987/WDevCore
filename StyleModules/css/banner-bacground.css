@@ -10,11 +10,11 @@
     position: relative;
 }
 .site-header h1 {
-    color: #fff;
+    color: var(--primary-color);
 }
 
 .site-header a {
-    color: #fff;
+    color: var(--primary-color);
     margin: 20px 20px 20px 0px;
     display: inline-block;
     text-decoration: none;
@@ -3485,7 +3485,7 @@
 .vr_layer_item {
     width: 70%;
     height: 70%;
-    border: 3px solid #fff;
+    border: 3px solid var(--primary-color);
     border-radius: 100%;
     background: rgba(0, 0, 0, 0.05);
     -webkit-animation: sphere 3000ms cubic-bezier(0.215, 0.61, 0.355, 1) alternate infinite, color 5000ms linear alternate infinite;
