@@ -542,7 +542,6 @@ class WFilterOptions extends HTMLElement {
             grid-template-columns: repeat(4,calc(25% - 12px));
             grid-gap: 15px;
             padding: 10px;
-            overflow: hidden;
             max-height: 0px;
             transition: all 0.3s;
             border-radius: 10px; 
