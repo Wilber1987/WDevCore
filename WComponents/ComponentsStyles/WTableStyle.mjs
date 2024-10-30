@@ -19,6 +19,7 @@ export const WTableStyle = css`@import url(/WDevCore/StyleModules/css/scrolls.cs
     position: relative;
     padding-right: 15px;
     border-right: 1px var(--fifty-color) solid;
+    color: var(--font-secundary-color) !important;
 }
 
 .WTable th label::first-letter {
@@ -29,6 +30,7 @@ export const WTableStyle = css`@import url(/WDevCore/StyleModules/css/scrolls.cs
     padding: 0.8rem;
     text-align: left;
     vertical-align: top;
+    color: var(--font-primary-color) !important;
     border-right: 1px var(--fifty-color) solid;
 }
 

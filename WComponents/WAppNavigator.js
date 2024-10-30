@@ -423,6 +423,7 @@ class WAppNavigator extends HTMLElement {
                     transition: all 0.6s;
                     border-bottom: solid 1px rgba(0, 0, 0, 0.2);
                     margin-bottom: 20px;
+                    color: var(--font-secundary-color);
                     & button {
                         display: flex;
                         align-items: center;    

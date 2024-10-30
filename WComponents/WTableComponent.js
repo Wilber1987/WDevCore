@@ -46,7 +46,7 @@ class WTableComponent extends HTMLElement {
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
             EntityModel: Config.EntityModel,
             Display: Config.Options?.FilterDisplay ?? false,
-            UseEntityMethods: true,
+            UseEntityMethods: this.TableConfig.AddItemsFromApi ?? true,//TODO
             FilterFunction: (DFilt) => {
                 this.withFilter = true;
                 this.DrawTable(DFilt);
