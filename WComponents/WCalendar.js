@@ -1,5 +1,5 @@
 import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
-import { WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
+import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 import {WAjaxTools} from "../WModules/WAjaxTools.js";
 let photoB64;
 class CalendarConfig {
@@ -191,85 +191,95 @@ class WCalendar extends HTMLElement {
         });
         return tfooter;
     }
-    StyleCalendar() {
-        const Style = {
-            type: "w-style",
-            props: {
-                id: "StyleCalendarTemplate",
-                ClassList: [
-                    new WCssClass(`.calendarTitle`, {
-                        padding: "10px",
-                        background: "#367cc3",
-                        color: "#fff",
-                        "text-align": "center",
-                        "font-size": "16px"
-                    }), new WCssClass(`.GridCalendarMonth`, {
-                        display: "grid",
-                        "grid-template-columns": "auto auto auto auto auto auto auto",
-                    }), new WCssClass(`.ListDays`, {
-                        display: "flex",
-                        "justify-content": "center",
-                        "align-items": "center"
-                    }), new WCssClass(`.ListDays label`, {
-                        width: "100%",
-                        color: "#367cc3",
-                        padding: "10px",
-                        "font-size": "12px",
-                        "text-align": "center"
-                    }), new WCssClass(`.GridDayColum`, {
-                        display: "grid",
-                        "grid-template-rows": "45px 45px 45px 45px 45px 45px",
-                    }), new WCssClass(`.CalendarDayDisable`, {
-                        padding: 10,
-                        "font-size": 12,
-                        border: "solid 1px #bbbb",
-                        "background-color": "rgb(242 242 242)",
-                    }), new WCssClass(`.CalendarDay`, {
-                        padding: 10,
-                        "font-size": 12,
-                        border: "solid 1px #bbbb",
-                        cursor: "pointer",
-                        transition: "all 0.5s"
-                    }), new WCssClass(`.CalendarDay:hover`, {
-                        "background-color": "#79a6d2"
-                    }), new WCssClass(`.CalendarDayActive`, {
-                        padding: 10,
-                        border: "solid 1px #2d5986",
-                        cursor: "pointer",
-                        "font-size": 12,
-                        transition: "all 0.5s",
-                        "background-color": "#538cc6",
-                        color: "#fff",
-                    }), //PAGINACION
-                    new WCssClass(`.pagBTN`, {
-                        display: "inline-block",
-                        padding: "10px",
-                        color: "#888888",
-                        "margin": "5px",
-                        cursor: "pointer",
-                        "border-radius": "0.2cm",
-                        "font-weight": "bold",
-                        transition: "all 0.6s",
-                        "text-align": "center",
-                    }), new WCssClass(`.div`, {
-                        display: "flex",
-                        "justify-content": "flex-end",
-                        "padding-left": "20px",
-                        "padding-right": "20px",
-                        background: "#d8d8d8",
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                    }),
-                ],
-                MediaQuery: [{
-                    condicion: "(max-width: 800px)",
-                    ClassList: []
-                },]
-            }
+    StyleCalendar() {        
+        return css`
+        .calendarTitle {
+            padding: 10px;
+            background: var(--tertiary-color);
+            color: var(--font-primary-color);
+            text-align: center;
+            font-size: 16px;
         }
-        return Style;
+
+        .GridCalendarMonth {
+            display: grid;
+            grid-template-columns: auto auto auto auto auto auto auto;
+        }
+
+        .ListDays {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ListDays label {
+            width: 100%;
+            color: var(--tertiary-color);
+            padding: 10px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .GridDayColum {
+            display: grid;
+            grid-template-rows: 45px 45px 45px 45px 45px 45px;
+        }
+
+        .CalendarDayDisable {
+            padding: 10px;
+            font-size: 12px;
+            border: solid 1px var(--fourth-color);
+            background-color: var(--fourth-color);
+        }
+
+        .CalendarDay {
+            padding: 10px;
+            font-size: 12px;
+            border: solid 1px var(--fourth-color);
+            cursor: pointer;
+            transition: all 0.5s;
+        }
+
+        .CalendarDay:hover {
+            background-color: var(--tertiary-color);
+        }
+
+        .CalendarDayActive {
+            padding: 10px;
+            border: solid 1px var(--fourth-color);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.5s;
+            background-color:  var(--fourth-color);
+            color: var(--font-primary-color);
+        }
+
+        .pagBTN {
+            display: inline-block;
+            padding: 10px;
+            color: var(--font-primary-color);
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 0.2cm;
+            font-weight: bold;
+            transition: all 0.6s;
+            text-align: center;
+        }
+
+        .div {
+            display: flex;
+            justify-content: flex-end;
+            padding-left: 20px;
+            padding-right: 20px;
+            background: var(--tertiary-color);
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+        }
+
+        @media (max-width: 800px) {}
+        `;
     }
 }
 class DetailDayClass extends HTMLElement {
@@ -370,67 +380,72 @@ class DetailDayClass extends HTMLElement {
             this.append(hour);
         });
     }
-    Style = {
-        type: "w-style",
-        props: {
-            ClassList: [
-                new WCssClass(`.DayDetail`, {
-                    display: "flex",
-                    "flex-direction": "column",
-                    overflow: "auto",
-                    "margin-left": 15,
-                    "border-radius": "0.5cm",
-                    "box-shadow": "0 2px 5px 0px rgb(0 0 0 / 50%)",
-                }), new WCssClass(`.hourDetail label`, {
-                    //border: "1px solid #888",
-                    display: "block",
-                    padding: "5px 25px",
-                    "font-size": "12px",
-                    "margin-bottom": "0px !important",
-                    cursor: "pointer",
-                }), new WCssClass(`.hourDetail`, {
-                    background: "rgb(242 242 242)",
-                    //display: "flex",
-                    "border-bottom": "1px solid #b2b2b2",
-                }), new WCssClass(`.hourH input`, {
-                    display: "none",
-                }), new WCssClass(`.hourH label::after`, {
-                    'content': '""',
-                    'background': 'transparent',
-                    'border': '2px solid #b2b2b2 !important',
-                    'height': '12px',
-                    'line-height': '12px',
-                    'margin-right': '5px',
-                    'text-align': 'center',
-                    'vertical-align': 'middle',
-                    'width': '12px',
-                    'position': 'relative',
-                    'margin': '0px',
-                    'float': 'right',
-                    'top': '0px'
-                }), new WCssClass(
-                    `.hourH input[type="checkbox"]:checked + label::after`, {
-                    "content": "''",
-                    "font-size": "15px",
-                    "color": "#757575",
-                    "background-color": "#4894aa;   ",
-                    "box-shadow": "inset 0 0 0 2px #e2e2e2",
-                    "transition": "all ease 0.5s",
-                }), new WCssClass(`.hourR`, {
-                    background: "#cdccdb",
-                }), new WCssClass(`.hourH`, {
-                    background: "#fff",
-                    cursor: "pointer",
-                }), new WCssClass(`.DayContent`, {
-                    display: "flex",
-                    padding: "10px 15px",
-                    gap: 10,
-                    "font-weight": "600",
-                    "border-bottom": "1px solid #b2b2b2"
-                })
-            ]
+    Style = css`
+        .DayDetail {
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            margin-left: 15px;
+            border-radius: 0.5cm;
+            box-shadow: 0 2px 5px 0px var(--fifty-color);
         }
-    };
+
+        .hourDetail label {
+            display: block;
+            padding: 5px 25px;
+            font-size: 12px;
+            margin-bottom: 0px !important;
+            cursor: pointer;
+        }
+
+        .hourDetail {
+            background: var(--secundary-color);
+            border-bottom: 1px solid var(--fifty-color);
+        }
+
+        .hourH input {
+            display: none;
+        }
+
+        .hourH label::after {
+            content: "";
+            background: transparent;
+            border: 2px solid var(--fifty-color) !important;
+            height: 12px;
+            line-height: 12px;
+            margin-right: 5px;
+            text-align: center;
+            vertical-align: middle;
+            width: 12px;
+            position: relative;
+            margin: 0px;
+            float: right;
+            top: 0px;
+        }
+
+        .hourH input[type="checkbox"]:checked+label::after {
+            content: '';
+            font-size: 15px;
+            color: var(--primary-color);
+            background-color: var(--tertiary-color);
+            transition: all ease 0.5s;
+        }
+
+        .hourR {
+            background: var(--secundary-color);
+        }
+
+        .hourH {
+            cursor: pointer;
+        }
+
+        .DayContent {
+            display: flex;
+            padding: 10px 15px;
+            gap: 10px;
+            font-weight: 600;
+            border-bottom: 1px solid #b2b2b2;
+        }`
 }
 const CalendarFunction = async () => {
     return { Agenda: [], Calendario: [] }

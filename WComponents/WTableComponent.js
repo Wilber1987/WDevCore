@@ -46,7 +46,7 @@ class WTableComponent extends HTMLElement {
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
             EntityModel: Config.EntityModel,
             Display: Config.Options?.FilterDisplay ?? false,
-            UseEntityMethods: true,
+            UseEntityMethods: this.TableConfig.AddItemsFromApi ?? true,//TODO
             FilterFunction: (DFilt) => {
                 this.withFilter = true;
                 this.DrawTable(DFilt);
@@ -267,7 +267,10 @@ class WTableComponent extends HTMLElement {
             this.DeleteBTN(Options, element, tr);
             if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
-                    if (Action == null || (Action.rendered != undefined && Action.rendered(element) == true)) {
+                    if (Action == null || 
+                        (Action.rendered != undefined && 
+                            // @ts-ignore
+                            (Action.rendered == false || Action.rendered(element) == false))) {
                         //console.log();
                         return;
                     }

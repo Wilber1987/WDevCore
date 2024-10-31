@@ -118,7 +118,7 @@ input:-internal-autofill-selected {
 
 input[type=checkbox] {
     appearance: none;
-    background-color: #fff;
+    background-color: var(--secundary-color);
     margin: 0;
     font: inherit;
     color: currentColor;
@@ -269,7 +269,7 @@ input[type=checkbox]:checked::before {
 input[type=radio] {
     cursor: pointer;
     appearance: none;
-    background-color: #fff;
+    background-color: var(--secundary-color);
     border-radius: 50%;
     font: inherit;
     color: currentColor;

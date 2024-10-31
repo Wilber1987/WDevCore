@@ -1,16 +1,28 @@
 :root {
-    --primary-color: rgb(9, 68, 108);
+    --primary-color: rgb(255, 255, 255);
     --secundary-color: rgb(255, 255, 255);
-    --tertiary-color: rgb(0, 41, 107);
-    --fourth-color: rgba(255, 255, 255, 0.9);;
+    --tertiary-color: rgb(8, 48, 100);
+    --fourth-color: rgba(240, 239, 239, 0.9);
+    --fifty-color: rgba(222, 222, 222, 0.9);
+
     --font: "Open Sans", sans-serif;
-    --font-primary-color: #ffffff;
-    --font-secundary-color: #ffffff;
+    --font-primary-color: #222222;
+    --font-secundary-color: rgb(11, 89, 153);
     --font-tertiary-color: rgb(0, 191, 165);
-    --font-fourth-color: #595959;
-    --bs-border-width: 1px;
-    --bs-border-style: solid;
-    --bs-border-color: #d3d3d3;
-    --bs-border-radius: 10px;
-    --bs-btn-bg: #fff;
+    --font-fourth-color: #444444;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: rgb(19, 21, 22);/*color mas fuerte*/
+        --secundary-color: rgb(31, 34, 36);/*color mas debil*/
+        --tertiary-color: rgb(31, 88, 199);/*color de contraste*/
+        --fourth-color: rgb(40, 44, 47);
+        --fifty-color: rgba(63, 63, 63, 0.9);
+
+        --font: "Open Sans", sans-serif;
+        --font-primary-color: #ffffff;
+        --font-secundary-color: #06a3ec;
+        --font-tertiary-color: rgb(0, 191, 165);
+        --font-fourth-color: #d3d3d3;
+    }
 }

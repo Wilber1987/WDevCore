@@ -542,10 +542,10 @@ class WFilterOptions extends HTMLElement {
             grid-template-columns: repeat(4,calc(25% - 12px));
             grid-gap: 15px;
             padding: 10px;
-            overflow: hidden;
             max-height: 0px;
             transition: all 0.3s;
             border-radius: 10px; 
+            border-radius: 10px;            
             
         }
 
@@ -553,7 +553,7 @@ class WFilterOptions extends HTMLElement {
             max-height: inherit;
             padding: 10px;
             transition: all 0.3s;
-            border: 1px solid #d3d3d3;
+            border: 1px solid var(--fifty-color);
         }
 
         .OptionContainer label {

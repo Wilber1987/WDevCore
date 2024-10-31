@@ -32,7 +32,7 @@ class WRichText extends HTMLElement {
         this.style.backgroundColor = "#fff";
         //this.style.padding = "5px";
         this.style.borderRadius = "10px";
-        this.style.border = "1px solid rgb(222 222 222)"
+        this.style.border = "1px solid var(--fifty-color)";
         this.Config = Config;
         this.DrawComponent();
         this.MaxColumns = 10;
@@ -241,7 +241,7 @@ class WRichText extends HTMLElement {
                 top: 40px;
                 left: 50%;
                 transform: translateX(-50%);
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 box-shadow: #c5c5c5 0 0 5px 0;
                 padding: 10px 10px 20px 10px;
             }
@@ -287,7 +287,7 @@ class WRichText extends HTMLElement {
                 border-collapse: collapse;
             }
             .my-table th,  .my-table td  {
-                border: solid 1px #c5c5c5;
+                border: solid 1px var(--fifty-color);)
                 padding: 5px;
                 line-height: 15px;
                 font-size: 15px;
@@ -340,6 +340,7 @@ const WRichTextStyle = css`
         margin: 0px;
         padding: 20px;
         overflow-y: auto;
+        color: #444;
     }
     .WREditor:focus-visible  {
         outline-color : #b1d7f0;
@@ -353,7 +354,7 @@ const WRichTextStyle = css`
         align-items: center;
         justify-content: flex-start;
         flex-wrap: wrap;
-        background-color: #f5f2f2;
+        background-color: var(--fifty-color);
         position: relative;
     }
 
@@ -361,7 +362,7 @@ const WRichTextStyle = css`
         margin: 0px;
         border-radius: 4px;
         padding: 5px;
-        border: solid 1px #c5c5c5;
+        border: solid 1px var(--fifty-color);
         display: grid;
         grid-template-columns: auto auto auto;
         justify-content: left;
@@ -379,7 +380,7 @@ const WRichTextStyle = css`
     .AttachBtn {
         padding: 5px;
         cursor: pointer;
-        color: #fff;
+        color: var(--font-primary-color);
         background-color: #994914;
         border-radius: 5px;
         display: flex;
@@ -407,13 +408,24 @@ const WRichTextStyle = css`
     }
 
     w-rich-text .ROption {
-        border: solid 1px #c5c5c5;
         border: none;
         padding: 3px;
         margin: 0px;
         display: grid;
         place-items: center;
-
+        background-color: transparent;
+        color: var(--font-primary-color);
+        cursor  : pointer;
+        transition: all 0.3s;
+    }
+    w-rich-text .ROption:hover {
+        color: var(--font-secundary-color);
+    }
+    w-rich-text .ROption:hover > svg {
+        fill: var(--font-secundary-color);
+    }
+    w-rich-text .ROption svg {
+        fill: var(--font-primary-color);
     }
 
     .tooltip {
@@ -426,7 +438,7 @@ const WRichTextStyle = css`
         visibility: hidden;
         min-width: 120px;
         background-color: black;
-        color: #fff;
+        color: var(--font-primary-color);
         text-align: center;
         border-radius: 6px;
         padding: 5px;

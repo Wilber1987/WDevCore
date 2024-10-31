@@ -660,7 +660,7 @@ class WTableDynamicComp extends HTMLElement {
             .TableOptions .TableOptionsBTN {
                 grid-column: 1/3;
                 padding: 10px;
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 display: flex;
                 align-items: center;
             }            
@@ -669,7 +669,7 @@ class WTableDynamicComp extends HTMLElement {
                 width: 100%;
                 grid-row: 2/3;
                 flex-direction: column;
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 box-shadow: 0 0 2px 0 rgba(0, 0, 0, 30%);
                 height: 100%;
             }            
@@ -695,7 +695,7 @@ class WTableDynamicComp extends HTMLElement {
                 grid-column: 1/2;
                 grid-row: 1/4;
                 padding: 10px;
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -764,7 +764,7 @@ class WTableDynamicComp extends HTMLElement {
                 justify-content: space-between;
                 align-items: center;
                 padding: 5px;
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 cursor: pointer;
                 border-bottom: solid 2px #efefef;
             }            
@@ -785,7 +785,7 @@ class WTableDynamicComp extends HTMLElement {
             }
             .TableOptions w-form {
                 grid-column: span 2;
-                background-color: #fff;
+                background-color: var(--secundary-color);
                 box-shadow: 0 0 2px 0 rgba(0, 0, 0, 30%);
             }
             .TableOptionsInact w-form  {

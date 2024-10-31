@@ -268,7 +268,7 @@ class WPaginatorViewer extends HTMLElement {
 
             .paginateBTNActive {
                 font-weight: bold;
-                color: #444444;
+                color: var(--font-fourth-color)444;
             }
 
             .pagBTN {
@@ -358,36 +358,6 @@ class WPaginatorViewer extends HTMLElement {
                 object-fit: cover;
                 box-shadow: 0 2px 5px 0 rgb(0 0 0 / 30%);
                 margin: 10px;
-            }
-
-            *::-webkit-scrollbar-thumb {
-                background: #ccc;
-                border-radius: 4px;
-            }
-
-            *::-webkit-scrollbar-thumb:hover {
-                background: #b3b3b3;
-                box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);
-            }
-
-            *::-webkit-scrollbar-thumb:active {
-                background-color: #999999;
-            }
-
-            *::-webkit-scrollbar {
-                width: 8px;
-                height: 10px;
-                margin: 10px;
-            }
-
-            *::-webkit-scrollbar-track {
-                background: #e1e1e1;
-                border-radius: 4px;
-            }
-
-            *::-webkit-scrollbar-track:active,
-            *::-webkit-scrollbar-track:hover {
-                background: #d4d4d4;
             }
         `;
         return WTableStyle;
