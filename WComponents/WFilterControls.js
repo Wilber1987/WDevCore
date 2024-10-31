@@ -545,7 +545,8 @@ class WFilterOptions extends HTMLElement {
             max-height: 0px;
             transition: all 0.3s;
             border-radius: 10px; 
-            border-radius: 10px;            
+            border-radius: 10px;   
+            overflow: hidden;         
             
         }
 
@@ -554,6 +555,7 @@ class WFilterOptions extends HTMLElement {
             padding: 10px;
             transition: all 0.3s;
             border: 1px solid var(--fifty-color);
+            overflow: unset;
         }
 
         .OptionContainer label {

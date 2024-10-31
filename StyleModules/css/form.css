@@ -89,12 +89,7 @@
 .BtnAlert2 {
     display: inline-block;
     text-decoration: none;
-    padding: 10px;
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
-    font-weight: var(--bs-btn-font-weight);
-    line-height: var(--bs-btn-line-height);
-    color: var(--bs-btn-color);
+    padding: 10px;  
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
@@ -104,12 +99,12 @@
     user-select: none;
     border-radius: 8px;
     margin-left: 5px;
-    background-color: var(--bs-btn-bg);
+   
     -webkit-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
-    color: var(--font-primary-color);
+    color: #fff;
     background-color: #1f58c7;
     border-color: transparent;
 }
@@ -332,14 +327,13 @@ textarea:focus {
     align-items: center;
     padding: 10px 20px;
     font-size: 12px;
-    ;
     border-radius: 10px;
     color: #282c2f;
     text-align: left;
     border: 0;
     overflow-anchor: none;
     transition: color 0.15s ease-in-out;
-    background-color: 0.15s ease-in-out;
+    background-color: var(--secundary-color);
     border-color: 0.15s ease-in-out;
     box-shadow: 0.15s ease-in-outp;
     justify-content: space-between;

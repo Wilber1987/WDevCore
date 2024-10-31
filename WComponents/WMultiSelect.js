@@ -344,13 +344,16 @@ class MultiSelect extends HTMLElement {
             "nombre",
             "Nombre",
             "Nombres",
+            "text",
+            "Text",
+            "Texto", "texto",
             "Descripcion_Servicio"]
         for (const key in element) {
             if (keys.find(k => k == key) != null) {
                 this.DisplayName = key;
                 break;
             }
-        }
+        }        
         return element[this.DisplayName ?? ""] ?? "Element" + index;
     }
     DisplayOptions = () => {
@@ -572,6 +575,9 @@ const MainMenu = css`
     .MenuActive {
         max-height: 500px;
     }
+    .Option {
+        background-color: var(--secundary-color);
+    }
     .OContainer {
         transition: all 0.1s;
         cursor: pointer;
@@ -611,11 +617,15 @@ const MainMenu = css`
         padding: 10px;
         border: none;
         outline: none;
+        background-color: var(--secundary-color);
+        border-bottom: solid 1px var(--fifty-color);
+        color: var(--font-primary-color);
     }
     .txtControl:active,
     .txtControl:focus {
         border: none;
         outline: none;
+        border-bottom: solid 1px var(--fifty-color);
         box-shadow: 0 0 5px #4894aa;
     }
     .btnSelect {
@@ -625,7 +635,7 @@ const MainMenu = css`
         position: absolute;
         right: 0px;
         margin-right: 10px;
-        background: var(--secundary-color);
+        background: var(--sexty-color);
         clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
         transition: all 0.1s;
         top: 50%;
