@@ -267,7 +267,10 @@ class WTableComponent extends HTMLElement {
             this.DeleteBTN(Options, element, tr);
             if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
-                    if (Action == null || (Action.rendered != undefined && Action.rendered(element) == true)) {
+                    if (Action == null || 
+                        (Action.rendered != undefined && 
+                            // @ts-ignore
+                            (Action.rendered == false || Action.rendered(element) == false))) {
                         //console.log();
                         return;
                     }

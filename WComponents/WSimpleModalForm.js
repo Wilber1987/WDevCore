@@ -57,7 +57,6 @@ class WSimpleModalForm extends HTMLElement {
     modalStyle = css`
         w-simple-modal{
             position: fixed;
-            background-color: rgba(255, 255, 255, 0.25);
             top: 0;
             right: 0;
             bottom: 0;
@@ -70,12 +69,6 @@ class WSimpleModalForm extends HTMLElement {
    `;
     FormStyle = () => {
         return css`
-            :root {
-                --color-primary: rgb(53, 128, 226);
-                --color-secundary: rgb(255, 25, 133);
-                --color-terciario: rgb(52, 12, 56);
-            }
-
             .ContainerFormWModal {
                 display: flex;
                 flex-direction: column;
@@ -89,7 +82,7 @@ class WSimpleModalForm extends HTMLElement {
                 left: 50%;
                 transform: translate(-50%, 0%);
                 padding: 2em;
-                background: white;
+                background-color: var(--secundary-color);;
                 border-radius: 20px;
             }
 
@@ -105,7 +98,7 @@ class WSimpleModalForm extends HTMLElement {
                 align-items: center;
                 text-transform: uppercase;
                 font-weight: 500;
-                color: #1c4786;
+                color: var(--font-tertiary-color);
                 font-size: 20px;
                 text-align: center;
                 margin-bottom: 10px;

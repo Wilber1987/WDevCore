@@ -317,7 +317,7 @@ class WNode {
  * @typedef {Object} Actions 
  * @property {String} name
  * @property {Function} action
- * @property {Function} [rendered] funcion que debe retornar true o false
+ * @property {Function|Boolean} [rendered] funcion que debe retornar true o false
  * **/
 /**
  * @typedef {Object} TableOptions 
