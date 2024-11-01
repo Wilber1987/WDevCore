@@ -1,5 +1,5 @@
 //@ts-check
-import { WRender, ComponentsManager, html } from '../WModules/WComponentsTools.js';
+import { WRender, html } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WSimpleModalForm } from "./WSimpleModalForm.js";
@@ -1232,7 +1232,7 @@ class WForm extends HTMLElement {
                     /**
                      * @type {?HTMLInputElement | undefined | any}
                      */
-                    const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
+                    const control = this.DivForm?.querySelector("#ControlValue" + prop);
                     if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
                         if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
                             return false;

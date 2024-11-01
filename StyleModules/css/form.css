@@ -111,8 +111,7 @@
 
 .Btn:active,
 .Btn:focus,
-.Btn:hover {
-    color: var(--font-primary-color);
+.Btn:hover {    
     background-color: #1c4fb3 !important;
     border-color: transparent !important;
 }
@@ -214,7 +213,7 @@ input[type=datetime-local],
 w-multi-select,
 select,
 textarea {
-    display: block;
+    display: flex;
     width: calc(100%);
     box-sizing: border-box;
     padding: .47rem .75rem;
@@ -386,6 +385,21 @@ textarea:focus {
 .vertical-acordeon-btn.active-btn::after {
     transform: rotate(-90deg);
 }
+
+
+.check-icon::before {
+    content: " ";
+    display: inline-block;
+    margin: 0 5px;
+    width: 0.65em;
+    height: 0.65em;
+    box-shadow: inset 1em 1em var(--form-control-color);
+    transform-origin: bottom left;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    background-color: #fff;
+}
+
+
 @media (prefers-color-scheme: dark) { 
     * {
         color-scheme: dark;
