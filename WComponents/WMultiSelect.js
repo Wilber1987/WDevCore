@@ -90,9 +90,11 @@ class MultiSelect extends HTMLElement {
                         }
                     }
                     const responseDataset = await new this.ModelObject.constructor({ FilterData: [{ FilterType: "or", Filters: filterData }] }).Get();
+                    this.Dataset = [...this.Dataset, ...responseDataset]
                     this.DrawFilterData(responseDataset, ev);
                 } else {
                     const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value);
+                    this.Dataset = [...this.Dataset, ...Dataset]
                     this.DrawFilterData(Dataset, ev);
                 }
             }

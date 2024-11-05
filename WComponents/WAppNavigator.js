@@ -320,8 +320,7 @@ class WAppNavigator extends HTMLElement {
                 display: none;
             }
             .TabContainer {
-                padding: 20px 0px;
-                overflow-y: auto;
+                padding: 20px 0px;               
             }
         
             .elementNav:hover {

@@ -1,6 +1,24 @@
+import { ModelProperty } from "./CommonModel.js";
 import { EntityClass } from "./EntityClass.js";
 
 class WArrayF {
+    static ValidateByModel(object, model) {
+        for (const prop in model) {
+            const exclude = ["Filterdata", "ApiMethods", "OrderData"]
+            /**@type {ModelProperty} */
+            const propValue = model[prop];
+            if (propValue.__proto__ != Function.Property &&
+                propValue.__proto__.constructor.name != "AsyncFunction" &&
+                prop != "FilterData" &&
+                prop != "OrderData" &&
+                prop != "ApiMethods" &&
+                propValue?.require != false && (object[prop] == undefined || object[prop] == null)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Agrega o Elimina un elemento de un arreglo seg n un parametro de seleccion
      * @param {Object} Element Elemento a agregar o eliminar
