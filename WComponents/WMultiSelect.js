@@ -47,6 +47,7 @@ class MultiSelect extends HTMLElement {
         this.FieldName = "";
         this.FullDetail = this.Config.FullDetail ?? true;
         this.SubOptionsFieldName = "";
+        this.ControlsContainer = WRender.Create({ className: "ControlContainer" });
         WRender.SetStyle(this, {
             display: this.Config.IsFilterControl == true ? "flex" : "block",
             position: "relative",
@@ -67,9 +68,24 @@ class MultiSelect extends HTMLElement {
             tagName: "input",
             class: "txtControl",
             placeholder: "Buscar...",
-            onchange: async (ev) => {
+            onkeypress: async (ev) => {
                 if (this.ModelObject?.__proto__ == Function.prototype) {
                     this.ModelObject = this.ModelObject();
+                }
+                const filterDataset = this.Dataset.filter((element) => {
+                    for (const prop in element) {
+                        try {
+                            if (WArrayF.evalValue(element[prop], ev.target.value) != null) {
+                                return element;
+                            }
+                        } catch (error) {
+                            console.log(element);
+                        }
+                    }
+                });
+                if (filterDataset.length != 0) {
+                    this.DrawFilterData(filterDataset, ev);
+                    return;
                 }
 
                 if (this.ModelObject?.Get != undefined) {
@@ -84,7 +100,7 @@ class MultiSelect extends HTMLElement {
                         if ((this.ModelObject[prop].type?.toUpperCase() == "TEXT")
                             && ev.target.value.replaceAll(" ", "") != "") {
                             filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
-                        } else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER" &&  !isNaN(ev.target.value))
+                        } else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER" && !isNaN(ev.target.value))
                             && ev.target.value.replaceAll(" ", "") != "") {
                             filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })
                         }
@@ -99,10 +115,13 @@ class MultiSelect extends HTMLElement {
                 }
             }
         });
-        this.shadowRoot?.append(
+        this.ControlsContainer?.append(
             this.LabelMultiselect,
             StyleScrolls.cloneNode(true),
             MainMenu.cloneNode(true)
+        );
+        this.shadowRoot?.append(
+            this.ControlsContainer
         );
         if (Config.Mode == "SELECT_BOX") {
             this.shadowRoot?.append(selectBoxStyle.cloneNode(true));
@@ -177,9 +196,22 @@ class MultiSelect extends HTMLElement {
 
     connectedCallback() {
         this.Draw();
-        this.parentNode?.addEventListener("click", (e) => this.undisplayMultiSelects(e));
-        this.parentNode?.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
+        document.addEventListener("click", this.handleGlobalClick);
+        document.addEventListener("scroll", this.undisplayMultiSelects, true);
     }
+    // Método para limpiar eventos al desconectar el componente
+    disconnectedCallback() {
+        document.removeEventListener("click", this.handleGlobalClick);
+        document.removeEventListener("scroll", this.undisplayMultiSelects, true);
+    }
+    // Método para detectar clic fuera del componente
+    handleGlobalClick = (e) => {
+        const isClickInside = this.contains(e.target) || e.target.tagName.includes("W-MULTI-SELECT");
+
+        if (!isClickInside) {
+            this.undisplayMultiSelects(e);
+        }
+    };
 
     Draw = (Dataset = this.Dataset) => {
         this.OptionsContainer.innerHTML = "";
@@ -194,6 +226,7 @@ class MultiSelect extends HTMLElement {
                 tagName: "input",
                 id: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
                 type: OType,
+                hidden: OType == "radio" ? true : false,
                 name: element.name,
                 checked: WArrayF.FindInArray(element, this.selectedItems),
                 className: "Option", onchange: (ev) => {
@@ -209,6 +242,18 @@ class MultiSelect extends HTMLElement {
                         } else {
                             console.log("Item Existente")
                         }
+
+                        this.shadowRoot?.querySelectorAll(".OContainer").forEach((nodo) => {
+                            nodo.classList.remove("OContainerActive");
+                            const nodoOption = nodo.querySelector(".Option");
+                            // @ts-ignore
+                            if (nodoOption?.checked == true) {
+                                nodo.classList.add("OContainerActive");
+                            } else {
+                                nodo.classList.remove("OContainerActive");
+                            }
+                        })
+
                     } else {
                         this.selectedItems.splice(index, 1);
                         if (this.selectedItems.length == 0) {
@@ -239,8 +284,10 @@ class MultiSelect extends HTMLElement {
                 SubContainer.append(element.SubMultiSelect);
             }
 
-            const Options = WRender.Create({
-                className: "OContainer",
+
+            const Options = WRender.Create({   // @ts-ignore
+                className: "OContainer" + (Option.checked == true ? " OContainerActive" : ""),
+                // @ts-ignore                
                 children: [OptionLabel, Option, SubContainer]
             });
             this.OptionsContainer.append(Options);
@@ -355,7 +402,7 @@ class MultiSelect extends HTMLElement {
                 this.DisplayName = key;
                 break;
             }
-        }        
+        }
         return element[this.DisplayName ?? ""] ?? "Element" + index;
     }
     DisplayOptions = () => {
@@ -497,7 +544,7 @@ class WToolTip extends HTMLElement {
                 const viewportHeight = window.innerHeight;
                 if (tooltipRect.bottom + 400 > viewportHeight) {
                     // @ts-ignore
-                    this.style = 'top: auto !important ; bottom : 100%';
+                    //this.style = 'top: auto !important ; bottom : 100%';
                 } else {
                     //this.style.top = '100%';
                     //this.style.bottom = 'auto';
@@ -590,8 +637,8 @@ const MainMenu = css`
         grid-row: auto auto;
         align-items: center;
     }
-    .OContainer:hover {
-        background: var(--secundary-color);
+    .OContainer:hover , .OContainerActive{
+        background: var(--fifty-color);
     }
     .OptionLabel {
         width: 100%;

@@ -12,6 +12,8 @@ class WArrayF {
                 prop != "FilterData" &&
                 prop != "OrderData" &&
                 prop != "ApiMethods" &&
+                propValue?.hidden != true &&
+                propValue?.primary != true &&
                 propValue?.require != false && (object[prop] == undefined || object[prop] == null)) {
                 return false;
             }
@@ -357,6 +359,7 @@ class WArrayF {
         }
         return val;
     }
+
 
     static compareObj(ComparativeObject, EvalObject) {//compara si dos objetos son iguales en las propiedades        
         if (typeof ComparativeObject === "string" && typeof ComparativeObject === "number") {
