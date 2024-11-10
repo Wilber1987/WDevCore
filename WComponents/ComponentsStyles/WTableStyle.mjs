@@ -209,7 +209,7 @@ input[type=radio]:checked::before {
 
 .paginateBTNActive {
     font-weight: bold;
-    color: var(--font-fourth-color);
+    color: var(--font-secundary-color);
 }
 
 .pagBTN {

@@ -68,6 +68,9 @@ class MultiSelect extends HTMLElement {
             tagName: "input",
             class: "txtControl",
             placeholder: "Buscar...",
+            onclick: (ev) => {
+                ev.stopPropagation();
+            },
             onkeypress: async (ev) => {
                 if (this.ModelObject?.__proto__ == Function.prototype) {
                     this.ModelObject = this.ModelObject();
@@ -132,7 +135,8 @@ class MultiSelect extends HTMLElement {
         }
         //this.shadowRoot?.append(
         this.SetOptions()
-        this.LabelMultiselect.onclick = () => {
+        this.LabelMultiselect.onclick = (e) => {
+            e.stopPropagation();
             if (!this.tool?.isConnected) {
                 this.DisplayOptions();
             } else {
@@ -153,7 +157,8 @@ class MultiSelect extends HTMLElement {
 
     addBtn(targetControl) {
         const addBtn = WRender.Create({
-            tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async () => {
+            tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async (e) => {
+                e.stopPropagation();
                 if (this.ModelObject != undefined) {
                     this.ModalCRUD(undefined, targetControl, addBtn);
                 } else {
@@ -207,9 +212,14 @@ class MultiSelect extends HTMLElement {
     // Método para detectar clic fuera del componente
     handleGlobalClick = (e) => {
         const isClickInside = this.contains(e.target) || e.target.tagName.includes("W-MULTI-SELECT");
-
         if (!isClickInside) {
-            this.undisplayMultiSelects(e);
+            setTimeout(()=> {
+                if (this.toolHaveRemoved != false) {
+                    this.tool?.remove();
+                    this.undisplayMultiSelects(e);
+                }          
+                this.toolHaveRemoved = true;     
+            },100)            
         }
     };
 
@@ -270,7 +280,11 @@ class MultiSelect extends HTMLElement {
                         this.tool?.remove();
                     }
                 }
+
             });
+            Option.addEventListener("click", (ev) => {
+                this.toolHaveRemoved = !this.MultiSelect;
+            })
 
             const SubContainer = WRender.Create({ className: "SubMenu" });
             if (element.SubOptions != undefined && element.SubOptions.__proto__ == Array.prototype) {

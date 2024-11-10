@@ -349,18 +349,10 @@ class WArrayF {
 
     //BUSQUEDA Y COMPARACIONES
     static FindInArray(element, Dataset) {
-        let val = false;
-        for (let index = 0; index < Dataset.length; index++) {
-            const Data = Dataset[index];
-            val = this.compareObj(element, Data)
-            if (val == true) {
-                break;
-            }
-        }
-        return val;
+        let exists = Dataset.find((item) => this.compareObj(element, item));       
+        return (exists != null || exists != undefined) ? true : false;
     }
-
-
+    
     static compareObj(ComparativeObject, EvalObject) {//compara si dos objetos son iguales en las propiedades        
         if (typeof ComparativeObject === "string" && typeof ComparativeObject === "number") {
             if (ComparativeObject == EvalObject) return true;
