@@ -257,7 +257,6 @@ class WTableComponent extends HTMLElement {
      */
     DrawTBody = async (Dataset = this.Dataset) => {
         //console.log(Dataset);
-
         this.Table?.querySelector("tbody")?.remove();
         let tbody = WRender.Create({ tagName: "tbody" });
 
@@ -266,6 +265,10 @@ class WTableComponent extends HTMLElement {
         }
         Dataset?.slice((this.ActualPage - 1) * this.maxElementByPage, this.ActualPage * this.maxElementByPage)
             .forEach((element, DatasetIndex) => {
+                if (element == undefined) {
+                    return;
+                    
+                }
                 let tr = WRender.Create({ tagName: "tr" });
                 this.DrawTRow(tr, element);
                 tbody.append(tr);

@@ -87,7 +87,7 @@ class WAppNavigator extends HTMLElement {
             this.NavStyle = "nav";
         }
         this.Nav = WRender.Create({ tagName: "nav", id: "MainNav", className: this.NavStyle });
-        this.shadowRoot?.append(this.Nav);        
+        this.shadowRoot?.append(this.Nav);
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         if (this.Config.isMediaQuery == true) {
             this.shadowRoot?.append(this.MediaStyle());
@@ -129,10 +129,14 @@ class WAppNavigator extends HTMLElement {
             }
             const elementNav = WRender.createElement({
                 type: "a",
-                props: { id: "element" + (element.id  ?? element.name.replace(" ", "")), class: "elementNav" }
+                props: {
+                    id: "element" + (element.id ?? element.name.toString().replace(" ", "")),
+                    class: "elementNav",
+                    innerHTML: element.name.toString()
+                }
             });
 
-            elementNav.append(element.name)
+            //elementNav.append(element.name)
             if (element.icon) {
                 elementNav.append(WRender.createElement({
                     type: 'img', props: {
@@ -156,7 +160,7 @@ class WAppNavigator extends HTMLElement {
                         if (this.Manager?.Exists("element" + Index) == true) {
                             this.Manager?.NavigateFunction("element" + Index);
                             return;
-                        } 
+                        }
                         const object = await element.action();
                         const objectWrapper = html`<div class="ObjectWrapper">
                             <div class="header">
@@ -190,7 +194,7 @@ class WAppNavigator extends HTMLElement {
         });
     }
     CreateTabControllers = () => {
-        this.TabContainer =  this.TabContainer ?? WRender.Create({ className: "TabContainer", id: "content-container" });
+        this.TabContainer = this.TabContainer ?? WRender.Create({ className: "TabContainer", id: "content-container" });
         this.Manager = new ComponentsManager({ MainContainer: this.TabContainer, SPAManage: false });
         this.shadowRoot?.append(this.TabContainer);
     }
@@ -526,7 +530,7 @@ class WAppNavigator extends HTMLElement {
                 }
         }`;
     }
-    ActiveTab (tabName) {
+    ActiveTab(tabName) {
         // @ts-ignore
         this.Nav?.querySelector(`#element${tabName.replace(" ", "")}`)?.onclick();
     }
