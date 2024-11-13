@@ -26,17 +26,24 @@ class WAjaxTools {
     */
     static Request = async (Url, Data = {}, PostConfig) => {   
         const loadinModal = new LoadinModal();
-        try {
-            const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);
-            if (!PostConfig?.WithoutLoading) {
+        let isComplete = false;
+        setTimeout(() => {
+            if (!PostConfig?.WithoutLoading && !isComplete) {
                 document.body.appendChild(loadinModal);
             }
+        }, 2000);
+        try {
+            const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);           
             let response = await fetch(Url, config);
             const ProcessRequest = await WAjaxTools.ProcessRequest(response, Url);
+            // @ts-ignore
             loadinModal.close();
+            isComplete = true;
             return ProcessRequest;
         } catch (error) {
+            // @ts-ignore        
             loadinModal.close();
+            isComplete = true;
             if (error == "TypeError: Failed to fetch") {
                 //return WAjaxTools.LocalData(Url);
             }

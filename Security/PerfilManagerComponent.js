@@ -64,16 +64,17 @@ class PerfilManagerComponent extends HTMLElement {
     perfilManagerComponent = async () => {
         this.mainTable = new WTableComponent({
             Dataset: this.Dataset,
-            AddItemsFromApi: false,
+            AddItemsFromApi: true,
             AutoSave: true,
             ModelObject: this.ModelObject, CustomStyle: StylesControlsV2,
             Options: {
                 MultiSelect: true,
                 Show: true,
-                Edit: true
+                Edit: true,
+                Filter: true,
             }
         });
-        this.FilterOptions = new WFilterOptions({
+        /*this.FilterOptions = new WFilterOptions({
             // @ts-ignore
             Dataset: this.Dataset,
             AutoSetDate: true,
@@ -81,11 +82,11 @@ class PerfilManagerComponent extends HTMLElement {
             FilterFunction: (DFilt) => {
                 this.mainTable?.DrawTable(DFilt);
             }
-        });
+        });*/
         this.TabManager.NavigateFunction("Tab-perfil-Manager",
             WRender.Create({
                 className: "perfilView", children:
-                    [this.FilterOptions, this.OptionContainer2, this.mainTable]
+                    [this.OptionContainer2, this.mainTable]
             }));
     }
     update = async () => {
