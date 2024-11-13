@@ -17,6 +17,7 @@ import { css, WCssClass } from "../WModules/WStyledRender.js";
     * @property {String} [Direction] row | column
     * @property {String} [NavStyle] nav | tab
     * @property {HTMLStyleElement} [CustomStyle]
+    * @property {HTMLElement} [TabContainer]
 **/
 class WAppNavigator extends HTMLElement {
     /**
@@ -35,6 +36,7 @@ class WAppNavigator extends HTMLElement {
         this.Direction = Config.Direction;
         this.NavStyle = Config.NavStyle ?? "nav";
         this.NavTitle = Config.NavTitle;
+        this.TabContainer = Config.TabContainer;
         if (this.NavStyle == "tab") {
             WRender.SetStyle(this, {
                 display: "block"
@@ -84,8 +86,8 @@ class WAppNavigator extends HTMLElement {
         if (this.NavStyle == undefined) {
             this.NavStyle = "nav";
         }
-        const Nav = WRender.Create({ tagName: "nav", id: "MainNav", className: this.NavStyle });
-        this.shadowRoot?.append(Nav);        
+        this.Nav = WRender.Create({ tagName: "nav", id: "MainNav", className: this.NavStyle });
+        this.shadowRoot?.append(this.Nav);
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         if (this.Config.isMediaQuery == true) {
             this.shadowRoot?.append(this.MediaStyle());
@@ -127,10 +129,14 @@ class WAppNavigator extends HTMLElement {
             }
             const elementNav = WRender.createElement({
                 type: "a",
-                props: { id: "element" + (element.id ?? Index), class: "elementNav" }
+                props: {
+                    id: "element" + (element.id ?? element.name.toString().replace(" ", "")),
+                    class: "elementNav",
+                    innerHTML: element.name.toString()
+                }
             });
 
-            elementNav.append(element.name)
+            //elementNav.append(element.name)
             if (element.icon) {
                 elementNav.append(WRender.createElement({
                     type: 'img', props: {
@@ -141,9 +147,9 @@ class WAppNavigator extends HTMLElement {
             if (element.url != undefined && element.url != "#") {
                 elementNav.href = element.url
             }
-            Nav.appendChild(elementNav);
+            this.Nav?.appendChild(elementNav);
             if (element.SubNav != undefined) {
-                this.AddSubNav(Index, element, elementNav, Nav);
+                this.AddSubNav(Index, element, elementNav, this.Nav);
             } else {
                 if (elementNav.url == undefined) {
                     elementNav.url = "#" + this.id;
@@ -154,7 +160,7 @@ class WAppNavigator extends HTMLElement {
                         if (this.Manager?.Exists("element" + Index) == true) {
                             this.Manager?.NavigateFunction("element" + Index);
                             return;
-                        } 
+                        }
                         const object = await element.action();
                         const objectWrapper = html`<div class="ObjectWrapper">
                             <div class="header">
@@ -188,7 +194,7 @@ class WAppNavigator extends HTMLElement {
         });
     }
     CreateTabControllers = () => {
-        this.TabContainer = WRender.Create({ className: "TabContainer", id: "content-container" });
+        this.TabContainer = this.TabContainer ?? WRender.Create({ className: "TabContainer", id: "content-container" });
         this.Manager = new ComponentsManager({ MainContainer: this.TabContainer, SPAManage: false });
         this.shadowRoot?.append(this.TabContainer);
     }
@@ -318,8 +324,7 @@ class WAppNavigator extends HTMLElement {
                 display: none;
             }
             .TabContainer {
-                padding: 20px 0px;
-                overflow-y: auto;
+                padding: 20px 0px;               
             }
         
             .elementNav:hover {
@@ -423,6 +428,7 @@ class WAppNavigator extends HTMLElement {
                     transition: all 0.6s;
                     border-bottom: solid 1px rgba(0, 0, 0, 0.2);
                     margin-bottom: 20px;
+                    color: var(--font-secundary-color);
                     & button {
                         display: flex;
                         align-items: center;    
@@ -523,6 +529,10 @@ class WAppNavigator extends HTMLElement {
                     box-shadow: none;
                 }
         }`;
+    }
+    ActiveTab(tabName) {
+        // @ts-ignore
+        this.Nav?.querySelector(`#element${tabName.replace(" ", "")}`)?.onclick();
     }
 }
 customElements.define("w-app-navigator", WAppNavigator);

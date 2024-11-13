@@ -1,5 +1,5 @@
 //@ts-check
-import { WRender, ComponentsManager, html } from '../WModules/WComponentsTools.js';
+import { WRender, html } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WSimpleModalForm } from "./WSimpleModalForm.js";
@@ -496,9 +496,11 @@ class WForm extends HTMLElement {
                     ModelProperty.Dataset &&
                     ModelProperty.Dataset?.length > 0) {
                     ObjectF[prop] = ModelProperty?.Dataset[0];
-                }
+                } 
+
                 val = ObjectF[prop];
-                const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop);
+                const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop, val);               
+
                 InputControl = await this.CreateWSelect(InputControl, DataseFilter, prop, ObjectF, Model);
                 if (disabled) {
                     InputControl.style.pointerEvents = "none";
@@ -513,10 +515,10 @@ class WForm extends HTMLElement {
                 }
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
-                InputControl = new MultiSelect({
+                InputControl = new MultiSelect({                    
                     AddObject: ModelProperty.type?.toUpperCase() != "WCHECKBOX" && this.Config.WSelectAddObject,
                     Mode: ModelProperty.type?.toUpperCase() == "WCHECKBOX" ? "SELECT_BOX" : "SELECT",
-                    FullDetail: ModelProperty.type?.toUpperCase() != "WCHECKBOX",
+                    FullDetail:  ModelProperty.fullDetail == false ?  ModelProperty.fullDetail : ModelProperty.type?.toUpperCase() != "WCHECKBOX",
                     action: (selecteds) => {
                         if (ModelProperty.action) {
                             ModelProperty.action(ObjectF, this, InputControl, prop)
@@ -991,8 +993,8 @@ class WForm extends HTMLElement {
         return InputControl;
     }
 
-    CreateDatasetForMultiSelect(Model, prop) {
-        return Model[prop].Dataset?.map(item => {
+    CreateDatasetForMultiSelect(Model, prop, val = {}) {
+        const Dataset = Model[prop].Dataset?.map(item => {
             const MapObject = {};
             for (const key in item) {
                 const element = item[key];
@@ -1002,6 +1004,11 @@ class WForm extends HTMLElement {
             }
             return MapObject;
         });
+        const findvale = Dataset.find(item => WArrayF.compareObj(item, val));
+        if (!findvale) {
+            Dataset.push(val);
+        }
+        return Dataset;
     }
 
     FindObjectMultiselect(val, InputControl) {
@@ -1029,9 +1036,9 @@ class WForm extends HTMLElement {
         const ModelProperty = Model[prop];
         const { MultiSelect } = await import("./WMultiSelect.js");
         InputControl = new MultiSelect({
-            MultiSelect: false,
+            MultiSelect: false,            
             Mode: ModelProperty.type?.toUpperCase() == "WRADIO" ? "SELECT_BOX" : "SELECT",
-            FullDetail: ModelProperty.type?.toUpperCase() != "WRADIO",
+            FullDetail: ModelProperty.fullDetail == false ? false : ModelProperty.type?.toUpperCase() != "WRADIO",
             Dataset: Dataset,
             AddObject: ModelProperty.type?.toUpperCase() != "WRADIO" && this.Config.WSelectAddObject,
             ModelObject: this.Config.ModelObject[prop].ModelObject,
@@ -1232,7 +1239,7 @@ class WForm extends HTMLElement {
                     /**
                      * @type {?HTMLInputElement | undefined | any}
                      */
-                    const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
+                    const control = this.DivForm?.querySelector("#ControlValue" + prop);
                     if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
                         if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
                             return false;

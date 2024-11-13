@@ -1,6 +1,26 @@
+import { ModelProperty } from "./CommonModel.js";
 import { EntityClass } from "./EntityClass.js";
 
 class WArrayF {
+    static ValidateByModel(object, model) {
+        for (const prop in model) {
+            const exclude = ["Filterdata", "ApiMethods", "OrderData"]
+            /**@type {ModelProperty} */
+            const propValue = model[prop];
+            if (propValue.__proto__ != Function.Property &&
+                propValue.__proto__.constructor.name != "AsyncFunction" &&
+                prop != "FilterData" &&
+                prop != "OrderData" &&
+                prop != "ApiMethods" &&
+                propValue?.hidden != true &&
+                propValue?.primary != true &&
+                propValue?.require != false && (object[prop] == undefined || object[prop] == null)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Agrega o Elimina un elemento de un arreglo seg n un parametro de seleccion
      * @param {Object} Element Elemento a agregar o eliminar
@@ -329,17 +349,10 @@ class WArrayF {
 
     //BUSQUEDA Y COMPARACIONES
     static FindInArray(element, Dataset) {
-        let val = false;
-        for (let index = 0; index < Dataset.length; index++) {
-            const Data = Dataset[index];
-            val = this.compareObj(element, Data)
-            if (val == true) {
-                break;
-            }
-        }
-        return val;
+        let exists = Dataset.find((item) => this.compareObj(element, item));       
+        return (exists != null || exists != undefined) ? true : false;
     }
-
+    
     static compareObj(ComparativeObject, EvalObject) {//compara si dos objetos son iguales en las propiedades        
         if (typeof ComparativeObject === "string" && typeof ComparativeObject === "number") {
             if (ComparativeObject == EvalObject) return true;

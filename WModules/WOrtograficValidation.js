@@ -73,6 +73,8 @@ class WOrtograficValidation {
         { error: ["EMPENO"], value: "empeño" },    
         { error: ["VEHICULO"], value: "vehículo" },  
         { error: ["GUIA"], value: "guía" }, 
+        { error: ["REGION"], value: "región" }, 
+        { error: ["RELIGION"], value: "religión" }, 
     ]
 }
 export { WOrtograficValidation }

@@ -47,6 +47,7 @@ class MultiSelect extends HTMLElement {
         this.FieldName = "";
         this.FullDetail = this.Config.FullDetail ?? true;
         this.SubOptionsFieldName = "";
+        this.ControlsContainer = WRender.Create({ className: "ControlContainer" });
         WRender.SetStyle(this, {
             display: this.Config.IsFilterControl == true ? "flex" : "block",
             position: "relative",
@@ -67,9 +68,27 @@ class MultiSelect extends HTMLElement {
             tagName: "input",
             class: "txtControl",
             placeholder: "Buscar...",
-            onchange: async (ev) => {
+            onclick: (ev) => {
+                ev.stopPropagation();
+            },
+            onkeypress: async (ev) => {
                 if (this.ModelObject?.__proto__ == Function.prototype) {
                     this.ModelObject = this.ModelObject();
+                }
+                const filterDataset = this.Dataset.filter((element) => {
+                    for (const prop in element) {
+                        try {
+                            if (WArrayF.evalValue(element[prop], ev.target.value) != null) {
+                                return element;
+                            }
+                        } catch (error) {
+                            console.log(element);
+                        }
+                    }
+                });
+                if (filterDataset.length != 0) {
+                    this.DrawFilterData(filterDataset, ev);
+                    return;
                 }
 
                 if (this.ModelObject?.Get != undefined) {
@@ -84,23 +103,28 @@ class MultiSelect extends HTMLElement {
                         if ((this.ModelObject[prop].type?.toUpperCase() == "TEXT")
                             && ev.target.value.replaceAll(" ", "") != "") {
                             filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
-                        } else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER" &&  !isNaN(ev.target.value))
+                        } else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER" && !isNaN(ev.target.value))
                             && ev.target.value.replaceAll(" ", "") != "") {
                             filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })
                         }
                     }
                     const responseDataset = await new this.ModelObject.constructor({ FilterData: [{ FilterType: "or", Filters: filterData }] }).Get();
+                    this.Dataset = [...this.Dataset, ...responseDataset]
                     this.DrawFilterData(responseDataset, ev);
                 } else {
                     const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value);
+                    this.Dataset = [...this.Dataset, ...Dataset]
                     this.DrawFilterData(Dataset, ev);
                 }
             }
         });
-        this.shadowRoot?.append(
+        this.ControlsContainer?.append(
             this.LabelMultiselect,
             StyleScrolls.cloneNode(true),
             MainMenu.cloneNode(true)
+        );
+        this.shadowRoot?.append(
+            this.ControlsContainer
         );
         if (Config.Mode == "SELECT_BOX") {
             this.shadowRoot?.append(selectBoxStyle.cloneNode(true));
@@ -111,7 +135,8 @@ class MultiSelect extends HTMLElement {
         }
         //this.shadowRoot?.append(
         this.SetOptions()
-        this.LabelMultiselect.onclick = () => {
+        this.LabelMultiselect.onclick = (e) => {
+            e.stopPropagation();
             if (!this.tool?.isConnected) {
                 this.DisplayOptions();
             } else {
@@ -132,7 +157,8 @@ class MultiSelect extends HTMLElement {
 
     addBtn(targetControl) {
         const addBtn = WRender.Create({
-            tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async () => {
+            tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async (e) => {
+                e.stopPropagation();
                 if (this.ModelObject != undefined) {
                     this.ModalCRUD(undefined, targetControl, addBtn);
                 } else {
@@ -175,9 +201,27 @@ class MultiSelect extends HTMLElement {
 
     connectedCallback() {
         this.Draw();
-        this.parentNode?.addEventListener("click", (e) => this.undisplayMultiSelects(e));
-        this.parentNode?.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
+        document.addEventListener("click", this.handleGlobalClick);
+        document.addEventListener("scroll", this.undisplayMultiSelects, true);
     }
+    // Método para limpiar eventos al desconectar el componente
+    disconnectedCallback() {
+        document.removeEventListener("click", this.handleGlobalClick);
+        document.removeEventListener("scroll", this.undisplayMultiSelects, true);
+    }
+    // Método para detectar clic fuera del componente
+    handleGlobalClick = (e) => {
+        const isClickInside = this.contains(e.target) || e.target.tagName.includes("W-MULTI-SELECT");
+        if (!isClickInside) {
+            setTimeout(()=> {
+                if (this.toolHaveRemoved != false) {
+                    this.tool?.remove();
+                    this.undisplayMultiSelects(e);
+                }          
+                this.toolHaveRemoved = true;     
+            },100)            
+        }
+    };
 
     Draw = (Dataset = this.Dataset) => {
         this.OptionsContainer.innerHTML = "";
@@ -192,6 +236,7 @@ class MultiSelect extends HTMLElement {
                 tagName: "input",
                 id: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
                 type: OType,
+                hidden: OType == "radio" ? true : false,
                 name: element.name,
                 checked: WArrayF.FindInArray(element, this.selectedItems),
                 className: "Option", onchange: (ev) => {
@@ -207,6 +252,18 @@ class MultiSelect extends HTMLElement {
                         } else {
                             console.log("Item Existente")
                         }
+
+                        this.shadowRoot?.querySelectorAll(".OContainer").forEach((nodo) => {
+                            nodo.classList.remove("OContainerActive");
+                            const nodoOption = nodo.querySelector(".Option");
+                            // @ts-ignore
+                            if (nodoOption?.checked == true) {
+                                nodo.classList.add("OContainerActive");
+                            } else {
+                                nodo.classList.remove("OContainerActive");
+                            }
+                        })
+
                     } else {
                         this.selectedItems.splice(index, 1);
                         if (this.selectedItems.length == 0) {
@@ -223,7 +280,11 @@ class MultiSelect extends HTMLElement {
                         this.tool?.remove();
                     }
                 }
+
             });
+            Option.addEventListener("click", (ev) => {
+                this.toolHaveRemoved = !this.MultiSelect;
+            })
 
             const SubContainer = WRender.Create({ className: "SubMenu" });
             if (element.SubOptions != undefined && element.SubOptions.__proto__ == Array.prototype) {
@@ -237,8 +298,10 @@ class MultiSelect extends HTMLElement {
                 SubContainer.append(element.SubMultiSelect);
             }
 
-            const Options = WRender.Create({
-                className: "OContainer",
+
+            const Options = WRender.Create({   // @ts-ignore
+                className: "OContainer" + (Option.checked == true ? " OContainerActive" : ""),
+                // @ts-ignore                
                 children: [OptionLabel, Option, SubContainer]
             });
             this.OptionsContainer.append(Options);
@@ -344,6 +407,9 @@ class MultiSelect extends HTMLElement {
             "nombre",
             "Nombre",
             "Nombres",
+            "text",
+            "Text",
+            "Texto", "texto",
             "Descripcion_Servicio"]
         for (const key in element) {
             if (keys.find(k => k == key) != null) {
@@ -492,7 +558,7 @@ class WToolTip extends HTMLElement {
                 const viewportHeight = window.innerHeight;
                 if (tooltipRect.bottom + 400 > viewportHeight) {
                     // @ts-ignore
-                    this.style = 'top: auto !important ; bottom : 100%';
+                    //this.style = 'top: auto !important ; bottom : 100%';
                 } else {
                     //this.style.top = '100%';
                     //this.style.bottom = 'auto';
@@ -572,6 +638,9 @@ const MainMenu = css`
     .MenuActive {
         max-height: 500px;
     }
+    .Option {
+        background-color: var(--secundary-color);
+    }
     .OContainer {
         transition: all 0.1s;
         cursor: pointer;
@@ -582,8 +651,8 @@ const MainMenu = css`
         grid-row: auto auto;
         align-items: center;
     }
-    .OContainer:hover {
-        background: var(--secundary-color);
+    .OContainer:hover , .OContainerActive{
+        background: var(--fifty-color);
     }
     .OptionLabel {
         width: 100%;
@@ -611,11 +680,15 @@ const MainMenu = css`
         padding: 10px;
         border: none;
         outline: none;
+        background-color: var(--secundary-color);
+        border-bottom: solid 1px var(--fifty-color);
+        color: var(--font-primary-color);
     }
     .txtControl:active,
     .txtControl:focus {
         border: none;
         outline: none;
+        border-bottom: solid 1px var(--fifty-color);
         box-shadow: 0 0 5px #4894aa;
     }
     .btnSelect {
@@ -625,7 +698,7 @@ const MainMenu = css`
         position: absolute;
         right: 0px;
         margin-right: 10px;
-        background: var(--secundary-color);
+        background: var(--sexty-color);
         clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
         transition: all 0.1s;
         top: 50%;

@@ -119,6 +119,7 @@ class WDetailObject extends HTMLElement {
                                     ImageUrlPath: this.Config.ImageUrlPath,
                                     AddItemsFromApi: false,
                                     EntityModel: this.Config.EntityModel,
+                                    isActiveSorts: false,
                                     ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
                                     Dataset: ObjectDetail[prop] ?? []
                                 })
@@ -241,6 +242,7 @@ class WDetailObject extends HTMLElement {
         }  
         .DataContainer label {
             font-size:16px;
+            color: var(--font-primary-color);
         }
         .cont .label-value {          
             width: 100%;

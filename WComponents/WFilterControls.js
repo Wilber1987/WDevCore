@@ -49,6 +49,8 @@ class WFilterOptions extends HTMLElement {
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
         this.shadowRoot?.append(WRender.createElement(this.styles));
         this.shadowRoot?.append(this.FilterContainer);
+        this.ModelObject.FilterData = [];
+        this.ModelObject.OrderData = [];
         this.DrawFilter();
         /**@type {Array<OrderData>} */
         this.Sorts = Config.Sorts ?? [];
@@ -163,135 +165,112 @@ class WFilterOptions extends HTMLElement {
     * @param {Array<OrderData>} [sorts] 
     */
     filterFunction = async (sorts) => {
-        const Model = this.EntityModel ?? this.ModelObject;
-        if (Model.Get || this.Config.UseEntityMethods == false) {
-            this.ModelObject.FilterData = [];
-            this.ModelObject.OrderData = [];
-            if (sorts) {
-                sorts.forEach(sort => {
-                    this.ModelObject.OrderData.push(sort);
+        this.BuildFiltersAndSorts(sorts);
+        if (this.ModelObject.FilterData.length == 0 && this.Config.Dataset.length > 0) {
+            if (this.Config.FilterFunction != undefined ) {
+                this.Config.FilterFunction(this.Config.Dataset);
+            }
+            return;
+        }
+        if (this.Config.Dataset.length > 0) {
+            const DFilt = this.Config.Dataset.filter(obj => {
+                let flagObj = true;
+                this.FilterControls.forEach(control => {
+                    if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
+                        const ModelProperty = this.ModelObject[control.id];
+                        switch (ModelProperty.type?.toUpperCase()) {
+                            case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "NUMBER":
+                                if (control.value != null && control.value != undefined && control.value != "") {
+                                    findByValue(control);
+                                }
+                                break;
+                            case "TITLE": case "IMG": case "IMAGE": case "IMAGES": case "HORA": case "PASSWORD":
+                                break;
+                            case "DATE": case "FECHA": case "HORA":
+                                /**TODO */
+                                const inputs = control.querySelectorAll("input");
+                                findElementByDate(inputs[0].value, inputs[1].value);
+                                break;
+                            case "WSELECT": case "MULTISELECT":
+                                if (control.selectedItems.length > 0) {
+                                    findElement(control);
+                                }
+                                break;
+                            case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
+                                break;
+                            case "RADIO": case "CHECKBOX":
+                                /**TODO */
+                                break;
+                            case "CALENDAR":
+                                /**TODO */
+                                break;
+                            default:
+                                break;
+                        }
+                    } else {
+                        findElement(control);
+                    }
+                    /** @param { MultiSelect } multiSelect */
+                    function findElement(multiSelect) {
+                        if (multiSelect.selectedItems.length > 0) {
+                            let find;
+                            //@ts-ignore  
+                            const objectlement = obj[multiSelect.id];
+                            if (objectlement?.__proto__ == Object.prototype)
+                                find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
+                            else if (objectlement?.__proto__ == Array.prototype)
+                                find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
+                            else
+                                find = multiSelect.selectedItems.find(x => x == objectlement);
+                            if (find == undefined) {
+                                flagObj = false;
+                            }
+                        }
+                    }
+                    /** @param { HTMLInputElement } input */
+                    function findByValue(input) {
+                        if (!flagObj) {
+                            return;
+                        }
+                        if (obj[input.id] == null || obj[input.id] == undefined) {
+                            flagObj = false;
+                            return undefined;
+                        }
+                        if (obj[input.id] != null && WArrayF.evalValue(obj[input.id], input.value.toUpperCase()) == null) {
+                            flagObj = false;
+                            return undefined;
+                        }
+                        return obj[input.id]
+                    }
+    
+                    function findElementByDate(firstDate, secondDate) {
+                        if (firstDate != "" && new Date(obj[control.id]) < new Date(firstDate + "T00:00:00")) {
+                            flagObj = false;
+                            return undefined;
+                        }
+    
+                        if (secondDate != "" && new Date(obj[control.id]) > new Date(secondDate + "T00:00:00")) {
+                            flagObj = false;
+                            return undefined;
+                        }
+                        return obj[control.id]
+                    }
+    
                 });
-            }
-            if (this.EntityModel) {
-                this.EntityModel.FilterData = [];
-                this.EntityModel.OrderData = [];
-                if (sorts) {
-                    sorts.forEach(sort => {
-                        this.EntityModel.OrderData.push(sort);
-                    });
-                }
-            }
-            this.FilterControls.forEach(control => {
-                if (this.ModelObject[control.id]) {
-                    let values;
-                    let filterType;
-                    /**
-                     * @type {ModelProperty}
-                     */
-                    const ModelProperty = this.ModelObject[control.id];
-                    let propiertyName = control.id;
-                    switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
-                            if (control.value != null && control.value != undefined && control.value != "") {
-                                filterType = "LIKE"
-                                values = [control.value];
-                            }
-                            break;
-                        case "NUMBER":
-                            if (control.value != null
-                                && control.value != undefined
-                                && control.value != ""
-                                && !isNaN(control.value)
-                            ) {
-                                filterType = "="
-                                values = [control.value];
-                            }
-                            break;
-                        case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
-                            break;
-                        case "DATE": case "FECHA": case "HORA":
-                            /**TODO */
-                            filterType = "BETWEEN"
-                            const inputs = control.querySelectorAll("input");
-                            console.log(inputs);
-
-                            if (inputs[0].value != '' || inputs[1].value != '') {
-                                values = []
-                                if (inputs[0].value != '') {
-                                    values.push(inputs[0].value)
-                                } else {
-                                    values.push(null)
-                                }
-                                if (inputs[1].value != '') {
-                                    values.push(inputs[1].value)
-                                }
-                            }
-                            break;
-                        case "WSELECT": case "MULTISELECT":
-                            if (control.selectedItems.length > 0 && ModelProperty.ModelObject != undefined) {
-                                if (ModelProperty.ModelObject.__proto__ == Function.prototype) {
-                                    ModelProperty.ModelObject = ModelProperty.ModelObject();
-                                    console.log(ModelProperty.ModelObject);
-                                }
-                                //TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
-                                let foraingKeyName = null;
-                                const foreynKeyExist = ModelProperty.ForeignKeyColumn != undefined;
-                                if (!foreynKeyExist) {
-                                    for (const propiedad in ModelProperty.ModelObject) {
-                                        const keyNameSames = ModelProperty.ModelObject[propiedad].primary
-                                            && ModelProperty.ModelObject.hasOwnProperty(propiedad)
-                                            && this.ModelObject.hasOwnProperty(propiedad);
-                                        if (keyNameSames) {
-                                            foraingKeyName = propiedad;
-                                        }
-                                    }
-                                } else {
-                                    foraingKeyName = ModelProperty.ForeignKeyColumn;
-                                }
-                                if (foraingKeyName != null) {
-                                    values = []
-                                    filterType = "IN";
-                                    propiertyName = foraingKeyName;
-                                    let primaryKey = null;
-                                    for (const key in control.ModelObject) {
-                                        if (control.ModelObject[key].primary) {
-                                            primaryKey = key;
-                                            break;
-                                        }
-                                    }
-                                    control.selectedItems?.forEach(element => {
-                                        // @ts-ignore
-                                        values.push(element[primaryKey]?.toString())
-                                    });
-                                    //console.log(foraingKeyName, primaryKey, control.selectedItems, values);                                    
-                                }
-                            }
-                            break;
-                        case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "PASSWORD":
-                            break;
-                        case "RADIO": case "CHECKBOX":
-                            /**TODO */
-                            break;
-                        case "CALENDAR":
-                            /**TODO */
-                            break;
-                        default:
-                            break;
-                    }
-                    if (this.EntityModel) {
-                        this.EntityModel.FilterData.push({
-                            PropName: propiertyName,
-                            FilterType: filterType,
-                            Values: values
-                        })
-                    }
-                    this.ModelObject.FilterData.push({
-                        PropName: propiertyName,
-                        FilterType: filterType,
-                        Values: values
-                    })
-                }
+                return flagObj;
             });
+           
+            if (this.Config.FilterFunction != undefined && DFilt.length  > 0) {
+                WArrayF.SortArray(sorts, DFilt);
+                this.Config.FilterFunction(DFilt);
+                return;
+            } else {
+                console.log(DFilt);
+            }
+        }
+       
+        const Model = this.EntityModel ?? this.ModelObject;
+        if (Model.Get || this.Config.UseEntityMethods == false) {           
             if (this.Config.UseEntityMethods == false
                 && this.Config.FilterFunction != undefined) {
                 this.Config.FilterFunction(Model.FilterData);
@@ -307,100 +286,140 @@ class WFilterOptions extends HTMLElement {
             }
 
         }
-
-        const DFilt = this.Config.Dataset.filter(obj => {
-            let flagObj = true;
-            this.FilterControls.forEach(control => {
-                if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
-                    const ModelProperty = this.ModelObject[control.id];
-                    switch (ModelProperty.type?.toUpperCase()) {
-                        case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "NUMBER":
-                            if (control.value != null && control.value != undefined && control.value != "") {
-                                findByValue(control);
-                            }
-                            break;
-                        case "TITLE": case "IMG": case "IMAGE": case "IMAGES": case "HORA": case "PASSWORD":
-                            break;
-                        case "DATE": case "FECHA": case "HORA":
-                            /**TODO */
-                            const inputs = control.querySelectorAll("input");
-                            findElementByDate(inputs[0].value, inputs[1].value);
-                            break;
-                        case "WSELECT": case "MULTISELECT":
-                            if (control.selectedItems.length > 0) {
-                                findElement(control);
-                            }
-                            break;
-                        case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "TEXTAREA":
-                            break;
-                        case "RADIO": case "CHECKBOX":
-                            /**TODO */
-                            break;
-                        case "CALENDAR":
-                            /**TODO */
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
-                    findElement(control);
-                }
-                /** @param { MultiSelect } multiSelect */
-                function findElement(multiSelect) {
-                    if (multiSelect.selectedItems.length > 0) {
-                        let find;
-                        //@ts-ignore  
-                        const objectlement = obj[multiSelect.id];
-                        if (objectlement?.__proto__ == Object.prototype)
-                            find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
-                        else if (objectlement?.__proto__ == Array.prototype)
-                            find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
-                        else
-                            find = multiSelect.selectedItems.find(x => x == objectlement);
-                        if (find == undefined) {
-                            flagObj = false;
-                        }
-                    }
-                }
-                /** @param { HTMLInputElement } input */
-                function findByValue(input) {
-                    if (!flagObj) {
-                        return;
-                    }
-                    if (obj[input.id] == null || obj[input.id] == undefined) {
-                        flagObj = false;
-                        return undefined;
-                    }
-                    if (obj[input.id] != null && WArrayF.evalValue(obj[input.id], input.value.toUpperCase()) == null) {
-                        flagObj = false;
-                        return undefined;
-                    }
-                    return obj[input.id]
-                }
-
-                function findElementByDate(firstDate, secondDate) {
-                    if (firstDate != "" && new Date(obj[control.id]) < new Date(firstDate + "T00:00:00")) {
-                        flagObj = false;
-                        return undefined;
-                    }
-
-                    if (secondDate != "" && new Date(obj[control.id]) > new Date(secondDate + "T00:00:00")) {
-                        flagObj = false;
-                        return undefined;
-                    }
-                    return obj[control.id]
-                }
-
-            });
-            return flagObj;
-        });
-        WArrayF.SortArray(sorts, DFilt);
-        if (this.Config.FilterFunction != undefined) {
-            this.Config.FilterFunction(DFilt);
-        } else {
-            console.log(DFilt);
-        }
+        
     }
+    BuildFiltersAndSorts(sorts) {
+        this.ModelObject.FilterData = [];
+        this.ModelObject.OrderData = [];
+        if (sorts) {
+            sorts.forEach(sort => {
+                this.ModelObject.OrderData.push(sort);
+            });
+        }
+        if (this.EntityModel) {
+            this.EntityModel.FilterData = [];
+            this.EntityModel.OrderData = [];
+            if (sorts) {
+                sorts.forEach(sort => {
+                    this.EntityModel.OrderData.push(sort);
+                });
+            }
+        }
+        this.FilterControls.forEach(control => {
+            if (this.ModelObject[control.id]) {
+                let values;
+                let filterType;
+                /**
+                 * @type {ModelProperty}
+                 */
+                const ModelProperty = this.ModelObject[control.id];
+                let propiertyName = control.id;
+                switch (ModelProperty.type?.toUpperCase()) {
+                    case "TEXT": case "SELECT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA":
+                        if (control.value != null && control.value != undefined && control.value != "") {
+                            filterType = "LIKE";
+                            values = [control.value];
+                        }
+                        break;
+                    case "NUMBER":
+                        if (control.value != null
+                            && control.value != undefined
+                            && control.value != ""
+                            && !isNaN(control.value)) {
+                            filterType = "=";
+                            values = [control.value];
+                        }
+                        break;
+                    case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
+                        break;
+                    case "DATE": case "FECHA": case "HORA":
+                        /**TODO */
+                        filterType = "BETWEEN";
+                        const inputs = control.querySelectorAll("input");
+                        console.log(inputs);
+
+                        if (inputs[0].value != '' || inputs[1].value != '') {
+                            values = [];
+                            if (inputs[0].value != '') {
+                                values.push(inputs[0].value);
+                            } else {
+                                values.push(null);
+                            }
+                            if (inputs[1].value != '') {
+                                values.push(inputs[1].value);
+                            }
+                        }
+                        break;
+                    case "WSELECT": case "MULTISELECT":
+                        if (control.selectedItems.length > 0 && ModelProperty.ModelObject != undefined) {
+                            if (ModelProperty.ModelObject.__proto__ == Function.prototype) {
+                                ModelProperty.ModelObject = ModelProperty.ModelObject();
+                                console.log(ModelProperty.ModelObject);
+                            }
+                            //TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
+                            let foraingKeyName = null;
+                            const foreynKeyExist = ModelProperty.ForeignKeyColumn != undefined;
+                            if (!foreynKeyExist) {
+                                for (const propiedad in ModelProperty.ModelObject) {
+                                    const keyNameSames = ModelProperty.ModelObject[propiedad].primary
+                                        && ModelProperty.ModelObject.hasOwnProperty(propiedad)
+                                        && this.ModelObject.hasOwnProperty(propiedad);
+                                    if (keyNameSames) {
+                                        foraingKeyName = propiedad;
+                                    }
+                                }
+                            } else {
+                                foraingKeyName = ModelProperty.ForeignKeyColumn;
+                            }
+                            if (foraingKeyName != null) {
+                                values = [];
+                                filterType = "IN";
+                                propiertyName = foraingKeyName;
+                                let primaryKey = null;
+                                for (const key in control.ModelObject) {
+                                    if (control.ModelObject[key].primary) {
+                                        primaryKey = key;
+                                        break;
+                                    }
+                                }
+                                control.selectedItems?.forEach(element => {
+                                    // @ts-ignore
+                                    values.push(element[primaryKey]?.toString());
+                                });
+                                //console.log(foraingKeyName, primaryKey, control.selectedItems, values);                                    
+                            }
+                        }
+                        break;
+                    case "MASTERDETAIL": case "MODEL": case "FILE": case "DRAW": case "PASSWORD":
+                        break;
+                    case "RADIO": case "CHECKBOX":
+                        /**TODO */
+                        break;
+                    case "CALENDAR":
+                        /**TODO */
+                        break;
+                    default:
+                        break;
+                }
+                if (this.EntityModel) {
+                    this.EntityModel.FilterData.push({
+                        PropName: propiertyName,
+                        FilterType: filterType,
+                        Values: values
+                    });
+                }
+                if (values != undefined || values != null) {
+                    this.ModelObject.FilterData.push({
+                        PropName: propiertyName,
+                        FilterType: filterType,
+                        Values: values
+                    });
+                }
+               
+            }
+        });
+    }
+
     /** @param {String} value  */
 
     /**
@@ -542,11 +561,11 @@ class WFilterOptions extends HTMLElement {
             grid-template-columns: repeat(4,calc(25% - 12px));
             grid-gap: 15px;
             padding: 10px;
-            overflow: hidden;
             max-height: 0px;
             transition: all 0.3s;
             border-radius: 10px; 
-            border-radius: 10px;            
+            border-radius: 10px;   
+            overflow: hidden;         
             
         }
 
@@ -555,6 +574,7 @@ class WFilterOptions extends HTMLElement {
             padding: 10px;
             transition: all 0.3s;
             border: 1px solid var(--fifty-color);
+            overflow: unset;
         }
 
         .OptionContainer label {

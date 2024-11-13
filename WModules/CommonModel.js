@@ -32,6 +32,7 @@ function ModelFunction() { }
     * @property {any} [defaultValue]
     * @property {String} [placeholder]
     * @property {Boolean} [hiddenFilter]
+    * @property {Boolean} [fullDetail] - esto oculta el detalle del objeto en multiselect(por ahora)
     * @property {String | Number} [min] para rangos de tipo number y date
     * @property {String | Number} [max] para rangos de tipo number y date
     * @property {String} [fieldRequire] CAMBIA UN ESTADO DE UNA PROPIEDAD A REQUERIDO
@@ -56,7 +57,7 @@ class ModelProperty { }
     * @property {Boolean} [DarkMode]
     * @property {Boolean} [AutoSave]
     * @property {Boolean} [WSelectAddObject]
-    * @property {Boolean} [DataRequire]
+    * @property {Boolean} [DataRequire]    
     * @property {String} [id] 
     * @property {String} [StyleForm] - columnX1 | columnX3 | columnX3   
     * @property {String} [DivColumns] - columnX1 | columnX3 | columnX3 
@@ -67,7 +68,7 @@ class ModelProperty { }
     * @property {Function} [SaveFunction]
     * @property {Function} [ValidateFunction]
     * @property {Function} [ProxyAction]
-    * @property {HTMLStyleElement} [CustomStyle]
+    * @property {HTMLStyleElement} [CustomStyle]    
     **/
 class FormConfig { };
 
@@ -274,6 +275,7 @@ class ElementStyle {}
      * @property {String} [type]
      * @property {Partial<CSSStyleDeclaration> | String} [style]
      * @property {String} [className]
+     * @property {Boolean} [hidden]
      * @property {String} [class]
      * @property {String} [name]
      * @property {String} [htmlFor]
@@ -317,7 +319,7 @@ class WNode {
  * @typedef {Object} Actions 
  * @property {String} name
  * @property {Function} action
- * @property {Function} [rendered] funcion que debe retornar true o false
+ * @property {Function|Boolean} [rendered] funcion que debe retornar true o false
  * **/
 /**
  * @typedef {Object} TableOptions 

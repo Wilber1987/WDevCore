@@ -14,6 +14,7 @@ import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 
 
 class WTableComponent extends HTMLElement {
+
     /**
      * @param {TableConfig} Config 
      */
@@ -24,6 +25,7 @@ class WTableComponent extends HTMLElement {
         }
         this.TableClass = "WTable WScroll";
         this.selectedItems = [];
+        this.isSelectAll = false;
         this.ModelObject = {};
         this.paginate = Config.paginate ?? true;
         this.attachShadow({ mode: "open" });
@@ -36,7 +38,7 @@ class WTableComponent extends HTMLElement {
         this.Table = WRender.Create({ tagName: "Table", className: this.TableClass, id: "MainTable" + this.id });
         this.Tfooter = WRender.Create({ class: "tfooter" });
         this.divTableContainer = WRender.Create({ type: "div", class: "tableContainer", children: [this.Table] });
-        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);        
+        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);
         /**@type {Array<OrderData>} */
         this.Sorts = [];
         this.FilterOptions = new WFilterOptions({
@@ -46,9 +48,25 @@ class WTableComponent extends HTMLElement {
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
             EntityModel: Config.EntityModel,
             Display: Config.Options?.FilterDisplay ?? false,
-            UseEntityMethods: true,
+            UseEntityMethods: this.TableConfig.AddItemsFromApi ?? true,//TODO
             FilterFunction: (DFilt) => {
                 this.withFilter = true;
+                this.FilterDataset = DFilt;
+                if (this.Dataset.length == 0) {
+                    this.Dataset = [...this.Dataset, ...DFilt];
+                } else {
+                    const objSet = new Set(this.Dataset.map(item => JSON.stringify(item)));
+                    DFilt.forEach(itemf => {
+                        const itemfStr = JSON.stringify(itemf);
+                        if (!objSet.has(itemfStr)) {
+                            this.Dataset.push(itemf);
+                            objSet.add(itemfStr);
+                        } else {
+                            console.log("Item Existente");
+                        }
+                    });
+                }
+                this.FilterOptions.Config.Dataset = this.Dataset;
                 this.DrawTable(DFilt);
             }
         });
@@ -143,12 +161,14 @@ class WTableComponent extends HTMLElement {
             if (isWithtUrl) {
                 // @ts-ignore
                 Dataset = await WAjaxTools.PostRequest(this.TableConfig?.Options?.UrlSearch);
+                this.Dataset = [...this.Dataset, ...Dataset];
             } else if (this.Options?.Filter == true) {
                 await this.FilterOptions.filterFunction(this.Sorts);
                 chargeWithFilter = true;
             } else if (isWithtModel) {
                 const model = this.TableConfig.EntityModel ?? this.TableConfig.ModelObject;
                 Dataset = await model.Get();
+                this.Dataset = [...this.Dataset, ...Dataset];
             }
         }
         this.withFilter = false;
@@ -165,7 +185,7 @@ class WTableComponent extends HTMLElement {
             }
         }
 
-      
+
     }
     DrawHeadOptions() {
         if (this.ThOptions.innerHTML != "") return;
@@ -215,7 +235,16 @@ class WTableComponent extends HTMLElement {
         }
         if (this.Options != undefined) {
             if (this.TrueOptions()) {
-                tr.append(WRender.Create({ tagName: "th", innerHTML: "Opciones" }));
+                const th = WRender.Create({ tagName: "th", innerHTML: "Acciones" });
+                tr.append(th);
+                if (this.TableConfig.Options?.MultiSelect == true) {
+                    th.append(WRender.Create({
+                        tagName: "input",
+                        class: "Btn",
+                        checked: this.isSelectAll,
+                        type: "checkbox", onchange: (ev) => { this.SelectAll(ev) }
+                    }));
+                }
             }
         }
         thead.append(tr);
@@ -228,7 +257,6 @@ class WTableComponent extends HTMLElement {
      */
     DrawTBody = async (Dataset = this.Dataset) => {
         //console.log(Dataset);
-
         this.Table?.querySelector("tbody")?.remove();
         let tbody = WRender.Create({ tagName: "tbody" });
 
@@ -237,6 +265,10 @@ class WTableComponent extends HTMLElement {
         }
         Dataset?.slice((this.ActualPage - 1) * this.maxElementByPage, this.ActualPage * this.maxElementByPage)
             .forEach((element, DatasetIndex) => {
+                if (element == undefined) {
+                    return;
+                    
+                }
                 let tr = WRender.Create({ tagName: "tr" });
                 this.DrawTRow(tr, element);
                 tbody.append(tr);
@@ -267,7 +299,10 @@ class WTableComponent extends HTMLElement {
             this.DeleteBTN(Options, element, tr);
             if (this.Options?.UserActions != undefined) {
                 this.Options.UserActions.forEach(Action => {
-                    if (Action == null || (Action.rendered != undefined && Action.rendered(element) == true)) {
+                    if (Action == null ||
+                        (Action.rendered != undefined &&
+                            // @ts-ignore
+                            (Action.rendered == false || Action.rendered(element) == false))) {
                         //console.log();
                         return;
                     }
@@ -313,17 +348,29 @@ class WTableComponent extends HTMLElement {
             tagName: 'input', type: 'button',
             className: 'sort-down ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "DESC") ? "sort-active" : ""),
             onclick: async (ev) => {
-               
+
             }
         });
         return { up, down };
+    }
+    SelectAll(ev) {
+        if (ev.target.checked == true) {
+            this.selectedItems = [];
+            this.Dataset.forEach(element => {
+                this.selectedItems.push(element);
+            });
+        } else {
+            this.selectedItems = [];
+        }
+        this.DrawTBody();
+
     }
 
     async ExecuteSort(ev, prop, up, down, order) {
         ev.target.disabled = true;
         const sort = new OrderData({ OrderType: order, PropName: prop });
         const findSort = this.Sorts.find(s => s.PropName == prop);
-        if (this.TableConfig.isActiveMultiSorts != true) { 
+        if (this.TableConfig.isActiveMultiSorts != true) {
             this.querySelectorAll(".sort-active").forEach(element => {
                 element.classList.remove("sort-active");
             });
@@ -349,7 +396,7 @@ class WTableComponent extends HTMLElement {
             } else {
                 this.Sorts = [sort];
             }
-            if (order == "ASC") { 
+            if (order == "ASC") {
                 up.className = "sort-up sort-active";
                 down.className = "sort-down";
             } else {
@@ -708,6 +755,14 @@ class WTableComponent extends HTMLElement {
             tagName: "label", innerText: "<<",
             class: "pagBTN",
             onclick: () => {
+                this.ActualPage = 1;
+                SelectPage(this.ActualPage);
+            }
+        }));
+        tfooter.push(WRender.Create({
+            tagName: "label", innerText: "<",
+            class: "pagBTN",
+            onclick: () => {
                 this.ActualPage = this.ActualPage - 1;
                 if (this.ActualPage <= 0) {
                     this.ActualPage = this.numPage;
@@ -735,12 +790,19 @@ class WTableComponent extends HTMLElement {
         }
         tfooter.push(tfooterNumbers);
         tfooter.push(WRender.Create({
-            tagName: "label", innerText: ">>", class: "pagBTN",
+            tagName: "label", innerText: ">", class: "pagBTN",
             onclick: () => {
                 this.ActualPage = this.ActualPage + 1;
                 if (this.ActualPage > this.numPage) {
                     this.ActualPage = 1;
                 }
+                SelectPage(this.ActualPage);
+            }
+        }));
+        tfooter.push(WRender.Create({
+            tagName: "label", innerText: ">>", class: "pagBTN",
+            onclick: () => {
+                this.ActualPage = this.numPage;
                 SelectPage(this.ActualPage);
             }
         }));
