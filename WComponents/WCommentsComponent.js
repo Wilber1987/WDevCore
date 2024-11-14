@@ -302,10 +302,6 @@ class WCommentsComponent extends HTMLElement {
                 // Insertar el nuevo comentario en la posición correcta
                 this.CommentsContainer.insertBefore(newCommentWrapper, commentsWrappers[insertBeforeIndex]);
             }
-
-
-
-
         });
     }
     update = async (inicialize = false, isUpScrolling = false) => {

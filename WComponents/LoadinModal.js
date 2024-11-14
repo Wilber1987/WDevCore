@@ -70,7 +70,10 @@ class LoadinModal extends HTMLElement {
     close = () => {
         ComponentsManager.modalFunction(this);
         setTimeout(() => {
-            this.parentNode.removeChild(this);
+            //this.remove();
+            if (this.parentNode != undefined) {
+                this.parentNode.removeChild(this);
+            }            
         }, 200);
     };
     FormStyle = () => {
