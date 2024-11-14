@@ -1004,7 +1004,7 @@ class WForm extends HTMLElement {
             }
             return MapObject;
         });
-        const findvale = Dataset.find(item => WArrayF.compareObj(item, val));
+        const findvale = Dataset.find(item => item != null && val != null && WArrayF.compareObj(item, val));
         if (!findvale) {
             Dataset.push(val);
         }
