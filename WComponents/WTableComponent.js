@@ -498,7 +498,7 @@ class WTableComponent extends HTMLElement {
                     tr.append(td);
                     break;
                 case "OPERATION":
-                    td.append(element[prop] != null || element[prop] != undefined ? value.toString() : Model[prop].action(element));
+                    td.append(Model[prop].action(element));
                     tr.append(td);
                     break;
                 case "MONEY":

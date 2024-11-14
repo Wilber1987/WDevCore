@@ -5,21 +5,37 @@ class DateTime extends Date {
     constructor(dateTime) {
         if (dateTime == undefined) {
             super(new Date().getTime());
-            this.Date = new Date();  
-        } else  if (dateTime instanceof Date) {
+            this.Date = new Date();
+        } else if (dateTime instanceof Date) {
             super(dateTime.getTime());
             this.Date = dateTime;
         } else {
             super(dateTime);
             this.Date = new Date(dateTime);
         }
-       
+
     }
     /**
      * @returns {String} ISO 8601 date string (YYYY-MM-DD)
      */
     toISO() {
         return this.Date.toISO();
+    }
+    /**
+    * @returns {String} ISO 8601 date string (YYYY-MM-DD)
+    */
+    toDDMMYYYY() {
+        let date =this.Date;
+
+        let day = date.getDate()
+        let month = date.getMonth() + 1
+        let year = date.getFullYear()
+
+        if (month < 10) {
+            return `${day}-0${month}-${year}`
+        } else {
+            return  `${day}-${month}-${year}`
+        }
     }
     /**
      * @returns {String} Formatted date string (dd de mes de a o)
@@ -55,17 +71,17 @@ class DateTime extends Date {
      * @param {Integer} days The number of days to subtract
      * @returns {DateTime} The modified DateTime object
      */
-    subtractDays(days) {    
-        this.Date.subtractDays(days);   
+    subtractDays(days) {
+        this.Date.subtractDays(days);
         return this;
-    }   
+    }
 
     /**
      * Modifies the month of the date by the given number of months
      * @param {Number} meses The number of months to add (positive) or subtract (negative)
      * @returns {DateTime} The modified DateTime object
      */
-    modifyMonth(meses) {    
+    modifyMonth(meses) {
         this.Date.modifyMonth(meses);
         return this;
     }
@@ -83,7 +99,7 @@ class DateTime extends Date {
      * @returns {String} Day of the week as a string (e.g. 'lunes', 'martes', etc.)
      */
     getDayFormatEs() {
-        return this.Date.getDayFormatEs();  
+        return this.Date.getDayFormatEs();
     }
 
 }
