@@ -5,6 +5,7 @@ import { css } from "../WModules/WStyledRender.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
+import "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
 
 /**
  * @typedef {Object} ReportConfig
@@ -14,6 +15,7 @@ import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
  * @property {String} [SubHeader]
  * @property {String} [Logo]
  * @property {String} [PageType]
+ * @property {Function} [exportXlsAction]
  */
 class WReportComponent extends HTMLElement {
     /**
@@ -39,7 +41,8 @@ class WReportComponent extends HTMLElement {
         );
         this.Pages = [];
         this.countProps = 0;
-        this.Config.PageType = this.Config.PageType ?? "A4"
+        this.Config.PageType = this.Config.PageType ?? "A4";
+        this.exportXlsAction = Config.exportXlsAction;
 
     }
     connectedCallback() {
@@ -64,7 +67,8 @@ class WReportComponent extends HTMLElement {
         if (this.Config.Logo) {
             this.Header.append(WRender.Create({
                 tagName: "img", src: this.Config.Logo,
-                className: "logo"
+                className: "logo",
+                style: "width: 80px; height: 80px; object-fit:cover"
             }));
         }
         if (this.Config.Header) {
@@ -309,7 +313,10 @@ class WReportComponent extends HTMLElement {
         })*/
         this.OptionContainer.append(new WPrintExportToolBar({
             ExportXlsAction: (tool) => {
-                tool.exportToXls(this.Config.Dataset, this.Header)
+                // const base64 = "...."
+                // Crear una instancia de JSZip
+                // Crear una instancia de JSZip
+                tool.exportToXls(this.Config.Dataset, this.Header, `report${Date.now}.xls`, this.exportXlsAction)
             }, ExportPdfAction: (tool) => {
                 const body = html`<div class="" style="position:relative">                               
                     ${this.Pages.map(page => page.cloneNode(true))}
@@ -335,7 +342,7 @@ class WReportComponent extends HTMLElement {
             padding: 60px 60px;
             border: 1px solid #D2D2D2;
             background: #fff;
-            box-shadow: 0 2px 5px 0px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 5px 0px #D2D2D2;
             width: 210mm;
             height: 297mm;
             border: 1px solid #000;

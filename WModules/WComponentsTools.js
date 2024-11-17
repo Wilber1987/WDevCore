@@ -96,6 +96,7 @@ function html(strings, ...values) {
 
 export { html }
 class WRender {
+    
     /**
      * 
      * @param {*} string 
@@ -347,6 +348,15 @@ class WRender {
             }
         }
     
+        return htmlContent; // Devolver el HTML modificado
+    }
+
+    static RemoveImagesToCanvasInHtml(htmlContent) {
+           
+        const images = htmlContent.querySelectorAll('img');
+        for (let img of images) {
+            htmlContent.removeChild(img);            
+        }    
         return htmlContent; // Devolver el HTML modificado
     }
     

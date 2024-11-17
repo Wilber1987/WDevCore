@@ -170,6 +170,7 @@ class WPrintExportToolBar extends HTMLElement {
      * @param {Array<Array<{value:string|number, style:string}>|Object>} rows
      * @param {HTMLElement} header      
      * @param {string} filename example: 
+     * @param {Function} action example: 
         const data = [
             [{value: "Nombre", style: "color:red"}, {value: "Edad"},{value: "Nac."}],
             [{value: "Juan"}, {value: 12}, {value: "Nic"}],
@@ -178,18 +179,19 @@ class WPrintExportToolBar extends HTMLElement {
         WPrintExportToolBarInstance.exportToCsv("filename", data);
      
      */
-    async exportToXls(rows, header, filename) {
+    async exportToXls(rows, header, filename, action) {
         const table = html`<table style="border-collapse: collapse; width: 100%;">`; // Añade estilo inicial
 
         // Crear el encabezado principal con colspan
         if (header) {
-            const processedHeader = await WRender.convertImagesToCanvasInHtml(header);
+            //const processedHeader = await WRender.convertImagesToCanvasInHtml(header);
+            const processedHeader = await WRender.RemoveImagesToCanvasInHtml(header);
             const headerCell = WRender.Create({
                 tagName: "td",
                 children: [processedHeader],
-                style: "text-align: center; font-weight: bold; font-size: 14px;"
+                style: "text-align: center; font-weight: bold; font-size: 14px; "
             });
-            headerCell.setAttribute('colspan', "5"); // Ajusta el número de columnas según sea necesario
+            headerCell.setAttribute('colspan', "7"); // Ajusta el número de columnas según sea necesario
             table.append(WRender.Create({
                 tagName: "tr",
                 children: [headerCell]
@@ -208,7 +210,7 @@ class WPrintExportToolBar extends HTMLElement {
                         const datoHeader = { value: WOrtograficValidation.es(key) };
                         trheader.append(WRender.Create({
                             tagName: "td",
-                            style: "border: 1px solid #ccc; background-color: #f0f0f0; font-weight: bold; text-align: center; padding: 5px; max-width:200px",
+                            style: "border: 1px solid #D2D2D2; background-color: #D2D2D2; color: #000000; font-weight: bold; text-align: center; padding: 5px; max-width:200px",
                             innerHTML: WArrayF.Capitalize(datoHeader.value?.toString() ?? "-")
                         }));
                     }
@@ -217,7 +219,7 @@ class WPrintExportToolBar extends HTMLElement {
                     const dato = { value: row[key] };
                     tr.append(WRender.Create({
                         tagName: "td",
-                        style: "border: 1px solid #ccc; text-align: left; padding: 5px;",
+                        style: "border: 1px solid #D2D2D2; text-align: left; padding: 5px;",
                         innerHTML: dato.value?.toString() ?? "-"
                     }));
                 }
@@ -232,12 +234,16 @@ class WPrintExportToolBar extends HTMLElement {
                     tagName: "tr",
                     children: row.map(dato => WRender.Create({
                         tagName: "td",
-                        style: "border: 1px solid #ccc; text-align: left; padding: 5px;",
+                        style: "border: 1px solid #D2D2D2; text-align: left; padding: 5px;",
                         innerHTML: dato.value?.toString() ?? "-"
                     }))
                 }));
             }
         });
+        if (action) {
+            action(table)
+            return;
+        }
 
         // Generar datos para el archivo Excel
 
@@ -248,7 +254,7 @@ class WPrintExportToolBar extends HTMLElement {
                 <style>
                     table, td {
                         border-collapse: collapse;
-                        border: 1px solid #ccc;
+                        border: 1px solid #D2D2D2;
                     }
                 </style>
             </head>
@@ -267,7 +273,6 @@ class WPrintExportToolBar extends HTMLElement {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-
     }
 
 
