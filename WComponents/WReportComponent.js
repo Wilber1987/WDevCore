@@ -2,7 +2,10 @@
 import { WRender, ComponentsManager, html } from "../WModules/WComponentsTools.js";
 import { StylesControlsV2, StylesControlsV3, StyleScrolls } from "../StyleModules/WStyleComponents.js"
 import { css } from "../WModules/WStyledRender.js";
-import {WArrayF} from "../WModules/WArrayF.js";
+import { WArrayF } from "../WModules/WArrayF.js";
+import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
+import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
+
 /**
  * @typedef {Object} ReportConfig
  * @property {Array} [Dataset]
@@ -66,14 +69,14 @@ class WReportComponent extends HTMLElement {
         }
         if (this.Config.Header) {
             this.Header.append(WRender.Create({
-                tagName: "h1",
+                tagName: "h2",
                 className: "header",
                 innerText: this.Config.Header
             }));
         }
         if (this.Config.SubHeader) {
             this.Header.append(WRender.Create({
-                tagName: "p",
+                tagName: "h3",
                 className: "sub-header",
                 innerText: this.Config.SubHeader
             }));
@@ -113,7 +116,7 @@ class WReportComponent extends HTMLElement {
                 }
                 currentPage?.append(WRender.Create({
                     className: "row-title",
-                    children: [prop]
+                    children: [WOrtograficValidation.es(prop)]
                 }));
             }
         }
@@ -140,7 +143,7 @@ class WReportComponent extends HTMLElement {
                     for (const prop in dato) {
                         currentPage.append(WRender.Create({
                             className: "row-title",
-                            children: [prop]
+                            children: [WOrtograficValidation.es(prop)]
                         }));
                     }
                     this.Pages.push(currentPage);
@@ -230,14 +233,14 @@ class WReportComponent extends HTMLElement {
         }*/
         return (prop == "get" || prop == "set") ||
             prop == "ApiMethods" ||
-            prop == "FilterData" || 
+            prop == "FilterData" ||
             prop == "Get" ||
             prop == "GetByProps" ||
             prop == "FindByProps" ||
             prop == "Save" ||
             prop == "Update" ||
             prop == "GetData" ||
-            prop == "SaveData" ||            
+            prop == "SaveData" ||
             element[prop]?.__proto__ == Function.prototype ||
             element[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "OrderData";
     }
@@ -291,7 +294,7 @@ class WReportComponent extends HTMLElement {
         }
     }
     SetOption() {
-        this.OptionContainer.append(WRender.Create({
+        /*WRender.Create({
             tagName: 'button', className: 'Block-Primary', innerText: 'Imprimir',
             onclick: async () => {
                 const ventimp = window.open(' ', 'popimpr');
@@ -303,6 +306,17 @@ class WReportComponent extends HTMLElement {
                     ventimp?.close();
                 }, 100)
             }
+        })*/
+        this.OptionContainer.append(new WPrintExportToolBar({
+            ExportXlsAction: (tool) => {
+                tool.exportToXls(this.Config.Dataset, this.Header)
+            }, ExportPdfAction: (tool) => {
+                const body = html`<div class="" style="position:relative">                               
+                    ${this.Pages.map(page => page.cloneNode(true))}
+                    ${this.ExportStyle.cloneNode(true)}
+                </div>`
+                tool.ExportPdf(body, this.Config.PageType);
+            }
         }))
     }
 
@@ -312,8 +326,8 @@ class WReportComponent extends HTMLElement {
             border-collapse: collapse;
         }
         .MainContainer{
-            background-color: #afabab;
-            border: solid 1px #313131;
+            background-color: #e6e6e6;
+            border: solid 1px #bdbbbb;
             overflow-y: auto;
         }
         .A4, .A4-horizontal,  .carta, .oficio, .carta-horizontal,
@@ -379,6 +393,7 @@ class WReportComponent extends HTMLElement {
             text-transform: uppercase;
             font-weight: bold;
         }   
+        
         .row-number {
             justify-content: flex-end;
         }
@@ -404,6 +419,7 @@ class WReportComponent extends HTMLElement {
         .header, .sub-header {
             margin: 0px;
             font-weight: bold;
+            text-align: center;
         }
         .report-container {
             border-collapse: collapse;
@@ -438,6 +454,24 @@ class WReportComponent extends HTMLElement {
             }
             
         }      
+    `
+    ExportStyle = css`
+         .A4, .A4-horizontal,  .carta, .oficio, .carta-horizontal,
+        .oficio-horizontal{
+            border: none; /* Optional: Remove border for printing */           
+            padding: 0;
+            margin: 5mm auto;
+            width: auto;
+            height: auto;
+            box-shadow: none; /* Optional: Remove any shadow for printing */
+            page-break-after: always; /* Ensure each .page-container starts on a new page */
+        }
+        .header, .sub-header {
+            margin: 0px;
+            margin-left: -70px;
+            font-weight: bold;
+            text-align: center;
+        }
     `
     replacer(value) {
         if (value == null) {

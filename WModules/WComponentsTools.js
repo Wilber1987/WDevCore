@@ -275,6 +275,82 @@ class WRender {
         }
     }
 
+    static async convertImagesToBase64InHtml(htmlContent) {
+        const div = document.createElement('div');
+        //div.appendChild(htmlContent);
+    
+        const images = htmlContent.querySelectorAll('img');
+        for (let img of images) {
+            const src = img.getAttribute('src');
+            if (src) {
+                try {
+                    const base64 = await fetch(src)
+                        .then(res => res.blob())
+                        .then(blob => new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        }));
+    
+                    img.setAttribute('src', base64); // Reemplaza la URL con la versión en Base64
+                } catch (error) {
+                    console.error(`Error al convertir la imagen: ${src}`, error);
+                }
+            }
+        }
+    
+        return htmlContent;
+    }
+    static async convertImagesToCanvasInHtml(htmlContent) {
+        const div = document.createElement('div');
+        div.innerHTML = htmlContent; // Asegúrate de agregar el contenido HTML al div.
+    
+        const images = htmlContent.querySelectorAll('img');
+        for (let img of images) {
+            const src = img.getAttribute('src');
+            if (src) {
+                try {
+                    // Obtener la imagen como base64
+                    const base64 = await fetch(src)
+                        .then(res => res.blob())
+                        .then(blob => new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        }));
+    
+                    img.setAttribute('src', base64); // Reemplaza la URL con la versión en Base64
+                    
+                    // Crear un canvas para dibujar la imagen
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const image = new Image();
+    
+                    // Cuando la imagen esté cargada, dibujamos en el canvas
+                    image.onload = () => {
+                        // Establecemos el tamaño del canvas al de la imagen
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        ctx.drawImage(image, 0, 0);
+    
+                        // Aquí puedes hacer lo que quieras con el canvas,
+                        // como añadirlo al DOM o extraer datos de él
+                        htmlContent.appendChild(canvas); // Por ejemplo, añadir el canvas al body
+                    };
+                    image.src = base64; // Cargar la imagen en base64 al objeto Image
+    
+                } catch (error) {
+                    console.error(`Error al convertir la imagen: ${src}`, error);
+                }
+            }
+        }
+    
+        return htmlContent; // Devolver el HTML modificado
+    }
+    
+
 }
 export { WRender }
 /**

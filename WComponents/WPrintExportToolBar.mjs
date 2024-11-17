@@ -1,7 +1,11 @@
 //@ts-check
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { WArrayF } from "../WModules/WArrayF.js";
 import { html, WRender } from "../WModules/WComponentsTools.js";
+import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css } from "../WModules/WStyledRender.js";
+import "../libs/html2pdf.js"
+import { PageType } from "./WReportComponent.js";
 
 /**
  * @typedef {Object} Config 
@@ -53,8 +57,8 @@ class WPrintExportToolBar extends HTMLElement {
                 CVS
             </button>`: ""}
             ${this.Confg.ExportXlsAction ? html`<button class="toolbar-button green" onclick="${(ev) => {
-              // @ts-ignore
-              this.Confg.ExportXlsAction(this)
+                // @ts-ignore
+                this.Confg.ExportXlsAction(this)
             }}">
                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px"  viewBox="0 0 40 40">
                     <path fill="#4CAF50" d="M41,10H25v28h16c0.553,0,1-0.447,1-1V11C42,10.447,41.553,10,41,10z"></path><path fill="#FFF" d="M32 15H39V18H32zM32 25H39V28H32zM32 30H39V33H32zM32 20H39V23H32zM25 15H30V18H25zM25 25H30V28H25zM25 30H30V33H25zM25 20H30V23H25z"></path><path fill="#2E7D32" d="M27 42L6 38 6 10 27 6z"></path><path fill="#FFF" d="M19.129,31l-2.411-4.561c-0.092-0.171-0.186-0.483-0.284-0.938h-0.037c-0.046,0.215-0.154,0.541-0.324,0.979L13.652,31H9.895l4.462-7.001L10.274,17h3.837l2.001,4.196c0.156,0.331,0.296,0.725,0.42,1.179h0.04c0.078-0.271,0.224-0.68,0.439-1.22L19.237,17h3.515l-4.199,6.939l4.316,7.059h-3.74V31z"></path>
@@ -78,7 +82,7 @@ class WPrintExportToolBar extends HTMLElement {
     /**
      * @param {HTMLElement} body
      */
-    ExportPdf(body) {
+    ExportPdf(body, pagetype = PageType.A4) {
         const options = {
             margin: 0,
             filename: `filename_${new Date()}.pdf`,
@@ -89,6 +93,36 @@ class WPrintExportToolBar extends HTMLElement {
             },
             jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
         };
+        // Cambiar las configuraciones según el tipo de página
+        switch (pagetype) {
+            case PageType.A4:
+                options.jsPDF.format = 'a4';
+                options.jsPDF.orientation = 'portrait';  // A4 en orientación vertical
+                break;
+            case PageType.A4_HORIZONTAL:
+                options.jsPDF.format = 'a4';
+                options.jsPDF.orientation = 'landscape';  // A4 en orientación horizontal
+                break;
+            case PageType.CARTA:
+                options.jsPDF.format = 'letter'; // Carta en formato vertical
+                options.jsPDF.orientation = 'portrait';
+                break;
+            case PageType.CARTA_HORIZONTAL:
+                options.jsPDF.format = 'letter';
+                options.jsPDF.orientation = 'landscape'; // Carta en formato horizontal
+                break;
+            case PageType.OFICIO:
+                options.jsPDF.format = 'legal'; // Oficio en formato vertical
+                options.jsPDF.orientation = 'portrait';
+                break;
+            case PageType.OFICIO_HORIZONTAL:
+                options.jsPDF.format = 'legal';
+                options.jsPDF.orientation = 'landscape'; // Oficio en formato horizontal
+                break;
+            default:
+                options.jsPDF.format = 'a4'; // Por defecto usar A4
+                options.jsPDF.orientation = 'portrait';
+        }
         // @ts-ignore
         html2pdf().set(options).from(body).save();
     }
@@ -133,7 +167,7 @@ class WPrintExportToolBar extends HTMLElement {
         link.remove();
     }
     /**
-     * @param {Array<Array<{value:string|number, style:string}>>} rows
+     * @param {Array<Array<{value:string|number, style:string}>|Object>} rows
      * @param {HTMLElement} header      
      * @param {string} filename example: 
         const data = [
@@ -144,43 +178,100 @@ class WPrintExportToolBar extends HTMLElement {
         WPrintExportToolBarInstance.exportToCsv("filename", data);
      
      */
-    exportToXls(rows, header, filename) {
+    async exportToXls(rows, header, filename) {
+        const table = html`<table style="border-collapse: collapse; width: 100%;">`; // Añade estilo inicial
 
-        const table = html`<table></table>`;
+        // Crear el encabezado principal con colspan
         if (header) {
-            table.append(WRender.Create({
-                tagName: "tr", children: [WRender.Create({ tagName: "td", children: [header] })]
-            }));
-        }
-        rows.forEach(row => {
+            const processedHeader = await WRender.convertImagesToCanvasInHtml(header);
+            const headerCell = WRender.Create({
+                tagName: "td",
+                children: [processedHeader],
+                style: "text-align: center; font-weight: bold; font-size: 14px;"
+            });
+            headerCell.setAttribute('colspan', "5"); // Ajusta el número de columnas según sea necesario
             table.append(WRender.Create({
                 tagName: "tr",
-                children: row.map(dato => WRender.Create({ tagName: "td", style: dato.style ?? "", innerHTML: dato.value?.toString() ?? "-" }))
+                children: [headerCell]
             }));
-        })
-        const data = `
-            <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+        }
+
+        // Procesar las filas
+        rows.forEach((row, index) => {
+            const trheader = WRender.Create({ tagName: "tr" });
+            const tr = WRender.Create({ tagName: "tr" });
+
+            if (row.__proto__ === Object.prototype) {
+                for (const key in row) {
+                    if (index === 0) {
+                        // Encabezados de columna con fondo gris tenue
+                        const datoHeader = { value: WOrtograficValidation.es(key) };
+                        trheader.append(WRender.Create({
+                            tagName: "td",
+                            style: "border: 1px solid #ccc; background-color: #f0f0f0; font-weight: bold; text-align: center; padding: 5px; max-width:200px",
+                            innerHTML: WArrayF.Capitalize(datoHeader.value?.toString() ?? "-")
+                        }));
+                    }
+
+                    // Celdas de datos
+                    const dato = { value: row[key] };
+                    tr.append(WRender.Create({
+                        tagName: "td",
+                        style: "border: 1px solid #ccc; text-align: left; padding: 5px;",
+                        innerHTML: dato.value?.toString() ?? "-"
+                    }));
+                }
+
+                if (index === 0) {
+                    table.append(trheader); // Agregar encabezado de columnas
+                }
+                table.append(tr); // Agregar fila de datos
+            } else if (row.__proto__ === Array.prototype) {
+                // Fila para arreglos
+                table.append(WRender.Create({
+                    tagName: "tr",
+                    children: row.map(dato => WRender.Create({
+                        tagName: "td",
+                        style: "border: 1px solid #ccc; text-align: left; padding: 5px;",
+                        innerHTML: dato.value?.toString() ?? "-"
+                    }))
+                }));
+            }
+        });
+
+        // Generar datos para el archivo Excel
+
+        const data = `<html xmlns:o="urn:schemas-microsoft-com:office:office" 
             xmlns:x="urn:schemas-microsoft-com:office:excel"  
             xmlns="http://www.w3.org/TR/REC-html40">
             <head> <meta charset="utf-8">
-                <style>.table-container {  mso-number-format:"\@"; } </style>
+                <style>
+                    table, td {
+                        border-collapse: collapse;
+                        border: 1px solid #ccc;
+                    }
+                </style>
             </head>
-            <body> ${table.outerHTML} </body>
-            </html>
-        `;
+            <body>${table.outerHTML}</body>
+        </html>`;
+
         const blob = new Blob([data], {
             type: 'application/vnd.ms-excel'
         });
-        // Crear un enlace para descargar el archivo
+
+        // Crear enlace para descarga
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = filename ? `${filename}.xls` : 'tabla-exportada.xls';
-        // Simular el clic para iniciar la descarga
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
     }
+
+
+
     CustomStyle = css`
         .toolbar {
             display: flex;
