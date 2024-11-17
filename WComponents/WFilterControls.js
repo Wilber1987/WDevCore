@@ -19,6 +19,7 @@ import { WArrayF } from "../WModules/WArrayF.js";
     * @property {Boolean} [UseEntityMethods]
     * @property {Boolean} [AutoFilter]
     * @property {Boolean} [AutoSetDate]
+    * @property {Boolean} [FullDetail]
     * @property {Object} [ModelObject]
     * @property {Object} [EntityModel]
 **/
@@ -520,7 +521,7 @@ class WFilterOptions extends HTMLElement {
             IsFilterControl: true,
             ModelObject: ModelProperty.ModelObject.__proto__ == Function.prototype ? ModelProperty.ModelObject() : ModelProperty.ModelObject,
             id: prop,
-            FullDetail: true,
+            FullDetail: this.Config.FullDetail ?? false,
             action: () => {
                 this.filterFunction(this.Sorts);
             }

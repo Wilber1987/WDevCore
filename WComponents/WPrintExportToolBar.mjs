@@ -179,7 +179,7 @@ class WPrintExportToolBar extends HTMLElement {
         WPrintExportToolBarInstance.exportToCsv("filename", data);
      
      */
-    async exportToXls(rows, header, filename, action) {
+    async exportToXls(rows, header, filename, action, model) {
         const table = html`<table style="border-collapse: collapse; width: 100%;">`; // Añade estilo inicial
 
         // Crear el encabezado principal con colspan
@@ -199,12 +199,15 @@ class WPrintExportToolBar extends HTMLElement {
         }
 
         // Procesar las filas
-        rows.forEach((row, index) => {
+        rows.forEach((row, index) => {            
             const trheader = WRender.Create({ tagName: "tr" });
             const tr = WRender.Create({ tagName: "tr" });
 
             if (row.__proto__ === Object.prototype) {
                 for (const key in row) {
+                    if (this.isNotDrawable(key, model, row)) {
+                        continue;
+                    }
                     if (index === 0) {
                         // Encabezados de columna con fondo gris tenue
                         const datoHeader = { value: WOrtograficValidation.es(key) };
@@ -275,6 +278,33 @@ class WPrintExportToolBar extends HTMLElement {
         document.body.removeChild(a);
     }
 
+
+    isNotDrawable(prop, ModelObject, element) {
+
+        if (ModelObject != undefined && ((ModelObject[prop]?.type == undefined
+            //|| ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+            //|| ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
+            || ModelObject[prop]?.primary == true
+            || ModelObject[prop]?.hidden == true
+            || ModelObject[prop]?.hiddenInTable == true
+        )
+            || element[prop]?.__proto__ == Function.prototype
+            || element[prop]?.__proto__.constructor.name == "AsyncFunction")) {
+            return true;
+        }
+        return (prop == "get" || prop == "set") ||
+            prop == "ApiMethods" ||
+            prop == "FilterData" ||
+            prop == "Get" ||
+            prop == "GetByProps" ||
+            prop == "FindByProps" ||
+            prop == "Save" ||
+            prop == "Update" ||
+            prop == "GetData" ||
+            prop == "SaveData" ||
+            element[prop]?.__proto__ == Function.prototype ||
+            element[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "OrderData";
+    }
 
 
     CustomStyle = css`

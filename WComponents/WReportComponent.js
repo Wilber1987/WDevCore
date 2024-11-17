@@ -224,7 +224,7 @@ class WReportComponent extends HTMLElement {
     }
     isNotDrawable(prop, ModelObject, element) {
 
-        /*if (ModelObject != undefined && ((ModelObject[prop]?.type == undefined
+        if (ModelObject != undefined && ((ModelObject[prop]?.type == undefined
             //|| ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
             //|| ModelObject[prop]?.type.toUpperCase() == "MULTISELECT"
             || ModelObject[prop]?.primary == true
@@ -234,7 +234,7 @@ class WReportComponent extends HTMLElement {
             || element[prop]?.__proto__ == Function.prototype
             || element[prop]?.__proto__.constructor.name == "AsyncFunction")) {
             return true;
-        }*/
+        }
         return (prop == "get" || prop == "set") ||
             prop == "ApiMethods" ||
             prop == "FilterData" ||
@@ -316,7 +316,7 @@ class WReportComponent extends HTMLElement {
                 // const base64 = "...."
                 // Crear una instancia de JSZip
                 // Crear una instancia de JSZip
-                tool.exportToXls(this.Config.Dataset, this.Header, `report${Date.now}.xls`, this.exportXlsAction)
+                tool.exportToXls(this.Config.Dataset, this.Header, `report${Date.now}.xls`, this.exportXlsAction, this.Config.ModelObject)
             }, ExportPdfAction: (tool) => {
                 const body = html`<div class="" style="position:relative">                               
                     ${this.Pages.map(page => page.cloneNode(true))}
