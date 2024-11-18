@@ -145,6 +145,9 @@ class WReportComponent extends HTMLElement {
                 if (isPage && currentPage != undefined && !this.elementFitsInPage(currentPage, div)) {
                     currentPage = this.createPage();
                     for (const prop in dato) {
+                        if (this.isNotDrawable(prop, this.Config.ModelObject, dato)) {
+                            continue;
+                        }
                         currentPage.append(WRender.Create({
                             className: "row-title",
                             children: [WOrtograficValidation.es(prop)]
