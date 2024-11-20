@@ -2,7 +2,7 @@ import { ElementStyle, WNode } from "./CommonModel.js";
 
 
 /** 
- * @returns {HTMLElement}
+ * @returns {HTMLElement|HTMLInputElement|HTMLSelectElement}
  * @param {any} strings
  * @param {any[]} values
  */

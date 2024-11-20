@@ -12,6 +12,7 @@ import { FormConfig, ModelFiles, ModelProperty } from '../WModules/CommonModel.j
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
+import { WCalendarComponent } from './WCalendar.js';
 
 
 let fileBase64;
@@ -37,10 +38,20 @@ class WForm extends HTMLElement {
         this.Options = this.Options ?? true;
         this.DataRequire = this.DataRequire ?? true;
         this.StyleForm = this.Config.StyleForm;
-        this.limit = this.Config.limit ?? 2;
-        console.log(this.Config.DivColumns);
-        
-        this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px)  calc(50% - 10px)";
+
+        if (this.DivColumns) {
+            const props = Object.keys(this.ModelObject).filter(prop => !this.isNotDrawable(this.ModelObject, prop))
+            if (props.length < 5) {
+                this.limit = 1;
+                this.DivColumns = "calc(100% - 20px)";
+            } else {
+                this.limit = this.Config.limit ?? 2;
+                this.DivColumns = "calc(50% - 10px)  calc(50% - 10px)";
+            }
+        } else {
+            this.limit = this.Config.limit ?? 2;
+            this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px)  calc(50% - 10px)";
+        }
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
@@ -496,10 +507,10 @@ class WForm extends HTMLElement {
                     ModelProperty.Dataset &&
                     ModelProperty.Dataset?.length > 0) {
                     ObjectF[prop] = ModelProperty?.Dataset[0];
-                } 
+                }
 
                 val = ObjectF[prop];
-                const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop, val);               
+                const DataseFilter = this.CreateDatasetForMultiSelect(Model, prop, val);
 
                 InputControl = await this.CreateWSelect(InputControl, DataseFilter, prop, ObjectF, Model);
                 if (disabled) {
@@ -515,10 +526,10 @@ class WForm extends HTMLElement {
                 }
                 const { MultiSelect } = await import("./WMultiSelect.js");
                 const Datasetilt = this.CreateDatasetForMultiSelect(Model, prop);
-                InputControl = new MultiSelect({                    
+                InputControl = new MultiSelect({
                     AddObject: ModelProperty.type?.toUpperCase() != "WCHECKBOX" && this.Config.WSelectAddObject,
                     Mode: ModelProperty.type?.toUpperCase() == "WCHECKBOX" ? "SELECT_BOX" : "SELECT",
-                    FullDetail:  ModelProperty.fullDetail == false ?  ModelProperty.fullDetail : ModelProperty.type?.toUpperCase() != "WCHECKBOX",
+                    FullDetail: ModelProperty.fullDetail == false ? ModelProperty.fullDetail : ModelProperty.type?.toUpperCase() != "WCHECKBOX",
                     action: (selecteds) => {
                         if (ModelProperty.action) {
                             ModelProperty.action(ObjectF, this, InputControl, prop)
@@ -850,7 +861,7 @@ class WForm extends HTMLElement {
     }
 
     async createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
-        const { WCalendarComponent } = await import('./WCalendar.js');
+       
         InputControl = new WCalendarComponent({
             CalendarFunction: Model[prop].CalendarFunction,
             SelectedBlocks: ObjectF[prop],
@@ -1036,7 +1047,7 @@ class WForm extends HTMLElement {
         const ModelProperty = Model[prop];
         const { MultiSelect } = await import("./WMultiSelect.js");
         InputControl = new MultiSelect({
-            MultiSelect: false,            
+            MultiSelect: false,
             Mode: ModelProperty.type?.toUpperCase() == "WRADIO" ? "SELECT_BOX" : "SELECT",
             FullDetail: ModelProperty.fullDetail == false ? false : ModelProperty.type?.toUpperCase() != "WRADIO",
             Dataset: Dataset,
@@ -1258,18 +1269,18 @@ class WForm extends HTMLElement {
                     } else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
                         || this.Config.ModelObject[prop]?.type.toUpperCase() == "CALENDAR") {
                         if (this.Config.ModelObject[prop].require == true) {
-                            this.Config.ModelObject[prop].MinimunRequired = this.Config.ModelObject[prop]?.MinimunRequired ?? 1;
+                            this.Config.ModelObject[prop].min = this.Config.ModelObject[prop]?.min ?? 1;
                         }
-                        if (this.Config.ModelObject[prop]?.MaxRequired
-                            && ObjectF[prop].length > this.Config.ModelObject[prop]?.MaxRequired) {
+                        if (this.Config.ModelObject[prop]?.max
+                            && ObjectF[prop].length > this.Config.ModelObject[prop]?.max) {
                             this.createAlertToolTip(control, `El máximo de registros permitidos es `
-                                + this.Config.ModelObject[prop]?.MaxRequired);
+                                + this.Config.ModelObject[prop]?.max);
                             return false;
                         }
-                        if (this.Config.ModelObject[prop]?.MinimunRequired
-                            && ObjectF[prop].length < this.Config.ModelObject[prop]?.MinimunRequired) {
+                        if (this.Config.ModelObject[prop]?.min
+                            && ObjectF[prop].length < this.Config.ModelObject[prop]?.min) {
                             this.createAlertToolTip(control, `El mínimo de registros permitidos es `
-                                + this.Config.ModelObject[prop]?.MinimunRequired);
+                                + this.Config.ModelObject[prop]?.min);
                             return false;
                         }
 
