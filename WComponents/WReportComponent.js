@@ -63,7 +63,7 @@ class WReportComponent extends HTMLElement {
         });*/
     }
     DrawReportHeader() {
-        this.Header.style.gridColumn = `span ${this.countProps}`
+        this.Header.style.gridColumn = `span ${this.countProps + 1}`
         if (this.Config.Logo) {
             this.Header.append(WRender.Create({
                 tagName: "img", src: this.Config.Logo,
@@ -111,6 +111,10 @@ class WReportComponent extends HTMLElement {
      */
     BuildContent(index, dato, currentPage, isPage, data, consolidado) {
         if (index == 0) {
+            currentPage?.append(WRender.Create({
+                className: "row-title",
+                children: ["№"]
+            }));
             for (const prop in consolidado) {
                 if (!consolidado[prop]) {
                     continue;
@@ -124,6 +128,8 @@ class WReportComponent extends HTMLElement {
                 }));
             }
         }
+        const NumbeRow = WRender.Create({ className: "row-string", children: [(index ?? 0) + 1] });
+        currentPage?.append(NumbeRow)
         if (dato?.__proto__ == Object.prototype) {
             const rowElements = [];
             for (const prop in consolidado) {
@@ -165,6 +171,10 @@ class WReportComponent extends HTMLElement {
 
         // @ts-ignore
         if (index + 1 == data?.length) {
+            currentPage?.append(WRender.Create({
+                className:  "row-footer",
+                children: [ "-"]
+            }));
             for (const prop in consolidado) {
                 if (!consolidado[prop]) {
                     continue;
@@ -198,7 +208,7 @@ class WReportComponent extends HTMLElement {
         // Create a new A4 page container
         return WRender.Create({
             className: `container ${this.Config.PageType}`,
-            style: { gridTemplateColumns: `repeat(${this.countProps}, auto)` }
+            style: { gridTemplateColumns: `repeat(${this.countProps + 1}, auto)` }
         });
     }
 
