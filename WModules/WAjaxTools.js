@@ -16,12 +16,13 @@ class PostConfig {
     /**  @type {String | undefined} */ HeaderType = "json";
     /**  @type {String | undefined} */ CSRFToken = "";
     /**  @type {boolean} */ WithoutLoading = false;
+    /**  @type {Array<{name:string, value:string}>} */ headers;
 }
 class WAjaxTools {
     /**
     * @param {String} Url
     * @param {Object} [Data]
-    * @param {PostConfig} [PostConfig]
+    * @param {Partial<PostConfig>} [PostConfig]
     * @returns {Promise<any>}
     */
     static Request = async (Url, Data = {}, PostConfig, retryCount = 3) => {
@@ -58,7 +59,7 @@ class WAjaxTools {
     /**
     * @param {String} Url
     * @param {Object} Data
-    * @param {PostConfig} postConfig 
+    * @param {Partial<PostConfig>} postConfig 
     * @returns {Promise<any>}
     */
     static PostRequest = async (Url, Data = {}, postConfig = new PostConfig()) => {
@@ -103,7 +104,11 @@ class WAjaxTools {
             }
         }
     }
-
+    /**
+    * @param {Partial<PostConfig>} postConfig 
+    * @param {any} Data 
+    * @returns {any}
+    */
     static BuildConfigRequest(postConfig = new PostConfig(), Data) {
         let ContentType = "application/json; charset=utf-8";
         let Accept = "*/*";
@@ -124,6 +129,11 @@ class WAjaxTools {
         }
         if (postConfig.CSRFToken != undefined && postConfig.CSRFToken != "") {
             dataRequest.headers['X-CSRF-TOKEN'] = postConfig.CSRFToken;
+        }
+        if (postConfig.headers) {
+            postConfig.headers.forEach(header => {
+                dataRequest.headers[header.name] = header.value
+            })
         }
         return dataRequest;
     }

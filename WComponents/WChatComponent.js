@@ -82,9 +82,18 @@ class WChatComponent extends HTMLElement {
             const pElement = document.createElement("p");
             // Send POST request to API, get response and set the reponse as paragraph element text
             try {
-                const model = { prompt: userText };
+                const model = {
+                    SessionId: "12345",
+                    Text: userText,
+                    Source: "webapi",
+                    Id: "1",
+                    UserId: "+50588078386",
+                    Timestamp: new Date()
+                };
                 /**@type {WebApiResponse} */
-                const response = await WAjaxTools.PostRequest(this.Config.Url ?? "", model);
+                const response = await WAjaxTools.PostRequest(this.Config.Url ?? "", model, {
+                   headers : [{name : "X-Platform", value: "webapi"}]
+                });
                 pElement.textContent = response.Reply;
                 this.WithAgent = response.WithAgentResponse;
             } catch (error) { // Add error class to the paragraph element and set error text
