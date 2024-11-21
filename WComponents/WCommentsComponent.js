@@ -109,8 +109,6 @@ class WCommentsComponent extends HTMLElement {
             this.shadowRoot?.append(this.MailsSelect)
         }
         this.shadowRoot?.append(this.OptionContainer, this.RitchOptionContainer)
-
-
     }
     saveComment = async () => {
         // @ts-ignore

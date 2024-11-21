@@ -16,43 +16,50 @@ class PostConfig {
     /**  @type {String | undefined} */ HeaderType = "json";
     /**  @type {String | undefined} */ CSRFToken = "";
     /**  @type {boolean} */ WithoutLoading = false;
+    /**  @type {Array<{name:string, value:string}>} */ headers;
 }
 class WAjaxTools {
     /**
     * @param {String} Url
     * @param {Object} [Data]
-    * @param {PostConfig} [PostConfig]
+    * @param {Partial<PostConfig>} [PostConfig]
     * @returns {Promise<any>}
     */
-    static Request = async (Url, Data = {}, PostConfig) => {   
+    static Request = async (Url, Data = {}, PostConfig, retryCount = 3) => {
         const loadinModal = new LoadinModal();
         let isComplete = false;
+    
         setTimeout(() => {
             if (!PostConfig?.WithoutLoading && !isComplete) {
                 document.body.appendChild(loadinModal);
             }
         }, 2000);
-        try {
-            const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);           
-            let response = await fetch(Url, config);
-            const ProcessRequest = await WAjaxTools.ProcessRequest(response, Url);
-            // @ts-ignore
-            loadinModal.close();
-            isComplete = true;
-            return ProcessRequest;
-        } catch (error) {
-            // @ts-ignore        
-            loadinModal.close();
-            isComplete = true;
-            if (error == "TypeError: Failed to fetch") {
-                //return WAjaxTools.LocalData(Url);
+    
+        let attempts = 0;
+    
+        while (attempts < retryCount) {
+            try {
+                const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);
+                let response = await fetch(Url, config);
+                const ProcessRequest = await WAjaxTools.ProcessRequest(response, Url);
+                loadinModal.close();
+                isComplete = true;
+                return ProcessRequest;
+            } catch (error) {
+                attempts++;
+                if (attempts >= retryCount) {
+                    loadinModal.close();
+                    isComplete = true;
+                    console.error(`Error after ${retryCount} attempts:`, error);
+                    throw error; // Si ya alcanzamos el máximo de intentos, lanzamos el error.
+                }
             }
         }
-    }
+    };
     /**
     * @param {String} Url
     * @param {Object} Data
-    * @param {PostConfig} postConfig 
+    * @param {Partial<PostConfig>} postConfig 
     * @returns {Promise<any>}
     */
     static PostRequest = async (Url, Data = {}, postConfig = new PostConfig()) => {
@@ -97,7 +104,11 @@ class WAjaxTools {
             }
         }
     }
-
+    /**
+    * @param {Partial<PostConfig>} postConfig 
+    * @param {any} Data 
+    * @returns {any}
+    */
     static BuildConfigRequest(postConfig = new PostConfig(), Data) {
         let ContentType = "application/json; charset=utf-8";
         let Accept = "*/*";
@@ -118,6 +129,11 @@ class WAjaxTools {
         }
         if (postConfig.CSRFToken != undefined && postConfig.CSRFToken != "") {
             dataRequest.headers['X-CSRF-TOKEN'] = postConfig.CSRFToken;
+        }
+        if (postConfig.headers) {
+            postConfig.headers.forEach(header => {
+                dataRequest.headers[header.name] = header.value
+            })
         }
         return dataRequest;
     }
