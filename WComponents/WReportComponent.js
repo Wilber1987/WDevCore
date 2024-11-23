@@ -57,6 +57,45 @@ class WReportComponent extends HTMLElement {
         console.log(consolidado);
         this.countProps = Object.keys(consolidado).length;
         this.DrawReportHeader();
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+
+
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+
+
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
+        this.Config.Dataset.push(this.Config.Dataset[0])
         this.CreateTable(this.Config.Dataset, true);
         /*this.Pages.forEach(page => {
             this.MainContainer.appendChild(page);
@@ -129,9 +168,10 @@ class WReportComponent extends HTMLElement {
             }
         }
         const NumbeRow = WRender.Create({ className: "row-string", children: [(index ?? 0) + 1] });
-        currentPage?.append(NumbeRow)
         if (dato?.__proto__ == Object.prototype) {
-            const rowElements = [];
+            currentPage?.append(NumbeRow)
+
+            const rowElements = [NumbeRow];
             for (const prop in consolidado) {
                 if (!consolidado[prop]) {
                     continue;
@@ -166,7 +206,7 @@ class WReportComponent extends HTMLElement {
                     this.Pages.push(currentPage);
                     this.MainContainer.appendChild(currentPage);
                 }
-                //currentPage?.append(div);
+                currentPage?.append(div);
             }
             rowElements.forEach(div => {
                 currentPage?.append(div);
@@ -192,7 +232,7 @@ class WReportComponent extends HTMLElement {
                         "row-number row-footer" : "row-footer",
                     children: [(consolidado[prop].Suma != undefined ?
                         "Total: " + consolidado[prop].Suma?.toFixed(2) : "-")]
-                });
+                });               
                 // @ts-ignore
                 if (isPage && !this.elementFitsInPage(currentPage, div)) {
                     currentPage = this.createPage();
@@ -334,7 +374,7 @@ class WReportComponent extends HTMLElement {
                 // Crear una instancia de JSZip
                 // Crear una instancia de JSZip
                 tool.exportToXls(this.Config.Dataset, this.Header, `report${Date.now}.xls`, this.exportXlsAction, this.Config.ModelObject)
-            }, ExportPdfAction: (tool) => {
+            }, ExportPdfAction: (/** @type {WPrintExportToolBar} */ tool) => {
                 const body = html`<div class="" style="position:relative">                               
                     ${this.Pages.map(page => page.cloneNode(true))}
                     ${this.ExportStyle.cloneNode(true)}
@@ -393,8 +433,18 @@ class WReportComponent extends HTMLElement {
 
         /* Tamaño oficio vertical (14in x 8.5in) */
         .oficio-horizontal {
-            width: 14in;
-            height: 8.5in;
+            padding: 20mm; /* Ajusta el padding según lo necesario */
+            border: 1px solid #D2D2D2;
+            background: #fff;
+            box-shadow: 0 2px 5px 0px #D2D2D2;
+            width: 340mm; /* 14 pulgadas en mm */
+            height: 200mm; /* 8.5 pulgadas en mm */
+            border: 1px solid #000;
+            box-sizing: border-box;
+            margin: 5mm auto;
+            overflow: hidden;
+            position: relative;
+            page-break-after: always;
         }
 
         .row-title, .row-number, .row-string, .report-title {
