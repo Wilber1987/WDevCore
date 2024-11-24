@@ -1,6 +1,8 @@
 import { css } from "../../WModules/WStyledRender.js";
 
-export const WFormStyle = css`.ContainerFormWModal {
+export const WFormStyle = css`
+@import url(/WDevcore/StyleModules/css/variables.css);
+.ContainerFormWModal {
     font-family: 'Montserrat-Medium', sans-serif !important;
 }
 .divForm {

@@ -1,4 +1,4 @@
-@import url(/WDevCore/StyleModules/css/variables.css);
+@import url(./variables.css);
 .green {
     background-color: rgb(36, 165, 91)
 }

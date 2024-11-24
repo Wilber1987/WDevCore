@@ -39,7 +39,7 @@ class WForm extends HTMLElement {
         this.DataRequire = this.DataRequire ?? true;
         this.StyleForm = this.Config.StyleForm;
 
-        if (this.DivColumns) {
+        if (!this.DivColumns) {
             const props = Object.keys(this.ModelObject).filter(prop => !this.isNotDrawable(this.ModelObject, prop))
             if (props.length < 5) {
                 this.limit = 1;

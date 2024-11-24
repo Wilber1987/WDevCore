@@ -697,4 +697,13 @@ function ConvertToMoneyString(numero, currency = undefined) {
     }).format(numero).replace(/,/g, '|').replace(/\./g, ',').replace(/\|/g, '.');;
 }
 
+
 export { ConvertToMoneyString }
+
+export function generateGUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = (Math.random() * 16) | 0; // Genera un número aleatorio entre 0 y 15
+        const v = c === 'x' ? r : (r & 0x3 | 0x8); // Maneja los bits para ajustar el GUID según el estándar
+        return v.toString(16); // Convierte el número a hexadecimal
+    });
+}

@@ -431,7 +431,8 @@ class WCommentsComponent extends HTMLElement {
             text-align: left;
         }
         .commentSelf p, .comment p {
-            font-size: 12px;
+            white-space: pre-wrap;
+            font-size: 14px;
         }
         .commentSelf p::first-letter, .comment p::first-letter {
             text-transform: uppercase;

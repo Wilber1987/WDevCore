@@ -1,8 +1,9 @@
 //@ts-check
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
-import { html, WRender } from "../WModules/WComponentsTools.js";
+import { generateGUID, html, WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
 import { WChatStyle } from "./ComponentsStyles/WChatStyle.js";
+import { WForm } from "./WForm.js";
 
 class WebApiResponse {
     /**@type {Boolean?} */ WithAgentResponse
@@ -26,11 +27,54 @@ class WChatComponent extends HTMLElement {
        </div>`);
         this.append(WChatStyle.cloneNode(true), this.Container);
         this.Config = Config;
+        this.identity = {
+            Tipo: undefined,
+            Value: localStorage.getItem("identity"),
+            Session: sessionStorage.getItem("Session") ?? generateGUID()
+        };
         this.Draw();
-       
+
     }
     connectedCallback() { }
     Draw = async () => {
+        if (!this.identity.Value) {
+            const form = new WForm({
+                ModelObject: {
+                    Tipo: {
+                        type: "radio", Dataset: ["Correo electrónico", "No Teléfono"],
+                        DefaultValue: "Correo electrónico",
+                        action: (editingObject, /**@type {WForm} */ form) => {
+                            if (editingObject.Tipo == "No Teléfono") {
+                                form.ModelObject.Telefono.hidden = false
+                                form.ModelObject.Correo.hidden = true
+                            } else {
+                                form.ModelObject.Telefono.hidden = true
+                                form.ModelObject.Correo.hidden = false
+                            }
+                            form.DrawComponent();
+                        }
+                    },
+                    Telefono: { type: "tel", hidden: true },
+                    Correo: { type: "email" },
+                },
+                SaveFunction: (editingObject) => {
+                    if (editingObject.Tipo == "No Teléfono") {
+                        this.identity.Tipo = editingObject.Tipo
+                        this.identity.Value = editingObject.Telefono
+                    } else {
+                        this.identity.Tipo = editingObject.Tipo
+                        this.identity.Value = editingObject.Correo
+                    }
+                    // @ts-ignore
+                    localStorage.setItem("identity", this.identity.Value)
+                    this.update()
+                }
+            })
+            this.append(html`<div class="default-text"><h1>Ingrese su identificación</h1>
+                ${form}
+            </div>`);
+            return;
+        }
         /**@type {HTMLInputElement} */
         // @ts-ignore
         const chatInput = html`<textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required></textarea>`
@@ -38,7 +82,7 @@ class WChatComponent extends HTMLElement {
         const chatContainer = html`<div class="chat-container"></div>`;
         const themeButton = html`<span id="theme-btn" class="material-symbols-rounded">light_mode</span>`;
         const deleteButton = html`<span id="delete-btn" class="material-symbols-rounded">delete</span>`;
-      
+
         this.Container.appendChild(chatContainer);
         this.Container.appendChild(html`<div class="typing-container">
             <div class="typing-content">
@@ -83,16 +127,17 @@ class WChatComponent extends HTMLElement {
             // Send POST request to API, get response and set the reponse as paragraph element text
             try {
                 const model = {
-                    SessionId: "12345",
+                    SessionId: this.identity.Session,
                     Text: userText,
                     Source: "webapi",
                     Id: "1",
-                    UserId: "+50588078386",
+                    UserId: this.identity.Value,
                     Timestamp: new Date()
                 };
                 /**@type {WebApiResponse} */
                 const response = await WAjaxTools.PostRequest(this.Config.Url ?? "", model, {
-                   headers : [{name : "X-Platform", value: "webapi"}]
+                    headers: [{ name: "X-Platform", value: "webapi" }],
+                    WithoutLoading: true
                 });
                 pElement.textContent = response.Reply;
                 this.WithAgent = response.WithAgentResponse;

@@ -99,6 +99,13 @@ export const WChatStyle = css`
  .chat-container .chat.outgoing {
      background: var(--outgoing-chat-bg);
      border: 1px solid var(--outgoing-chat-border);
+     & .chat-content  {
+        justify-content: flex-end;
+        & .chat-details {
+            flex-direction: row-reverse;
+        }
+        
+     }
  }
 
  .chat-container .chat.incoming {
@@ -136,8 +143,9 @@ export const WChatStyle = css`
  }
 
  .chat .chat-details svg {
-     width: 35px;
-     height: 35px;
+     width: 40px;
+     height: 40px;
+     min-width: 40px;
      align-self: flex-start;
      object-fit: cover;
      border-radius: 2px;
@@ -271,6 +279,12 @@ export const WChatStyle = css`
 
  .typing-controls span:hover {
      background: var(--icon-hover-bg);
+ }
+
+ w-form {
+    max-width: 400px;
+    padding: 40px 40px; 
+    background-color: var(--secundary-color)
  }
 
  /* Reponsive Media Query */
