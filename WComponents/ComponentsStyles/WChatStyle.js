@@ -94,6 +94,7 @@ export const WChatStyle = css`
      max-width: 1200px;
      margin: auto;
      border-radius: 0.3cm;
+     margin-bottom: 5px;
  }
 
  .chat-container .chat.outgoing {

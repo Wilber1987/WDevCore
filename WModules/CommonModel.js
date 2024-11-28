@@ -443,10 +443,10 @@ class OrderData {
     }
     PropName;
     OrderType;
-    Asc(propName) {
+    static Asc(propName) {
         return new OrderData({ PropName: propName, OrderType: "ASC" });
     }
-    Desc(propName) {
+    static Desc(propName) {
         return new OrderData({ PropName: propName, OrderType: "DESC" });
     }
 
