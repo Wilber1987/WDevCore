@@ -35,7 +35,6 @@ class WChatComponent extends HTMLElement {
         this.append(html`<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">`)
         this.appendChild(html`<div class="header">
             <h2>${localStorage.getItem("TITULO") ?? "CHATBOT"}</h2>
-            <p>${localStorage.getItem("SUB_TITULO") ?? "Start"}</p>
        </div>`);
         this.append(WChatStyle.cloneNode(true), this.Container);
         this.Config = Config;
@@ -87,6 +86,7 @@ class WChatComponent extends HTMLElement {
                     localStorage.setItem("identity", this.identity.Value)
                     form.remove();
                     header.remove();
+                    this.chatContainer.querySelector(".default-text")?.remove();
                     this.Draw();
                     this.update()
                 }
@@ -305,10 +305,9 @@ class WChatComponent extends HTMLElement {
             // @ts-ignore
             const response = await WAjaxTools.PostRequest(this.Config.UrlSearch, Message, { WithoutLoading: true });
             //console.log(response);
-            //this.Dataset = response;
-            if (this.chatContainer.querySelector(".default-text")) {
-                this.chatContainer.querySelector(".default-text")?.remove();
-            }
+            //this.Dataset = response;         
+            this.chatContainer.querySelector(".default-text")?.remove();
+            
             response.forEach(comment => {
                 if (this.chatContainer.querySelector("#Comment" + comment.Id_Comentario)) {
                     return;
