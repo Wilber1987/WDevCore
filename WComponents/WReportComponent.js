@@ -16,6 +16,9 @@ import "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
  * @property {String} [Logo]
  * @property {String} [PageType]
  * @property {Function} [exportXlsAction]
+ * @property {boolean} [exportPdf]
+ * @property {boolean} [exportPdfApi]
+ * @property {boolean} [exportXls]
  */
 class WReportComponent extends HTMLElement {
     /**
@@ -332,72 +335,73 @@ class WReportComponent extends HTMLElement {
                 }, 100)
             }
         })*/
-        this.OptionContainer.append(new WPrintExportToolBar({
-            ExportXlsAction: (tool) => {
-                // const base64 = "...."
-                // Crear una instancia de JSZip
-                // Crear una instancia de JSZip
-                tool.exportToXls(this.Config.Dataset, this.Header, `report${Date.now}.xls`, this.exportXlsAction, this.Config.ModelObject)
-            }, ExportPdfAction: async (/** @type {WPrintExportToolBar} */ tool) => {
-                /*const body = html`<div class="" style="position:relative">                               
-                    ${this.Pages.map(page => page.cloneNode(true))}
-                    ${this.ExportStyle.cloneNode(true)}
-                   
-                </div>`*/
-                //document.querySelector("")?.outerHTML
+        if (this.Config.exportPdf || this.Config.exportPdfApi || this.Config.exportXls) {
+            this.OptionContainer.append(new WPrintExportToolBar({
+                ExportXlsAction: this.Config.exportXls
+                    ? (tool) => {
+                        // const base64 = "...."
+                        // Crear una instancia de JSZip
+                        // Crear una instancia de JSZip
+                        tool.exportToXls(this.Config.Dataset, this.Header, `report${Date.now}.xls`, this.exportXlsAction, this.Config.ModelObject)
+                    } : undefined,
+                ExportPdfAction: this.Config.exportPdf || this.Config.exportPdfApi
+                    ? async (/** @type {WPrintExportToolBar} */ tool) => {
+                        /**/
+                        //console.log();
+                        if (this.Config.exportPdfApi) {
+                            tool.ExportPdfFromApi(
+                                this.Config.Dataset ?? [],
+                                this.Header,
+                                this.Config.ModelObject,
+                                "/api/ApiDocumentsData/GeneratePdf",
+                                css`
+                                    * {
+                                    font-family: "IBM Plex Sans", sans-serif;
+                                    }
+                                    tr:nth-child(odd) {
+                                        background-color: var(--fourth-color);
+                                    }
+                                    .header-container {
+                                        display: grid;
+                                        grid-template-columns: 100px calc(100% - 120px);
+                                        gap: 15px 30px;
+                                        margin-bottom: 20px;
+                                    }                        
+                                    .header-container .logo {
+                                        height: 80px;
+                                        object-fit: cover;
+                                        float: left;
+                                    }
+                                    table {
+                                        border-collapse: collapse;
+                                        width: 100%;
+                                        page-break-inside: auto;
+                                    }
+                                    thead {
+                                        display: table-header-group;
+                                    }
+                                    tr {
+                                        page-break-inside: avoid;
+                                        page-break-after: auto;
+                                    }
+                                    td, th {
+                                        word-wrap: break-word;
+                                        padding: 8px;
+                                    }
+                                `,
+                                this.Config.PageType
+                            );
+                        } else {      
+                            const body = html`<html>
+                                ${this.MainContainer.innerHTML}
+                                ${this.ExportStyle.cloneNode(true)}
+                            </html>`
+                            tool.ExportPdf(body, this.Config.PageType);
+                        }
+                    } : undefined
+            }))
+        }
 
-                const body = html`<html>
-                    ${this.MainContainer.innerHTML}
-                    ${this.CustomStyle.cloneNode(true)}
-                    ${this.ExportStyle.cloneNode(true)}
-                </html>`
-                //console.log();
-                tool.ExportPdfFromApi(
-                    this.Config.Dataset ?? [],
-                    this.Header,
-                    this.Config.ModelObject,
-                    "/api/ApiDocumentsData/GeneratePdf",
-                    css`
-                        * {
-                           font-family: "IBM Plex Sans", sans-serif;
-                        }
-                        tr:nth-child(odd) {
-                            background-color: var(--fourth-color);
-                        }
-                        .header-container {
-                            display: grid;
-                            grid-template-columns: 100px calc(100% - 120px);
-                            gap: 15px 30px;
-                            margin-bottom: 20px;
-                        }                        
-                        .header-container .logo {
-                            height: 80px;
-                            object-fit: cover;
-                            float: left;
-                        }
-                        table {
-                            border-collapse: collapse;
-                            width: 100%;
-                            page-break-inside: auto;
-                        }
-                        thead {
-                            display: table-header-group;
-                        }
-                        tr {
-                            page-break-inside: avoid;
-                            page-break-after: auto;
-                        }
-                        td, th {
-                            word-wrap: break-word;
-                            padding: 8px;
-                        }
-                    `,
-                    this.Config.PageType
-                );
-                
-                //tool.ExportPdf(body, this.Config.PageType);
-            }
-        }))
     }
 
     CustomStyle = css`
