@@ -358,8 +358,7 @@ class WRender {
             htmlContent.removeChild(img);            
         }    
         return htmlContent; // Devolver el HTML modificado
-    }
-    
+    }    
 
 }
 export { WRender }

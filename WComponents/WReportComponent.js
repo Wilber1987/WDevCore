@@ -57,45 +57,9 @@ class WReportComponent extends HTMLElement {
         console.log(consolidado);
         this.countProps = Object.keys(consolidado).length;
         this.DrawReportHeader();
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-
-
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-
-
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
-        this.Config.Dataset.push(this.Config.Dataset[0])
+        /*for (let index = 0; index < 500; index++) {
+            this.Config.Dataset.push(this.Config.Dataset[0])
+        }*/
         this.CreateTable(this.Config.Dataset, true);
         /*this.Pages.forEach(page => {
             this.MainContainer.appendChild(page);
@@ -216,8 +180,8 @@ class WReportComponent extends HTMLElement {
         // @ts-ignore
         if (index + 1 == data?.length) {
             currentPage?.append(WRender.Create({
-                className:  "row-footer",
-                children: [ "-"]
+                className: "row-footer",
+                children: ["-"]
             }));
             for (const prop in consolidado) {
                 if (!consolidado[prop]) {
@@ -232,7 +196,7 @@ class WReportComponent extends HTMLElement {
                         "row-number row-footer" : "row-footer",
                     children: [(consolidado[prop].Suma != undefined ?
                         "Total: " + consolidado[prop].Suma?.toFixed(2) : "-")]
-                });               
+                });
                 // @ts-ignore
                 if (isPage && !this.elementFitsInPage(currentPage, div)) {
                     currentPage = this.createPage();
@@ -374,12 +338,64 @@ class WReportComponent extends HTMLElement {
                 // Crear una instancia de JSZip
                 // Crear una instancia de JSZip
                 tool.exportToXls(this.Config.Dataset, this.Header, `report${Date.now}.xls`, this.exportXlsAction, this.Config.ModelObject)
-            }, ExportPdfAction: (/** @type {WPrintExportToolBar} */ tool) => {
-                const body = html`<div class="" style="position:relative">                               
+            }, ExportPdfAction: async (/** @type {WPrintExportToolBar} */ tool) => {
+                /*const body = html`<div class="" style="position:relative">                               
                     ${this.Pages.map(page => page.cloneNode(true))}
                     ${this.ExportStyle.cloneNode(true)}
-                </div>`
-                tool.ExportPdf(body, this.Config.PageType);
+                   
+                </div>`*/
+                //document.querySelector("")?.outerHTML
+
+                const body = html`<html>
+                    ${this.MainContainer.innerHTML}
+                    ${this.CustomStyle.cloneNode(true)}
+                    ${this.ExportStyle.cloneNode(true)}
+                </html>`
+                //console.log();
+                tool.ExportPdfFromApi(
+                    this.Config.Dataset ?? [],
+                    this.Header,
+                    this.Config.ModelObject,
+                    "/api/ApiDocumentsData/GeneratePdf",
+                    css`
+                        * {
+                           font-family: "IBM Plex Sans", sans-serif;
+                        }
+                        tr:nth-child(odd) {
+                            background-color: var(--fourth-color);
+                        }
+                        .header-container {
+                            display: grid;
+                            grid-template-columns: 100px calc(100% - 120px);
+                            gap: 15px 30px;
+                            margin-bottom: 20px;
+                        }                        
+                        .header-container .logo {
+                            height: 80px;
+                            object-fit: cover;
+                            float: left;
+                        }
+                        table {
+                            border-collapse: collapse;
+                            width: 100%;
+                            page-break-inside: auto;
+                        }
+                        thead {
+                            display: table-header-group;
+                        }
+                        tr {
+                            page-break-inside: avoid;
+                            page-break-after: auto;
+                        }
+                        td, th {
+                            word-wrap: break-word;
+                            padding: 8px;
+                        }
+                    `,
+                    this.Config.PageType
+                );
+                
+                //tool.ExportPdf(body, this.Config.PageType);
             }
         }))
     }
@@ -547,6 +563,14 @@ class WReportComponent extends HTMLElement {
             text-align: center;
         }
     `
+    async obtainExportBody() {
+        return html`<div>${this.MainContainer}</div>`;
+        /* return html`<div class="" style="position:relative">                               
+             ${this.Pages.map(page => page.outerHTML)}
+             ${this.ExportStyle.outerHTML}
+         </div>`;*/
+    }
+
     replacer(value) {
         if (value == null) {
             return null;

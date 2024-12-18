@@ -82,14 +82,17 @@ class WPrintExportToolBar extends HTMLElement {
     /**
      * @param {HTMLElement} body
      */
-    ExportPdf(body, pagetype = PageType.A4) {
+    async ExportPdf(body, pagetype = PageType.A4) {
+        // URL de tu API
+        await this.SendToApi(body, pagetype);
+        return;
         const options = {
             margin: 0,
             filename: `filename_${new Date()}.pdf`,
             image: { type: 'jpeg', quality: 1.0 },
             html2canvas: {
                 scrollX: 0,
-                scrollY: 0, scale: 4, logging: true, dpi: 192, letterRendering: true
+                scrollY: 0, scale: 1, logging: true, dpi: 192, letterRendering: true
             },
             jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
         };
@@ -124,8 +127,96 @@ class WPrintExportToolBar extends HTMLElement {
                 options.jsPDF.orientation = 'portrait';
         }
         // @ts-ignore
-        html2pdf().set(options).from(body).save();
+        //html2pdf().set(options).from(body).save();
+        const resp = html2pdf().set(options).from(body);
+        setTimeout(() => {
+            resp.save()
+        }, 100);
+        console.log(resp);
+
     }
+    async ExportPdfFromApi(rows,
+        header,      
+        model,
+        apiUrl,
+        style,
+        pagetype = PageType.A4) {
+        // const apiUrl = "/api/ApiDocumentsData/GeneratePdf";
+        const table = await this.BuildTableFromRows(header, rows, model, true);
+        const body = `<html >
+            <head><meta charset="utf-8">
+                ${style.outerHTML}
+            </head>
+            <body>${table.outerHTML}</body>
+        </html>`;
+        // Realizar la solicitud POST a la API
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                HtmlContent: body,
+                PageType: pagetype
+            })
+        });
+
+        // Verificar si la solicitud fue exitosa
+        if (!response.ok) {
+            throw new Error(`Error al generar el PDF: ${response.statusText}`);
+        }
+
+        // Obtener el PDF como un Blob
+        const blob = await response.blob();
+
+        // Crear un enlace para descargar el archivo
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "generated.pdf"; // Nombre del archivo descargado
+        document.body.appendChild(a);
+        a.click();
+
+        // Limpiar el enlace temporal
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    }
+    async SendToApi(body, pagetype = PageType.A4) {
+        const apiUrl = "/api/ApiDocumentsData/GeneratePdf";
+
+        // Realizar la solicitud POST a la API
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                HtmlContent: body.outerHTML,
+                PageType: pagetype
+            })
+        });
+
+        // Verificar si la solicitud fue exitosa
+        if (!response.ok) {
+            throw new Error(`Error al generar el PDF: ${response.statusText}`);
+        }
+
+        // Obtener el PDF como un Blob
+        const blob = await response.blob();
+
+        // Crear un enlace para descargar el archivo
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "generated.pdf"; // Nombre del archivo descargado
+        document.body.appendChild(a);
+        a.click();
+
+        // Limpiar el enlace temporal
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    }
+
     /**
      * @param {HTMLElement} body
      */
@@ -180,69 +271,7 @@ class WPrintExportToolBar extends HTMLElement {
      
      */
     async exportToXls(rows, header, filename, action, model) {
-        const table = html`<table style="border-collapse: collapse; width: 100%;">`; // Añade estilo inicial
-
-        // Crear el encabezado principal con colspan
-        if (header) {
-            //const processedHeader = await WRender.convertImagesToCanvasInHtml(header);
-            const processedHeader = await WRender.RemoveImagesToCanvasInHtml(header);
-            const headerCell = WRender.Create({
-                tagName: "td",
-                children: [processedHeader],
-                style: "text-align: center; font-weight: bold; font-size: 14px; "
-            });
-            headerCell.setAttribute('colspan', "7"); // Ajusta el número de columnas según sea necesario
-            table.append(WRender.Create({
-                tagName: "tr",
-                children: [headerCell]
-            }));
-        }
-
-        // Procesar las filas
-        rows.forEach((row, index) => {            
-            const trheader = WRender.Create({ tagName: "tr" });
-            const tr = WRender.Create({ tagName: "tr" });
-
-            if (row.__proto__ === Object.prototype) {
-                for (const key in row) {
-                    if (this.isNotDrawable(key, model, row)) {
-                        continue;
-                    }
-                    if (index === 0) {
-                        // Encabezados de columna con fondo gris tenue
-                        const datoHeader = { value: WOrtograficValidation.es(key) };
-                        trheader.append(WRender.Create({
-                            tagName: "td",
-                            style: "border: 1px solid #D2D2D2; background-color: #D2D2D2; color: #000000; font-weight: bold; text-align: center; padding: 5px; max-width:200px",
-                            innerHTML: WArrayF.Capitalize(datoHeader.value?.toString() ?? "-")
-                        }));
-                    }
-
-                    // Celdas de datos
-                    const dato = { value: row[key] };
-                    tr.append(WRender.Create({
-                        tagName: "td",
-                        style: "border: 1px solid #D2D2D2; text-align: left; padding: 5px;",
-                        innerHTML: dato.value?.toString() ?? "-"
-                    }));
-                }
-
-                if (index === 0) {
-                    table.append(trheader); // Agregar encabezado de columnas
-                }
-                table.append(tr); // Agregar fila de datos
-            } else if (row.__proto__ === Array.prototype) {
-                // Fila para arreglos
-                table.append(WRender.Create({
-                    tagName: "tr",
-                    children: row.map(dato => WRender.Create({
-                        tagName: "td",
-                        style: "border: 1px solid #D2D2D2; text-align: left; padding: 5px;",
-                        innerHTML: dato.value?.toString() ?? "-"
-                    }))
-                }));
-            }
-        });
+        const table = await this.BuildTableFromRows(header, rows, model);
         if (action) {
             action(table)
             return;
@@ -278,6 +307,79 @@ class WPrintExportToolBar extends HTMLElement {
         document.body.removeChild(a);
     }
 
+
+    async BuildTableFromRows(header, rows, model, withImage = false) {
+        const table = html`<table style="border-collapse: collapse; width: 100%;">`; // Añade estilo inicial
+        const thead = WRender.Create({tagName: "thead"});
+        const tableBody = WRender.Create({tagName: "tbody"});
+        table.append(thead, tableBody);
+        // Crear el encabezado principal con colspan
+        if (header) {
+            let processedHeader
+            if (withImage) {
+                processedHeader  = await WRender.convertImagesToCanvasInHtml(header);           
+            } else {
+                 processedHeader = await WRender.RemoveImagesToCanvasInHtml(header);
+            }           
+            const headerCell = WRender.Create({
+                tagName: "td",
+                children: [processedHeader],
+                style: "text-align: center; font-weight: bold; font-size: 14px; "
+            });
+            headerCell.setAttribute('colspan', "7"); // Ajusta el número de columnas según sea necesario
+            thead.append(WRender.Create({
+                tagName: "tr",
+                children: [headerCell]
+            }));
+        }
+
+        // Procesar las filas
+        rows.forEach((row, index) => {
+            const trheader = WRender.Create({ tagName: "tr" });
+            const tr = WRender.Create({ tagName: "tr" });
+
+            if (row.__proto__ === Object.prototype) {
+                for (const key in row) {
+                    if (this.isNotDrawable(key, model, row)) {
+                        continue;
+                    }
+                    if (index === 0) {
+                        // Encabezados de columna con fondo gris tenue
+                        const datoHeader = { value: WOrtograficValidation.es(key) };
+                        trheader.append(WRender.Create({
+                            tagName: "td",
+                            style: "border: 1px solid #D2D2D2; background-color: #D2D2D2; color: #000000; font-weight: bold; text-align: center; padding: 5px; max-width:200px",
+                            innerHTML: WArrayF.Capitalize(datoHeader.value?.toString() ?? "-")
+                        }));
+                    }
+
+                    // Celdas de datos
+                    const dato = { value: row[key] };
+                    tr.append(WRender.Create({
+                        tagName: "td",
+                        style: "border: 1px solid #D2D2D2; text-align: left; padding: 5px;",
+                        innerHTML: dato.value?.toString() ?? "-"
+                    }));
+                }
+
+                if (index === 0) {
+                    thead.append(trheader); // Agregar encabezado de columnas
+                }
+                tableBody.append(tr); // Agregar fila de datos
+            } else if (row.__proto__ === Array.prototype) {
+                // Fila para arreglos
+                tableBody.append(WRender.Create({
+                    tagName: "tr",
+                    children: row.map(dato => WRender.Create({
+                        tagName: "td",
+                        style: "border: 1px solid #D2D2D2; text-align: left; padding: 5px;",
+                        innerHTML: dato.value?.toString() ?? "-"
+                    }))
+                }));
+            }
+        });
+        return table;
+    }
 
     isNotDrawable(prop, ModelObject, element) {
 
