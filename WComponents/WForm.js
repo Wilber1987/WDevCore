@@ -728,7 +728,7 @@ class WForm extends HTMLElement {
             case "TEXTAREA":
                 ControlContainer.classList.add("textAreaContainer");
                 ControlContainer.style.height = "auto";
-                ControlContainer.style.gridColumn = this.Config.DivColumns == "calc(100%)" ? "span 1" : "span 2";
+                ControlContainer.style.gridColumn = `span ${this.limit}`;
                 InputControl = WRender.Create({
                     tagName: "textarea", style: { height: "calc(100% - 12px)", borderRadius: "10px" },
                     className: prop, value: val, onchange: disabled ? undefined : onChangeEvent,
@@ -739,7 +739,7 @@ class WForm extends HTMLElement {
             case "RICHTEXT":
                 const { WRichText } = await import('./WRichText.js');
                 ControlContainer.classList.add("textAreaContainer");
-                ControlContainer.style.gridColumn = this.Config.DivColumns == "calc(100%)" ? "span 1" : "span 2";
+                ControlContainer.style.gridColumn = `span ${this.limit}`;
                 ControlContainer.style.height = "auto";
                 InputControl = new WRichText({
                     value: val,

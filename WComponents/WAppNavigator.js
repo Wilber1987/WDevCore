@@ -164,7 +164,7 @@ class WAppNavigator extends HTMLElement {
                         const object = await element.action();
                         const objectWrapper = html`<div class="ObjectWrapper">
                             <div class="header">
-                                <h4 class="title">${element.name}</h4>
+                                <!-- <h4 class="title">${element.name}</h4> -->
                                 <button class="zoomBtn"
                                  onclick="${() => { this.ZoomInOrOut(objectWrapper); }}">
                                     <svg class="btnZoomIn" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" fill="#074cbb" stroke="#074cbb" stroke-width="0.8879999999999999"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.144"></g><g id="SVGRepo_iconCarrier"><path d="M9.354 15.354L3.7 21H8v1H2v-6h1v4.285l5.646-5.639zM22 2h-6v1h4.3l-5.654 5.646.707.708L21 3.715V8h1zm-6 20h6v-6h-1v4.285l-5.646-5.639-.707.708L20.3 21H16zM8 2H2v6h1V3.715l5.646 5.639.707-.708L3.7 3H8z"></path><path fill="none" d="M0 0h24v24H0z"></path></g></svg>
@@ -422,12 +422,13 @@ class WAppNavigator extends HTMLElement {
                     flex-grow: 1;
                 }
                 & .header {
+                    position: relative;
                     display: flex;
                     align-items: center;
                     justify-content: space-between; 
                     transition: all 0.6s;
-                    border-bottom: solid 1px rgba(0, 0, 0, 0.2);
-                    margin-bottom: 20px;
+                    /*border-bottom: solid 1px rgba(0, 0, 0, 0.2);*/
+                    margin-bottom: 0px;
                     color: var(--font-secundary-color);
                     & button {
                         display: flex;
@@ -439,6 +440,9 @@ class WAppNavigator extends HTMLElement {
                     & .zoomBtn svg {
                         height: 25px;
                         width: 25px;
+                        position: absolute;
+                        right: 0px;
+                        transform: translateY(-100%);
                     } 
                     & .zoomBtn .btnZoomOut{
                         display: none;
