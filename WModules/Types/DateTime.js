@@ -1,4 +1,4 @@
-class DateTime extends Date {
+class DateTime extends Date {   
     /**
     * @param {String|Date} [dateTime] 
     */
@@ -13,30 +13,31 @@ class DateTime extends Date {
             super(dateTime);
             this.Date = new Date(dateTime);
         }
-
     }
+
     /**
      * @returns {String} ISO 8601 date string (YYYY-MM-DD)
      */
     toISO() {
         return this.Date.toISO();
     }
+
     /**
     * @returns {String} ISO 8601 date string (YYYY-MM-DD)
     */
     toDDMMYYYY() {
-        let date =this.Date;
-
-        let day = date.getDate()
-        let month = date.getMonth() + 1
-        let year = date.getFullYear()
+        let date = this.Date;
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
 
         if (month < 10) {
-            return `${day}-0${month}-${year}`
+            return `${day}-0${month}-${year}`;
         } else {
-            return  `${day}-${month}-${year}`
+            return `${day}-${month}-${year}`;
         }
     }
+
     /**
      * @returns {String} Formatted date string (dd de mes de a o)
      */
@@ -50,6 +51,7 @@ class DateTime extends Date {
     toDateTimeFormatEs() {
         return this.Date.toString().toDateTimeFormatEs();
     }
+
     /**
      * @returns {Date} A new Date object representing the start of the day
      * (i.e. the date at 00:00:00)
@@ -57,6 +59,7 @@ class DateTime extends Date {
     toStartDate() {
         return this.Date.toStartDate();
     }
+
     /**
      * Adds the given number of days to the date
      * @param {Integer} days The number of days to add
@@ -66,6 +69,7 @@ class DateTime extends Date {
         this.Date.addDays(days);
         return this;
     }
+
     /**
      * Subtracts the given number of days from the date
      * @param {Integer} days The number of days to subtract
@@ -78,15 +82,13 @@ class DateTime extends Date {
 
     /**
      * Modifies the month of the date by the given number of months
-     * @param {Number} meses The number of months to add (positive) or subtract (negative)
+     * @param {Number} Meses The number of months to add (positive) or subtract (negative)
      * @returns {DateTime} The modified DateTime object
      */
-    modifyMonth(meses) {
-        this.Date.modifyMonth(meses);
+    modifyMonth(Meses) {
+        this.Date.modifyMonth(Meses);
         return this;
     }
-
-
 
     /**
      * @returns {String} Month as a string (e.g. 'enero', 'febrero', etc.)
@@ -101,8 +103,13 @@ class DateTime extends Date {
     getDayFormatEs() {
         return this.Date.getDayFormatEs();
     }
+    static Meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    static MesesIngles = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+    static Dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    static DiasIngles = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
 }
+
 export { DateTime };
 
 //Date UTILITYS
@@ -112,6 +119,7 @@ function pad(number) {
     }
     return number;
 }
+
 /**
  * @class Date
  * @memberof Date.prototype
@@ -124,91 +132,100 @@ Date.prototype.toISO = function () {
     const month = pad(this.getMonth() + 1);
     const day = pad(this.getDate());
     return `${year}-${month}-${day}`;
-   /* + return this.getUTCFullYear() +   '-' + pad(this.getUTCMonth() + 1) + '-' + pad(this.getUTCDate()) 
-      'T' + pad(this.getUTCHours()) +
-      ':' + pad(this.getUTCMinutes()) +
-      ':' + pad(this.getUTCSeconds()) +
-      '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
-      'Z' */;
 };
 
 String.prototype.toISO = function () {
     const date = new Date(this).toISO();
     return date;
 };
+
 Date.prototype.toStartDate = function () {
     return new Date(this.getUTCFullYear() +
         '-' + pad(this.getUTCMonth() + 1) +
-        '-' + pad(this.getUTCDate()))
+        '-' + pad(this.getUTCDate()));
 };
+
 /**
  * 
  * @param {Integer} days 
  * @returns {Date}
  */
 Date.prototype.addDays = function (days) {
-    this.setDate(this.getDate() + days)
+    this.setDate(this.getDate() + days);
     return this;
 };
+
 /**
  * 
  * @param {Integer} days 
  * @returns {Date}
  */
 Date.prototype.subtractDays = function (days) {
-    this.setDate(this.getDate() - days)
+    this.setDate(this.getDate() - days);
     return this;
 };
+
 /**
  * 
  * @param {Integer} month 
  * @returns {Date}
  */
-Date.prototype.modifyMonth = function (meses) {
+Date.prototype.modifyMonth = function (Meses) {
     const fecha = new Date(this.toString()); //¡se hace esto para no modificar la fecha original!
     const mes = fecha.getMonth();
-    fecha.setMonth(fecha.getMonth() + meses);
+    fecha.setMonth(fecha.getMonth() + Meses);
     while (fecha.getMonth() === mes) {
         fecha.setDate(fecha.getDate() - 1);
     }
     return fecha;
-}
+};
 
 String.prototype.toDateFormatEs = function () {
     if (this == null || this == undefined || this == "") return "";
-    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    const dias_semana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const fecha = new Date(this);
-    return dias_semana[fecha.getDay()]
+    return DateTime.Dias[fecha.getDay()]
         + ', ' + fecha.getDate()
-        + ' de ' + meses[fecha.getMonth()]
+        + ' de ' + DateTime.Meses[fecha.getMonth()]
         + ' de ' + fecha.getUTCFullYear();
 };
 
 String.prototype.toDateTimeFormatEs = function () {
     if (this == null || this == undefined || this == "") return "";
-    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    const dias_semana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const fecha = new Date(this);
-    return dias_semana[fecha.getDay()]
+    return DateTime.Dias[fecha.getDay()]
         + ', ' + fecha.getDate()
-        + ' de ' + meses[fecha.getMonth()]
+        + ' de ' + DateTime.Meses[fecha.getMonth()]
         + ' de ' + fecha.getUTCFullYear()
         + ' ' + pad(fecha.getHours()) + ':' + pad(fecha.getMinutes());
 };
 
 String.prototype.getMonthFormatEs = function () {
     if (this == null || this == undefined || this == "") return "";
-    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    const dias_semana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const fecha = new Date(this);
-    return meses[fecha.getMonth()];
+    return DateTime.Meses[fecha.getMonth()];
 };
 
-
-
-
-String.prototype.toDateTimeFormatEs = function () {
+String.prototype.toDateFormatEn = function () {
+    if (this == null || this == undefined || this == "") return "";
     const fecha = new Date(this);
-    return this.toDateFormatEs() + ' hora ' + pad(fecha.getUTCHours()) + ':' + pad(fecha.getUTCMinutes());
+    return DateTime.DiasIngles[fecha.getDay()]
+        + ', ' + fecha.getDate()
+        + ' ' + DateTime.MesesIngles[fecha.getMonth()]
+        + ' ' + fecha.getUTCFullYear();
+};
+
+String.prototype.toDateTimeFormatEn = function () {
+    if (this == null || this == undefined || this == "") return "";
+    const fecha = new Date(this);
+    return DateTime.DiasIngles[fecha.getDay()]
+        + ', ' + fecha.getDate()
+        + ' ' + DateTime.MesesIngles[fecha.getMonth()]
+        + ' ' + fecha.getUTCFullYear()
+        + ' ' + pad(fecha.getHours()) + ':' + pad(fecha.getMinutes());
+};
+
+String.prototype.getMonthFormatEn = function () {
+    if (this == null || this == undefined || this == "") return "";
+    const fecha = new Date(this);
+    return DateTime.MesesIngles[fecha.getMonth()];
 };
