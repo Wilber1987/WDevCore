@@ -659,7 +659,10 @@ class WTableComponent extends HTMLElement {
                         if (element == undefined) {
                             this.Dataset.push(NewObject);
                             if (this.Options?.AddAction != undefined) {
-                                this.Options.AddAction(element);
+                                const bool = this.Options.AddAction(element);
+                                if (bool == false) {
+                                    this.Dataset.splice(this.Dataset.indexOf(NewObject), 1);
+                                }
                             }
                             this.DrawTable();
                         } else {

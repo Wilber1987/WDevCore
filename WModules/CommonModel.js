@@ -340,7 +340,7 @@ class WNode {
     * @property {String} [UrlAdd]
     * @property {String} [UrlDelete]
     * @property {String} [UrlSearch]
-    * @property {Function} [AddAction] requiere Add en true, recibe como parametro el elemento
+    * @property {Function} [AddAction] requiere Add en true, recibe como parametro el elemento y si esta funcion retorna false elimina el objeto agregado de la tabla
     * @property {Function} [EditAction] requiere Edit en true, recibe como parametro el elemento
     * @property {Function} [DeleteAction] requiere Delete en true, recibe como parametro el elemnto
     * @property {Function} [SelectAction] requiere select en true, recibe como parametro el elemnto

@@ -114,6 +114,15 @@ class WForm extends HTMLElement {
                     if (control) {
                         // @ts-ignore
                         control.value = target[property];
+                        /**@type {ModelProperty} */ const modelProperty = Model[property]; 
+                        if (modelProperty) {                            
+                            // @ts-ignore
+                            control.max = modelProperty.max ?? control.max;
+                            // @ts-ignore
+                            control.min = modelProperty.min ?? control.min;
+                        }
+                        
+
                     }
                 }
                 if (this.Config.ProxyAction != undefined) {
@@ -599,25 +608,25 @@ class WForm extends HTMLElement {
                         Search: ModelProperty.Options?.Search ?? true,
                         AddAction: () => {
                             if (ModelProperty.action) {
-                                ModelProperty.action(ObjectF, this, InputControl, prop)
+                                return ModelProperty.action(ObjectF, this, InputControl, prop)
                             }
                             this.SetOperationValues(Model)
                         },
                         EditAction: () => {
                             if (ModelProperty.action) {
-                                ModelProperty.action(ObjectF, this, InputControl, prop)
+                                return ModelProperty.action(ObjectF, this, InputControl, prop)
                             }
                             this.SetOperationValues(Model)
                         },
                         DeleteAction: () => {
                             if (ModelProperty.action) {
-                                ModelProperty.action(ObjectF, this, InputControl, prop)
+                                return ModelProperty.action(ObjectF, this, InputControl, prop)
                             }
                             this.SetOperationValues(Model)
                         },
                         SelectAction: () => {
                             if (ModelProperty.action) {
-                                ModelProperty.action(ObjectF, this, InputControl, prop)
+                                return ModelProperty.action(ObjectF, this, InputControl, prop)
                             }
                             this.SetOperationValues(Model)
                         }
