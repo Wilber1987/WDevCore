@@ -20,8 +20,8 @@ class WModalForm extends HTMLElement {
         for (const p in Config) {
             this[p] = Config[p];
         }
-        this.DivColumns = "calc(100%)";
-        if (this.StyleForm == "columnX1") {
+        this.DivColumns = this.Config.DivColumns;
+        /*if (this.StyleForm == "columnX1") {
             this.WidthContainer = "40%";
             this.Config.DivColumns = "calc(100%)";
         } else if (this.StyleForm == "columnX3") {
@@ -33,7 +33,7 @@ class WModalForm extends HTMLElement {
         } else {
             this.WidthContainer = "70%";
             this.Config.DivColumns = "calc(50% - 10px) calc(50% - 10px)";
-        }
+        }*/
     }
     attributeChangedCallBack() {
         this.DrawSlide();

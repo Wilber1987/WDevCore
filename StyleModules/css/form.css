@@ -327,7 +327,7 @@ textarea:focus {
     padding: 10px 20px;
     font-size: 12px;
     border-radius: 10px;
-    color: #282c2f;
+    color: var(--font-primary-color);
     text-align: left;
     border: 0;
     overflow-anchor: none;
@@ -343,7 +343,8 @@ textarea:focus {
 }
 
 .active-btn {
-    background-color: rgb(210, 222, 244);
+    background-color: var(--secundary-color);
+    color: var(--font-secundary-color);
 }
 
 .accordion-button.active-btn::after {

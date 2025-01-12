@@ -60,6 +60,7 @@ class WRichText extends HTMLElement {
         this.clearInnerHtml(this.Divinput.innerText);
         this.append(this.Divinput);
         this.DrawAttached();
+        this.DrawHtmlEditor();
     }
     clearInnerHtml(contenido) {
         // @ts-ignore
@@ -88,6 +89,15 @@ class WRichText extends HTMLElement {
                 title: command.commandName,
                 innerText: command.label
             });
+            if (command.class == "list") {
+                CommandBtn.appendChild(html`<svg viewBox="0 -5 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 1H1V3H3V1Z" fill="#000000"></path> <path d="M3 5H1V7H3V5Z" fill="#000000"></path> <path d="M1 9H3V11H1V9Z" fill="#000000"></path> <path d="M3 13H1V15H3V13Z" fill="#000000"></path> <path d="M15 1H5V3H15V1Z" fill="#000000"></path> <path d="M15 5H5V7H15V5Z" fill="#000000"></path> <path d="M5 9H15V11H5V9Z" fill="#000000"></path> <path d="M15 13H5V15H15V13Z" fill="#000000"></path> </g></svg>`)
+            } else if (command.class == "left") {
+                CommandBtn.appendChild(html`<svg viewBox="0 -5 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11 1H1V3H11V1Z" fill="#000000"></path> <path d="M1 5H15V7H1V5Z" fill="#000000"></path> <path d="M11 9H1V11H11V9Z" fill="#000000"></path> <path d="M15 13H1V15H15V13Z" fill="#000000"></path> </g></svg>`)
+            } else if (command.class == "center") {
+                CommandBtn.appendChild(html`<svg viewBox="0 -5 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M13 1H3V3H13V1Z" fill="#000000"></path> <path d="M1 5H15V7H1V5Z" fill="#000000"></path> <path d="M13 9H3V11H13V9Z" fill="#000000"></path> <path d="M15 13H1V15H15V13Z" fill="#000000"></path> </g></svg>`)
+            } else if (command.class == "right") {
+                CommandBtn.appendChild(html`<svg viewBox="0 -5 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 1H5V3H15V1Z" fill="#000000"></path> <path d="M1 5H15V7H1V5Z" fill="#000000"></path> <path d="M15 9H5V11H15V9Z" fill="#000000"></path> <path d="M15 13H1V15H15V13Z" fill="#000000"></path> </g></svg>`)
+            }
             CommandBtn[command.event] = () => {
                 const ROption = this.querySelector("#ROption" + command.commandName);
                 //console.log( ROption.value );   
@@ -102,6 +112,9 @@ class WRichText extends HTMLElement {
         OptionsSection.append(html`<button onclick="${() => this.DisplayTableBuilder()}" class="tableBtn ROption tooltip tooltipBtn">${this.tableBuilder}
             <svg class="" viewBox="0 0 20 20"><path d="M3 6v3h4V6H3zm0 4v3h4v-3H3zm0 4v3h4v-3H3zm5 3h4v-3H8v3zm5 0h4v-3h-4v3zm4-4v-3h-4v3h4zm0-4V6h-4v3h4zm1.5 8a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 17V4c.222-.863 1.068-1.5 2-1.5h13c.932 0 1.778.637 2 1.5v13zM12 13v-3H8v3h4zm0-4V6H8v3h4z"></path></svg>
             <svg class="ck ck-icon ck-reset_all-excluded ck-icon_inherit-color ck-dropdown__arrow" viewBox="0 0 10 10"><path d="M.941 4.523a.75.75 0 1 1 1.06-1.06l3.006 3.005 3.005-3.005a.75.75 0 1 1 1.06 1.06l-3.549 3.55a.75.75 0 0 1-1.168-.136L.941 4.523z"></path></svg></button>`)
+        OptionsSection.append(html`<button onclick="${() => this.ToggleHtmlEditor()}" class="htmlBtn ROption tooltip tooltipBtn">
+            <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <rect x="0" fill="none" width="20" height="20"></rect> <g> <path d="M4 16v-2H2v2H1v-5h1v2h2v-2h1v5H4zM7 16v-4H5.6v-1h3.7v1H8v4H7zM10 16v-5h1l1.4 3.4h.1L14 11h1v5h-1v-3.1h-.1l-1.1 2.5h-.6l-1.1-2.5H11V16h-1zM19 16h-3v-5h1v4h2v1zM9.4 4.2L7.1 6.5l2.3 2.3-.6 1.2-3.5-3.5L8.8 3l.6 1.2zm1.2 4.6l2.3-2.3-2.3-2.3.6-1.2 3.5 3.5-3.5 3.5-.6-1.2z"></path> </g> </g></svg>
+        </button>`);
         this.append(OptionsSection);
 
     }
@@ -110,7 +123,7 @@ class WRichText extends HTMLElement {
             this.tableBuilder.classList.remove("active")
         } else {
             this.tableBuilder.classList.add("active")
-        }        
+        }
     }
 
     DrawAttached() {
@@ -273,8 +286,9 @@ class WRichText extends HTMLElement {
             }
         </style>
     </div>`
-    CreateTable(ev) {        
+    CreateTable(ev) {
         this.Divinput.append(this.CreateHtmlTable(ev));
+        this.value = this.Divinput.innerHTML;
     }
     CreateHtmlTable(event) {
         const button = event.target;
@@ -329,7 +343,31 @@ class WRichText extends HTMLElement {
         }
         return BtnArray
     }
-
+    ToggleHtmlEditor() {
+        if (this.htmlEditor.style.display === "none") {
+            this.htmlEditor.style.display = "block";
+            this.Divinput.style.display = "none";
+            this.htmlEditor.value = this.value;
+        } else {
+            this.htmlEditor.style.display = "none";
+            this.Divinput.style.display = "block";
+            this.value = this.htmlEditor.value;
+            this.Divinput.innerHTML = this.value;
+        }
+    }
+    DrawHtmlEditor() {
+        this.htmlEditor = WRender.Create({
+            tagName: "textarea",
+            class: "HtmlEditor",
+            style: "display: none; width: 100%; height: 170px;",
+            oninput: () => {
+                this.value = this.htmlEditor.value;
+                // @ts-ignore
+                this.Config?.action(this.value);
+            }
+        });
+        this.append(this.htmlEditor);
+    }
 }
 
 
@@ -356,6 +394,7 @@ const WRichTextStyle = css`
         flex-wrap: wrap;
         background-color: var(--fifty-color);
         position: relative;
+        gap: 10px;
     }
 
     w-rich-text .InputFileSection {
@@ -426,6 +465,12 @@ const WRichTextStyle = css`
     }
     w-rich-text .ROption svg {
         fill: var(--font-primary-color);
+    }
+    w-rich-text .ROption svg path {
+        fill: var(--font-primary-color);
+    }
+    w-rich-text .ROption:hover > svg path {
+        fill: var(--font-secundary-color);
     }
 
     .tooltip {
@@ -533,7 +578,6 @@ const WRichTextStyle = css`
         background-repeat: no-repeat;
         background-position: center;
         background-size: 18px;
-        background-image: url("/WDevCore/Icons/list.png");
     }
 
     .link {
@@ -566,7 +610,6 @@ const WRichTextStyle = css`
         background-repeat: no-repeat;
         background-position: center;
         background-size: 18px;
-        background-image: url("/WDevCore/Icons/align-center.png");
     }
 
     .right {
@@ -574,7 +617,6 @@ const WRichTextStyle = css`
         background-repeat: no-repeat;
         background-position: center;
         background-size: 18px;
-        background-image: url("/WDevCore/Icons/symbol.png");
     }
 
     .left {
@@ -582,7 +624,6 @@ const WRichTextStyle = css`
         background-repeat: no-repeat;
         background-position: center;
         background-size: 18px;
-        background-image: url("/WDevCore/Icons/align-left.png");
     }
 
     .bold {
@@ -604,6 +645,20 @@ const WRichTextStyle = css`
         font-weight: bold;
         text-decoration: underline;
         font-size: 18px;
+    }
+    .HtmlEditor {
+        font-family: monospace;
+        padding: 10px;
+        border: 1px solid var(--fifty-color);
+        border-radius: 4px;
+        resize: none;
+    }
+    .htmlBtn {
+        border: none;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 18px;
+        background-image: url("/WDevCore/Icons/code.png");
     }
     `
 
