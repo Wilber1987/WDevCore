@@ -1,4 +1,5 @@
-class DateTime extends Date {   
+class DateTime extends Date {
+    
     /**
     * @param {String|Date} [dateTime] 
     */
@@ -103,6 +104,9 @@ class DateTime extends Date {
     getDayFormatEs() {
         return this.Date.getDayFormatEs();
     }
+    GetFullHour() {
+        return pad(this.Date.getHours()) + ':' + pad(this.Date.getMinutes()) + ':' + pad(this.Date.getSeconds());
+    }  
     static Meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     static MesesIngles = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
     static Dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];

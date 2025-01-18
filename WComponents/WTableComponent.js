@@ -435,7 +435,7 @@ class WTableComponent extends HTMLElement {
                     td.append(ControlBuilder.BuildImage(value, this.TableConfig?.ImageUrlPath));
                     tr.append(td);
                     break;
-                case "SELECT":
+                case "SELECT":case "RADIO":
                     if (Model[prop].ModelObject?.__proto__ == Function.prototype) {
                         Model[prop].ModelObject = Model[prop].ModelObject();
                         Model[prop].Dataset = await Model[prop].ModelObject.Get();
