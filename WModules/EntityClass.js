@@ -25,6 +25,15 @@ class EntityClass {
         return Data;
     }
     /**
+     * @param {Array<FilterData>} filterData 
+     * @returns {Array}
+     */
+    Where = async (...filters) => {
+        this.FilterData = filters;
+        let Data = await this.GetData(this.ApiMethods.Get);
+        return Data;
+    }
+    /**
      * @param {String} Param 
      * @returns {any}
      */

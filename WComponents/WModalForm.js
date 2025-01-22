@@ -4,6 +4,7 @@ import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents
 import { ModalConfig } from "../WModules/CommonModel.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WModalStyle } from "./ComponentsStyles/WModalStyle.mjs";
+import { WArrayF } from "../WModules/WArrayF.js";
 
 
 class WModalForm extends HTMLElement {
@@ -114,7 +115,8 @@ class WModalForm extends HTMLElement {
             this.Modal.children.push({ class: "ObjectModalContainer", children: [modalOb] });
         } else if (this.ObjectDetail || this.ModelObject || this.EditObject) { // MUESTRA EL DETALLE DE UN OBJETO EN UNA LISTA
             const { WForm } = await import("./WForm.js");
-            this.Config.SaveFunction = (ObjectF, response) => {
+            const config = WArrayF.CloneObject(this.Config);
+            config.SaveFunction = (ObjectF, response) => {
                 if (this.ObjectOptions != undefined) {  /**TODO REVISAR */
                     if (this.ObjectOptions.SaveFunction != undefined) {
                         this.ObjectOptions.SaveFunction(ObjectF, response);
@@ -122,7 +124,7 @@ class WModalForm extends HTMLElement {
                 }
                 this.close(false);
             }
-            this.Form = new WForm(this.Config);
+            this.Form = new WForm(config);
             this.Modal.children.push({ class: "ModalContent", children: [this.Form] });
         }
         if (this.ShadowRoot) {

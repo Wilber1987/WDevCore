@@ -349,10 +349,10 @@ class WArrayF {
 
     //BUSQUEDA Y COMPARACIONES
     static FindInArray(element, Dataset) {
-        let exists = Dataset.find((item) => this.compareObj(element, item));       
+        let exists = Dataset.find((item) => this.compareObj(element, item));
         return (exists != null || exists != undefined) ? true : false;
     }
-    
+
     static compareObj(ComparativeObject, EvalObject) {//compara si dos objetos son iguales en las propiedades        
         if (typeof ComparativeObject === "string" && typeof ComparativeObject === "number") {
             if (ComparativeObject == EvalObject) return true;
@@ -578,6 +578,14 @@ class WArrayF {
                 return 0; // Si los valores son iguales, no se cambia el orden
             });
         }
+    }
+
+    static CloneObject(object) {
+        const clone = {}
+        for (const key in object) {
+            clone[key] = object[key];
+        }
+        return clone;
     }
 }
 

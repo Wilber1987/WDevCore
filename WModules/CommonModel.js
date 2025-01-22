@@ -267,7 +267,7 @@ class FormConfig { };
      * @property {?String | undefined} [gridRow]
      * @property {?String | undefined} [gridGap]
      */
-class ElementStyle {}
+class ElementStyle { }
 /**
  * @typedef {Object} WNode
      * @property {String} [tagName]
@@ -340,7 +340,7 @@ class WNode {
     * @property {String} [UrlAdd]
     * @property {String} [UrlDelete]
     * @property {String} [UrlSearch]
-    * @property {Function} [AddAction] requiere Add en true, recibe como parametro el elemento
+    * @property {Function} [AddAction] requiere Add en true, recibe como parametro el elemento y si esta funcion retorna false elimina el objeto agregado de la tabla
     * @property {Function} [EditAction] requiere Edit en true, recibe como parametro el elemento
     * @property {Function} [DeleteAction] requiere Delete en true, recibe como parametro el elemnto
     * @property {Function} [SelectAction] requiere select en true, recibe como parametro el elemnto
@@ -412,26 +412,96 @@ class ModalConfig {
     //     }
     // };
 }
-/**
- * @typedef {Object} FilterData 
- *  * @property {String} [PropName]
-    * @property {String} [FilterType]
-    * @property {Array<any>} [Values]
-    * @property {Array<FilterData>} [Filters]
-**/
+
 class FilterData {
     /**
-    * @param {Partial<FilterData>} [props] 
-    */
+     * @param {Partial<FilterData>} [props] 
+     */
     constructor(props) {
         for (const prop in props) {
             this[prop] = props[prop];
         }
     }
-    PropName;
-    FilterType;
-    Values;
-    Filters;
+    /**@type {String}*/ PropName;
+    /**@type {String} */ FilterType;
+    /**@type {Array<any>}*/ Values;
+    /**@type {Array<FilterData>}*/ Filters;
+    // Static methods
+
+    static In(propName, ...values) {
+        return new FilterData({ PropName: propName, FilterType: "in", Values: values.map(v => v?.toString()) });
+    }
+
+    static NotIn(propName, ...values) {
+        return new FilterData({ PropName: propName, FilterType: "not in", Values: values.map(v => v?.toString()) });
+    }
+
+    static Equal(propName, value) {
+        if (value === null || value === undefined) {
+            throw new Error(`The value cannot be null or undefined for ${propName}`);
+        }
+        return new FilterData({ PropName: propName, FilterType: "=", Values: [value?.toString()] });
+    }
+
+    static Greater(propName, value) {
+        return new FilterData({ PropName: propName, FilterType: ">", Values: [value?.toString()] });
+    }
+
+    static GreaterEqual(propName, value) {
+        return new FilterData({ PropName: propName, FilterType: ">=", Values: [value?.toString()] });
+    }
+
+    static Less(propName, value) {
+        return new FilterData({ PropName: propName, FilterType: "<", Values: [value?.toString()] });
+    }
+
+    static LessEqual(propName, value) {
+        return new FilterData({ PropName: propName, FilterType: "<=", Values: [value?.toString()] });
+    }
+
+    static Distinct(propName, value) {
+        return new FilterData({ PropName: propName, FilterType: "!=", Values: [value?.toString()] });
+    }
+
+    static Like(propName, value) {
+        return new FilterData({ PropName: propName, FilterType: "like", Values: [value] });
+    }
+
+    static Between(propName, value1, value2) {
+        return new FilterData({ PropName: propName, FilterType: "BETWEEN", Values: [value1?.toString(), value2?.toString()] });
+    }
+
+    static IsNull(propName) {
+        return new FilterData({ PropName: propName, FilterType: "IsNull" });
+    }
+
+    static NotNull(propName) {
+        return new FilterData({ PropName: propName, FilterType: "NotNull" });
+    }
+
+    static Or(...conditions) {
+        return new FilterData({ FilterType: "or", Filters: conditions });
+    }
+
+    static And(...conditions) {
+        return new FilterData({ FilterType: "and", Filters: conditions });
+    }
+
+    static OrderByAsc(propName) {
+        return new FilterData({ PropName: propName, FilterType: "asc" });
+    }
+
+    static OrderByDesc(propName) {
+        return new FilterData({ PropName: propName, FilterType: "desc" });
+    }
+
+    static Paginate(value1, value2) {
+        return new FilterData({ FilterType: "paginate", Values: [value1.toString(), value2.toString()] });
+    }
+
+    static Limit(value) {
+        return new FilterData({ FilterType: "limit", Values: [value.toString()] });
+    }
 }
 class OrderData {
     /**
