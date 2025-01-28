@@ -80,7 +80,7 @@ class WPrintExportToolBar extends HTMLElement {
         this.Draw();
     }
     /**
-     * @param {HTMLElement} body
+     * @param {HTMLElement|Node} body
      */
     async ExportPdf(body, pagetype = PageType.A4) {
         // URL de tu API
