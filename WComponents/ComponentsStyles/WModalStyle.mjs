@@ -6,7 +6,7 @@ export const WModalStyle = css`
        margin: auto;
        margin-top: 20px;
        background-color: var(--secundary-color);
-       width: 80%;
+       width: 60%;
        border-radius: 0.3cm;
        position: relative;
        box-shadow: 0 0px 3px 0px #000;
