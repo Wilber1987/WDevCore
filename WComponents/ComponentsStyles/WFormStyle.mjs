@@ -9,7 +9,7 @@ export const WFormStyle = css`
     display: grid;
     grid-template-rows: auto;
     height: calc(100% - 70px);
-    gap: 15px;
+    gap: 10px;
 }
 .divComplexForm {
     display: grid;
@@ -108,7 +108,7 @@ input:-internal-autofill-selected {
 .formHeader{
     color: #1c4786;
     text-transform: uppercase;
-    margin-top: 40px;
+    margin-top: 15px;
 }
 
 .radioCheckedControl{
@@ -150,7 +150,8 @@ input[type=checkbox]:checked::before {
 
 .radioCheckedLabel{
     cursor: pointer;
-    
+    margin: 0px;
+    padding: 0px 10px;
 }
 
 .ToolTip {
@@ -248,13 +249,13 @@ input[type=checkbox]:checked::before {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    gap: 15px;
     flex-wrap: wrap;
 }
 
 
 .radio-group-container label {
     cursor: pointer;
+    font-size: 0.8rem;
 }
 
 .radio-element {
@@ -299,6 +300,9 @@ input[type=radio]:checked::before {
     content: " ";
     background-color: cornflowerblue;
     transform: scale(1);
+}
+.titleContainer {
+    height: 30px;
 }
 
 @media (max-width: 800px) {

@@ -112,7 +112,7 @@ class MultiSelect extends HTMLElement {
                     this.Dataset = [...this.Dataset, ...responseDataset]
                     this.DrawFilterData(responseDataset, ev);
                 } else {
-                    const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value);
+                    const Dataset = await WArrayF.FilterInArrayByValue(this.Dataset, ev.target.value);
                     this.Dataset = [...this.Dataset, ...Dataset]
                     this.DrawFilterData(Dataset, ev);
                 }
@@ -167,7 +167,7 @@ class MultiSelect extends HTMLElement {
                         this.Dataset.push(targetControl.value);
                         this.selectedItems.push(targetControl.value);
                         targetControl.value = "";
-                        this.Draw(await WArrayF.searchFunction(this.Dataset, targetControl.value));
+                        this.Draw(await WArrayF.FilterInArrayByValue(this.Dataset, targetControl.value));
                         this.DrawLabel();
                         addBtn.remove();
                         const tool = targetControl.parentNode.querySelector(".ToolTip");
@@ -493,7 +493,7 @@ class MultiSelect extends HTMLElement {
                         this.selectedItems.push(NewObject);
 
                         targetControl.value = "";
-                        this.Draw(await WArrayF.searchFunction(this.Dataset, targetControl.value));
+                        this.Draw(await WArrayF.FilterInArrayByValue(this.Dataset, targetControl.value));
                         this.DrawLabel();
                         if (this.Config.action != undefined) {
                             this.Config.action(this.selectedItems);
@@ -589,7 +589,6 @@ const MainMenu = css`
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
-        min-height: 25px;
         width: calc(100% - 30px);
         overflow-x: auto;
     }
@@ -609,15 +608,17 @@ const MainMenu = css`
         border-radius: 0.2cm;
         background-color: #1f58c7;
         color: #fff;
-        margin: 3px;
+        margin: 0px 3px;
         font-size: 10px;
         align-items: center;
         overflow: hidden;
         display: flex;
         line-height: 12px;
-
         width: fit-content;
-        height: fit-content;
+        height: fit-content;        
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     .LabelMultiselect label button {
         border: none;
