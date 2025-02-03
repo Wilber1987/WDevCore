@@ -1028,8 +1028,8 @@ class WForm extends HTMLElement {
     }
 
     CreateDatasetForMultiSelect(Model, prop, val = {}) {
-        const count = Object.keys(val).length;
-        if (count == 0) {
+        
+        if (val == null || val == undefined || Object.keys(val).length == 0) {
             return Model[prop].Dataset ?? [];            
         }
         const Dataset = Model[prop].Dataset?.map(item => {
