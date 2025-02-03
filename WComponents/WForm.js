@@ -777,11 +777,22 @@ class WForm extends HTMLElement {
                 val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
                 const placeholderp = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 const pass = WRender.Create({
-                    tagName: "input", id: "ControlPass1" + prop, className: prop, value: val, disabled: disabled,
-                    type: ModelProperty.type, placeholder: placeholderp, onchange: onChangeEvent
+                    tagName: "input", 
+                    id: "ControlPass1" + prop,
+                    className: prop, 
+                    value: val,
+                    disabled: disabled,
+                    type: ModelProperty.type,
+                    autocomplete: "off"
+,                    placeholder: placeholderp, 
+                    onchange: onChangeEvent
                 })
                 const pass2 = WRender.Create({
-                    tagName: "input", id: "ControlPass2" + prop, className: prop, value: val, disabled: disabled,
+                    tagName: "input", id: "ControlPass2" + prop,
+                    autocomplete: "off", 
+                    className: prop, 
+                    value: val, 
+                    disabled: disabled,
                     type: ModelProperty.type, placeholder: placeholderp, onchange: () => {
                         // @ts-ignore
                         if (pass.value != pass2.value) {
@@ -1017,6 +1028,10 @@ class WForm extends HTMLElement {
     }
 
     CreateDatasetForMultiSelect(Model, prop, val = {}) {
+        const count = Object.keys(val).length;
+        if (count == 0) {
+            return Model[prop].Dataset ?? [];            
+        }
         const Dataset = Model[prop].Dataset?.map(item => {
             const MapObject = {};
             for (const key in item) {

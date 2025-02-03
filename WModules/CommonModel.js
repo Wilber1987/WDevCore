@@ -304,6 +304,7 @@ class ElementStyle { }
      * @property {Function} [onload]
      * @property {Function} [oninput]
      * @property {Object} [object]
+     * @property {String} [autocomplete]
  **/
 class WNode {
     /**

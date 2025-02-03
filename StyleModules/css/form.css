@@ -137,7 +137,7 @@
 
 .btn-success,
 .BtnSuccess {
-    color: var(--font-primary-color);
+    color: white;
     background-color: #28b765;
     border-color: transparent;
 }

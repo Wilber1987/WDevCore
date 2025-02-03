@@ -63,7 +63,7 @@ class Security_Users {
 		}
 	}
 	/**@type {ModelProperty} */
-	Tbl_Profiles = { type: "masterdetail", ModelObject: new Tbl_Profile(), max: 1 };
+	//Tbl_Profiles = { type: "masterdetail", ModelObject: new Tbl_Profile(), max: 1 };
 	Id_User = { type: "number", primary: true };
 	Nombres = { type: "text" };
 	Descripcion = { type: "text", require: false };

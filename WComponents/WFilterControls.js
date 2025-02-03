@@ -277,11 +277,11 @@ class WFilterOptions extends HTMLElement {
                 this.Config.FilterFunction(Model.FilterData);
                 return;
             } else if (this.Config.UseEntityMethods == true) {
-                this.Config.Dataset = await Model.Get();
+                const Dataset = await Model.Get();
                 if (this.Config.FilterFunction != undefined) {
-                    this.Config.FilterFunction(this.Config.Dataset);
+                    this.Config.FilterFunction(Dataset);
                 } else {
-                    console.log(this.Config.Dataset);
+                    console.log(Dataset);
                 }
                 return;
             }
