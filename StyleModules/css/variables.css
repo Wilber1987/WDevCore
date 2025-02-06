@@ -1,6 +1,6 @@
 :root {
     --primary-color: rgb(255, 255, 255);
-    --secundary-color: rgb(255, 255, 255);
+    --secundary-color: rgb(245, 245, 245);
     --tertiary-color: rgb(8, 48, 100);
     --fourth-color: rgba(240, 239, 239, 0.9);
     --fifty-color: rgba(222, 222, 222, 0.9);
@@ -15,8 +15,8 @@
 }
 @media (prefers-color-scheme: dark) {
     :root {
-        --primary-color: rgb(19, 21, 22);/*color mas fuerte*/
-        --secundary-color: rgb(31, 34, 36);/*color mas debil*/
+        --primary-color: rgb(30, 33, 36);/*color mas fuerte*/
+        --secundary-color: rgb(41, 45, 48);/*color mas debil*/
         --tertiary-color: rgb(31, 88, 199);/*color de contraste*/
         --fourth-color: rgb(40, 44, 47);
         --fifty-color: rgba(63, 63, 63, 0.9);
@@ -24,7 +24,7 @@
         --font: "Open Sans", sans-serif;
         --font-primary-color: #ffffff;
         --font-secundary-color: #06a3ec;
-        --font-tertiary-color: rgb(0, 191, 165);
+        --font-tertiary-color: rgb(1, 87, 75);
         --font-fourth-color: #d3d3d3;
     }
 }

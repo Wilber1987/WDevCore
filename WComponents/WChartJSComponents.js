@@ -722,6 +722,7 @@ const WChartStyle = (ChartInstance) => {
             justify-content: center;
             align-items: center;
             font-size: 9px;
+            color: var(--font-primary-color);
         }
 
         .SectionLabels label span,
