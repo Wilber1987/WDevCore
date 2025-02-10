@@ -689,7 +689,7 @@ class WTableComponent extends HTMLElement {
                 this.DrawTable(Dataset.data);
             }
         } else {
-            const Dataset = await WArrayF.searchFunction(this.Dataset, ev.target.value)
+            const Dataset = await WArrayF.FilterInArrayByValue(this.Dataset, ev.target.value)
             if (Dataset.length == 0 && this.Options?.UrlSearch != undefined) {
                 const DataUrlSearch = await WAjaxTools.PostRequest(
                     this.Options.UrlSearch, { Param: ev.target.value }

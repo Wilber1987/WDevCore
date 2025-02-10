@@ -255,6 +255,9 @@ class WArrayF {
     }
 
     static MinValue(Data, MaxParam) {
+        if (Data == undefined || Data == null || Data.length == 0) {
+            return 0;
+        }
         var MinValue = Data[0][MaxParam] ?? 0
         for (let index = 0; index < Data.length; index++) {
             if (parseInt(Data[index][MaxParam]) < MinValue) {
@@ -367,8 +370,12 @@ class WArrayF {
         }
         return val;
     }
-
-    static async searchFunction(Dataset, param, apiUrl) {
+    /**
+    * @param {Array} Dataset 
+    * @param {Number|String} param
+    * @returns {Array}
+    */
+    static async FilterInArrayByValue(Dataset, param) {
         const dataset = Dataset.filter((element) => {
             for (const prop in element) {
                 try {

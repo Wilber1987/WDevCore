@@ -39,7 +39,7 @@ class WForm extends HTMLElement {
         this.DataRequire = this.DataRequire ?? true;
         this.StyleForm = this.Config.StyleForm;
 
-        if (!this.DivColumns) {
+        if (!this.limit && !this.DivColumns) {
             const props = Object.keys(this.ModelObject).filter(prop => !this.isNotDrawable(this.ModelObject, prop))
             if (props.length < 5) {
                 this.limit = 1;
@@ -48,10 +48,13 @@ class WForm extends HTMLElement {
                 this.limit = this.Config.limit ?? 2;
                 this.DivColumns = "calc(50% - 10px)  calc(50% - 10px)";
             }
-        } else {
+        } else if(this.limit && !this.DivColumns){
             this.limit = this.Config.limit ?? 2;
-            this.DivColumns = this.Config.DivColumns ?? "calc(50% - 10px)  calc(50% - 10px)";
-        }
+            this.DivColumns = `repeat(${this.limit}, 1fr)`;
+        } else if (!this.limit && this.DivColumns){
+            this.limit = 2;
+            this.DivColumns = this.Config.DivColumns
+        } 
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
@@ -739,7 +742,7 @@ class WForm extends HTMLElement {
                 ControlContainer.style.height = "auto";
                 ControlContainer.style.gridColumn = `span ${this.limit}`;
                 InputControl = WRender.Create({
-                    tagName: "textarea", style: { height: "calc(100% - 12px)", borderRadius: "10px" },
+                    tagName: "textarea", style: { height: "38px", borderRadius: "10px" },
                     className: prop, value: val, onchange: disabled ? undefined : onChangeEvent,
                     disabled: disabled
                 });
@@ -1025,8 +1028,8 @@ class WForm extends HTMLElement {
     }
 
     CreateDatasetForMultiSelect(Model, prop, val = {}) {
-        const count = Object.keys(val).length;
-        if (count == 0) {
+        
+        if (val == null || val == undefined || Object.keys(val).length == 0) {
             return Model[prop].Dataset ?? [];            
         }
         const Dataset = Model[prop].Dataset?.map(item => {
@@ -1467,7 +1470,7 @@ class WForm extends HTMLElement {
         const wstyle = new WStyledRender({
             ClassList: [
                 new WCssClass(`.divForm`, {
-                    "grid-template-columns": this.DivColumns
+                    "grid-template-columns": this.DivColumns 
                 }), new WCssClass(` .divForm .imageGridForm, .divForm .tableContainer,
                  .divForm .textAreaContainer, .divForm .titleContainer, .imgPhoto`, {
                     "grid-column": `span  ${this.limit}`,

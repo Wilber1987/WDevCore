@@ -95,7 +95,9 @@ class DateTime extends Date {
      * @returns {String} Month as a string (e.g. 'enero', 'febrero', etc.)
      */
     getMonthFormatEs() {
-        return this.Date.getMonthFormatEs();
+        if (this.Date == null || this.Date == undefined || this.Date == "") return "";
+        const fecha = new Date(this.Date);
+        return DateTime.Meses[fecha.getMonth()];
     }
 
     /**

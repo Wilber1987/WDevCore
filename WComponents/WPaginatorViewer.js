@@ -306,7 +306,10 @@ class WPaginatorViewer extends HTMLElement {
                 font-size: 9px;
                 overflow: hidden;
                 margin: 5px;
-                width: 100%
+                width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
             .BtnTable,.BtnTableA,.BtnTableS,.BtnTableSR {

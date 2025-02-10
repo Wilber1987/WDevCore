@@ -25,21 +25,35 @@ class ControlBuilder {
     return new ProgessBar(value, total, barColor, progressColor);
   }
   /**
- * @param {() => void} action
+ * @param {{ action: () => void, Dataset: []}} action
  */
-  static BuildSearchInput(action) {
+  static BuildSearchInput(config) {
+    if (config.action == null && config.Dataset != null) {
+
+    }
     return html`<div class="search-box" >
-         <input type="text" class="form-control rounded border" onchange="${(ev) => { action(ev.target.value) }}" placeholder="Buscar...">
+         <input type="text" class="form-control rounded border" onchange="${(ev) => { config.action(ev.target.value) }}" placeholder="Buscar...">
          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24">
              <g data-name="Layer 2"><g data-name="search">
                  <rect width="24" height="24" opacity="0"></rect>
                  <path d="M20.71 19.29l-3.4-3.39A7.92 7.92 0 0 0 19 11a8 8 0 1 0-8 8 7.92 7.92 0 0 0 4.9-1.69l3.39 3.4a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42zM5 11a6 6 0 1 1 6 6 6 6 0 0 1-6-6z"></path>
              </g></g>
          </svg>
-         <style>
+         <style>     
             .search-box {
+              height: 35px;
               position: relative;
               display: flex;
+              & input {
+                height: 32px;
+                width: 100%;
+                border-radius: 20px;
+                border: solid 1px #c5c1c1;
+              }
+              & input:active, & input:focus  {
+                outline: none;
+                box-shadow: 0 0 2px 0 #06a3ec;
+              }
             }
             .search-box input{              
               padding-left: 40px !important;
