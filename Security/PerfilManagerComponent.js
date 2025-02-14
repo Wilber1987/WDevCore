@@ -5,7 +5,7 @@ import { Tbl_Servicios_ModelComponent } from "../../Proyect/FrontModel/Tbl_Servi
 import { activityStyle } from '../../Proyect/style.js';
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
 import { WFilterOptions } from '../WComponents/WFilterControls.js';
-import { ModalMessege, ModalVericateAction } from "../WComponents/WForm.js";
+import { ModalMessage, ModalVericateAction } from "../WComponents/WForm.js";
 import { WModalForm } from "../WComponents/WModalForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
@@ -101,7 +101,7 @@ class PerfilManagerComponent extends HTMLElement {
         name: "Asignar a dependencia", action: async () => {
             // @ts-ignore
             if (this.mainTable.selectedItems.length <= 0) {
-                this.shadowRoot?.append(ModalMessege("Seleccione perfiles"));
+                this.shadowRoot?.append(ModalMessage("Seleccione perfiles"));
                 return;
             }
             //const dependencias = await new Cat_Dependencias().Get();
@@ -125,10 +125,10 @@ class PerfilManagerComponent extends HTMLElement {
                                 await new Tbl_Profile().AsignarDependencias(this.mainTable?.selectedItems,
                                     profile.Tbl_Dependencias_Usuarios);
                             if (response.status == 200) {
-                                this.shadowRoot?.append(ModalMessege("Asignación Correcta"));
+                                this.shadowRoot?.append(ModalMessage("Asignación Correcta"));
                                 this.update();
                             } else {
-                                this.shadowRoot?.append(ModalMessege("Error"));
+                                this.shadowRoot?.append(ModalMessage("Error"));
                             }
                             modal.close();
                         }, "Esta seguro que desea asignar a esta dependencia"))
