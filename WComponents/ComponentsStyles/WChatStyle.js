@@ -5,333 +5,358 @@ export const WChatStyle = css`
  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
  * {
-     margin: 0;
-     padding: 0;
-     box-sizing: border-box;
-     font-family: "Poppins", sans-serif;
+	 margin: 0;
+	 padding: 0;
+	 box-sizing: border-box;
+	 font-family: "Poppins", sans-serif;
  }
 
  :root {
-     --text-color: #FFFFFF;
-     --icon-color: #ACACBE;
-     --icon-hover-bg: #5b5e71;
-     --placeholder-color: #dcdcdc;
-     --outgoing-chat-bg: #343541;
-     --incoming-chat-bg: #444654;
-     --outgoing-chat-border: #343541;
-     --incoming-chat-border: #444654;
+	 --text-color: #FFFFFF;
+	 --icon-color: #ACACBE;
+	 --icon-hover-bg: #5b5e71;
+	 --placeholder-color: #dcdcdc;
+	 --outgoing-chat-bg: #343541;
+	 --incoming-chat-bg: #444654;
+	 --outgoing-chat-border: #343541;
+	 --incoming-chat-border: #444654;
+	 
+	 
+	 --text-color: #343541;
+	 --icon-color: #a9a9bc;
+	 --icon-hover-bg: #f1f1f3;
+	 --placeholder-color: #6c6c6c;
+	 --outgoing-chat-bg: #FFFFFF;
+	 --incoming-chat-bg: #F7F7F8;
+	 --outgoing-chat-border: #FFFFFF;
+	 --incoming-chat-border: #D9D9E3;
  }
 
  .light-mode {
-     --text-color: #343541;
-     --icon-color: #a9a9bc;
-     --icon-hover-bg: #f1f1f3;
-     --placeholder-color: #6c6c6c;
-     --outgoing-chat-bg: #FFFFFF;
-     --incoming-chat-bg: #F7F7F8;
-     --outgoing-chat-border: #FFFFFF;
-     --incoming-chat-border: #D9D9E3;
+	 --text-color: #343541;
+	 --icon-color: #a9a9bc;
+	 --icon-hover-bg: #f1f1f3;
+	 --placeholder-color: #6c6c6c;
+	 --outgoing-chat-bg: #FFFFFF;
+	 --incoming-chat-bg: #F7F7F8;
+	 --outgoing-chat-border: #FFFFFF;
+	 --incoming-chat-border: #D9D9E3;
  }
 
  body {
-    background: var(--outgoing-chat-bg);
+	background: var(--outgoing-chat-bg);
  }
 
  .header {
-    padding: 20px;
-    border-bottom: #0693d4 solid 2px;
-    & * {
-        color: var(--text-color)
-    }
+	padding: 20px;
+	border-bottom: #0693d4 solid 2px;
+	& * {
+		color: var(--text-color)
+	}
  }
 
  /* Chats container styling */
  .chat-container {
-     overflow-y: auto;
-     max-height: calc(100vh - 100px);
-     padding-bottom: 150px;
+	 overflow-y: auto;
+	 max-height: calc(100vh - 100px);
+	 padding-bottom: 150px !important;
  }
 
  :where(.chat-container, textarea)::-webkit-scrollbar {
-     width: 6px;
+	 width: 6px;
  }
 
  :where(.chat-container, textarea)::-webkit-scrollbar-track {
-     background: var(--incoming-chat-bg);
-     border-radius: 25px;
+	 background: var(--incoming-chat-bg);
+	 border-radius: 25px;
  }
 
  :where(.chat-container, textarea)::-webkit-scrollbar-thumb {
-     background: var(--icon-color);
-     border-radius: 25px;
+	 background: var(--icon-color);
+	 border-radius: 25px;
  }
 
  .default-text {
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     flex-direction: column;
-     height: 70vh;
-     padding: 0 10px;
-     text-align: center;
-     color: var(--text-color);
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+	 flex-direction: column;
+	 height: 70vh;
+	 padding: 0 10px;
+	 text-align: center;
+	 color: var(--text-color);
  }
 
  .default-text h1 {
-     font-size: 3.3rem;
+	 font-size: 3.3rem;
  }
 
  .default-text p {
-     margin-top: 10px;
-     font-size: 1.1rem;
+	 margin-top: 10px;
+	 font-size: 1.1rem;
  }
 
  .chat-container .chat {
-     padding: 25px 20px;
-     display: flex;
-     justify-content: center;
-     color: var(--text-color);
-     max-width: 1200px;
-     margin: auto;
-     border-radius: 0.3cm;
-     margin-bottom: 5px;
+	 padding: 25px 20px;
+	 display: flex;
+	 justify-content: center;
+	 color: var(--text-color);
+	 max-width: 1200px;
+	 margin: auto;
+	 border-radius: 0.3cm;
+	 margin-bottom: 5px;
  }
 
  .chat-container .chat.outgoing {
-     background: var(--outgoing-chat-bg);
-     border: 1px solid var(--outgoing-chat-border);
-     & .chat-content  {
-        justify-content: flex-end;
-        & .chat-details {
-            flex-direction: row-reverse;
-        }
-        
-     }
+	 background: var(--outgoing-chat-bg);
+	 border: 1px solid var(--outgoing-chat-border);
+	 & .chat-content  {
+		justify-content: flex-end;
+		& .chat-details {
+			flex-direction: row-reverse;
+		}
+		
+	 }
  }
 
  .chat-container .chat.incoming {
-     background: var(--incoming-chat-bg);
-     border: 1px solid var(--incoming-chat-border);
+	 background: var(--incoming-chat-bg);
+	 border: 1px solid var(--incoming-chat-border);
  }
 
  .chat .chat-content {
-     display: flex;
-     max-width: 1200px;
-     width: 100%;
-     align-items: flex-start;
-     justify-content: space-between;
+	 display: flex;
+	 max-width: 1200px;
+	 width: 100%;
+	 align-items: flex-start;
+	 justify-content: space-between;
  }
 
  span.material-symbols-rounded {
-     user-select: none;
-     cursor: pointer;
+	 user-select: none;
+	 cursor: pointer;
  }
 
  .chat .chat-content span {
-     cursor: pointer;
-     font-size: 1.3rem;
-     color: var(--icon-color);
-     visibility: hidden;
+	 cursor: pointer;
+	 font-size: 1.3rem;
+	 color: var(--icon-color);
+	 visibility: hidden;
  }
 
  .chat:hover .chat-content:not(:has(.typing-animation), :has(.error)) span {
-     visibility: visible;
+	 visibility: visible;
  }
 
  .chat .chat-details {
-     display: flex;
-     align-items: center;
+	 display: flex;
+	 align-items: center;
  }
 
  .chat .chat-details svg {
-     width: 40px;
-     height: 40px;
-     min-width: 40px;
-     align-self: flex-start;
-     object-fit: cover;
-     border-radius: 2px;
+	 width: 40px;
+	 height: 40px;
+	 min-width: 40px;
+	 align-self: flex-start;
+	 object-fit: cover;
+	 border-radius: 2px;
  }
 
  .chat .chat-details p {
-     white-space: pre-wrap;
-     font-size: 1.05rem;
-     padding: 0 50px 0 25px;
-     color: var(--text-color);
-     word-break: break-word;
+	 white-space: pre-wrap;
+	 font-size: 1.05rem;
+	 padding: 0 50px 0 25px;
+	 color: var(--text-color);
+	 word-break: break-word;
  }
 
  .chat .chat-details p.error {
-     color: #e55865;
+	 color: #e55865;
  }
 
  .chat .typing-animation {
-     padding-left: 25px;
-     display: inline-flex;
+	 padding-left: 25px;
+	 display: inline-flex;
+ }
+ .chat-container {
+	padding: 10px;
+ }
+ 
+ .bot {
+	align-self: baseline;
  }
 
  .typing-animation .typing-dot {
-     height: 7px;
-     width: 7px;
-     border-radius: 50%;
-     margin: 0 3px;
-     opacity: 0.7;
-     background: var(--text-color);
-     animation: animateDots 1.5s var(--delay) ease-in-out infinite;
+	 height: 7px;
+	 width: 7px;
+	 border-radius: 50%;
+	 margin: 0 3px;
+	 opacity: 0.7;
+	 background: var(--text-color);
+	 animation: animateDots 1.5s var(--delay) ease-in-out infinite;
  }
 
  .typing-animation .typing-dot:first-child {
-     margin-left: 0;
+	 margin-left: 0;
  }
 
  @keyframes animateDots {
 
-     0%,
-     44% {
-         transform: translateY(0px);
-     }
+	 0%,
+	 44% {
+		 transform: translateY(0px);
+	 }
 
-     28% {
-         opacity: 0.4;
-         transform: translateY(-6px);
-     }
+	 28% {
+		 opacity: 0.4;
+		 transform: translateY(-6px);
+	 }
 
-     44% {
-         opacity: 0.2;
-     }
+	 44% {
+		 opacity: 0.2;
+	 }
  }
 
  /* Typing container styling */
  .typing-container {
-     position: fixed;
-     bottom: 0;
-     width: 100%;
-     display: flex;
-     padding: 20px 10px;
-     justify-content: center;
-     background: var(--outgoing-chat-bg);
-     border-top: 1px solid var(--incoming-chat-border);
+	 position: fixed;
+	 bottom: 0;
+	 width: 100%;
+	 display: flex;
+	 padding: 20px 10px;
+	 justify-content: center;
+	 background: var(--outgoing-chat-bg);
+	 border-top: 1px solid var(--incoming-chat-border);
  }
 
  .typing-container .typing-content {
-     display: flex;
-     max-width: 950px;
-     width: 100%;
-     align-items: flex-end;
+	 display: flex;
+	 max-width: 950px;
+	 width: 100%;
+	 align-items: flex-end;
  }
 
  .typing-container .typing-textarea {
-     width: 100%;
-     display: flex;
-     position: relative;
+	 width: 100%;
+	 display: flex;
+	 position: relative;
  }
 
  .typing-textarea textarea {
-     resize: none;
-     min-height: 55px;
-     height: 55px;
-     width: 100%;
-     border: none;
-     padding: 15px 45px 15px 20px;
-     color: var(--text-color);
-     font-size: 1rem;
-     border-radius: 4px;
-     max-height: 250px;
-     overflow-y: auto;
-     background: var(--incoming-chat-bg);
-     outline: 1px solid var(--incoming-chat-border);
+	 resize: none;
+	 min-height: 55px;
+	 height: 55px;
+	 width: 100%;
+	 border: none;
+	 padding: 15px 45px 15px 20px;
+	 color: var(--text-color);
+	 font-size: 1rem;
+	 border-radius: 4px;
+	 max-height: 250px;
+	 overflow-y: auto;
+	 background: var(--incoming-chat-bg);
+	 outline: 1px solid var(--incoming-chat-border);
  }
 
  .typing-textarea textarea::placeholder {
-     color: var(--placeholder-color);
+	 color: var(--placeholder-color);
  }
 
  .typing-content span {
-     width: 55px;
-     height: 55px;
-     display: flex;
-     border-radius: 4px;
-     font-size: 1.35rem;
-     align-items: center;
-     justify-content: center;
-     color: var(--icon-color);
+	 width: 55px;
+	 height: 55px;
+	 display: flex;
+	 border-radius: 4px;
+	 font-size: 1.35rem;
+	 align-items: center;
+	 justify-content: center;
+	 color: var(--icon-color);
  }
 
  .typing-textarea span {
-     position: absolute;
-     right: 0;
-     bottom: 0;
-     visibility: hidden;
+	 position: absolute;
+	 right: 0;
+	 bottom: 0;
+	 visibility: hidden;
  }
 
  .typing-textarea textarea:valid~span {
-     visibility: visible;
+	 visibility: visible;
  }
 
  .typing-controls {
-     display: flex;
+	 display: flex;
  }
 
  .typing-controls span {
-     margin-left: 7px;
-     font-size: 1.4rem;
-     background: var(--incoming-chat-bg);
-     outline: 1px solid var(--incoming-chat-border);
+	 margin-left: 7px;
+	 font-size: 1.4rem;
+	 background: var(--incoming-chat-bg);
+	 outline: 1px solid var(--incoming-chat-border);
  }
 
  .typing-controls span:hover {
-     background: var(--icon-hover-bg);
+	 background: var(--icon-hover-bg);
  }
 
  w-form {
-    max-width: 400px;
-    padding: 40px 40px; 
-    background-color: var(--secundary-color)
+	max-width: 400px;
+	padding: 40px 40px; 
+	background-color: var(--secundary-color)
+ }
+ .material-symbols-rounded{
+	max-width: 50px;
+	overflow: hidden;
  }
 
  /* Reponsive Media Query */
- @media screen and (max-width: 600px) {
-     .default-text h1 {
-         font-size: 2.3rem;
-     }
+ @media screen and (max-width: 800px) {
+	 .default-text h1 {
+		 font-size: 2.3rem;
+	 }
 
-     :where(.default-text p, textarea, .chat p) {
-         font-size: 0.95rem !important;
-     }
+	 :where(.default-text p, textarea, .chat p) {
+		 font-size: 0.95rem !important;
+	 }
 
-     .chat-container .chat {
-         padding: 20px 10px;
-     }
+	 .chat-container .chat {
+		 padding: 20px 10px;
+	 }
 
-     .chat-container .chat img {
-         height: 32px;
-         width: 32px;
-     }
+	 .chat-container .chat img {
+		 height: 32px;
+		 width: 32px;
+	 }
 
-     .chat-container .chat p {
-         padding: 0 20px;
-     }
+	 .chat-container .chat p {
+		 padding: 0 20px;
+	 }
 
-     .chat .chat-content:not(:has(.typing-animation), :has(.error)) span {
-         visibility: visible;
-     }
+	 .chat .chat-content:not(:has(.typing-animation), :has(.error)) span {
+		 visibility: visible;
+	 }
 
-     .typing-container {
-         padding: 15px 10px;
-     }
+	 .typing-container {
+		 padding: 15px 10px;
+	 }
 
-     .typing-textarea textarea {
-         height: 45px;
-         padding: 10px 40px 10px 10px;
-     }
+	 .typing-textarea textarea {
+		 height: 45px;
+		 padding: 10px 40px 10px 10px;
+	 }
 
-     .typing-content span {
-         height: 45px;
-         width: 45px;
-         margin-left: 5px;
-     }
+	 .typing-content span {
+		 height: 45px;
+		 width: 45px;
+		 margin-left: 5px;
+	 }
 
-     span.material-symbols-rounded {
-         font-size: 1.25rem !important;
-     }
+	 span.material-symbols-rounded {
+		 font-size: 1.25rem !important;
+	 }
+	 
+	 .chat .chat-details p {
+		padding: 0 20px 0 20px;
+	 }
  }
 `
