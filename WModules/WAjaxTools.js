@@ -1,6 +1,6 @@
 //@ts-check
 import { LoadinModal } from "../WComponents/LoadinModal.js";
-import { ModalMessege } from "../WComponents/WForm.js";
+import { ModalMessage } from "../WComponents/WForm.js";
 
 
 class PostConfig {
@@ -89,7 +89,7 @@ class WAjaxTools {
             const messageError = await response.text();
             var lineas = messageError.split(/\r?\n/);
             console.log(lineas);
-            document.body.appendChild(ModalMessege(lineas[0]));
+            document.body.appendChild(ModalMessage(lineas[0]));
             throw new Error(this.ProcessError(lineas[0])).message;
         } else {
             try {

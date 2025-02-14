@@ -1344,7 +1344,7 @@ class WForm extends HTMLElement {
         }
         //console.log(JSON.stringify(this.#OriginalObject), JSON.stringify(ObjectF));
         //if (JSON.stringify(this.#OriginalObject) == JSON.stringify(ObjectF)) {
-        //this.shadowRoot?.append(ModalMessege("No se han detectado cambios."));
+        //this.shadowRoot?.append(ModalMessage("No se han detectado cambios."));
         //return false;
         //}
         return true;
@@ -1408,7 +1408,7 @@ class WForm extends HTMLElement {
                 loadinModal.close();
                 ModalCheck.close();
                 console.log(error);
-                this.shadowRoot?.append(ModalMessege(error));
+                this.shadowRoot?.append(ModalMessage(error));
             }
         }
         const { WModalForm } = await import('./WModalForm.js');
@@ -1506,7 +1506,7 @@ const ModalVericateAction = (Action, title, withClose = true) => {
     });
     return ModalCheck;
 }
-const ModalMessege = (message, detail = "", reload = false) => {
+const ModalMessage = (message, detail = "", reload = false) => {
     const ModalCheck = new WSimpleModalForm({
         title: message,
         CloseOption: false,
@@ -1529,4 +1529,4 @@ const ModalMessege = (message, detail = "", reload = false) => {
     return ModalCheck;
 }
 customElements.define('w-form', WForm);
-export { WForm, ModalVericateAction, ModalMessege }
+export { WForm, ModalVericateAction, ModalMessage }
