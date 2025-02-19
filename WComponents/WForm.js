@@ -814,12 +814,13 @@ class WForm extends HTMLElement {
                 Form.appendChild(ControlContainer);
                 break;
             default:
-                val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
+                val = ObjectF[prop] ?? ModelProperty.defaultValue ?? 0;
                 const placeholder = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 InputControl = WRender.Create({
                     tagName: "input",
                     className: prop,
-                    value: val,
+                    // @ts-ignore
+                    value: ModelProperty.type.toUpperCase() == "MONEY" ? val.toFixed(3) : val,
                     type: ModelProperty.type.toUpperCase() == "MONEY" || ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type,
                     min: ModelProperty.min,
                     max: ModelProperty.max,
