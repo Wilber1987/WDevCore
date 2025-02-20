@@ -2,7 +2,7 @@
 import { WRender, html } from '../WModules/WComponentsTools.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
-import { WSimpleModalForm } from "./WSimpleModalForm.js";
+import { WSimpleModal } from "./WSimpleModal.js";
 
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { WIcons } from '../WModules/WIcons.js';
@@ -13,6 +13,7 @@ import { WArrayF } from "../WModules/WArrayF.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
 import { WCalendarComponent } from './WCalendar.js';
+import { ModalMessage } from './ModalMessage.js';
 
 
 let fileBase64;
@@ -1483,7 +1484,7 @@ class WForm extends HTMLElement {
     }
 }
 const ModalVericateAction = (Action, title, withClose = true) => {
-    const ModalCheck = new WSimpleModalForm({
+    const ModalCheck = new WSimpleModal({
         title: "AVISO",
         CloseOption: false,
         ObjectModal: [
@@ -1507,27 +1508,6 @@ const ModalVericateAction = (Action, title, withClose = true) => {
     });
     return ModalCheck;
 }
-const ModalMessage = (message, detail = "", reload = false) => {
-    const ModalCheck = new WSimpleModalForm({
-        title: message,
-        CloseOption: false,
-        ObjectModal: [WRender.Create({ tagName: 'p', class: "modalP", innerText: detail }), WRender.Create({
-            style: { textAlign: "center" },
-            children: [WRender.Create({
-                tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {
-                    ModalCheck.close();
-                    if (reload == true) {
-                        window.location.reload();
-                    }
-                }
-            }), css`
-                .modalP{
-                    text-align: center;
-                }
-            `]
-        })]
-    });
-    return ModalCheck;
-}
+
 customElements.define('w-form', WForm);
-export { WForm, ModalVericateAction, ModalMessage }
+export { WForm }
