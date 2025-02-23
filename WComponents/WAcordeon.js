@@ -2,8 +2,6 @@
 import { html } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css } from "../WModules/WStyledRender.js";
-import { WReportComponent } from "../WComponents/WReportComponent.js";
-import { WTableComponent } from "../WComponents/WTableComponent.js";
 /**
  * @typedef {Object} Config 
     * @property {Object} [ModelObject]
@@ -44,9 +42,6 @@ class WAcorden extends HTMLElement {
         });
     }
     BuildPropiertyDetail(ObjectF, prop) {
-        //console.log(html`<div>${WOrtograficValidation.es(prop)}: ${ObjectF[prop]}</div>`);
-
-        // return html`<div>${WOrtograficValidation.es(prop)}: ${ObjectF[prop]}</div>`;
         switch (this.Config.ModelObject[prop]?.type.toUpperCase()) {
             case "MASTERDETAIL":
                 const modelClass = this.Config.ModelObject[prop].ModelObject.__proto__ == Function.prototype ? this.Config.ModelObject[prop].ModelObject() : this.Config.ModelObject[prop].ModelObject;
@@ -70,11 +65,6 @@ class WAcorden extends HTMLElement {
                     })}</div>
                 </div>`
                 })}</div>`;
-            /*new WTableComponent({
-                Dataset: ObjectF[prop],
-                ModelObject: this.Config.ModelObject[prop].ModelObject,
-                Options: {}
-            })*/
             default:
                 return html`<div class="prop">${WOrtograficValidation.es(prop)}: ${ObjectF[prop]}</div>`;
         }

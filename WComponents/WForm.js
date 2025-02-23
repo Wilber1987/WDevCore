@@ -469,7 +469,7 @@ class WForm extends HTMLElement {
                 }
                 Form.appendChild(ControlContainer);
                 break;
-            case "HORA":
+            case "TIME":
                 //@ts-ignore
                 let time_val = val == "" ? "08:00" : ObjectF[prop];
                 InputControl = WRender.Create({

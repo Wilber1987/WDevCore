@@ -130,7 +130,7 @@ class WFilterOptions extends HTMLElement {
 				return this.CreateTextControl(prop);
 			case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
 				break;
-			case "DATE": case "FECHA": case "HORA":
+			case "DATE": case "FECHA": case "TIME":
 				/**TODO */
 				return this.CreateDateControl(prop);
 			case "MONEY":
@@ -185,9 +185,9 @@ class WFilterOptions extends HTMLElement {
 									findByValue(control);
 								}
 								break;
-							case "TITLE": case "IMG": case "IMAGE": case "IMAGES": case "HORA": case "PASSWORD":
+							case "TITLE": case "IMG": case "IMAGE": case "IMAGES": case "TIME": case "PASSWORD":
 								break;
-							case "DATE": case "FECHA": case "HORA":
+							case "DATE": case "FECHA": case "TIME":
 								/**TODO */
 								const inputs = control.querySelectorAll("input");
 								findElementByDate(inputs[0].value, inputs[1].value);
@@ -333,7 +333,7 @@ class WFilterOptions extends HTMLElement {
 						break;
 					case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
 						break;
-					case "DATE": case "FECHA": case "HORA":
+					case "DATE": case "FECHA": case "TIME":
 						/**TODO */
 						filterType = "BETWEEN";
 						const inputs = control.querySelectorAll("input");

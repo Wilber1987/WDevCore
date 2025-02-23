@@ -4,7 +4,6 @@ import { ComponentsManager, ConvertToMoneyString, WRender } from '../WModules/WC
 import { ControlBuilder } from '../WModules/WControlBuilder.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
-import { WAcorden } from "./WAcordeon.js";
 import { WAppNavigator } from './WAppNavigator.js';
 import { WTableComponent } from './WTableComponent.js';
 let photoB64;
