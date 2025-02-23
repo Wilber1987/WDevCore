@@ -107,12 +107,7 @@ class WDetailObject extends HTMLElement {
                                 ObjectDetail[prop] = ObjectDetail[prop] != ""
                                     && ObjectDetail[prop] != undefined
                                     && ObjectDetail[prop] != null
-                                    && ObjectDetail[prop].__proto__ == Array.prototype ? ObjectDetail[prop] : [];
-                                /*return new WAcorden({
-                                    ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
-                                    Dataset: ObjectDetail[prop] ?? []
-                                });*/
-
+                                    && ObjectDetail[prop].__proto__ == Array.prototype ? ObjectDetail[prop] : [];   
                                 return new WTableComponent({
                                     Options: { Search: true, Show: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,

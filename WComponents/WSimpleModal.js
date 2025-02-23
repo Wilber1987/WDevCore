@@ -2,7 +2,7 @@ import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 
-class WSimpleModalForm extends HTMLElement {
+class WSimpleModal extends HTMLElement {
     /**
      *
      * @param {ModalConfig} Config
@@ -106,5 +106,5 @@ class WSimpleModalForm extends HTMLElement {
         `;
     };
 }
-customElements.define("w-simple-modal", WSimpleModalForm);
-export { WSimpleModalForm };
+customElements.define("w-simple-modal", WSimpleModal);
+export { WSimpleModal };

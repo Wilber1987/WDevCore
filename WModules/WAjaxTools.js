@@ -1,6 +1,6 @@
 //@ts-check
 import { LoadinModal } from "../WComponents/LoadinModal.js";
-import { ModalMessage } from "../WComponents/WForm.js";
+import { ModalMessage } from "../WComponents/ModalMessage.js";
 
 
 class PostConfig {

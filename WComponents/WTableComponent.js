@@ -540,7 +540,7 @@ class WTableComponent extends HTMLElement {
                 class: "BtnTableA",
                 type: "button",
                 onclick: async () => {
-                    const { ModalVericateAction } = await import("./WForm.js");
+                    const { ModalVericateAction } = await import("./ModalVericateAction.js");
                     this.shadowRoot?.append(ModalVericateAction(() => {
                         const index = this.Dataset.indexOf(element);
                         if (WArrayF.FindInArray(element, this.Dataset) == true) {

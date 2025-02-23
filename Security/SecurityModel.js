@@ -56,8 +56,9 @@ class Security_Users_Roles {
 export { Security_Users_Roles }
 
 
-class Security_Users {
+class Security_Users  extends EntityClass{
 	constructor(props) {
+		super(props, "EntitySECURITY");
 		for (const prop in props) {
 			this[prop] = props[prop];
 		}
