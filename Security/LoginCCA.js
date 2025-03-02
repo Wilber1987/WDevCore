@@ -63,15 +63,15 @@ const OnLoad = async () => {
                                         WSecurity.Login(UserData);
                                     }
                                 },
-                                children: [{
-                                    id: "password-addon",
-                                    tagName: 'button',
-                                    type: 'button',
-                                    className: 'btn btn-link position-absolute h-100 end-0 top-0',
-                                    children: [
-                                        html`<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
-                                    ]
-                                }]
+                                children: []
+                            }, {
+                                id: "password-addon",
+                                tagName: 'button',
+                                type: 'button',
+                                className: 'btn btn-link position-absolute h-100 end-0 top-0',
+                                children: [
+                                    html`<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
+                                ]
                             }
                         ]
                     }]
@@ -97,11 +97,20 @@ const OnLoad = async () => {
         }), html`<form></form>`)
         // @ts-ignore
         App.appendChild(LoginForm);
+
+        document.getElementById('password-addon')?.addEventListener('click', function () {
+            const passwordField = document.getElementById('password-input');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);            
+        });
+        
+        
         LoginForm.append(WRender.Create({
             children: [
                 MasterStyle
             ]
         }));
+
     }, 300);
 }
 /**
@@ -110,7 +119,7 @@ const OnLoad = async () => {
 * @returns {HTMLElement}
 */
 const GetLoginLayout = (loginForm, registerForm) => {
-    const year = new Date().getFullYear(); 
+    const year = new Date().getFullYear();
 
     const loginLayout = html`<div class="authentication-bg min-vh-100">
         <!-- <div class="bg-overlay bg-light"></div> -->
@@ -174,6 +183,7 @@ const MasterStyle = css`
         padding: 5px;
         border-radius: 5px; 
     }
+
     @media (max-width: 768px) {
         .svg-background {
             display: none;
