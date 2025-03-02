@@ -84,7 +84,7 @@ class WPrintExportToolBar extends HTMLElement {
 	 *  @param {String} pagetype
 	 *  @param {Boolean} withApi
 	 */
-	async ExportPdf(body, pagetype = PageType.A4, withApi = true) {
+	async ExportPdf(body, pagetype = PageType.A4, withApi = true, fileName = 'filename_') {
 		// URL de tu API
 		if (withApi) {
 			await this.SendToApi(body, pagetype);
@@ -93,7 +93,7 @@ class WPrintExportToolBar extends HTMLElement {
 		
 		const options = {
 			margin: 0,
-			filename: `filename_${new Date()}.pdf`,
+			filename: fileName+`.pdf`,
 			image: { type: 'jpeg', quality: 2.0 },
 			html2canvas: {
 				scrollX: 0,
