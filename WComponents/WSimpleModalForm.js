@@ -98,7 +98,7 @@ class WSimpleModalForm extends HTMLElement {
                 align-items: center;
                 text-transform: uppercase;
                 font-weight: 500;
-                color: var(--font-tertiary-color);
+                color: black;
                 font-size: 20px;
                 text-align: center;
                 margin-bottom: 10px;
