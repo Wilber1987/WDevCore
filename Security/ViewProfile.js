@@ -4,7 +4,6 @@ import { ChangePasswordModel } from './SecurityModel.js';
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WAppNavigator } from '../WComponents/WAppNavigator.js';
 import { WDetailObject } from '../WComponents/WDetailObject.js';
-import { ModalVericateAction, WForm } from "../WComponents/WForm.js";
 import { WModalForm } from "../WComponents/WModalForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';

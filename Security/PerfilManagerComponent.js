@@ -4,8 +4,9 @@ import { Cat_Dependencias_ModelComponent } from "../../Proyect/FrontModel/Cat_De
 import { Tbl_Servicios_ModelComponent } from "../../Proyect/FrontModel/Tbl_Servicios.js";
 import { activityStyle } from '../../Proyect/style.js';
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
+import { ModalMessage } from "../WComponents/ModalMessage.js";
+import { ModalVericateAction } from "../WComponents/ModalVericateAction.js";
 import { WFilterOptions } from '../WComponents/WFilterControls.js';
-import { ModalMessage, ModalVericateAction } from "../WComponents/WForm.js";
 import { WModalForm } from "../WComponents/WModalForm.js";
 import { WTableComponent } from "../WComponents/WTableComponent.js";
 import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';

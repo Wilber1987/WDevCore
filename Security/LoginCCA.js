@@ -89,7 +89,7 @@ const OnLoad = async () => {
                     children: [{
                         className: 'text-decoration-underline',
                         tagName: 'a',
-                        innerText: 'Olvidaste tu contraseña?',
+                        innerText: '¿Olvidaste tu contraseña?',
                         href: "/Security/RecoveryPassword"
                     }]
                 }
@@ -134,7 +134,7 @@ const GetLoginLayout = (loginForm, registerForm) => {
                         <div class="card">
                             <div class="card-body p-4"> 
                                 <div class="text-center mt-2">
-                                    <h3>${localStorage.getItem("TITULO")}</h3>
+                                    <!--<h3>${localStorage.getItem("TITULO")}</h3>-->
                                     <!-- <p>${localStorage.getItem("SUB_TITULO")}</p> -->
                                 </div>
                                 <div class="p-2 mt-1" id="container">
