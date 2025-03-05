@@ -1220,7 +1220,7 @@ class WForm extends HTMLElement {
                 tagName: 'button',
                 class: 'Btn',
                 type: "button",
-                innerText: 'CONFIRMAR',
+                innerText: 'GUARDAR',
                 onclick: async (ev) => {
                     try {
                         ev.target.enabled = false

@@ -142,7 +142,7 @@ class WAcorden extends HTMLElement {
             font-weight: 700;
             text-transform: uppercase;
             padding: 10px;
-            background-color: var(--secundary-color);
+            background-color: var(--secundary-color);            
         }
         .value {
             flex: 1;

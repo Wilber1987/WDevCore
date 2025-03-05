@@ -11,6 +11,7 @@ import { WArrayF } from "../WModules/WArrayF.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WTableStyle } from "./ComponentsStyles/WTableStyle.mjs";
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { DateTime } from "../WModules/Types/DateTime.js";
 
 
 class WTableComponent extends HTMLElement {
@@ -492,6 +493,10 @@ class WTableComponent extends HTMLElement {
                     }));
                     break;
                 case "MASTERDETAIL":
+                    break;
+                case "DATETIME":
+                    td.append(value ? new DateTime(value).toDateTimeFormatEs() : "");
+                    tr.append(td);
                     break;
                 case "DATE": case "FECHA":
                     td.append(value?.toString()?.toDateFormatEs());

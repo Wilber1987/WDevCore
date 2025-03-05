@@ -63,15 +63,15 @@ const OnLoad = async () => {
                                         WSecurity.Login(UserData);
                                     }
                                 },
-                                children: [{
-                                    id: "password-addon",
-                                    tagName: 'button',
-                                    type: 'button',
-                                    className: 'btn btn-link position-absolute h-100 end-0 top-0',
-                                    children: [
-                                        html`<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
-                                    ]
-                                }]
+                                children: []
+                            }, {
+                                id: "password-addon",
+                                tagName: 'button',
+                                type: 'button',
+                                className: 'btn btn-link position-absolute h-100 end-0 top-0',
+                                children: [
+                                    html`<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
+                                ]
                             }
                         ]
                     }]
@@ -89,14 +89,22 @@ const OnLoad = async () => {
                     children: [{
                         className: 'text-decoration-underline',
                         tagName: 'a',
-                        innerText: 'Olvidaste tu contraseña?',
+                        innerText: '¿Olvidaste tu contraseña?',
                         href: "/Security/RecoveryPassword"
                     }]
                 }
             ]
         }), html`<form></form>`)
         // @ts-ignore
-        App.appendChild(LoginForm);    
+        App.appendChild(LoginForm);
+
+        document.getElementById('password-addon')?.addEventListener('click', function () {
+            const passwordField = document.getElementById('password-input');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);            
+        });
+        
+        
         LoginForm.append(WRender.Create({
             children: [
                 MasterStyle
@@ -135,7 +143,7 @@ const GetLoginLayout = (loginForm, registerForm) => {
                         <div class="card">
                             <div class="card-body p-4"> 
                                 <div class="text-center mt-2">
-                                    <h3>${localStorage.getItem("TITULO")}</h3>
+                                    <!--<h3>${localStorage.getItem("TITULO")}</h3>-->
                                     <!-- <p>${localStorage.getItem("SUB_TITULO")}</p> -->
                                 </div>
                                 <div class="p-2 mt-1" id="container">
@@ -196,10 +204,8 @@ const MasterStyle = css`
         cursor: pointer;
         font-size: 16px;
     }
+
     @media (max-width: 768px) {
-        .svg-background {
-            display: none;
-        }
     }
 `
 
