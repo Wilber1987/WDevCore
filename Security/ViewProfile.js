@@ -42,7 +42,7 @@ class PerfilClass extends HTMLElement {
         Inicialize: true,
         Elements: [
             {
-                name: "Datos Generales",
+                name: "DATOS GENERALES",
                 action: async (ev) => {
                     this.response = await WAjaxTools.PostRequest("../../api/Profile/TakeProfile",
                         { Id_Perfil: this.Id_Perfil }
