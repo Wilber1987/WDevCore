@@ -22,6 +22,7 @@ class WCommentsComponent extends HTMLElement {
      * AddObject?: boolean;
      * UseDestinatarios?: boolean; 
      * UseAttach?: boolean;
+     *isRichTextActive?: boolean;
      * }} props
      */
     constructor(props) {
@@ -42,6 +43,8 @@ class WCommentsComponent extends HTMLElement {
         this.MessageInput = WRender.Create({ tagName: 'textarea' });
         this.autoScroll = true;
         this.updating = false;
+        this.isRichTextActive = props.isRichTextActive ?? true;
+    
 
         //this.style.backgroundColor = "#fff";
         this.OptionContainer = WRender.Create({
@@ -80,7 +83,7 @@ class WCommentsComponent extends HTMLElement {
                         this.RitchOptionContainer.style.display = "none";
                         this.OptionContainer.style.display = "grid";
                     }
-                }, {
+                }, this.isRichTextActive ? {
                     tagName: 'label',
                     innerText: 'Texto enriquecido', onclick: async () => {
                         this.CommentsContainer.style.height = "calc(100% - 600px)";
@@ -88,7 +91,7 @@ class WCommentsComponent extends HTMLElement {
                         this.OptionContainer.style.display = "none";
 
                     }
-                }
+                }: ""
             ]
         })
         this.Mails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.EvalProperty);
@@ -153,7 +156,7 @@ class WCommentsComponent extends HTMLElement {
             await this.update();
             this.scrollToBottom();
             this.updating = false;
-        }, 30000);
+        }, 5000);
         let isLoading = false;
 
         // Definir la función de manejo de scroll por separado

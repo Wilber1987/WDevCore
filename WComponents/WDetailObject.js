@@ -150,7 +150,7 @@ class WDetailObject extends HTMLElement {
 
         h3 {
             margin: 5px 10px;
-            color: #09315f;
+            color: var(--font-secundary-color);
         }
 
 

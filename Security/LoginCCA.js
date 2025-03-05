@@ -96,12 +96,13 @@ const OnLoad = async () => {
             ]
         }), html`<form></form>`)
         // @ts-ignore
-        App.appendChild(LoginForm);
+        App.appendChild(LoginForm);    
         LoginForm.append(WRender.Create({
             children: [
                 MasterStyle
             ]
         }));
+
     }, 300);
 }
 /**
@@ -110,7 +111,7 @@ const OnLoad = async () => {
 * @returns {HTMLElement}
 */
 const GetLoginLayout = (loginForm, registerForm) => {
-    const year = new Date().getFullYear(); 
+    const year = new Date().getFullYear();
 
     const loginLayout = html`<div class="authentication-bg min-vh-100">
         <!-- <div class="bg-overlay bg-light"></div> -->
@@ -173,6 +174,27 @@ const MasterStyle = css`
         /* background-color: rgba(0, 0, 0, 0.5);  */
         padding: 5px;
         border-radius: 5px; 
+    }
+    .password-container {
+        position: relative;
+        width: 300px;
+    }
+
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
     }
     @media (max-width: 768px) {
         .svg-background {
