@@ -147,6 +147,7 @@ class WTableComponent extends HTMLElement {
      * @param {Array} Dataset 
      */
     async DrawTable(Dataset = this.Dataset) {
+        
         this.DefineModelObject(Dataset);
         //console.log(this.ModelObject, this.Dataset);
         this.DrawHeadOptions();
@@ -518,7 +519,7 @@ class WTableComponent extends HTMLElement {
                     td.append(WRender.Create({
                         tagName: "label", htmlFor: "select" + index,
                         style: this.Options?.Select ? "cursor: pointer" : "",
-                        innerHTML: value == "" ? "-" : `${((value != undefined) && (value != null) ? parseFloat(value.toString()) : 0)}`
+                        innerHTML: value == "" ? "-" : `${((value != undefined) && (value != null) ? value.toString() : 0)}`
                     }));
                     tr.append(td);
                     break;

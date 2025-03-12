@@ -290,7 +290,7 @@ class ProfileCard extends HTMLElement {
     connectedCallback() { }
     DraProfileCard = async (ObjectDetail, Model) => {
         this.container.innerHTML = "";
-        this.container.append(WRender.CreateStringNode("<h3>Datos Generales</h3>"));
+        this.container.append(WRender.CreateStringNode("<h3>DATOS GENERALES</h3>"));
         for (const prop in Model) {
             try {
                 if (ObjectDetail[prop] == undefined || ObjectDetail[prop] == null || this.isNotDrawable(Model, prop)) {
