@@ -68,7 +68,7 @@ const OnLoad = async () => {
                                 id: "password-addon",
                                 tagName: 'button',
                                 type: 'button',
-                                className: 'btn btn-link position-absolute h-100 end-0 top-0',
+                                className: 'btn btn-link position-absolute h-100 end-0',
                                 children: [
                                     html`<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
                                 ]
@@ -100,8 +100,8 @@ const OnLoad = async () => {
 
         document.getElementById('password-addon')?.addEventListener('click', function () {
             const passwordField = document.getElementById('password-input');
-            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordField.setAttribute('type', type);            
+            const type = passwordField?.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField?.setAttribute('type', type);            
         });
         
         
