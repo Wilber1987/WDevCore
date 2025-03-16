@@ -103,8 +103,8 @@ const OnLoad = async () => {
             const type = passwordField?.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordField?.setAttribute('type', type);            
         });
-        
-        
+
+
         LoginForm.append(WRender.Create({
             children: [
                 MasterStyle
@@ -164,14 +164,21 @@ const GetLoginLayout = (loginForm, registerForm) => {
 
 const MasterStyle = css`
     .svg-background {
-        background-image: url('/Media/img/calendar-img.png');
-        background-size: contain;
+        background-image: url('/Media/img/login-img.png');
+        /*background-size: contain;*/
+        background-size: cover;
         background-position: center center;
         background-repeat: no-repeat;
         background-color: var(--primary-color);
         display: table;
         align-items: center;
         justify-content: center;
+    }
+    p.text-white.position-absolute.bottom-left {        
+        font-size: 20px;
+        color: white;
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+        text-align: center;
     }
     .bottom-left {
         position: absolute;
