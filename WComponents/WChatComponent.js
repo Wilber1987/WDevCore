@@ -330,8 +330,7 @@ class WChatComponent extends HTMLElement {
 				}
 				// Create an incoming chat div with typing animation and append it to chat container
 				const incomingChatDiv = html`<div class="chat ${comment.NickName == this.identity.Value ? "outgoing" : "incoming"}" id="Comment${comment.Id_Comentario}">
-					<div class="chat-content">
-						<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
+					<div class="chat-content">						
 						<div class="chat-details">
 							<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
 							<div class="typing-animation">

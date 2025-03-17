@@ -74,8 +74,8 @@ class ColumChart extends HTMLElement {
         }
         this.DrawChart();
         //console.log(this.ChartTable);
-        console.log(this.ChartInstance.Title);
-        console.table(this.ChartJson.data);
+        //console.log(this.ChartInstance.Title);
+        //console.table(this.ChartJson.data);
     }
     InitializeDataset() {
         if (this.EvalValue == null && this.Dataset.length != 0) {
