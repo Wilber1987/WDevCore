@@ -46,13 +46,13 @@ class WAjaxTools {
                 isComplete = true;
                 return ProcessRequest;
             } catch (error) {
-                attempts++;
-                if (attempts >= retryCount) {
+                attempts++;                
+                //if (attempts >= retryCount) {
                     loadinModal.close();
                     isComplete = true;
                     console.error(`Error after ${retryCount} attempts:`, error);
                     throw error; // Si ya alcanzamos el máximo de intentos, lanzamos el error.
-                }
+                //}
             }
         }
     };
