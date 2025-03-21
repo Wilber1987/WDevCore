@@ -14,14 +14,15 @@ class WebApiResponse {
 class WChatComponent extends HTMLElement {
 	/**
 	 * @param {{ 
-		* Url?: String,
+		*Url?: String,
 		*UrlGetConfigData?:String,
 		*UrlSearch?:String,
 		*UrlAdd?:String,
 		*UserIdProp?:String,
 		*CommentsIdentify?:String,
 		*CommentsIdentifyName?:String,
-		*AddObject?:Boolean
+		*AddObject?:Boolean,
+		*Header?:HTMLElement
 	* }} Config
 	 * 
 	 */
@@ -36,17 +37,22 @@ class WChatComponent extends HTMLElement {
 		if (!themeColor) {
 			localStorage.setItem("themeColor", "light_mode");
 			document.body.classList.toggle("light-mode", themeColor === "light_mode");
-			themeColor = "light_mode";			
-		
+			themeColor = "light_mode";
+
 		}
 		if (themeColor == "light_mode") {
 			document.body.classList.add("light_mode");
 		}
-		
+
 		this.append(html`<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">`)
-		this.appendChild(html`<div class="header">
-			<h2>${localStorage.getItem("TITULO") ?? "CHATBOT"}</h2>
-	   </div>`);
+		if (Config.Header) {
+			this.appendChild(Config.Header);
+		} else {
+			this.appendChild(html`<div class="header">
+				<h2>${localStorage.getItem("TITULO") ?? "CHATBOT"}</h2>
+			</div>`);
+		}
+
 		this.append(WChatStyle.cloneNode(true), this.Container);
 		this.Config = Config;
 		this.identity = {
@@ -143,12 +149,9 @@ class WChatComponent extends HTMLElement {
 			document.body.classList.toggle("light-mode", themeColor === "light_mode");
 			themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
 
-			const defaultText = `<div class="default-text">
-				<h1>${localStorage.getItem("TITULO") ?? "CHATBOT"}</h1>
-				<p>${localStorage.getItem("SUB_TITULO") ?? "Start"}</p>
-			</div>`;
+			
 
-			this.chatContainer.innerHTML = localStorage.getItem("all-chats") ?? defaultText;
+			this.chatContainer.innerHTML = localStorage.getItem("all-chats") ?? "";
 			if (this.chatContainer.querySelector(".default-text")) {
 				this.chatContainer.querySelector(".default-text")?.remove();
 			}
@@ -159,7 +162,8 @@ class WChatComponent extends HTMLElement {
 		};
 
 		const getChatResponse = async (incomingChatDiv) => {
-			const pElement = document.createElement("p");
+			const pElement = document.createElement("div");
+			pElement.className = "pElement";
 			// Send POST request to API, get response and set the reponse as paragraph element text
 			try {
 				const model = {
@@ -172,7 +176,7 @@ class WChatComponent extends HTMLElement {
 				};
 				/**@type {WebApiResponse} */
 				const response = await this.SendMessage(model);
-				pElement.textContent = response.Reply;
+				pElement.innerHTML = response.Reply;
 				if (this.WithAgent != true) {
 					// Remove the typing animation, append the paragraph element and save the chats to local storage                   
 					incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
@@ -186,7 +190,7 @@ class WChatComponent extends HTMLElement {
 				this.ActiveInterval();
 			} catch (error) { // Add error class to the paragraph element and set error text
 				console.log(error);
-				
+
 				pElement.classList.add("error");
 				pElement.textContent = "Oops! Something went wrong while retrieving the response. Please try again.";
 			}
@@ -195,13 +199,6 @@ class WChatComponent extends HTMLElement {
 			this.chatContainer.scrollTo(0, this.chatContainer.scrollHeight);
 		};
 
-		const copyResponse = (copyBtn) => {
-			// Copy the text content of the response to the clipboard
-			const reponseTextElement = copyBtn.parentElement.querySelector("p");
-			navigator.clipboard.writeText(reponseTextElement.textContent);
-			copyBtn.textContent = "done";
-			setTimeout(() => copyBtn.textContent = "content_copy", 1000);
-		};
 		const showTypingAnimation = () => {
 			// Display the typing animation and call the getChatResponse function
 			const html = `<div class="chat-content">
@@ -212,8 +209,7 @@ class WChatComponent extends HTMLElement {
 							<div class="typing-dot" style="--delay: 0.3s"></div>
 							<div class="typing-dot" style="--delay: 0.4s"></div>
 						</div>
-					</div>
-					<span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span>
+					</div>					
 				</div>`;
 			// Create an incoming chat div with typing animation and append it to chat container
 			const incomingChatDiv = createChatElement(html, "incoming");
@@ -333,8 +329,8 @@ class WChatComponent extends HTMLElement {
 					return;
 				}
 				// Create an incoming chat div with typing animation and append it to chat container
-				const incomingChatDiv = html`<div class="chat ${comment.NickName == this.identity.Value ? "outgoing" : "incoming"}" id="Comment${comment.Id_Comentario}"><div class="chat-content">
-						<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
+				const incomingChatDiv = html`<div class="chat ${comment.NickName == this.identity.Value ? "outgoing" : "incoming"}" id="Comment${comment.Id_Comentario}">
+					<div class="chat-content">						
 						<div class="chat-details">
 							<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
 							<div class="typing-animation">
@@ -344,15 +340,15 @@ class WChatComponent extends HTMLElement {
 								<div class="typing-dot" style="--delay: 0.4s"></div>
 							</div>
 						</div>
-						<span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span>
 					</div>
 				</div>`;
 				this.chatContainer.appendChild(incomingChatDiv);
-				const pElement = document.createElement("p");
+				const pElement = document.createElement("div");
+				pElement.className = "pElement";
 				// Send POST request to API, get response and set the reponse as paragraph element text
 				try {
 
-					pElement.textContent = comment.Body ?? comment.mensaje;
+					pElement.innerHTML = comment.Body ?? comment.mensaje;
 					incomingChatDiv.querySelector(".chat-details")?.appendChild(pElement);
 				} catch (error) { // Add error class to the paragraph element and set error text
 					pElement.classList.add("error");

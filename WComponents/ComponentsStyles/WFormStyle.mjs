@@ -106,7 +106,7 @@ input:-internal-autofill-selected {
 }
 
 .formHeader{
-    color: #3482f8;
+    color: var(--font-secundary-color);
     text-transform: uppercase;
     margin-top: 15px;
 }

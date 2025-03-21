@@ -1,12 +1,8 @@
 import { css } from "../../WModules/WStyledRender.js";
 
 export const WChatStyle = css`
- /* Import Google font - Poppins */
- @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-
  * {
 	 margin: 0;
-	 padding: 0;
 	 box-sizing: border-box;
 	 font-family: "Poppins", sans-serif;
  }
@@ -91,7 +87,7 @@ export const WChatStyle = css`
 	 font-size: 3.3rem;
  }
 
- .default-text p {
+ .default-text .pElement {
 	 margin-top: 10px;
 	 font-size: 1.1rem;
  }
@@ -162,7 +158,7 @@ export const WChatStyle = css`
 	 border-radius: 2px;
  }
 
- .chat .chat-details p {
+ .chat .chat-details .pElement {
 	 white-space: pre-wrap;
 	 font-size: 1.05rem;
 	 padding: 0 50px 0 25px;
@@ -170,7 +166,7 @@ export const WChatStyle = css`
 	 word-break: break-word;
  }
 
- .chat .chat-details p.error {
+ .chat .chat-details .pElement.error {
 	 color: #e55865;
  }
 
@@ -315,7 +311,7 @@ export const WChatStyle = css`
 		 font-size: 2.3rem;
 	 }
 
-	 :where(.default-text p, textarea, .chat p) {
+	 :where(.default-text .pElement, textarea, .chat .pElement) {
 		 font-size: 0.95rem !important;
 	 }
 
@@ -328,7 +324,7 @@ export const WChatStyle = css`
 		 width: 32px;
 	 }
 
-	 .chat-container .chat p {
+	 .chat-container .chat .pElement {
 		 padding: 0 20px;
 	 }
 
@@ -355,7 +351,7 @@ export const WChatStyle = css`
 		 font-size: 1.25rem !important;
 	 }
 	 
-	 .chat .chat-details p {
+	 .chat .chat-details .pElement {
 		padding: 0 20px 0 20px;
 	 }
  }

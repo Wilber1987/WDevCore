@@ -49,13 +49,13 @@ class WForm extends HTMLElement {
                 this.limit = this.Config.limit ?? 2;
                 this.DivColumns = "calc(50% - 10px)  calc(50% - 10px)";
             }
-        } else if(this.limit && !this.DivColumns){
+        } else if (this.limit && !this.DivColumns) {
             this.limit = this.Config.limit ?? 2;
             this.DivColumns = `repeat(${this.limit}, 1fr)`;
-        } else if (!this.limit && this.DivColumns){
+        } else if (!this.limit && this.DivColumns) {
             this.limit = 2;
             this.DivColumns = this.Config.DivColumns
-        } 
+        }
         this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
         this.shadowRoot?.append(StyleScrolls.cloneNode(true));
         this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
@@ -118,14 +118,14 @@ class WForm extends HTMLElement {
                     if (control) {
                         // @ts-ignore
                         control.value = target[property];
-                        /**@type {ModelProperty} */ const modelProperty = Model[property]; 
-                        if (modelProperty) {                            
+                        /**@type {ModelProperty} */ const modelProperty = Model[property];
+                        if (modelProperty) {
                             // @ts-ignore
                             control.max = modelProperty.max ?? control.max;
                             // @ts-ignore
                             control.min = modelProperty.min ?? control.min;
                         }
-                        
+
 
                     }
                 }
@@ -470,7 +470,7 @@ class WForm extends HTMLElement {
                 }
                 Form.appendChild(ControlContainer);
                 break;
-            case "HORA":
+            case "TIME":
                 //@ts-ignore
                 let time_val = val == "" ? "08:00" : ObjectF[prop];
                 InputControl = WRender.Create({
@@ -765,6 +765,9 @@ class WForm extends HTMLElement {
                 //console.log(InputControl.value.length);
                 ObjectF[prop] = InputControl.value;
                 Form.appendChild(ControlContainer);
+                if (disabled) {
+                    InputControl.style.pointerEvents = "none";
+                }
                 break;
             case "CALENDAR":
                 ObjectF[prop] = ObjectF[prop]?.__proto__ == Array.prototype ? ObjectF[prop] : [];
@@ -778,21 +781,21 @@ class WForm extends HTMLElement {
                 val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
                 const placeholderp = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 const pass = WRender.Create({
-                    tagName: "input", 
+                    tagName: "input",
                     id: "ControlPass1" + prop,
-                    className: prop, 
+                    className: prop,
                     value: val,
                     disabled: disabled,
                     type: ModelProperty.type,
                     autocomplete: "off"
-,                    placeholder: placeholderp, 
+                    , placeholder: placeholderp,
                     onchange: onChangeEvent
                 })
                 const pass2 = WRender.Create({
                     tagName: "input", id: "ControlPass2" + prop,
-                    autocomplete: "off", 
-                    className: prop, 
-                    value: val, 
+                    autocomplete: "off",
+                    className: prop,
+                    value: val,
                     disabled: disabled,
                     type: ModelProperty.type, placeholder: placeholderp, onchange: () => {
                         // @ts-ignore
@@ -815,7 +818,12 @@ class WForm extends HTMLElement {
                 Form.appendChild(ControlContainer);
                 break;
             default:
-                val = ObjectF[prop] ?? ModelProperty.defaultValue ?? 0;
+                //val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
+                if (ModelProperty.type.toUpperCase() == "MONEY" || ModelProperty.type.toUpperCase() == "PERCENTAGE") {
+                    val = ObjectF[prop] ?? ModelProperty.defaultValue ?? 0;
+                } else {
+                    val = ObjectF[prop] ?? ModelProperty.defaultValue ?? "";
+                }
                 const placeholder = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
                 InputControl = WRender.Create({
                     tagName: "input",
@@ -886,7 +894,7 @@ class WForm extends HTMLElement {
     }
 
     async createDrawCalendar(InputControl, prop, ControlContainer, ObjectF, Model) {
-       
+
         InputControl = new WCalendarComponent({
             CalendarFunction: Model[prop].CalendarFunction,
             SelectedBlocks: ObjectF[prop],
@@ -1030,9 +1038,9 @@ class WForm extends HTMLElement {
     }
 
     CreateDatasetForMultiSelect(Model, prop, val = {}) {
-        
+
         if (val == null || val == undefined || Object.keys(val).length == 0) {
-            return Model[prop].Dataset ?? [];            
+            return Model[prop].Dataset ?? [];
         }
         const Dataset = Model[prop].Dataset?.map(item => {
             const MapObject = {};
@@ -1212,7 +1220,7 @@ class WForm extends HTMLElement {
                 tagName: 'button',
                 class: 'Btn',
                 type: "button",
-                innerText: 'CONFIRMAR',
+                innerText: 'GUARDAR',
                 onclick: async (ev) => {
                     try {
                         ev.target.enabled = false
@@ -1393,9 +1401,21 @@ class WForm extends HTMLElement {
                 this.shadowRoot?.append(loadinModal);
                 if (withModel) {
                     const response = await this.Config.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
+                    if (response.status == 500 && response.message) {
+                        loadinModal.close();
+                        ModalCheck.close();
+                        this.shadowRoot?.append(ModalMessage(response.message))
+                        return;
+                    }
                     await this.ExecuteSaveFunction(ObjectF, response);
                 } else if (this.Config.ObjectOptions?.Url != undefined) {
                     const response = await WAjaxTools.PostRequest(this.Config.ObjectOptions?.Url, ObjectF);
+                    if (response.status == 500 && response.message) {
+                        loadinModal.close();
+                        ModalCheck.close();
+                        this.shadowRoot?.append(ModalMessage(response.message))
+                        return;
+                    }
                     await this.ExecuteSaveFunction(ObjectF, response);
                 }
                 loadinModal.close();
@@ -1472,7 +1492,7 @@ class WForm extends HTMLElement {
         const wstyle = new WStyledRender({
             ClassList: [
                 new WCssClass(`.divForm`, {
-                    "grid-template-columns": this.DivColumns 
+                    "grid-template-columns": this.DivColumns
                 }), new WCssClass(` .divForm .imageGridForm, .divForm .tableContainer,
                  .divForm .textAreaContainer, .divForm .titleContainer, .imgPhoto`, {
                     "grid-column": `span  ${this.limit}`,

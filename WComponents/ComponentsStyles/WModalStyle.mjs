@@ -19,7 +19,7 @@ export const WModalStyle = css`
   .ContainerFormWModal h5 {
 	  display: block;
 	  text-align: center;
-	  font: 400 13.3333px !important;
+	  font-size: 13px !important;
 	  margin: 10px 0px;
   }
   .ContainerFormWModal h4,

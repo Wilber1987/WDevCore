@@ -63,15 +63,15 @@ const OnLoad = async () => {
                                         WSecurity.Login(UserData);
                                     }
                                 },
-                                children: [{
-                                    id: "password-addon",
-                                    tagName: 'button',
-                                    type: 'button',
-                                    className: 'btn btn-link position-absolute h-100 end-0 top-0',
-                                    children: [
-                                        html`<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
-                                    ]
-                                }]
+                                children: []
+                            }, {
+                                id: "password-addon",
+                                tagName: 'button',
+                                type: 'button',
+                                className: 'btn btn-link position-absolute h-100 end-0',
+                                children: [
+                                    html`<i class="mdi mdi-eye-outline font-size-18 text-muted"></i>`
+                                ]
                             }
                         ]
                     }]
@@ -89,7 +89,7 @@ const OnLoad = async () => {
                     children: [{
                         className: 'text-decoration-underline',
                         tagName: 'a',
-                        innerText: 'Olvidaste tu contraseña?',
+                        innerText: '¿Olvidaste tu contraseña?',
                         href: "/Security/RecoveryPassword"
                     }]
                 }
@@ -97,11 +97,20 @@ const OnLoad = async () => {
         }), html`<form></form>`)
         // @ts-ignore
         App.appendChild(LoginForm);
+
+        document.getElementById('password-addon')?.addEventListener('click', function () {
+            const passwordField = document.getElementById('password-input');
+            const type = passwordField?.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField?.setAttribute('type', type);            
+        });
+
+
         LoginForm.append(WRender.Create({
             children: [
                 MasterStyle
             ]
         }));
+
     }, 300);
 }
 /**
@@ -110,7 +119,7 @@ const OnLoad = async () => {
 * @returns {HTMLElement}
 */
 const GetLoginLayout = (loginForm, registerForm) => {
-    const year = new Date().getFullYear(); 
+    const year = new Date().getFullYear();
 
     const loginLayout = html`<div class="authentication-bg min-vh-100">
         <!-- <div class="bg-overlay bg-light"></div> -->
@@ -134,7 +143,7 @@ const GetLoginLayout = (loginForm, registerForm) => {
                         <div class="card">
                             <div class="card-body p-4"> 
                                 <div class="text-center mt-2">
-                                    <h3>${localStorage.getItem("TITULO")}</h3>
+                                    <!--<h3>${localStorage.getItem("TITULO")}</h3>-->
                                     <!-- <p>${localStorage.getItem("SUB_TITULO")}</p> -->
                                 </div>
                                 <div class="p-2 mt-1" id="container">
@@ -155,14 +164,21 @@ const GetLoginLayout = (loginForm, registerForm) => {
 
 const MasterStyle = css`
     .svg-background {
-        background-image: url('/Media/img/calendar-img.png');
-        background-size: contain;
+        background-image: url('/Media/img/login-img.png');
+        /*background-size: contain;*/
+        background-size: cover;
         background-position: center center;
         background-repeat: no-repeat;
         background-color: var(--primary-color);
         display: table;
         align-items: center;
         justify-content: center;
+    }
+    p.text-white.position-absolute.bottom-left {        
+        font-size: 20px;
+        color: white;
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+        text-align: center;
     }
     .bottom-left {
         position: absolute;
@@ -174,10 +190,29 @@ const MasterStyle = css`
         padding: 5px;
         border-radius: 5px; 
     }
+    .password-container {
+        position: relative;
+        width: 300px;
+    }
+
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
     @media (max-width: 768px) {
-        .svg-background {
-            display: none;
-        }
     }
 `
 

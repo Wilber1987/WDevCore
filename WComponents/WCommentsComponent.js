@@ -9,6 +9,7 @@ import { WArrayF } from "../WModules/WArrayF.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 
 class WCommentsComponent extends HTMLElement {
+
     /**
      * @param {{ 
      * Dataset: any[]; 
@@ -22,6 +23,7 @@ class WCommentsComponent extends HTMLElement {
      * AddObject?: boolean;
      * UseDestinatarios?: boolean; 
      * UseAttach?: boolean;
+     *isRichTextActive?: boolean;
      * }} props
      */
     constructor(props) {
@@ -42,6 +44,8 @@ class WCommentsComponent extends HTMLElement {
         this.MessageInput = WRender.Create({ tagName: 'textarea' });
         this.autoScroll = true;
         this.updating = false;
+        this.isRichTextActive = props.isRichTextActive ?? true;
+
 
         //this.style.backgroundColor = "#fff";
         this.OptionContainer = WRender.Create({
@@ -59,6 +63,7 @@ class WCommentsComponent extends HTMLElement {
         this.RitchInput = new WRichText({
             activeAttached: this.UseAttach
         });
+        //this.AddInputFileSection
         this.RitchOptionContainer = WRender.Create({
             className: "RichOptionContainer", style: { display: "none" }, children: [
                 this.RitchInput,
@@ -80,7 +85,7 @@ class WCommentsComponent extends HTMLElement {
                         this.RitchOptionContainer.style.display = "none";
                         this.OptionContainer.style.display = "grid";
                     }
-                }, {
+                }, this.isRichTextActive ? {
                     tagName: 'label',
                     innerText: 'Texto enriquecido', onclick: async () => {
                         this.CommentsContainer.style.height = "calc(100% - 600px)";
@@ -88,7 +93,7 @@ class WCommentsComponent extends HTMLElement {
                         this.OptionContainer.style.display = "none";
 
                     }
-                }
+                } : ""
             ]
         })
         this.Mails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.EvalProperty);
@@ -108,17 +113,24 @@ class WCommentsComponent extends HTMLElement {
             });
             this.shadowRoot?.append(this.MailsSelect)
         }
-        this.shadowRoot?.append(this.OptionContainer, this.RitchOptionContainer)
+        this.shadowRoot?.append(this.OptionContainer)
+        if (this.isRichTextActive) {
+            this.shadowRoot?.append(this.RitchOptionContainer)
+        } else if (this.UseAttach && this.RitchInput?.AddInputFileSection) {
+            this.shadowRoot?.append(this.RitchInput?.AddInputFileSection)
+        }
     }
-    saveComment = async () => {
+    saveComment = async () => {      
         // @ts-ignore
-        if (this.MessageInput.value.length < 3) {
+        if (this.MessageInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
             return;
         }
+        this.ClearEvents();       
         const Message = {
             // @ts-ignore
             Body: this.MessageInput.value,
             Id_User: this.User.UserId,
+            Attach_Files: this.RitchInput.Files,
             Mails: this.UseDestinatarios == true ? this.MailsSelect?.selectedItems : undefined
         }
         Message[this.CommentsIdentifyName] = this.CommentsIdentify
@@ -126,9 +138,15 @@ class WCommentsComponent extends HTMLElement {
         const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
         // @ts-ignore
         this.MessageInput.value = "";
-        this.update();
+        this.RitchInput.FunctionClear();
+        this.InicializarActualizacion();
     }
     saveRitchComment = async () => {
+         // @ts-ignore
+         if (this.RitchInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
+            return;
+        }
+        this.ClearEvents();    
         const Message = {
             // @ts-ignore
             Body: this.RitchInput.value,
@@ -138,26 +156,40 @@ class WCommentsComponent extends HTMLElement {
         Message[this.CommentsIdentifyName] = this.CommentsIdentify
         // @ts-ignore
         const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
+        // @ts-ignore
+        this.MessageInput.value = "";
         this.RitchInput.FunctionClear();
-        this.update();
+        this.InicializarActualizacion();
     }
 
     connectedCallback() {
+        this.InicializarActualizacion();
+
+    }
+    scrollToBottom = () => {
+        if (this.autoScroll) {
+            this.CommentsContainer.scrollTo({
+                top: this.CommentsContainer.scrollHeight,
+                behavior: 'instant' // Desplazamiento suave instant/smooth
+            });
+        }
+    }
+    InicializarActualizacion() {
+        // Guardar referencia al intervalo para poder limpiarlo luego
         this.Interval = setInterval(async () => {
-            console.log(this.updating, " - updating...");
-            if (this.updating == true) {
-                console.log(this.updating, " - block updating...");
+            if (this.updating) {
                 return;
             }
             this.updating = true;
             await this.update();
             this.scrollToBottom();
             this.updating = false;
-        }, 30000);
+        }, 5000);
+
         let isLoading = false;
 
         // Definir la función de manejo de scroll por separado
-        this.CommentsContainer.addEventListener('scroll', debounce(async () => {
+        this.scrollHandler = this.debounce(async () => {
             if (isLoading) {
                 return;
             }
@@ -165,11 +197,7 @@ class WCommentsComponent extends HTMLElement {
             const { scrollTop, clientHeight, scrollHeight } = this.CommentsContainer;
             const isAtBottom = scrollTop + clientHeight >= scrollHeight;
 
-            if (isAtBottom) {
-                this.autoScroll = true;
-            } else {
-                this.autoScroll = false;
-            }
+            this.autoScroll = isAtBottom;
 
             if (scrollTop === 0) {
                 isLoading = true;
@@ -177,30 +205,37 @@ class WCommentsComponent extends HTMLElement {
                 await this.update(false, true);
                 isLoading = false;
             }
-        }, 100)); // Adjust the debounce delay as needed
+        }, 1000); // Ajusta el tiempo de debounce según sea necesario
 
-        // Debouncing function
-        function debounce(func, delay) {
-            let timeout;
-            return function (...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), delay);
+        // Agregar evento de scroll
+        this.CommentsContainer.addEventListener('scroll', this.scrollHandler);
 
-            };
-        }
         this.update();
+    }
+    debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
 
-    }
-    scrollToBottom = () => {
-        if (this.autoScroll) {
-            this.CommentsContainer.scrollTo({
-                top: this.CommentsContainer.scrollHeight,
-                behavior: 'smooth' // Desplazamiento suave
-            });
-        }
-    }
+
     disconnectedCallback() {
-        this.Interval = null;
+        this.ClearEvents()
+    }
+    ClearEvents() {
+        if (this.Interval) {
+            clearInterval(this.Interval);
+            this.Interval = null;
+        }
+
+        if (this.CommentsContainer && this.scrollHandler) {
+            this.CommentsContainer.removeEventListener('scroll', this.scrollHandler);
+            this.scrollHandler = null;
+        }
+
+        console.log("Eventos e intervalos limpiados.");
     }
     GetDestinatarios() {
         // return this.Destinatarios;
@@ -215,8 +250,8 @@ class WCommentsComponent extends HTMLElement {
                 return;
             }
             const attachs = WRender.Create({ className: "attachs" });
-            comment.Attach_Files?.forEach(attach => {
-                if (attach.Type.toUpperCase().includes("JPG")
+            comment.Attach_Files?.filter(attach => attach != null && attach != undefined)?.forEach(attach => {
+                if (attach != null && attach != undefined && attach.Type.toUpperCase().includes("JPG")
                     || attach.Type.toUpperCase().includes("JPEG")
                     || attach.Type.toUpperCase().includes("PNG")) {
                     attachs.append(WRender.Create({
@@ -258,7 +293,7 @@ class WCommentsComponent extends HTMLElement {
                     + (comment.Leido == true ? "leido" : ""),
                 children: [
                     { tagName: "label", className: "nickname", innerHTML: comment.NickName ?? comment.Remitente },
-                    { tagName: "p", innerHTML: comment.Body ?? comment.mensaje }, attachs,
+                    { tagName: "p", innerHTML: comment.Body ?? comment.mensaje ?? "" }, attachs,
                     { tagName: "label", className: "date", innerHTML: comment.Fecha?.toDateTimeFormatEs() ?? comment.Created_at?.toDateTimeFormatEs() }
                 ]
             });
@@ -320,9 +355,12 @@ class WCommentsComponent extends HTMLElement {
         //console.log(response);
         this.Dataset = response;
         if (!inicialize) {
-            await this.DrawWCommentsComponent();
-            this.scrollToBottom();
+            await this.DrawWCommentsComponent();           
         }
+        this.CommentsContainer.scrollTo({
+            top: this.CommentsContainer.scrollHeight,
+            behavior: 'instant' // Desplazamiento suave instant/smooth
+        });
     }
     CustomStyle = css`    
         .CommentsContainer{
@@ -462,6 +500,7 @@ class WCommentsComponent extends HTMLElement {
         }
        
     `
+    
 }
 customElements.define('w-coment-component', WCommentsComponent);
 export { WCommentsComponent }

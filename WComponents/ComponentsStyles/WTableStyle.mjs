@@ -15,7 +15,7 @@ export const WTableStyle = css`@import url(/WDevCore/StyleModules/css/scrolls.cs
 .WTable th {
     text-align: left;
     padding: 10px;
-    text-transform: capitalize;
+    text-transform: math-auto;
     position: relative;
     padding-right: 15px;
     border-right: 1px var(--fifty-color) solid;
