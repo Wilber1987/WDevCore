@@ -167,7 +167,23 @@ class WFilterOptions extends HTMLElement {
 	*/
 	filterFunction = async (sorts) => {
 		this.BuildFiltersAndSorts(sorts);
-		if (this.ModelObject.FilterData.length == 0 && this.Dataset.length > 0) {
+		const Model = this.EntityModel ?? this.ModelObject;
+		if (Model.Get || this.Config.UseEntityMethods == false) {           
+			if (this.Config.UseEntityMethods == false
+				&& this.Config.FilterFunction != undefined) {
+				this.Config.FilterFunction(Model.FilterData);
+				return;
+			} else if (this.Config.UseEntityMethods == true) {
+				const Dataset = await Model.Get();
+				if (this.Config.FilterFunction != undefined) {
+					this.Config.FilterFunction(Dataset);
+				} else {
+					console.log(Dataset);
+				}
+				return;
+			}
+		}
+		if (this.ModelObject.FilterData.length == 0 && this.Config.Dataset.length > 0) {
 			if (this.Config.FilterFunction != undefined ) {
 				this.Config.FilterFunction(this.Config.Dataset);
 			}
