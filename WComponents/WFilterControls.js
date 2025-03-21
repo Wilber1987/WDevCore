@@ -10,7 +10,7 @@ import { MultiSelect } from "./WMultiSelect.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 /**
  * @typedef {Object} FilterConfig 
- *  * @property {Array} Dataset  
+ *  * @property {Array} [Dataset]  
 	* @property {Function} FilterFunction
 	* @property {String} [DateRange]
 	* @property {String} [Direction]
@@ -32,7 +32,7 @@ class WFilterOptions extends HTMLElement {
 	constructor(Config) {
 		super();
 		this.Config = Config;
-		this.Dataset = Config.Dataset;
+		this.Dataset = Config.Dataset ?? [];
 		this.FilterFunction = Config.FilterFunction;
 		this.ModelObject = Config.ModelObject;
 		this.EntityModel = Config.EntityModel;
@@ -89,7 +89,7 @@ class WFilterOptions extends HTMLElement {
 				}
 			]
 		}));
-		this.ModelObject = this.ModelObject ?? this.Config.Dataset[0];
+		this.ModelObject = this.ModelObject ?? this.Dataset[0];
 		for (const prop in this.ModelObject) {
 			const SelectData = WArrayF.GroupBy(this.Config.Dataset ?? [], prop).map(s => s[prop]);
 			if (this.isDrawable(this.ModelObject, prop)) {
@@ -167,14 +167,14 @@ class WFilterOptions extends HTMLElement {
 	*/
 	filterFunction = async (sorts) => {
 		this.BuildFiltersAndSorts(sorts);
-		if (this.ModelObject.FilterData.length == 0 && this.Config.Dataset.length > 0) {
+		if (this.ModelObject.FilterData.length == 0 && this.Dataset.length > 0) {
 			if (this.Config.FilterFunction != undefined ) {
 				this.Config.FilterFunction(this.Config.Dataset);
 			}
 			return;
 		}
-		if (this.Config.Dataset.length > 0) {
-			const DFilt = this.Config.Dataset.filter(obj => {
+		if (this.Dataset.length > 0) {
+			const DFilt = this.Dataset.filter(obj => {
 				let flagObj = true;
 				this.FilterControls.forEach(control => {
 					if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
