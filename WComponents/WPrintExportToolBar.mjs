@@ -223,11 +223,12 @@ class WPrintExportToolBar extends HTMLElement {
 	}
 
 	/**
-	 * @param {HTMLElement} body
+	 * @param {HTMLElement|Node} body
 	 */
 	Print(body) {
 		//this.append(body); return;
 		const ventimp = window.open(' ', 'popimpr');
+		// @ts-ignore
 		ventimp?.document.write(body.innerHTML);
 		ventimp?.focus();
 		setTimeout(() => {
