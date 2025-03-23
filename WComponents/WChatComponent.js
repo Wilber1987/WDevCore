@@ -33,6 +33,11 @@ class WChatComponent extends HTMLElement {
 		WRender.SetStyle(this, {
 			display: "block"
 		});
+		this.append(css`
+			body {
+				overflow: hidden;
+			}
+		`)
 		let themeColor = localStorage.getItem("themeColor");
 		if (!themeColor) {
 			localStorage.setItem("themeColor", "light_mode");
@@ -68,7 +73,12 @@ class WChatComponent extends HTMLElement {
 		this.Draw();
 
 	}
-	connectedCallback() { }
+	connectedCallback() {
+		this.chatContainer.scrollTo({
+			top: this.chatContainer.scrollHeight,
+			behavior: 'instant' // Desplazamiento suave instant/smooth
+		});
+	}
 	Draw = async () => {
 		if (!this.identity.Value) {
 			const header = html`<h1>Ingrese su identificación</h1>`
@@ -149,7 +159,7 @@ class WChatComponent extends HTMLElement {
 			document.body.classList.toggle("light-mode", themeColor === "light_mode");
 			themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
 
-			
+
 
 			this.chatContainer.innerHTML = localStorage.getItem("all-chats") ?? "";
 			if (this.chatContainer.querySelector(".default-text")) {
@@ -182,6 +192,7 @@ class WChatComponent extends HTMLElement {
 					incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
 				} else {
 					incomingChatDiv.remove();
+					localStorage.removeItem("all-chats");
 				}
 				this.WithAgent = response.WithAgentResponse ?? false;
 				sessionStorage.setItem("WithAgent", this.WithAgent == true ? "true" : "false");
@@ -332,9 +343,10 @@ class WChatComponent extends HTMLElement {
 				const incomingChatDiv = html`<div class="chat ${comment.NickName == this.identity.Value ? "outgoing" : "incoming"}" id="Comment${comment.Id_Comentario}">
 					<div class="chat-content">						
 						<div class="chat-details">
+							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="6" r="4" fill="#77cef3"></circle> <path opacity="0.5" d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z" fill="#77cef3"></path> </g></svg>
 							<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
 							<div class="typing-animation">
-							<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
+								<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
 								<div class="typing-dot" style="--delay: 0.2s"></div>
 								<div class="typing-dot" style="--delay: 0.3s"></div>
 								<div class="typing-dot" style="--delay: 0.4s"></div>
@@ -358,7 +370,6 @@ class WChatComponent extends HTMLElement {
 				localStorage.setItem("all-chats", this.chatContainer.innerHTML);
 				this.chatContainer.scrollTo(0, this.chatContainer.scrollHeight);
 			});
-
 		}
 	}
 }

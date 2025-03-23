@@ -54,8 +54,8 @@ export const WChatStyle = css`
  /* Chats container styling */
  .chat-container {
 	 overflow-y: auto;
-	 max-height: calc(100vh - 100px);
-	 padding-bottom: 150px !important;
+	 max-height: calc(100vh - 180px);
+	margin-bottom: 130px !important;
  }
 
  :where(.chat-container, textarea)::-webkit-scrollbar {
@@ -114,11 +114,17 @@ export const WChatStyle = css`
 		
 	 }
  }
+ .chat-container .chat.incoming svg{
+    display: none;
+}
+.chat-container .chat.outgoing img.bot{
+    display: none;
+}
 
- .chat-container .chat.incoming {
-	 background: var(--incoming-chat-bg);
-	 border: 1px solid var(--incoming-chat-border);
- }
+.chat-container .chat.incoming {
+	background: var(--incoming-chat-bg);
+	border: 1px solid var(--incoming-chat-border);
+}
 
  .chat .chat-content {
 	 display: flex;
