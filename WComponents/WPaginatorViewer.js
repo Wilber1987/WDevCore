@@ -28,7 +28,7 @@ class WPaginatorViewer extends HTMLElement {
         this.Dataset = [];
         this.paginate = true;
         this.PaginatorConfig = Config ?? {};
-        this.DrawPaginator();
+        this.filter = true;
         if (this.PaginatorConfig?.Options) {
             this.Options = this.PaginatorConfig?.Options;
         } else {
@@ -40,7 +40,9 @@ class WPaginatorViewer extends HTMLElement {
             };
         }
     }
-    connectedCallback() { }
+    connectedCallback() {
+        this.DrawPaginator();
+    }
     DrawPaginator = async () => {
         this.DarkMode = this.DarkMode ?? false;
         if (this.innerHTML != "") {
@@ -67,15 +69,41 @@ class WPaginatorViewer extends HTMLElement {
     }
     //BASIC TABLE-----------------------------------------------------------------------
     //#region tabla basica --------------------------------------------------------------
-    Draw(Dataset = this.Dataset) {
-        this.container.innerHTML = "";
-        this.body = WRender.Create({ class: "paginator-pages-container", id: "MainBody" });
-        const pages = this.DrawPages(Dataset);
-        pages.forEach(page => {
-            this.body.append(page);
+    Draw(Dataset = this.Dataset, filter = this.filter) {
+        this.filter = filter;
+//alert(this.filter)
+        if (this.filter) {            
+            this.container.innerHTML = "";
+            this.body = WRender.Create({ class: "paginator-pages-container", id: "MainBody" });
+            this.pages = this.DrawPages(Dataset);
+            this.pages.forEach(page => {
+                this.body.append(page);
+            });
+            this.container.append(this.body);
+            this.container.append(this.DrawTFooter(this.pages));
+            if (Dataset?.length > 0) {
+                this.Dataset = [...Dataset]
+                this.filter = false;
+            }
+            return;
+        }
+        /* this.Dataset.filter(item1 => 
+            !Dataset.some(item2 => item1.id === item2.id)
+        ).forEach(element => { element.style.display = "none" });*/
+        Dataset.forEach(element => {
+            const findElement = this.Dataset.find(e => e.id == element.id);
+            if (findElement == undefined) {
+                this.Dataset.push(element);
+                this.pages[0].insertBefore(element, this.pages[0].firstChild);
+            } else {
+                if (findElement.innerHTML !== element.innerHTML) {
+                    findElement.innerHTML = element.innerHTML;
+                }
+            }
         });
-        this.container.append(this.body);
-        this.container.append(this.DrawTFooter(pages));
+
+        return;
+
     }
     DrawHeadOptions() {
         const trOptions = { type: "div", props: { class: "thOptions" }, children: [] }
@@ -112,7 +140,6 @@ class WPaginatorViewer extends HTMLElement {
             if (pages[page].childNodes.length == this.maxElementByPage) {
                 page++;
             }
-
         });
         if (pages.length == 0) {
             pages.push(WRender.Create({
@@ -244,7 +271,7 @@ class WPaginatorViewer extends HTMLElement {
             }
         }
     }
-   
+
     PaginateTOptionsStyle() {
         const style = this.querySelector("#PaginateTOptionsStyle" + this.id);
         if (style) {

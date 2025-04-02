@@ -163,8 +163,7 @@ class WCommentsComponent extends HTMLElement {
     }
 
     connectedCallback() {
-        this.InicializarActualizacion();
-
+        this.InicializarActualizacion();   
     }
     scrollToBottom = () => {
         if (this.autoScroll) {
@@ -174,7 +173,7 @@ class WCommentsComponent extends HTMLElement {
             });
         }
     }
-    InicializarActualizacion() {
+    async InicializarActualizacion() {
         // Guardar referencia al intervalo para poder limpiarlo luego
         this.Interval = setInterval(async () => {
             if (this.updating) {
@@ -210,7 +209,11 @@ class WCommentsComponent extends HTMLElement {
         // Agregar evento de scroll
         this.CommentsContainer.addEventListener('scroll', this.scrollHandler);
 
-        this.update();
+        await this.update();
+        this.CommentsContainer.scrollTo({
+            top: this.CommentsContainer.scrollHeight,
+            behavior: 'instant' // Desplazamiento suave instant/smooth
+        });
     }
     debounce(func, delay) {
         let timeout;
@@ -356,11 +359,7 @@ class WCommentsComponent extends HTMLElement {
         this.Dataset = response;
         if (!inicialize) {
             await this.DrawWCommentsComponent();           
-        }
-        this.CommentsContainer.scrollTo({
-            top: this.CommentsContainer.scrollHeight,
-            behavior: 'instant' // Desplazamiento suave instant/smooth
-        });
+        }        
     }
     CustomStyle = css`    
         .CommentsContainer{

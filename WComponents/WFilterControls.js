@@ -19,6 +19,7 @@ import { WArrayF } from "../WModules/WArrayF.js";
 	* @property {Boolean} [UseEntityMethods]
 	* @property {Boolean} [AutoFilter]
 	* @property {Boolean} [AutoSetDate]
+	* @property {Boolean} [IsFilterWithChange]
 	* @property {Boolean} [FullDetail]
 	* @property {Object} [ModelObject]
 	* @property {Object} [EntityModel]
@@ -52,6 +53,7 @@ class WFilterOptions extends HTMLElement {
 		this.shadowRoot?.append(this.FilterContainer);
 		this.ModelObject.FilterData = [];
 		this.ModelObject.OrderData = [];
+		this.IsFilterWithChange = this.Config.IsFilterWithChange ?? false;
 		this.DrawFilter();
 		/**@type {Array<OrderData>} */
 		this.Sorts = Config.Sorts ?? [];
@@ -77,8 +79,8 @@ class WFilterOptions extends HTMLElement {
 			class: "options", children: [
 				{
 					tagName: "button",
-					 className: "accordion-button" + (this.Display ? " active-btn" : ""),
-					 innerText: "Filtros", onclick: async (ev) => {
+					className: "accordion-button" + (this.Display ? " active-btn" : ""),
+					innerText: "Filtros", onclick: async (ev) => {
 						if (!ControlOptions.className.includes("OptionContainerActive")) {
 							ControlOptions.className = "OptionContainer OptionContainerActive";
 						} else {
@@ -168,15 +170,17 @@ class WFilterOptions extends HTMLElement {
 	filterFunction = async (sorts) => {
 		this.BuildFiltersAndSorts(sorts);
 		const Model = this.EntityModel ?? this.ModelObject;
-		if (Model.Get || this.Config.UseEntityMethods == false) {           
+		if (Model.Get || this.Config.UseEntityMethods == false) {
 			if (this.Config.UseEntityMethods == false
 				&& this.Config.FilterFunction != undefined) {
-				this.Config.FilterFunction(Model.FilterData);
+				this.Config.FilterFunction(Model.FilterData, this.IsFilterWithChange);
+				this.IsFilterWithChange = false;
 				return;
 			} else if (this.Config.UseEntityMethods == true) {
 				const Dataset = await Model.Get();
 				if (this.Config.FilterFunction != undefined) {
-					this.Config.FilterFunction(Dataset);
+					this.Config.FilterFunction(Dataset, this.IsFilterWithChange);
+					this.IsFilterWithChange = false;
 				} else {
 					console.log(Dataset);
 				}
@@ -184,8 +188,9 @@ class WFilterOptions extends HTMLElement {
 			}
 		}
 		if (this.ModelObject.FilterData.length == 0 && this.Config.Dataset.length > 0) {
-			if (this.Config.FilterFunction != undefined ) {
-				this.Config.FilterFunction(this.Config.Dataset);
+			if (this.Config.FilterFunction != undefined) {
+				this.Config.FilterFunction(this.Config.Dataset, this.IsFilterWithChange);
+				this.IsFilterWithChange = false;
 			}
 			return;
 		}
@@ -259,35 +264,35 @@ class WFilterOptions extends HTMLElement {
 						}
 						return obj[input.id]
 					}
-	
+
 					function findElementByDate(firstDate, secondDate) {
 						if (firstDate != "" && new Date(obj[control.id]) < new Date(firstDate + "T00:00:00")) {
 							flagObj = false;
 							return undefined;
 						}
-	
+
 						if (secondDate != "" && new Date(obj[control.id]) > new Date(secondDate + "T00:00:00")) {
 							flagObj = false;
 							return undefined;
 						}
 						return obj[control.id]
 					}
-	
+
 				});
 				return flagObj;
 			});
-		   
-			if (this.Config.FilterFunction != undefined && DFilt.length  > 0) {
+
+			if (this.Config.FilterFunction != undefined && DFilt.length > 0) {
 				WArrayF.SortArray(sorts, DFilt);
-				this.Config.FilterFunction(DFilt);
+				this.Config.FilterFunction(DFilt, this.IsFilterWithChange); this.IsFilterWithChange = false;
 				return;
 			} else {
 				console.log(DFilt);
 			}
 		}
-	   
-		
-		
+
+
+
 	}
 	BuildFiltersAndSorts(sorts) {
 		this.ModelObject.FilterData = [];
@@ -402,21 +407,22 @@ class WFilterOptions extends HTMLElement {
 					default:
 						break;
 				}
-				if (this.EntityModel) {
-					this.EntityModel.FilterData.push({
-						PropName: propiertyName,
-						FilterType: filterType,
-						Values: values
-					});
-				}
 				if (values != undefined || values != null) {
+					//this.IsFilterWithChange = true;
+					if (this.EntityModel) {
+						this.EntityModel.FilterData.push({
+							PropName: propiertyName,
+							FilterType: filterType,
+							Values: values
+						});
+					}
 					this.ModelObject.FilterData.push({
 						PropName: propiertyName,
 						FilterType: filterType,
 						Values: values
 					});
 				}
-			   
+
 			}
 		});
 	}
@@ -456,10 +462,15 @@ class WFilterOptions extends HTMLElement {
 			className: prop,
 			id: prop,
 			placeholder: WOrtograficValidation.es(prop),
-			onchange: (ev) => { this.filterFunction(this.Sorts) }
+			onchange: (ev) => { this.OnChange(); }
 		});
 		return InputControl;
 	}
+	OnChange() {
+		this.IsFilterWithChange = true;
+		this.filterFunction(this.Sorts);
+	}
+
 	/**
 	 * @param {String} prop 
 	 * @returns 
@@ -476,7 +487,7 @@ class WFilterOptions extends HTMLElement {
 					value: this.Config.AutoSetDate == true ?  // @ts-ignore
 						(this.Config.DateRange == FilterDateRange.YEAR ? new Date().subtractDays(865).toISO() : new Date().subtractDays(30).toISO()) : undefined,
 					placeholder: prop,
-					onchange: (ev) => { this.filterFunction(this.Sorts) }
+					onchange:  (ev) => { this.OnChange(); }
 				}, {
 					tagName: "input",
 					type: "date",
@@ -485,7 +496,7 @@ class WFilterOptions extends HTMLElement {
 					value: this.Config.AutoSetDate == true ? new Date().addDays(1).toISO() : undefined,
 					id: prop + "second",
 					placeholder: prop,
-					onchange: (ev) => { this.filterFunction(this.Sorts) }
+					onchange:  (ev) => { this.OnChange(); }
 				}
 			]
 		});
@@ -501,14 +512,14 @@ class WFilterOptions extends HTMLElement {
 					className: prop + " firstNumber",
 					id: prop + "first",
 					placeholder: WOrtograficValidation.es(prop),
-					onchange: (ev) => { this.filterFunction(this.Sorts) }
+					onchange:  (ev) => { this.OnChange(); }
 				}, {
 					tagName: "input",
 					type: "number",
 					className: prop + " secondNumber",
 					id: prop + "second",
 					placeholder: WOrtograficValidation.es(prop),
-					onchange: (ev) => { this.filterFunction(this.Sorts) }
+					onchange:  (ev) => { this.OnChange(); }
 				}
 			]
 		});
@@ -523,6 +534,7 @@ class WFilterOptions extends HTMLElement {
 			id: prop,
 			FullDetail: this.Config.FullDetail ?? false,
 			action: () => {
+				this.IsFilterWithChange = true;
 				this.filterFunction(this.Sorts);
 			}
 		});

@@ -92,10 +92,13 @@ class EntityClass {
     /**
    * 
    * @param {String} Path 
+    * @param {Boolean} WithoutLoading 
    * @returns {Array}
    */
-    GetData = async (Path) => {
-        const Dataset = await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, this.replacer(this))
+    GetData = async (Path, WithoutLoading = false) => {
+        const Dataset = await WAjaxTools.PostRequest(this.ApiMethods.ApiRoute + Path, this.replacer(this), {
+            WithoutLoading: WithoutLoading
+        })
         // let Dataset = await fetch(this.ApiMethods.ApiRoute + this.constructor.name + '.json');
         //Dataset = await Dataset.json()
         if (Dataset.__proto__ == Object.prototype) {
