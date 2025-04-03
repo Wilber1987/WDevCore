@@ -77,7 +77,7 @@ class WFilterOptions extends HTMLElement {
 		const ControlOptions = WRender.Create({ className: "OptionContainer " + (this.Display ? "OptionContainerActive" : "") })
 		this.FilterContainer.append(WRender.Create({
 			class: "options", children: [
-				{
+				this.Display != true ? {
 					tagName: "button",
 					className: "accordion-button" + (this.Display ? " active-btn" : ""),
 					innerText: "Filtros", onclick: async (ev) => {
@@ -88,7 +88,7 @@ class WFilterOptions extends HTMLElement {
 						}
 						ev.target.className = ev.target.className.includes("active-btn") ? "accordion-button" : "accordion-button active-btn";
 					}
-				}
+				}: ""
 			]
 		}));
 		this.ModelObject = this.ModelObject ?? this.Dataset[0];
