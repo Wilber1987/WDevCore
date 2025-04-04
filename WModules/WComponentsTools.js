@@ -687,7 +687,8 @@ HTMLElement.prototype.SetStyle = function (Style = (new ElementStyle())) {
  * @returns {String}
  */
 function ConvertToMoneyString(numero, currency = undefined) {
-    return new Intl.NumberFormat('es-ES', {
+
+    return (currency?.toUpperCase() == "CORDOBAS" ? "C$ " : (currency?.toUpperCase() == "DOLARES" ? "$ ": "")) +  new Intl.NumberFormat('es-ES', {
         style: 'decimal',
         currency: 'EUR',
         minimumFractionDigits: 2,

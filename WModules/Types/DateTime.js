@@ -11,8 +11,8 @@ class DateTime extends Date {
             super(dateTime.getTime());
             this.Date = dateTime;
         } else {
-            super(dateTime);
-            this.Date = new Date(dateTime);
+            super(dateTime.replace("T", " "));
+            this.Date = new Date(dateTime.replace("T", " "));
         }
     }
 
