@@ -67,7 +67,7 @@ const StylesControlsV1 = css`
     input:active, input:focus, select:active, select:focus {
         border-bottom: 2px solid #0099cc;
         outline: none;
-    }`;
+}`;
 
 
 const StylesControlsV2 = css`@import url(/WDevCore/StyleModules/css/form.css);`

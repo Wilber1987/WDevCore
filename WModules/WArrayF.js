@@ -2,6 +2,9 @@ import { ModelProperty } from "./CommonModel.js";
 import { EntityClass } from "./EntityClass.js";
 
 class WArrayF {
+	static isArray(array) {
+		return  array != "" && array != undefined && array != null && array.__proto__ == Array.prototype
+	}
     static ValidateByModel(object, model) {
         for (const prop in model) {
             const exclude = ["Filterdata", "ApiMethods", "OrderData"]
@@ -441,19 +444,18 @@ class WArrayF {
      * @param {Object} Model
      * @param {string} prop
      */
-    static isModelFromFunction(Model, prop) {
-        return this.ModelFromFunction(Model[prop]);
+    static isModelFromFunction(Model) {
+        return this.ModelFromFunction(Model);
     }
 
     /**
-     * @param {Object} Model
-     * @param {string} prop
+     * @param {Object} propierty
      */
     static ModelFromFunction(propierty) {
-        if (propierty.ModelObject.__proto__ == Function.prototype) {
-            propierty.ModelObject = propierty.ModelObject();
+        if (propierty.__proto__ == Function.prototype) {
+            propierty = propierty();
         }
-        return propierty.ModelObject;
+        return propierty;
     }
 
     //STRINGS

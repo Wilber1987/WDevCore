@@ -1,15 +1,14 @@
-import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
-import { css, WCssClass } from "../WModules/WStyledRender.js";
-import "./WChartJSComponents.js";
-import { WModalForm } from "./WModalForm.js";
-import { WTableComponent } from "./WTableComponent.js";
-import { WFilterOptions } from "./WFilterControls.js";
-import { ColumChart, RadialChart } from "./WChartJSComponents.js";
 import { StyleScrolls } from "../StyleModules/WStyleComponents.js";
 import { ModelProperty } from "../WModules/CommonModel.js";
+import { WArrayF } from "../WModules/WArrayF.js";
+import { WRender } from "../WModules/WComponentsTools.js";
+import { css, WCssClass } from "../WModules/WStyledRender.js";
+import "./WChartJSComponents.js";
+import { ColumChart, RadialChart } from "./WChartJSComponents.js";
+import { WFilterOptions } from "./WFilterControls.js";
 import { WForm } from "./WForm.js";
-import {WArrayF} from "../WModules/WArrayF.js";
-import {WAjaxTools} from "../WModules/WAjaxTools.js";
+import { WModalForm } from "./WModalForm.js";
+import { WTableComponent } from "./WTableComponent.js";
 class DinamicConfigModel {
     constructor(/**@type {Function}*/ action) {
         this.action = action
@@ -802,4 +801,4 @@ class WTableDynamicComp extends HTMLElement {
     }
 }
 customElements.define("w-table-dynamic", WTableDynamicComp);
-export { WTableDynamicComp }
+export { WTableDynamicComp };

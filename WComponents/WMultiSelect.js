@@ -7,6 +7,7 @@ import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 import { FilterData } from "../WModules/CommonModel.js";
 import { WCardTable } from "./WTableComponent.js";
 import { WArrayF } from "../WModules/WArrayF.js";
+import { WToolTip } from "./FormComponents/WToolTip.js";
 
 /**
  * @typedef {Object} ConfigMS 
@@ -55,6 +56,16 @@ class MultiSelect extends HTMLElement {
 			height: "initial"
 		});
 
+		if (this.Config.Mode == "SELECT_BOX") {
+			WRender.SetStyle(this, {
+				display: this.Config.IsFilterControl == true ? "flex" : "block",
+				position: "relative",
+				padding: "0px",
+				border: "none",
+				height: "initial"
+			});
+		}
+
 		this.MultiSelect = this.Config.MultiSelect ?? true;
 		this.LabelMultiselect = WRender.Create({
 			className: "LabelMultiselect " + (this.MultiSelect ? "multi" : "select")
@@ -102,9 +113,11 @@ class MultiSelect extends HTMLElement {
 						}
 						if ((this.ModelObject[prop].type?.toUpperCase() == "TEXT")
 							&& ev.target.value.replaceAll(" ", "") != "") {
+							// @ts-ignore
 							filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
 						} else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER" && !isNaN(ev.target.value))
 							&& ev.target.value.replaceAll(" ", "") != "") {
+							// @ts-ignore
 							filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })
 						}
 					}
@@ -126,20 +139,22 @@ class MultiSelect extends HTMLElement {
 		this.shadowRoot?.append(
 			this.ControlsContainer
 		);
-		if (Config.Mode == "SELECT_BOX") {
-			this.shadowRoot?.append(selectBoxStyle.cloneNode(true));
-		}
+
 		// @ts-ignore
 		if (Style != null && Style.__proto__ == WStyledRender.prototype) {
 			this.shadowRoot?.append(Style);
 		}
 		//this.shadowRoot?.append(
-		this.SetOptions()
+		this.SetOptions();
+		if (Config.Mode == "SELECT_BOX") {
+			this.shadowRoot?.append(selectBoxStyle.cloneNode(true));
+			this.DisplayOptions();
+		}
 		this.LabelMultiselect.onclick = (e) => {
 			e.stopPropagation();
 			if (!this.tool?.isConnected) {
 				this.DisplayOptions();
-			} else {
+			} else if (this.tool?.isConnected && Config.Mode != "SELECT_BOX") {
 				this.tool?.remove();
 			}
 		}
@@ -171,7 +186,7 @@ class MultiSelect extends HTMLElement {
 						this.DrawLabel();
 						addBtn.remove();
 						const tool = targetControl.parentNode.querySelector(".ToolTip");
-						if (tool != null) {
+						if (tool != null && this.Config.Mode != "SELECT_BOX") {
 							tool.remove();
 						}
 					} else {
@@ -213,32 +228,32 @@ class MultiSelect extends HTMLElement {
 	handleGlobalClick = (e) => {
 		const isClickInside = this.contains(e.target) || e.target.tagName.includes("W-MULTI-SELECT");
 		if (!isClickInside) {
-			setTimeout(()=> {
-				if (this.toolHaveRemoved != false) {
+			setTimeout(() => {
+				if (this.toolHaveRemoved != false && this.Config.Mode != "SELECT_BOX") {
 					this.tool?.remove();
 					this.undisplayMultiSelects(e);
-				}          
-				this.toolHaveRemoved = true;     
-			},100)            
+				}
+				this.toolHaveRemoved = true;
+			}, 100)
 		}
 	};
 
 	Draw = (Dataset = this.Dataset) => {
 		this.OptionsContainer.innerHTML = "";
 		Dataset.forEach((element, index) => {
-			console.log(element);
-			
 			if (element == null) { return; }
 			const OType = this.MultiSelect == true ? "checkbox" : "radio";
 			const OptionLabel = WRender.Create({
-				tagName: "label", htmlFor: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
-				innerText: this.DisplayText(element, index), className: "OptionLabel"
+				tagName: "label",
+				htmlFor: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
+				innerText: this.DisplayText(element, index),
+				className: "OptionLabel"
 			});
 			const Option = WRender.Create({
 				tagName: "input",
 				id: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
 				type: OType,
-				hidden: OType == "radio" ? true : false,
+				hidden: OType == "radio" && this.Config.Mode != "SELECT_BOX" ? true : false,
 				name: element.name,
 				checked: WArrayF.FindInArray(element, this.selectedItems),
 				className: "Option", onchange: (ev) => {
@@ -278,12 +293,13 @@ class MultiSelect extends HTMLElement {
 						this.Config.action(this.selectedItems);
 					}
 					this.DrawLabel();
-					if (!this.MultiSelect) {
+					if (!this.MultiSelect && this.Config.Mode != "SELECT_BOX") {
 						this.tool?.remove();
 					}
 				}
 
 			});
+			// @ts-ignore
 			Option.addEventListener("click", (ev) => {
 				this.toolHaveRemoved = !this.MultiSelect;
 			})
@@ -328,12 +344,12 @@ class MultiSelect extends HTMLElement {
 			}
 			this.tool = new WToolTip([
 				this.OptionsContainer
-			]);
+			], false);
 		} else {
 			this.tool = new WToolTip([
 				this.SearchControl,
 				this.OptionsContainer
-			]);
+			], false);
 		}
 
 		return this.tool
@@ -412,7 +428,7 @@ class MultiSelect extends HTMLElement {
 			"text",
 			"Text",
 			"Texto", "texto",
-			"Descripcion_Servicio", "Detalles"]
+			"Descripcion_Servicio"]
 		for (const key in element) {
 			if (keys.find(k => k == key) != null) {
 				this.DisplayName = key;
@@ -464,7 +480,10 @@ class MultiSelect extends HTMLElement {
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			// @ts-ignore
 			document.querySelectorAll("w-multi-select").forEach((/**@type {MultiSelect} */ m) => {
-				m.tool?.remove();
+				if (this.Config.Mode != "SELECT_BOX") {
+					m.tool?.remove();
+				}
+
 				// @ts-ignore
 				m.LabelMultiselect.querySelector("span").className = "btnSelect";
 			})
@@ -502,7 +521,7 @@ class MultiSelect extends HTMLElement {
 						}
 						addBtn.remove();
 						const tool = targetControl.parentNode.querySelector(".ToolTip");
-						if (tool != null) {
+						if (tool != null && this.Config.Mode != "SELECT_BOX") {
 							tool.remove();
 						}
 					}
@@ -512,70 +531,7 @@ class MultiSelect extends HTMLElement {
 }
 customElements.define("w-multi-select", MultiSelect);
 export { MultiSelect };
-export { WToolTip };
 
-class WToolTip extends HTMLElement {
-	constructor(Element) {
-		super();
-		this.append(WRender.Create(Element))
-		this.append(css`
-			w-tooltip{
-				position: absolute;
-				width:  100%;
-				z-index: 1;
-				transition: all .1s;
-				max-height: 0px;
-				background-color: var(--secundary-color);
-				overflow: hidden;  
-				left: 0;      
-				top: 0;       
-			}
-			w-tooltip.active {
-				max-height: 400px;
-				overflow: auto;            
-			}
-		`)
-	}
-	connectedCallback() {
-		this.Display()
-	}
-	disconnectedCallback() {
-		this.className = "";
-	}
-	Display = async () => {
-		setTimeout(() => {
-			if (this.className == "active") {
-				this.className = "";
-			} else {
-				this.className = "active"
-			}
-		}, 100);
-	}
-	DisplayOptions = (node) => {
-		if (!node.querySelector("w-tooltip") || (node.shadowRoot && node.shadowRoot.querySelector("w-tooltip") == null)) {
-			if (node.shadowRoot) {
-				node.shadowRoot.append(this)
-				const tooltipRect = this.getBoundingClientRect();
-				console.log(tooltipRect, this.offsetHeight, window.innerHeight);
-				const viewportHeight = window.innerHeight;
-				if (tooltipRect.bottom + 400 > viewportHeight) {
-					// @ts-ignore
-					//this.style = 'top: auto !important ; bottom : 100%';
-				} else {
-					//this.style.top = '100%';
-					//this.style.bottom = 'auto';
-				}
-			} else {
-				node.append(this)
-			}
-		}
-		else {
-			this.remove();
-		}
-	}
-
-}
-customElements.define('w-tooltip', WToolTip);
 
 
 const MainMenu = css`
@@ -757,11 +713,53 @@ const selectBoxStyle = css`
 	w-tooltip {  
 		position: relative !important;
 		box-shadow: none !important;
+		top: 0px !important
+	}
+	.ElementDetail {
+		display: none;
 	}
 	.OptionsContainer {
 		box-shadow: none;
 	}
 	.txtControl, .LabelMultiselect {
 		display: none;
+	}
+	.OptionsContainer {
+		box-shadow: none;
+		display: flex;
+	}
+	.OContainer {
+		border: none;
+	}
+	.OContainer:hover, .OContainerActive {
+		background: var(--secundary-color);
+	}
+	input[type=checkbox] {
+		appearance: none;
+		background-color: var(--secundary-color);
+		margin: 0;
+		font: inherit;
+		color: currentColor;
+		width: 1.15em;
+		height: 1.15em;
+		padding: 13px;
+		border: 0.15em solid #999;
+		border-radius: 0.15em;
+		display: grid;
+		place-content: center;
+	}
+	input[type=checkbox]:checked::before {
+		content: " ";
+		background-color: cornflowerblue;
+		transform: scale(1);
+	}
+	input[type=checkbox]::before {
+		content: "";
+		width: 1em;
+		height: 1em;
+		transform: scale(0);
+		box-shadow: inset 1em 1em var(--form-control-color);
+		transform-origin: bottom left;
+		clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 	}
 `

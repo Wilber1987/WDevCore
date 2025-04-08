@@ -1,7 +1,7 @@
 
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { ComponentsManager, ConvertToMoneyString, WRender } from '../WModules/WComponentsTools.js';
-import { ControlBuilder } from '../WModules/WControlBuilder.js';
+import { ControlBuilder } from '../ComponentsBuilders/WControlBuilder.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css, WCssClass, WStyledRender } from '../WModules/WStyledRender.js';
 import { WAppNavigator } from './WAppNavigator.js';
@@ -107,7 +107,12 @@ class WDetailObject extends HTMLElement {
                                 ObjectDetail[prop] = ObjectDetail[prop] != ""
                                     && ObjectDetail[prop] != undefined
                                     && ObjectDetail[prop] != null
-                                    && ObjectDetail[prop].__proto__ == Array.prototype ? ObjectDetail[prop] : [];   
+                                    && ObjectDetail[prop].__proto__ == Array.prototype ? ObjectDetail[prop] : [];
+                                /*return new WAcorden({
+                                    ModelObject: Model[prop].ModelObject.__proto__ == Function.prototype ? Model[prop].ModelObject() : Model[prop].ModelObject,
+                                    Dataset: ObjectDetail[prop] ?? []
+                                });*/
+
                                 return new WTableComponent({
                                     Options: { Search: true, Show: true },
                                     ImageUrlPath: this.Config.ImageUrlPath,
@@ -150,7 +155,7 @@ class WDetailObject extends HTMLElement {
 
         h3 {
             margin: 5px 10px;
-            color: var(--font-secundary-color);
+            color: #09315f;
         }
 
 
@@ -290,7 +295,7 @@ class ProfileCard extends HTMLElement {
     connectedCallback() { }
     DraProfileCard = async (ObjectDetail, Model) => {
         this.container.innerHTML = "";
-        this.container.append(WRender.CreateStringNode("<h3>DATOS GENERALES</h3>"));
+        this.container.append(WRender.CreateStringNode("<h3>Datos Generales</h3>"));
         for (const prop in Model) {
             try {
                 if (ObjectDetail[prop] == undefined || ObjectDetail[prop] == null || this.isNotDrawable(Model, prop)) {

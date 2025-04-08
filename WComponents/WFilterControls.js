@@ -187,6 +187,7 @@ class WFilterOptions extends HTMLElement {
 				return;
 			}
 		}
+		// @ts-ignore
 		if (this.ModelObject.FilterData.length == 0 && this.Config.Dataset.length > 0) {
 			if (this.Config.FilterFunction != undefined) {
 				this.Config.FilterFunction(this.Config.Dataset, this.IsFilterWithChange);
@@ -690,7 +691,7 @@ class WFilterOptions extends HTMLElement {
 				font-size: 12px;
 			}
 		}
-		@container (max-width: 700px) {
+		@container (max-width: 700px) { 
 			.OptionContainer {
 				grid-template-columns: repeat(2,calc(50% - 12px));
 			}
@@ -702,5 +703,3 @@ export { WFilterOptions }
 export const FilterDateRange = {
 	YEAR: "YEAR", MOUNT: "MOUNT"
 }
-
-

@@ -193,6 +193,8 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 				count: validCount, // Número de elementos válidos
 				avg // % de elementos válidos sobre el total
 			};
+			console.log(summary);
+			
 		});
 
 		return summary;
@@ -254,7 +256,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 	RenderMetrics(summary, level) {
 		return WRender.Create({
 			className: "metrics-container  level" + level,
-			children: Object.keys(summary ?? {}).map(metric =>
+			children:  Object.keys(summary ?? {}).map(metric =>
 				WRender.Create({
 					className: "metric",
 					children: [this.ProcessMetricValue(metric, summary)]
@@ -270,20 +272,19 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		let sumValue = "";
 		let countValue = `Count: ${summary[metric].count}`;
 		let avgValue = `Avg: ${summary[metric].avg.toFixed(2)}%`;
-
+		
+		
 		if (isMoney || isNumber) {
-			sumValue = `Sum: ${summary[metric].sum}`;
+			sumValue = `${summary[metric].sum}`;
 			if (isMoney) {
-				sumValue = `Sum: ${ConvertToMoneyString(summary[metric].sum)}`;
+				sumValue = `${ConvertToMoneyString(summary[metric].sum)}`;
 			}
 		}
-
-		return html`<div class="metric-container">
-                <label class="metric-label">
-                    <span class="metric-name">${metric}: ${isWithModel && this.Config.ModelObject[metric]?.Currency ? this.Config.ModelObject[metric].Currency : ""}</span>
-                </label>
-                ${isMoney || isNumber ? html`
-                    <label class="metric-label">
+		return html`<div class="metric-container">               
+                ${(isMoney || isNumber) ? html`<label class="metric-label">
+						<label class="metric-label">
+							<span class="metric-name">${metric}: ${isWithModel && this.Config.ModelObject[metric]?.Currency ? this.Config.ModelObject[metric].Currency : ""}</span>
+						</label>
                         <span class="metric-value">${sumValue}</span>
                     </label>`
 				: ""}

@@ -15,9 +15,10 @@ function ModelFunction() { }
 /**
  * @typedef {Object} ModelProperty 
 	* @property {String} type - RADIO | DRAW | PASSWORD |
-	CHECKBOX | TEXT | IMG | NUMBER | DATE | EMAIL | FILE | 
+	CHECKBOX | TEXT | IMG | NUMBER | DATE | EMAIL | FILE 
+	| MONEY (se trata como number)| PERCENTAGE (se trata como number)|
 	TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | imagecapture 
-	CALENDAR | OPERATION (requiere un action para funcionar)
+	CALENDAR | OPERATION (requiere un action para funcionar y toma el valor que retorne el action)
 	* @property {Boolean|Function} [hidden] desabilita la propiedad y la oculta
 	* @property {Object} [Options] 
 	* @property {Boolean} [hiddenInTable] oculta en la tabla
@@ -25,9 +26,10 @@ function ModelFunction() { }
 	* @property {Boolean} [primary]
 	* @property {Boolean|Function} [disabled]
 	* @property {String} [label]
+	* @property {String} [Currency] para los tipo "MONEY" puede ser cualquier string ejemplo: NIO, C$
 	* @property {String} [ForeignKeyColumn] nombre de la llave foranea que enlaza el ModelObject de esta propiedad con la propiedad padre
 	* @property {Array} [fileType]
-	* @property {Array} [ControlAction] botones adicionales que se le agregan al control 
+	* @property {{ name: string, action: (EditingObject, form, control, propertyName)=>{}}[]} [ControlAction] botones adicionales que se le agregan al control 
 	* @property {String} [pattern]
 	* @property {any} [defaultValue]
 	* @property {String} [placeholder]
@@ -40,7 +42,7 @@ function ModelFunction() { }
 	* @property { EntityClass | ModelFunction} [EntityModel]
 	* @property {Array} [Dataset]
 	* @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
-	* @property {Function} [CalendarFunction] (obj) => {  }
+	* @property {() => { Agenda: Agenda[]; Calendario: Tbl_Calendario[]; }} [CalendarFunction] (obj) => {  }
 	* @property {String} [SelfChargeDataset] Si es un WSELECT con el valor de esta propiedad puede usar datos para llenar el desplegable a partir de la entidad padre, es funcional para relaciones recursivas dentro de un master detail
 
 **/
@@ -296,6 +298,7 @@ class ElementStyle { }
 	 * @property {Function} [onclick] 
 	 * @property {Function} [ondragover]
 	 * @property {Boolean} [draggable]
+	 * @property {Boolean} [require]
 	 * @property {Function} [onchange]
 	 * @property {Function} [onkeyup]
 	 * @property {Function} [ondrop]
@@ -331,12 +334,13 @@ class WNode {
 	* @property {Boolean} [AutoSetDate]
 	* @property {Boolean} [Edit]
 	* @property {Boolean} [FilterDisplay]
+	* @property {Boolean} [UseEntityMethods]
 	* @property {Boolean} [Delete]
 	* @property {Boolean} [Add]
 	* @property {Boolean} [Search]
 	* @property {Boolean} [Select]
 	* @property {Boolean} [MultiSelect] funciona solo cuando select esta habilitado
-	* @property {Array<Actions>} [UserActions]
+	* @property {Array<Actions?>} [UserActions]
 	* @property {String} [UrlUpdate]
 	* @property {String} [UrlAdd]
 	* @property {String} [UrlDelete]
@@ -385,8 +389,7 @@ class TableConfig { };
  *  * @property {Boolean} [ShadowRoot]
 	* @property {String} [icon]
 	* @property {String} [title]  
-	* @property {Boolean} [HeadOptions] 
-	* @property {Boolean} [FullScreen]   
+	* @property {Boolean} [HeadOptions]    
 	* @property {String} [StyleForm]   columnX1 | columnX3 | columnX3
 	* @property {String} [ImageUrlPath] 
 	* @property {Object} [ModelObject] 
