@@ -306,7 +306,8 @@ class WAppNavigator extends HTMLElement {
 				display: none;
 			}
 			.TabContainer {
-				padding: 20px 0px;               
+				padding: 30px 0px;
+				margin-top: 10px;
 			}
 		
 			.elementNav:hover {
@@ -423,7 +424,8 @@ class WAppNavigator extends HTMLElement {
 						height: 25px;
 						width: 25px;
 						position: absolute;
-						right: 0px;
+						right: 10px;
+						top: 0px;
 						transform: translateY(-100%);
 					} 
 					& .zoomBtn .btnZoomOut{

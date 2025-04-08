@@ -368,7 +368,7 @@ class WCommentsComponent extends HTMLElement {
             overflow: hidden;
             overflow-y: auto;  
             min-height: 280px;
-            background-color: var(--secundary-color);     
+            background-color: var(--primary-color);     
             height: calc(100%  - 150px);
             border-radius: 10px;
             padding: 10px;

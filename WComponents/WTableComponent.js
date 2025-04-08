@@ -21,6 +21,8 @@ class WTableComponent extends HTMLElement {
      */
     constructor(Config) {
         super();
+        this.attachShadow({ mode: "open" });
+        this.Config = Config
         for (const p in Config) {
             this[p] = Config[p];
         }
@@ -28,7 +30,6 @@ class WTableComponent extends HTMLElement {
         this.selectedItems = [];
         this.isSelectAll = false;
         this.ModelObject = {};
-
         this.ThOptions = WRender.Create({ class: "thOptions" });
         this.Table = WRender.Create({ tagName: "Table", className: this.TableClass, id: "MainTable"  });
         this.Tfooter = WRender.Create({ class: "tfooter" });
@@ -40,12 +41,11 @@ class WTableComponent extends HTMLElement {
         this.Dataset = [];
         this.Sorts = [];
         
-
         this.withFilter = false;
+        this.InicializeConfig(this.Config);
     }
     InicializeConfig(Config) {
         this.paginate = Config.paginate ?? true;
-        this.attachShadow({ mode: "open" });
         this.TypeMoney = Config.TypeMoney;
         this.Config = Config ?? {};
         this.Config.isActiveSorts = this.Config.isActiveSorts ?? true;
@@ -101,7 +101,6 @@ class WTableComponent extends HTMLElement {
     }
 
     connectedCallback() {
-        this.InicializeConfig(this.Config);
         this.Draw();
     }
     Draw = async () => {

@@ -84,13 +84,11 @@ export class GroupComponent extends HTMLElement {
 
 	CustomStyles = css`
 		.group-container {
-			border: 1px solid var(--tertiary-color);
 			border-radius: 8px;
 			margin: 10px 0;
 			padding: 10px;
-			background-color: var(--secundary-color);
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 			position: relative;
+			background-color: var(--primary-color);
 		}
 
 		.group-title {

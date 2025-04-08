@@ -256,7 +256,7 @@ class WRichText extends HTMLElement {
                 top: 40px;
                 left: 50%;
                 transform: translateX(-50%);
-                background-color: var(--secundary-color);
+                background-color: var(--primary-color);
                 box-shadow: #c5c5c5 0 0 5px 0;
                 padding: 10px 10px 20px 10px;
             }
@@ -430,6 +430,8 @@ const WRichTextStyle = css`
     }
     w-rich-text .ROption svg {
         fill: var(--font-primary-color);
+        height: 20px;
+        width: 20px;
     }
     w-rich-text .ROption svg path {
         fill: var(--font-primary-color);
@@ -447,7 +449,7 @@ const WRichTextStyle = css`
     .tooltiptext {
         visibility: hidden;
         min-width: 120px;
-        background-color: black;
+        background-color: var(--primary-color);
         color: var(--font-primary-color);
         text-align: center;
         border-radius: 6px;
@@ -457,9 +459,10 @@ const WRichTextStyle = css`
         bottom: 150%;
         left: 50%;
         margin-left: -60px;
+        box-shadow: 0 0 2px 0 #999;
     }
 
-    .tooltiptext::after {
+    /*.tooltiptext::after {
         content: "";
         position: absolute;
         bottom: -100;
@@ -468,16 +471,16 @@ const WRichTextStyle = css`
         border-width: 5px;
         border-style: solid;
         border-color: black transparent transparent transparent;
-    }
+    }*/
 
     .tooltip:hover .tooltiptext {
         visibility: visible;
     } 
 
-    input, .tooltipBtn {
+    .tooltipBtn {
         cursor: pointer;
-        width: 40px;
-        height: 40px;
+        width: 20px;
+        height: 20px;
         padding: 10px 20px;
         border: none;
         background-color: #f5f5f5;

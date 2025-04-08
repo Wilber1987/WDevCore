@@ -54,8 +54,7 @@ class WForm extends HTMLElement {
 
 		this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
 		this.shadowRoot?.append(StyleScrolls.cloneNode(true));
-		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
-		this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
+		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));		
 		if (this.Config.CustomStyle) {
 			this.shadowRoot?.append(this.Config.CustomStyle);
 		}
@@ -105,6 +104,7 @@ class WForm extends HTMLElement {
 				Url: undefined
 			};
 		}
+		this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
 		this.FormObject = this.FormObject ?? this.Config.EditObject ?? {};
 	}
 
@@ -698,7 +698,7 @@ class WForm extends HTMLElement {
 		let style = WFormStyle.cloneNode(true);
 
 		const wstyle = css`
-			.divForm {
+			.divForm, .group-container {
 				grid-template-columns: ${this.DivColumns};
 			}
 			.IMG,

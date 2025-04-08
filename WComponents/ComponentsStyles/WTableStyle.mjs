@@ -66,7 +66,7 @@ export const WTableStyle = css`
 }
 
 .WTable tbody tr:nth-child(odd) {
-	background-color: var(--fourth-color);
+	background-color: var(--secundary-color);
 }
 
 .icon {
