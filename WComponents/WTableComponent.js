@@ -101,6 +101,7 @@ class WTableComponent extends HTMLElement {
     }
 
     connectedCallback() {
+        this.InicializeConfig(this.Config);
         this.Draw();
     }
     Draw = async () => {
