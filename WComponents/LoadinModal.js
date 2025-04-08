@@ -44,9 +44,9 @@ class LoadinModal extends HTMLElement {
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
     <div class="loading show">

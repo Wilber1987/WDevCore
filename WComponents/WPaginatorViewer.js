@@ -1,12 +1,7 @@
-import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
-import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
-import { ControlBuilder } from "../WModules/WControlBuilder.js";
-import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
-import { css, WCssClass } from "../WModules/WStyledRender.js";
-import { WModalForm } from "./WModalForm.js";
-import { WToolTip } from "./WMultiSelect.js";
+import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WArrayF } from "../WModules/WArrayF.js";
-import { WAjaxTools } from "../WModules/WAjaxTools.js";
+import { WRender } from "../WModules/WComponentsTools.js";
+import { css, WCssClass } from "../WModules/WStyledRender.js";
 class PaginatorConfig {
     Dataset = [];
     ModelObject = {};
@@ -403,4 +398,4 @@ const WIcons = {
 }
 const Money = { Euro: "€", Dollar: "$", Cordoba: "C$" }
 customElements.define("w-paginator", WPaginatorViewer);
-export { WPaginatorViewer }
+export { WPaginatorViewer };

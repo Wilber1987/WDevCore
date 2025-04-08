@@ -1,30 +1,32 @@
 :root {
-    --primary-color: rgb(255, 255, 255);
-    --secundary-color: rgb(245, 245, 245);
-    --tertiary-color: rgb(8, 48, 100);
-    --fourth-color: rgba(240, 239, 239, 0.9);
-    --fifty-color: rgba(222, 222, 222, 0.9);
-    --sexty-color: rgba(184, 183, 183, 0.9);
+	--primary-color: rgb(255, 255, 255);
+	--secundary-color: rgb(250, 250, 250);
+	--tertiary-color: rgb(240, 240, 240);
+	--fourth-color: rgb(224, 224, 224);
+	--fifty-color: rgb(214, 214, 214);
+	--sexty-color: rgb(184, 183, 183);
 
-    --font: "Open Sans", sans-serif;
-    --font-primary-color: #222222;
-    --font-secundary-color: rgb(11, 89, 153);
-    --font-tertiary-color: rgb(232, 239, 238);
-    --font-fourth-color: #444444;
-    
+	--font: "Open Sans", sans-serif;
+	--font-primary-color: #222222;
+	--font-secundary-color: rgb(11, 89, 153);
+	--font-tertiary-color: rgb(232, 239, 238);
+	--font-fourth-color: #444444;
+	
 }
 @media (prefers-color-scheme: dark) {
-    :root {
-        --primary-color: rgb(30, 33, 36);/*color mas fuerte*/
-        --secundary-color: rgb(41, 45, 48);/*color mas debil*/
-        --tertiary-color: rgb(31, 88, 199);/*color de contraste*/
-        --fourth-color: rgb(32, 36, 37);
-        --fifty-color: rgba(63, 63, 63, 0.9);
+	:root {
+		--primary-color: #1f2224;/*color mas fuerte para backgrounds*/
+		--secundary-color: rgb(31, 34, 36);/*color mas suabe para fondos de contenedores*/
+		--tertiary-color: rgb(40, 44, 47);/*color mas suabe para controles*/
+		--fourth-color: rgb(51, 53, 59);/*color de contraste*/
+		--fifty-color: rgba(70, 70, 70, 0.9);
+		--sexty-color: rgba(184, 183, 183, 0.9);
 
-        --font: "Open Sans", sans-serif;
-        --font-primary-color: #ffffff;
-        --font-secundary-color: #06a3ec;
-        --font-tertiary-color: rgb(255, 255, 255);
-        --font-fourth-color: #d3d3d3;
-    }
+		--font: "Open Sans", sans-serif;
+		--font-primary-color: #ffffff;
+		--font-secundary-color: rgb(186, 187, 187);
+		--font-tertiary-color: rgb(0, 83, 207);
+		--font-fourth-color: #d3d3d3;
+	}
 }
+

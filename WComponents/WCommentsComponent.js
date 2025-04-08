@@ -2,7 +2,7 @@
 import { StylesControlsV2, StyleScrolls } from "../StyleModules/WStyleComponents.js";
 import { html, WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
-import { WRichText } from "./WRichText.js";
+import { WRichText } from "./FormComponents/WRichText.js";
 import { WModalForm } from "./WModalForm.js";
 import { MultiSelect } from "./WMultiSelect.js";
 import { WArrayF } from "../WModules/WArrayF.js";

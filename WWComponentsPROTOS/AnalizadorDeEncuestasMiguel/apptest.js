@@ -1,6 +1,6 @@
 import { data } from "./datos.js";
 
-import { ColumChart, RadialChart } from "../../WComponents/WChartJSComponents.js";
+import { ColumChart, RadialChart } from "../WComponents/WChartJSComponents.js";
 
 function processFormResponses(responses) {
     const result = {};

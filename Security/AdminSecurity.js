@@ -1,3 +1,4 @@
+//@ts-check
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WAppNavigator } from "../WComponents/WAppNavigator.js";
 import { WFilterOptions } from "../WComponents/WFilterControls.js";
@@ -7,7 +8,11 @@ import { ComponentsManager, WRender } from '../WModules/WComponentsTools.js';
 import { ChangePasswordModel, ChangeRolesModel, ChangeStateModel, Security_Permissions, Security_Roles, Security_Users } from "./SecurityModel.js";
 import { Tbl_Profile } from "./Tbl_Profile.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
+const Main = document.getElementById("Main") ?? document.body;
+const Aside = document.getElementById("Aside") ?? document.body;
+
 window.addEventListener("load", async () => {
+	
 	const DOMManager = new ComponentsManager({ MainContainer: Main });
 	const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});
 	const Permisos = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Permissions", {});
