@@ -515,7 +515,8 @@ class WTableComponent extends HTMLElement {
                     tr.append(td);
                     break;
                 case "DATE": case "FECHA":
-                    td.append(value?.toString()?.toDateFormatEs());
+                    //td.append(value?.toString()?.toDateFormatEs());
+                    td.append(value? new DateTime(value).formatDateToDDMMYY(value): "")
                     tr.append(td);
                     break;
                 case "OPERATION":
