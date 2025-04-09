@@ -368,7 +368,7 @@ export class ModelPropertyFormBuilder {
 			Multiple: multiple,
 			require: require,
 			disabled: disabled,
-			Files:  EditingObject[prop].__proto__ == Array.prototype ? EditingObject[prop] : ( typeof  EditingObject[prop] === "string" && !multiple ?  [EditingObject[prop]] : []),
+			Files:  EditingObject[prop]?.__proto__ == Array.prototype ? EditingObject[prop] : ( typeof  EditingObject[prop] === "string" && !multiple ?  [EditingObject[prop]] : []),
 			Types: filesType,
 			action: disabled ? undefined : async () => {
 				EditingObject[prop] = InputControl.GetValue();
