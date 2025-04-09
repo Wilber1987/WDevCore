@@ -256,7 +256,7 @@ class WForm extends HTMLElement {
 						class: "ModalElement", children: [ControlLabel]
 					});
 					if (Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
-						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop)
+						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop) + (Model[prop].require == false ? "" : "*");						
 						await this.CreateModelControl(Model, prop, ControlContainer, ObjectF, ControlLabel, onChangeEvent, DivForm);
 						//ControlContainer.append(InputControl);
 					}

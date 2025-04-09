@@ -93,10 +93,10 @@ class WAppNavigator extends HTMLElement {
 
 		if (this.NavStyle == "nav") {
 			const header = html`<header onclick="${() => {
-				const nav = this.querySelector("#MainNav");
-				// @ts-ignore
-				nav.className = nav?.className == "navActive" ? this.NavStyle + " navInactive" : nav.className = this.NavStyle + " navActive";
-			}}">
+					const nav = this.querySelector("#MainNav");
+					// @ts-ignore
+					nav.className = nav?.className == "navActive" ? this.NavStyle + " navInactive" : nav.className = this.NavStyle + " navActive";
+				}}">
 				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g clip-path="url(#clip0_429_11066)"> <path d="M3 6.00092H21M3 12.0009H21M3 18.0009H21" stroke="#292929" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path> </g> <defs> <clipPath id="clip0_429_11066"> <rect width="24" height="24" fill="white" transform="translate(0 0.000915527)"></rect> </clipPath> </defs> </g></svg>
 				${this.NavTitle ? html`<label class="NavTitle">${this.NavTitle}</label>` : ""}
 			</header>`
@@ -244,6 +244,12 @@ class WAppNavigator extends HTMLElement {
 				flex-wrap: wrap;
 				position: relative;
 			}
+			header svg {
+				height: 24px;
+				width: 24px;
+				cursor: pointer;
+			
+			}
 		
 			.tab {
 				display: flex;
@@ -306,7 +312,7 @@ class WAppNavigator extends HTMLElement {
 				display: none;
 			}
 			.TabContainer {
-				padding: 30px 0px;
+				padding: 20px 0px 10px 0px;
 				margin-top: 10px;
 			}
 		
@@ -398,7 +404,6 @@ class WAppNavigator extends HTMLElement {
 				max-height: 5000px;
 			}
 			.ObjectWrapper {
-				padding: 10px 0px;
 				display: flex;
 				flex-direction: column;
 				& .container {
@@ -425,7 +430,7 @@ class WAppNavigator extends HTMLElement {
 						width: 25px;
 						position: absolute;
 						right: 10px;
-						top: 0px;
+						top: 15px;
 						transform: translateY(-100%);
 					} 
 					& .zoomBtn .btnZoomOut{

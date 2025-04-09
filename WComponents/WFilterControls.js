@@ -690,12 +690,7 @@ class WFilterOptions extends HTMLElement {
 				grid-template-columns: auto;
 				font-size: 12px;
 			}
-		}
-		@container (max-width: 700px) { 
-			.OptionContainer {
-				grid-template-columns: repeat(2,calc(50% - 12px));
-			}
-		}
+		}		
 	`
 }
 customElements.define("w-filter-option", WFilterOptions);

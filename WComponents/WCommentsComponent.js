@@ -12,18 +12,19 @@ class WCommentsComponent extends HTMLElement {
 
     /**
      * @param {{ 
-     * Dataset: any[]; 
-     * ModelObject: Object;
-     * User: any; 
-     * UserIdProp?: string;
-     * CommentsIdentify: Number; 
-     * CommentsIdentifyName: string; 
-     * UrlSearch: string; 
-     * UrlAdd: string; 
-     * AddObject?: boolean;
-     * UseDestinatarios?: boolean; 
-     * UseAttach?: boolean;
-     *isRichTextActive?: boolean;
+        * Dataset: any[]; 
+        * ModelObject: Object;
+        * User: any; 
+        * UserIdProp?: string;
+        * CommentsIdentify: Number; 
+        * CommentsIdentifyName: string; 
+        * UrlSearch: string; 
+        * UrlAdd: string; 
+        * AddObject?: boolean;
+        * UseDestinatarios?: boolean; 
+        * UseAttach?: boolean;
+        * isRichTextActive?: boolean;
+        * CustomStyle?: HTMLStyleElement
      * }} props
      */
     constructor(props) {
@@ -45,7 +46,6 @@ class WCommentsComponent extends HTMLElement {
         this.autoScroll = true;
         this.updating = false;
         this.isRichTextActive = props.isRichTextActive ?? true;
-
 
         //this.style.backgroundColor = "#fff";
         this.OptionContainer = WRender.Create({
@@ -104,6 +104,9 @@ class WCommentsComponent extends HTMLElement {
             this.CustomStyle,
             this.CommentsContainer,
             this.TypeTextContainer)
+        if (props.CustomStyle) {
+            this.shadowRoot?.append(props.CustomStyle.cloneNode(true))
+        }
         if (this.UseDestinatarios == true) {
             this.MailsSelect = new MultiSelect({
                 Dataset: this.Mails,
@@ -120,12 +123,12 @@ class WCommentsComponent extends HTMLElement {
             this.shadowRoot?.append(this.RitchInput?.AddInputFileSection)
         }
     }
-    saveComment = async () => {      
+    saveComment = async () => {
         // @ts-ignore
         if (this.MessageInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
             return;
         }
-        this.ClearEvents();       
+        this.ClearEvents();
         const Message = {
             // @ts-ignore
             Body: this.MessageInput.value,
@@ -142,11 +145,11 @@ class WCommentsComponent extends HTMLElement {
         this.InicializarActualizacion();
     }
     saveRitchComment = async () => {
-         // @ts-ignore
-         if (this.RitchInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
+        // @ts-ignore
+        if (this.RitchInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
             return;
         }
-        this.ClearEvents();    
+        this.ClearEvents();
         const Message = {
             // @ts-ignore
             Body: this.RitchInput.value,
@@ -163,7 +166,7 @@ class WCommentsComponent extends HTMLElement {
     }
 
     connectedCallback() {
-        this.InicializarActualizacion();   
+        this.InicializarActualizacion();
     }
     scrollToBottom = () => {
         if (this.autoScroll) {
@@ -358,8 +361,8 @@ class WCommentsComponent extends HTMLElement {
         //console.log(response);
         this.Dataset = response;
         if (!inicialize) {
-            await this.DrawWCommentsComponent();           
-        }        
+            await this.DrawWCommentsComponent();
+        }
     }
     CustomStyle = css`    
         .CommentsContainer{
@@ -453,15 +456,14 @@ class WCommentsComponent extends HTMLElement {
             border-radius: 10px;
             font-size: 12px;
             height: fit-content;
-            max-width: 600px;
             text-align: left;
         }
         .comment { 
             background-color: #f2f5f8;
         }
         .commentSelf {
-            background-color: #1f58c7;
-            color: #ffffff;
+            background-color: #e3ecf3;
+            color: #000000;
         }        
         .comment label, .commentSelf label, .comment p, .commentSelf p {
             display: block;
@@ -499,7 +501,7 @@ class WCommentsComponent extends HTMLElement {
         }
        
     `
-    
+
 }
 customElements.define('w-coment-component', WCommentsComponent);
 export { WCommentsComponent }

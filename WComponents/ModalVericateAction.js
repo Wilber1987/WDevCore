@@ -13,8 +13,8 @@ export const ModalVericateAction = (Action, title, withClose = true) => {
 				style: { justifyContent: "center", display: "flex" },
 				children: [
 					WRender.Create({
-						tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async () => {
-							await Action();
+						tagName: 'input', type: 'button', className: 'Btn', value: 'ACEPTAR', onclick: async (ev) => {
+							await Action(ev);
 							ModalCheck.close();
 						}
 					}), withClose ? WRender.Create({

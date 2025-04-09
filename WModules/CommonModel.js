@@ -11,7 +11,14 @@
 	* @property {String} [message]
 **/
 class ResponseServices { }
-function ModelFunction() { }
+
+/**
+* @param {Object} [EditingObject] este objeto es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante
+* @returns {Object}
+*/
+function ModelFunction(EditingObject) { 
+	return {}
+}
 /**
  * @typedef {Object} ModelProperty 
 	* @property {String} type - RADIO | DRAW | PASSWORD |
@@ -38,7 +45,7 @@ function ModelFunction() { }
 	* @property {String | Number} [min] para rangos de tipo number y date
 	* @property {String | Number} [max] para rangos de tipo number y date
 	* @property {String} [fieldRequire] CAMBIA UN ESTADO DE UNA PROPIEDAD A REQUERIDO
-	* @property {Object | EntityClass | ModelFunction} [ModelObject]
+	* @property {Object | EntityClass | ModelFunction} [ModelObject] si es una funcion, esta podra recibir de forma opcional el EditingObject el cual es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante
 	* @property { EntityClass | ModelFunction} [EntityModel]
 	* @property {Array} [Dataset]
 	* @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado

@@ -417,6 +417,7 @@ class MultiSelect extends HTMLElement {
 		}
 		this.DisplayName = undefined;
 		const keys = ["tipo",
+			"Title", "Titulo", "title", "titulo",
 			"Descripcion",
 			"descripcion",
 			"desc",
@@ -668,7 +669,7 @@ const MainMenu = css`
 	}
 	.ElementDetail {
 		padding: 10px;
-		background-color: var(--fourth-color);
+		background-color: var(--primary-color);
 		border-radius: 10px;
 		margin: 10px;
 		font-size: 12px;

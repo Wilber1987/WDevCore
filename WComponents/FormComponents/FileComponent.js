@@ -43,7 +43,7 @@ export class FileComponent extends HTMLElement {
 		/**@type {HTMLInputElement} */
 		// @ts-ignore
 		const inputControl = html`<input type="file" id="file-input">`
-		console.log( this.getAcceptTypes());
+		//console.log( this.getAcceptTypes());
 		
 		inputControl.accept = this.getAcceptTypes();
 		inputControl.disabled = this.Config.disabled ?? false;
@@ -57,6 +57,10 @@ export class FileComponent extends HTMLElement {
 		// Escucha el evento de cambio en el input de archivos
 		const fileInput = this.shadowRoot?.getElementById('file-input');
 		fileInput?.addEventListener('change', (e) => this.handleFileUpload(e));
+		this._files.forEach(fileInArray => {
+			// @ts-ignore
+			this.renderFile({ name: fileInArray.name, type: fileInArray.type, data: fileInArray.data });
+		});
 	}
 
 	// Maneja la subida de archivos
@@ -148,7 +152,7 @@ export class FileComponent extends HTMLElement {
 		for (const file of this.Config.Files) {
 			let mimeType, fileBase64;
 
-			if (file.startsWith('http://') || file.startsWith('https://')) {
+			if (file.startsWith('http://') || file.startsWith('https://') || file.startsWith('/') || file.startsWith('\\')) {
 				// Es una URL: convertirla a Base64
 				const response = await fetch(file);
 				const blob = await response.blob();

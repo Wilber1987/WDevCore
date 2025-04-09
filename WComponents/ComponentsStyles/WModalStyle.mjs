@@ -5,7 +5,7 @@ export const WModalStyle = css`
        grid-template-rows: 70px calc(100% - 70px);
        margin: auto;
        margin-top: 20px;
-       background-color: var(--secundary-color);
+       background-color: var(--primary-color);
        width: 60%;
        border-radius: 0.3cm;
        position: relative;

@@ -2,7 +2,6 @@ import { WRender, ComponentsManager, html } from "../WModules/WComponentsTools.j
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { ModalConfig } from "../WModules/CommonModel.js";
-import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WModalStyle } from "./ComponentsStyles/WModalStyle.mjs";
 import { WArrayF } from "../WModules/WArrayF.js";
 
@@ -22,6 +21,7 @@ class WModalForm extends HTMLElement {
             this[p] = Config[p];
         }
         this.DivColumns = this.Config.DivColumns;
+        this.StyleForm = this.Config.DivColumns == "FullScreen" ? this.WidthContainer = "60%" : this.WidthContainer = "90%"
         /*if (this.StyleForm == "columnX1") {
             this.WidthContainer = "40%";
             this.Config.DivColumns = "calc(100%)";

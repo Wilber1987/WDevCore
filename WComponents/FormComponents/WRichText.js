@@ -199,6 +199,7 @@ class WRichText extends HTMLElement {
     FunctionClear() {
         // @ts-ignore
         this.value = this.Divinput.innerHTML = "";
+        this.htmlEditor.value = "";
         if (this.AttachedSection) {
             this.AttachedSection.innerHTML = "";
         }

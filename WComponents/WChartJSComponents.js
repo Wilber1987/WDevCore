@@ -1017,6 +1017,7 @@ class GanttChart extends HTMLElement {
     }
     DrawComponent = async () => {
         this.Task.innerHTML = "";
+        this.TaskContainer.innerHTML ="";
         this.TimeLine.innerHTML = "";
         if (this.Dataset == undefined || this.Dataset == null || this.Dataset.length == 0) {
             this.TimeLine.innerHTML = "NO DATA";

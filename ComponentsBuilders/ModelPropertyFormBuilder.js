@@ -2,6 +2,7 @@
 
 // @ts-ignore
 import { ModelProperty } from "../WModules/CommonModel.js";
+import { DateTime } from "../WModules/Types/DateTime.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -20,10 +21,10 @@ export class ModelPropertyFormBuilder {
 		const { require, disabled } = await this.DefineRequireAndDisable(ModelProperty, EditingObject);
 		const placeholder = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
 		const { pattern, calculatePlaceholder } = this.DefinePatternAndPlaceholder(ModelProperty);
-		const { max, min } = this.DefineMaxAndMin(ModelProperty);
+		const { max, min, defaultValue } = this.DefineMaxAndMinDefault(ModelProperty);
 		//const actionFunction = ModelProperty.action ?? null;
 		ModelProperty.require = require;
-		EditingObject[prop] = EditingObject[prop] ?? ModelProperty.defaultValue ?? min ?? "";
+		EditingObject[prop] = EditingObject[prop] ?? defaultValue ?? min ?? "";
 
 		/**@type {HTMLInputElement} */
 		// @ts-ignore
@@ -31,7 +32,7 @@ export class ModelPropertyFormBuilder {
 			tagName: "input",
 			id: "ControlValue" + prop,
 			className: prop,
-			value: EditingObject[prop],
+			value: EditingObject[prop] ?? defaultValue,
 			type: ModelProperty.type.toUpperCase() == "MONEY" || ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type,
 			min: min,
 			max: max,
@@ -263,11 +264,12 @@ export class ModelPropertyFormBuilder {
 		const { multiple, modType } = this.DefineMultiSelectConfig(ModelProperty);
 		ModelProperty.require = require;
 		//EditingObject[prop] = EditingObject[prop]?.__proto__ == Object.prototype ? EditingObject[prop] : null;		
-		ModelProperty.ModelObject = WArrayF.isModelFromFunction(ModelProperty.ModelObject);
+		ModelProperty.ModelObject = WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject);
 		const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
 		if (ModelProperty.Dataset == undefined && entity.Get) {
 			ModelProperty.Dataset = await entity.Get();
 		}
+		const selectedItems = [];
 
 		if ((EditingObject[prop] == null || EditingObject[prop] == undefined)
 			&& require != false
@@ -275,6 +277,7 @@ export class ModelPropertyFormBuilder {
 			&& ModelProperty.Dataset?.length > 0
 			&& !multiple) {
 			EditingObject[prop] = ModelProperty?.Dataset[0];
+			selectedItems.push(ModelProperty?.Dataset[0])
 		}
 
 		const Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
@@ -284,6 +287,7 @@ export class ModelPropertyFormBuilder {
 			Mode: modType, //ModelProperty.type?.toUpperCase() == "WRADIO" ? "SELECT_BOX" : "SELECT",
 			FullDetail: ModelProperty.fullDetail == false ? false : ModelProperty.type?.toUpperCase() != "WRADIO",
 			Dataset: Dataset,
+			selectedItems: selectedItems,
 			//AddObject: ModelProperty.type?.toUpperCase() != "WRADIO" && this.Config.WSelectAddObject,
 			ModelObject: ModelProperty.ModelObject,
 			action: (ItemSelects) => {
@@ -326,7 +330,7 @@ export class ModelPropertyFormBuilder {
 		const InputControl = new WTableComponent({
 			Dataset: EditingObject[prop],
 			AddItemsFromApi: false,
-			ModelObject: WArrayF.isModelFromFunction(ModelProperty.ModelObject),
+			ModelObject: WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject),
 			ParentEntity: EditingObject,
 			ImageUrlPath: ImageUrlPath,
 			Options: {
@@ -364,7 +368,7 @@ export class ModelPropertyFormBuilder {
 			Multiple: multiple,
 			require: require,
 			disabled: disabled,
-			Files: EditingObject[prop] ?? [],
+			Files:  EditingObject[prop].__proto__ == Array.prototype ? EditingObject[prop] : ( typeof  EditingObject[prop] === "string" && !multiple ?  [EditingObject[prop]] : []),
 			Types: filesType,
 			action: disabled ? undefined : async () => {
 				EditingObject[prop] = InputControl.GetValue();
@@ -444,11 +448,11 @@ export class ModelPropertyFormBuilder {
 	*/
 	static async CreateCalendar(ModelProperty, EditingObject, prop, onChangeListener) {
 		const { require, disabled } = await this.DefineRequireAndDisable(ModelProperty, EditingObject);
-		ModelProperty.require = require;		
+		ModelProperty.require = require;
 		EditingObject[prop] = EditingObject[prop] ?? [];
 		const { WCalendarComponent } = await import("../WComponents/FormComponents/WCalendarComponent.js");
 		const InputControl = new WCalendarComponent({
-			SelectedBlocks:  EditingObject[prop],
+			SelectedBlocks: EditingObject[prop],
 			action: (value) => {
 				if (onChangeListener) {
 					onChangeListener();
@@ -493,27 +497,32 @@ export class ModelPropertyFormBuilder {
 	/**
 	 * @param {ModelProperty} ModelProperty
 	 */
-	static DefineMaxAndMin(ModelProperty) {
+	static DefineMaxAndMinDefault(ModelProperty) {
 		let max = ModelProperty.max;
 		let min = ModelProperty.min;
+		let defaultValue = ModelProperty.defaultValue;
+
 
 		switch (ModelProperty.type?.toUpperCase()) {
 			case "TIME":
-				min = "06:00";
-				max = "20:00";
+				min = min ?? "06:00";
+				max = min ?? "20:00";
+				defaultValue = defaultValue ?? "06:00"
 				break;
 			case "DATE": case "FECHA":
 				max = max ?? '3000-01-01';
 				min = min ?? '1900-01-01';
+				defaultValue = defaultValue ?? new DateTime().toISO();
 				break;
 			case "DATETIME":
 				max = max ?? '3000-01-01T23:59';
 				min = min ?? '1900-01-01T00:00';
+				defaultValue = defaultValue ?? new DateTime().toISO();
 				break;
 		}
 
 
-		return { max, min }
+		return { max, min, defaultValue }
 	}
 	/**
 	 * @param {ModelProperty} ModelProperty
@@ -574,8 +583,8 @@ export class ModelPropertyFormBuilder {
 	static DefineMultiSelectConfig(ModelProperty) {
 		let multiple = ["WRADIO", "WSELECT"].includes(ModelProperty.type?.toUpperCase()) ? false : true;
 		let modType = ["WRADIO", "WCHECKBOX"].includes(ModelProperty.type?.toUpperCase()) ? "SELECT_BOX" : "SELECT";
-		console.log( multiple, modType);
-		
+		console.log(multiple, modType);
+
 		return { multiple, modType }
 	}
 
