@@ -14,7 +14,7 @@ const OnLoad = async () => {
     setTimeout(() => {
         const LoginForm = GetLoginLayout(WRender.Create({
             className: "sign-in-form", children: [
-                WRender.Create({ tagName: "style", innerHTML: '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");' }),
+                //WRender.Create({ tagName: "style", innerHTML: '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");' }),
                 //StylesControlsV2.cloneNode(true),
                 MasterStyle,
                 //{ tagName: 'img', src: "/Media/img/logo.png", class: 'className' },

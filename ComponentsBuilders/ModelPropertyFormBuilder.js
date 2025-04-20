@@ -371,7 +371,7 @@ export class ModelPropertyFormBuilder {
 			Files:  EditingObject[prop]?.__proto__ == Array.prototype ? EditingObject[prop] : ( typeof  EditingObject[prop] === "string" && !multiple ?  [EditingObject[prop]] : []),
 			Types: filesType,
 			action: disabled ? undefined : async () => {
-				EditingObject[prop] = InputControl.GetValue();
+				EditingObject[prop] = InputControl.GetModelValue();
 				if (onChangeListener) {
 					onChangeListener();
 				}

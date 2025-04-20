@@ -17,7 +17,7 @@
 .Btn-Mini,
 .Btn-Mini-Alert,
 .Btn-Mini-Success {
-	background-color: #1c4786;
+	background-color: #1f58c7;
 	border: none;
 	outline: none;
 	border-radius: 8px;
@@ -84,6 +84,7 @@
 .btn-danger,
 .btn-info,
 .Btn,
+.btn-go,
 .btn-danger2,
 .BtnAlert2 {
 	display: inline-block;
@@ -289,6 +290,8 @@ textarea:focus {
 	display: flex;
 	align-items: center;
 	cursor: pointer;
+	position: relative;
+	padding-right: 40px;
 }
 
 .btn-go * {
@@ -296,16 +299,18 @@ textarea:focus {
 }
 
 .btn-go::after {
+	position: absolute;
 	content: "";
 	transition: all 0.3s;
 	/* Transición para el hover */
 	clip-path: polygon(50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%, 0% 0%);
-	background-color: #033da7;
+	background-color: #fbfcfd;
 	fill: #000;
 	height: 10px;
 	width: 15px;
 	transform: rotate(-90deg);
 	margin-left: 10px;
+	right: 15px;
 }
 
 /*BOTON ACORDEON HOTIZONTAL*/
@@ -355,7 +360,7 @@ textarea:focus {
 
 /*BOTON ACORDEON VERTICAL*/
 .btn-go:hover::after {
-	margin-left: 15px;
+	right: 10px;
 	/* Desplaza la flecha 5px hacia la derecha en el hover */
 }
 

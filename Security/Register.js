@@ -71,7 +71,7 @@ const OnLoad = async () => {
     const EditForm = WRender.Create({
         className: "EditForm", style: {}, children: [
             WRender.Create(MasterStyle),
-            WRender.Create({ tagName: "style", innerHTML: '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");' }),
+            //WRender.Create({ tagName: "style", innerHTML: '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");' }),
            StylesControlsV2.cloneNode(true),
             WRender.Create(MasterStyle),
             { tagName: 'img', src: Icons.SNI, class: 'className' },

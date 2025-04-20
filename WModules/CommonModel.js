@@ -348,6 +348,7 @@ class WNode {
 	* @property {Boolean} [Select]
 	* @property {Boolean} [MultiSelect] funciona solo cuando select esta habilitado
 	* @property {Array<Actions?>} [UserActions]
+	* @property {Boolean} [UseManualControlForFiltering] le indica al filtro si debe usar opciones manuales, solo aplica si esta erl filtro activo
 	* @property {String} [UrlUpdate]
 	* @property {String} [UrlAdd]
 	* @property {String} [UrlDelete]
@@ -388,7 +389,7 @@ class WNode {
 	* @property {String} [id]
 	* @property {Function} [SaveFunction]
 	* @property {String} [icon]   
-	* @property {Function} [ValidateFunction]
+	* @property {Function} [ValidateFunction]	
 	* @property {HTMLStyleElement} [CustomStyle] 
  **/
 class TableConfig { };

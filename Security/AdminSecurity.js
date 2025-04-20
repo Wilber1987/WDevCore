@@ -61,6 +61,7 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
 					Filter: true, 
 					FilterDisplay: true,
 					UseEntityMethods: true,
+					UseManualControlForFiltering : true,
 					Add: TabName != "Permisos", UrlAdd: "../api/ApiEntitySECURITY/save" + Model.constructor.name,
 					Edit: TabName != "Permisos" && TabName != "Usuarios", UrlUpdate: "../api/ApiEntitySECURITY/save" + Model.constructor.name,
 					//Search: true, UrlSearch: "../api/ApiEntitySECURITY/get" + Model.constructor.name,

@@ -165,7 +165,9 @@ class WDocumentViewer extends HTMLElement {
 	 */
 	CreateNewPage() {
 		const page = WRender.Create({ className: `page ${this.Config.PageType}` });
-		if (this.Header) {
+		if (typeof this.Header === "string") {
+			page.append(this.Header);
+		} else if (this.Header) {
 			page.append(this.Header.cloneNode(true));
 		}
 		this.DocumentContainer.append(page);
@@ -315,7 +317,7 @@ class WDocumentViewer extends HTMLElement {
 				} : undefined,
 				ExportPdfAction: this.Config.exportPdf ? async (tool) => {
 					const body = this.GetExportBody();
-					tool.ExportPdf(body, this.Config.PageType);
+					tool.ExportPdf(body, this.Config.PageType, this.Config.exportPdfApi ?? false);
 				} : undefined
 			}));
 		}
@@ -323,12 +325,12 @@ class WDocumentViewer extends HTMLElement {
 
 	CompStyle = css`
 		#ComponentContainer {
-			border: 1px solid #c3c3c3;
+			border: 1px solid #dfdfdf;
 		}
 		.document-container {
 			align-items: center;
 			padding: 20px;
-			background-color: #c3c3c3;
+			background-color: #dfdfdf;
 			box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 			max-height: 600px;
 			overflow: auto;
@@ -387,14 +389,14 @@ class WDocumentViewer extends HTMLElement {
 		.TopOptions {
 			display: flex;
 			justify-content: flex-end;
-			padding: 10px;
-			border-bottom: 1px solid #c3c3c3;
+			gap: 10px;
+			border-bottom: 1px solid #dfdfdf;
 		}
 		.FooterOptions {
 			display: flex;
 			justify-content: flex-end;
 			padding: 10px;
-			border-top: 1px solid #c3c3c3;
+			border-top: 1px solid #dfdfdf;
 		}
 		
 		@media print {

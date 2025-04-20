@@ -1,5 +1,6 @@
 //@ts-check
 
+import { ModelFiles } from "../../WModules/CommonModel.js";
 import { html } from "../../WModules/WComponentsTools.js";
 import { css } from "../../WModules/WStyledRender.js";
 
@@ -207,6 +208,14 @@ export class FileComponent extends HTMLElement {
 	getMimeTypeFromBase64(base64) {
 		const mimeType = base64.match(/^data:(.*);base64,/);
 		return mimeType ? mimeType[1] : 'application/octet-stream'; // Tipo por defecto si no se encuentra
+	}
+	GetModelValue() {
+		const modelFiles = this._files.map(file => new ModelFiles(file.name, file.data, file.type))
+		if (this._multiple) {
+			return modelFiles;
+		} else {
+			return [modelFiles[0]];
+		}
 	}
 	GetValue() {
 		if (this._multiple) {

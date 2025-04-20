@@ -526,6 +526,7 @@ class WTableDynamicComp extends HTMLElement {
             Dataset: this.TableConfig.Dataset,
             DisplayFilts: this.DisplayFilts,
             AutoSetDate: true,
+            UseManualControlForFiltering : true,
             ModelObject: this.ModelObject,
             Display: true,
             FilterFunction: (DFilt) => {

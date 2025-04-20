@@ -3,7 +3,7 @@ import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents
 // @ts-ignore
 import { ModelProperty, OrderData } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";
-import { WRender } from "../WModules/WComponentsTools.js";
+import { html, WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
@@ -18,11 +18,13 @@ import { WArrayF } from "../WModules/WArrayF.js";
 	* @property {Boolean} [Display]
 	* @property {Boolean} [UseEntityMethods]
 	* @property {Boolean} [AutoFilter]
-	* @property {Boolean} [AutoSetDate]
-	* @property {Boolean} [IsFilterWithChange]
+	* @property {Boolean} [AutoSetDate] define un rango de fecha automatico para filtros del tipo fecha
+	* @property {Boolean} [IsDataFromFilter] indica se se ha realizado un filtro y los datos son resultado de este
+	* @property {Boolean} [UseManualControlForFiltering]
 	* @property {Boolean} [FullDetail]
 	* @property {Object} [ModelObject]
 	* @property {Object} [EntityModel]
+	
 **/
 
 class WFilterOptions extends HTMLElement {
@@ -53,7 +55,8 @@ class WFilterOptions extends HTMLElement {
 		this.shadowRoot?.append(this.FilterContainer);
 		this.ModelObject.FilterData = [];
 		this.ModelObject.OrderData = [];
-		this.IsFilterWithChange = this.Config.IsFilterWithChange ?? false;
+		this.IsDataFromFilter = this.Config.IsDataFromFilter ?? false; // es podible indicarle que desde el principio que los datos han venido de un filtro	
+		this.UseManualControlForFiltering = this.Config.UseManualControlForFiltering ?? false;
 		this.DrawFilter();
 		/**@type {Array<OrderData>} */
 		this.Sorts = Config.Sorts ?? [];
@@ -74,21 +77,28 @@ class WFilterOptions extends HTMLElement {
 	}
 	DrawFilter = () => {
 		this.FilterContainer.innerHTML = "";
-		const ControlOptions = WRender.Create({ className: "OptionContainer " + (this.Display ? "OptionContainerActive" : "") })
+		const ControlOptions = WRender.Create({ className: "OptionContainer" });
+		const FilterOptions = html`<div class="filter-options ${this.Display ? "OptionContainerActive" : ""}">
+			${ControlOptions} 
+			${this.UseManualControlForFiltering == true ? WRender.Create({
+						tagName: "button", className: "btn-go", innerText: "Filtrar",
+						onclick: async () => this.filterFunction(this.Sorts)
+					}) : ""}
+			</div>`
 		this.FilterContainer.append(WRender.Create({
 			class: "options", children: [
 				this.Display != true ? {
 					tagName: "button",
 					className: "accordion-button" + (this.Display ? " active-btn" : ""),
 					innerText: "Filtros", onclick: async (ev) => {
-						if (!ControlOptions.className.includes("OptionContainerActive")) {
-							ControlOptions.className = "OptionContainer OptionContainerActive";
+						if (!FilterOptions.className.includes("OptionContainerActive")) {
+							FilterOptions.className = "filter-options OptionContainerActive";
 						} else {
-							ControlOptions.className = "OptionContainer";
+							FilterOptions.className = "filter-options";
 						}
 						ev.target.className = ev.target.className.includes("active-btn") ? "accordion-button" : "accordion-button active-btn";
 					}
-				}: ""
+				} : ""
 			]
 		}));
 		this.ModelObject = this.ModelObject ?? this.Dataset[0];
@@ -100,8 +110,10 @@ class WFilterOptions extends HTMLElement {
 					if (filterControl != null) {
 						ControlOptions.append(WRender.Create({
 							className: this.ModelObject[prop].type.toUpperCase() == "DATE"
-								|| this.ModelObject[prop].type.toUpperCase() == "MONEY" || this.ModelObject[prop].type.toUpperCase() == "WSELECT"
-								|| this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" ? "multi-control-container" : "",
+								|| this.ModelObject[prop].type.toUpperCase() == "MONEY" 
+								|| this.ModelObject[prop].type.toUpperCase() == "WSELECT"
+								//|| this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" 
+								? "multi-control-container" : "",
 							children: [this.ModelObject[prop].label ? WOrtograficValidation.es(this.ModelObject[prop].label) : WOrtograficValidation.es(prop), filterControl]
 						}));
 						this.FilterControls.push(filterControl);
@@ -116,7 +128,7 @@ class WFilterOptions extends HTMLElement {
 		if (this.Config.AutoFilter == true) {
 			this.filterFunction(this.Sorts);
 		}
-		this.FilterContainer.append(WRender.createElement(ControlOptions));
+		this.FilterContainer.append(FilterOptions);
 	}
 	/**
 	 * 
@@ -168,19 +180,20 @@ class WFilterOptions extends HTMLElement {
 	* @param {Array<OrderData>} [sorts] 
 	*/
 	filterFunction = async (sorts) => {
+		this.IsDataFromFilter = true;
 		this.BuildFiltersAndSorts(sorts);
 		const Model = this.EntityModel ?? this.ModelObject;
 		if (Model.Get || this.Config.UseEntityMethods == false) {
 			if (this.Config.UseEntityMethods == false
 				&& this.Config.FilterFunction != undefined) {
-				this.Config.FilterFunction(Model.FilterData, this.IsFilterWithChange);
-				this.IsFilterWithChange = false;
+				this.Config.FilterFunction(Model.FilterData, this.IsDataFromFilter);
+				this.IsDataFromFilter = false;
 				return;
 			} else if (this.Config.UseEntityMethods == true) {
 				const Dataset = await Model.Get();
 				if (this.Config.FilterFunction != undefined) {
-					this.Config.FilterFunction(Dataset, this.IsFilterWithChange);
-					this.IsFilterWithChange = false;
+					this.Config.FilterFunction(Dataset, this.IsDataFromFilter);
+					this.IsDataFromFilter = false;
 				} else {
 					console.log(Dataset);
 				}
@@ -190,8 +203,8 @@ class WFilterOptions extends HTMLElement {
 		// @ts-ignore
 		if (this.ModelObject.FilterData.length == 0 && this.Config.Dataset.length > 0) {
 			if (this.Config.FilterFunction != undefined) {
-				this.Config.FilterFunction(this.Config.Dataset, this.IsFilterWithChange);
-				this.IsFilterWithChange = false;
+				this.Config.FilterFunction(this.Config.Dataset, this.IsDataFromFilter);
+				this.IsDataFromFilter = false;
 			}
 			return;
 		}
@@ -285,7 +298,7 @@ class WFilterOptions extends HTMLElement {
 
 			if (this.Config.FilterFunction != undefined && DFilt.length > 0) {
 				WArrayF.SortArray(sorts, DFilt);
-				this.Config.FilterFunction(DFilt, this.IsFilterWithChange); this.IsFilterWithChange = false;
+				this.Config.FilterFunction(DFilt, this.IsDataFromFilter); this.IsDataFromFilter = false;
 				return;
 			} else {
 				console.log(DFilt);
@@ -361,7 +374,6 @@ class WFilterOptions extends HTMLElement {
 						if (control.selectedItems.length > 0 && ModelProperty.ModelObject != undefined) {
 							if (ModelProperty.ModelObject.__proto__ == Function.prototype) {
 								ModelProperty.ModelObject = ModelProperty.ModelObject();
-								console.log(ModelProperty.ModelObject);
 							}
 							//TODO REPARAR LO DE LAS FORANES EN MODELPROPIERTY
 							let foraingKeyName = null;
@@ -409,7 +421,7 @@ class WFilterOptions extends HTMLElement {
 						break;
 				}
 				if (values != undefined || values != null) {
-					//this.IsFilterWithChange = true;
+					//this.IsDataFromFilter = true;
 					if (this.EntityModel) {
 						this.EntityModel.FilterData.push({
 							PropName: propiertyName,
@@ -446,10 +458,9 @@ class WFilterOptions extends HTMLElement {
 		})
 		options.unshift(WRender.Create({ tagName: "option", value: "", innerText: "Seleccionar" }));
 		let InputControl = WRender.Create({
-			tagName: "select", className: prop, onchange: () => this.filterFunction(this.Sorts), id: prop,
+			tagName: "select", className: prop, onchange: () => this.OnChange(), id: prop,
 			children: options
 		});
-
 		return InputControl;
 	}
 	/**
@@ -468,8 +479,10 @@ class WFilterOptions extends HTMLElement {
 		return InputControl;
 	}
 	OnChange() {
-		this.IsFilterWithChange = true;
-		this.filterFunction(this.Sorts);
+		if (!this.UseManualControlForFiltering) {
+
+			this.filterFunction(this.Sorts);
+		}
 	}
 
 	/**
@@ -488,7 +501,7 @@ class WFilterOptions extends HTMLElement {
 					value: this.Config.AutoSetDate == true ?  // @ts-ignore
 						(this.Config.DateRange == FilterDateRange.YEAR ? new Date().subtractDays(865).toISO() : new Date().subtractDays(30).toISO()) : undefined,
 					placeholder: prop,
-					onchange:  (ev) => { this.OnChange(); }
+					onchange: (ev) => { this.OnChange(); }
 				}, {
 					tagName: "input",
 					type: "date",
@@ -497,7 +510,7 @@ class WFilterOptions extends HTMLElement {
 					value: this.Config.AutoSetDate == true ? new Date().addDays(1).toISO() : undefined,
 					id: prop + "second",
 					placeholder: prop,
-					onchange:  (ev) => { this.OnChange(); }
+					onchange: (ev) => { this.OnChange(); }
 				}
 			]
 		});
@@ -513,20 +526,43 @@ class WFilterOptions extends HTMLElement {
 					className: prop + " firstNumber",
 					id: prop + "first",
 					placeholder: WOrtograficValidation.es(prop),
-					onchange:  (ev) => { this.OnChange(); }
+					onchange: (ev) => { this.OnChange(); }
 				}, {
 					tagName: "input",
 					type: "number",
 					className: prop + " secondNumber",
 					id: prop + "second",
 					placeholder: WOrtograficValidation.es(prop),
-					onchange:  (ev) => { this.OnChange(); }
+					onchange: (ev) => { this.OnChange(); }
 				}
 			]
 		});
 		return InputControl;
 	}
 	CreateWSelect(ModelProperty, prop) {
+		// Envolvemos el dataset con un Proxy
+		ModelProperty.Dataset = new Proxy(ModelProperty.Dataset || [], {
+			set(target, property, value) {
+				// Si el cambio afecta el contenido del array (y no propiedades como 'length', etc.)
+				const index = Number(property);
+				const isArrayChange = !isNaN(index) || property === 'length';
+
+				const result = Reflect.set(target, property, value);
+
+				if (isArrayChange && InputControl) {
+					InputControl.Draw(); // Redibuja si se agrega/modifica/elimina
+				}
+
+				return result;
+			},
+			deleteProperty(target, property) {
+				const result = Reflect.deleteProperty(target, property);
+				if (InputControl) {
+					InputControl.Draw(); // Redibuja si se elimina
+				}
+				return result;
+			}
+		});
 		const InputControl = new MultiSelect({
 			//MultiSelect: false,
 			Dataset: ModelProperty.Dataset,
@@ -534,21 +570,26 @@ class WFilterOptions extends HTMLElement {
 			ModelObject: ModelProperty.ModelObject.__proto__ == Function.prototype ? ModelProperty.ModelObject() : ModelProperty.ModelObject,
 			id: prop,
 			FullDetail: this.Config.FullDetail ?? false,
-			action: () => {
-				this.IsFilterWithChange = true;
-				this.filterFunction(this.Sorts);
-			}
-		});
-		InputControl.onclick = async () => {
-			if (ModelProperty.ModelObject?.__proto__ == Function.prototype) {
-				ModelProperty.ModelObject = await WArrayF.ModelFromFunction(ModelProperty);
+			clickAction: async () => {
+				ModelProperty.ModelObject = await WArrayF.ModelFromFunction(ModelProperty.ModelObject);
+				ModelProperty.EntityModel = await WArrayF.ModelFromFunction(ModelProperty.EntityModel);
 				/**@type {EntityClass} */
 				const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
-				ModelProperty.Dataset = await entity.Get();
-				InputControl.Dataset = ModelProperty.Dataset;
-				InputControl.Draw();
+				if (entity.Get) {
+					const newData = await entity.Get();
+					// Actualizamos el array por referencia
+					ModelProperty.Dataset.length = 0;
+					ModelProperty.Dataset.push(...newData);
+					// No necesitas llamar a Draw aquí porque el proxy lo hará automáticamente
+				}
+			}, action: (element) => {
+				if (ModelProperty.action) {
+					ModelProperty.action(element);
+				}
+				this.OnChange();
 			}
-		}
+		});
+
 		return InputControl;
 	}
 
@@ -569,17 +610,26 @@ class WFilterOptions extends HTMLElement {
 			gap: 10px;
 		}
 
+		.filter-options {
+			display: flex;	
+			gap: 20px;
+			align-items: center;
+			max-height: 0px;
+			overflow: hidden;      
+			& .btn-go {
+				height: 40px;
+			}
+		}
 		.OptionContainer {
 			display: grid;
 			width: -webkit-fill-available;
 			grid-template-columns: repeat(4,calc(25% - 12px));
 			grid-gap: 15px;
-			padding: 10px;
-			max-height: 0px;
+			padding: 10px;		
 			transition: all 0.3s;
 			border-radius: 10px; 
 			border-radius: 10px;   
-			overflow: hidden;         
+		   
 			
 		}
 
@@ -630,8 +680,10 @@ class WFilterOptions extends HTMLElement {
 		}
 
 	   
-		.multi-control-container, .w-multi-select-container {
+		.multi-control-container{
 			grid-column: span 2;
+		} .w-multi-select-container {
+			grid-column: span 1;
 		}
 		.multi-control {
 			display: flex !important;

@@ -27,6 +27,7 @@ import { WToolTip } from "./FormComponents/WToolTip.js";
 	* @property {Object} [CrudOptions]
 	* @property {String} [Mode]  SELECT_BOX, SELECT ImageUrlPath
 	* @property {String} [ImageUrlPath]   
+	* @property {Function} [clickAction] dado que el multiselect elimina la propagacion de eventos se agrega el clickaction para poder usar un onclick
 **/
 
 class MultiSelect extends HTMLElement {
@@ -50,7 +51,8 @@ class MultiSelect extends HTMLElement {
 		this.SubOptionsFieldName = "";
 		this.ControlsContainer = WRender.Create({ className: "ControlContainer" });
 		WRender.SetStyle(this, {
-			display: this.Config.IsFilterControl == true ? "flex" : "block",
+			display: this.Config.IsFilterControl == true ? "grid" : "block",
+			gridTemplateColumns: "50% 50%",
 			position: "relative",
 			fontSize: "12px",
 			height: "initial"
@@ -58,7 +60,8 @@ class MultiSelect extends HTMLElement {
 
 		if (this.Config.Mode == "SELECT_BOX") {
 			WRender.SetStyle(this, {
-				display: this.Config.IsFilterControl == true ? "flex" : "block",
+				display: this.Config.IsFilterControl == true ? "grid" : "block",
+				gridTemplateColumns: "50% 50%",
 				position: "relative",
 				padding: "0px",
 				border: "none",
@@ -79,8 +82,11 @@ class MultiSelect extends HTMLElement {
 			tagName: "input",
 			class: "txtControl",
 			placeholder: "Buscar...",
-			onclick: (ev) => {
+			onclick: async  (ev) => {
 				ev.stopPropagation();
+				if (this.Config.clickAction) {
+					await this.Config.clickAction(this);
+				}
 			},
 			onkeypress: async (ev) => {
 				if (this.ModelObject?.__proto__ == Function.prototype) {
@@ -131,6 +137,7 @@ class MultiSelect extends HTMLElement {
 				}
 			}
 		});
+		
 		this.ControlsContainer?.append(
 			this.LabelMultiselect,
 			StyleScrolls.cloneNode(true),
@@ -150,13 +157,21 @@ class MultiSelect extends HTMLElement {
 			this.shadowRoot?.append(selectBoxStyle.cloneNode(true));
 			this.DisplayOptions();
 		}
-		this.LabelMultiselect.onclick = (e) => {
+		this.LabelMultiselect.onclick = async (e) => {
 			e.stopPropagation();
+			
+			if (this.Config.clickAction) {
+				await this.Config.clickAction(this);
+			}
 			if (!this.tool?.isConnected) {
 				this.DisplayOptions();
 			} else if (this.tool?.isConnected && Config.Mode != "SELECT_BOX") {
 				this.tool?.remove();
 			}
+			setTimeout(() => {
+				this.SearchControl.focus();
+			}, 100);
+			
 		}
 	}
 
@@ -174,6 +189,9 @@ class MultiSelect extends HTMLElement {
 		const addBtn = WRender.Create({
 			tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async (e) => {
 				e.stopPropagation();
+				if (this.Config.clickAction) {
+					await this.Config.clickAction(this);
+				}
 				if (this.ModelObject != undefined) {
 					this.ModalCRUD(undefined, targetControl, addBtn);
 				} else {
@@ -290,7 +308,7 @@ class MultiSelect extends HTMLElement {
 						}
 					}
 					if (this.Config.action) {
-						this.Config.action(this.selectedItems);
+						this.Config.action(this.selectedItems, this);
 					}
 					this.DrawLabel();
 					if (!this.MultiSelect && this.Config.Mode != "SELECT_BOX") {
@@ -334,9 +352,8 @@ class MultiSelect extends HTMLElement {
 	}
 	SetOptions = () => {
 		if (this.Config.IsFilterControl) {
-			this.shadowRoot?.append(this.SearchControl);
-			this.style.padding = "0px";
-			this.SearchControl.style.borderRadius = "0 10px 10px 0";
+			this.shadowRoot?.insertBefore(this.SearchControl, this.shadowRoot?.firstChild);
+			this.style.padding = "0px";		
 			this.SearchControl.onfocus = () => {
 				if (this.Config.IsFilterControl) {
 					this.DisplayOptions();
@@ -357,7 +374,7 @@ class MultiSelect extends HTMLElement {
 	DrawLabel = () => {
 		// @ts-ignore
 		this.LabelMultiselect.querySelector(".selecteds").innerHTML =
-			this.selectedItems.length == 0 ? "Seleccionar: " : "";
+			this.selectedItems.length == 0 ? "" : "";
 		let sum = 0;
 		let add = 0;
 		let labelsWidth = 0;
@@ -384,7 +401,7 @@ class MultiSelect extends HTMLElement {
 						this.DrawLabel();
 						this.Draw();
 						if (this.Config.action) {
-							this.Config.action(this.selectedItems);
+							this.Config.action(this.selectedItems, this);
 						}
 					}
 				}));
@@ -518,7 +535,7 @@ class MultiSelect extends HTMLElement {
 						this.Draw(await WArrayF.FilterInArrayByValue(this.Dataset, targetControl.value));
 						this.DrawLabel();
 						if (this.Config.action != undefined) {
-							this.Config.action(this.selectedItems);
+							this.Config.action(this.selectedItems, this);
 						}
 						addBtn.remove();
 						const tool = targetControl.parentNode.querySelector(".ToolTip");
@@ -578,6 +595,7 @@ const MainMenu = css`
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		max-width: calc(100% - 65px);
 	}
 	.LabelMultiselect label button {
 		border: none;

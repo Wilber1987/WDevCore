@@ -1,8 +1,5 @@
 
 //@ts-check
-import { Cat_Dependencias_ModelComponent } from "../../Proyect/FrontModel/Cat_Dependencias";
-import { Tbl_Servicios_ModelComponent } from "../../Proyect/FrontModel/Tbl_Servicios.js";
-import { activityStyle } from '../../Proyect/style.js';
 import { StylesControlsV2, StylesControlsV3 } from "../StyleModules/WStyleComponents.js";
 import { ModalMessage } from "../WComponents/ModalMessage.js";
 import { ModalVericateAction } from "../WComponents/ModalVericateAction.js";
@@ -31,7 +28,7 @@ class PerfilManagerComponent extends HTMLElement {
         this.updateDataset(Dataset);
         this.Dataset = Dataset;
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot?.append(this.WStyle, StylesControlsV2.cloneNode(true), StylesControlsV3.cloneNode(true));
+        this.shadowRoot?.append(StylesControlsV2.cloneNode(true), StylesControlsV3.cloneNode(true));
         this.TabContainer = WRender.createElement({ type: 'div', props: { class: "content-container", id: "TabContainer" } });
         this.TabManager = new ComponentsManager({ MainContainer: this.TabContainer });
         this.OptionContainer = WRender.Create({ className: "OptionContainer" });
@@ -115,9 +112,7 @@ class PerfilManagerComponent extends HTMLElement {
                     Foto: { type: "text", hidden: true },
                     DNI: { type: "text", hidden: true },
                     Correo_institucional: { type: "text", hidden: true },
-                    Estado: { type: "text", hidden: true },
-                    Tbl_Dependencias_Usuarios: { type: 'Wselect', ModelObject: () => new Cat_Dependencias_ModelComponent() },
-                    Tbl_Servicios: { type: 'Wselect', ModelObject: () => new Tbl_Servicios_ModelComponent(), hidden: true }
+                    Estado: { type: "text", hidden: true },                  
                 }), ObjectOptions: {
                     SaveFunction: async (profile) => {
                         this.shadowRoot?.append(ModalVericateAction(async () => {
@@ -140,9 +135,6 @@ class PerfilManagerComponent extends HTMLElement {
         }
     }
     ]
-
-
-    WStyle = activityStyle.cloneNode(true)
 
     mapCaseToPaginatorElement(Dataset) {
         return Dataset.map(actividad => {
