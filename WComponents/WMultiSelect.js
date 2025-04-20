@@ -374,7 +374,7 @@ class MultiSelect extends HTMLElement {
 	DrawLabel = () => {
 		// @ts-ignore
 		this.LabelMultiselect.querySelector(".selecteds").innerHTML =
-			this.selectedItems.length == 0 ? "" : "";
+			this.selectedItems.length == 0  && this.Config.IsFilterControl != true ? "Seleccionar." : "";
 		let sum = 0;
 		let add = 0;
 		let labelsWidth = 0;
@@ -655,11 +655,11 @@ const MainMenu = css`
 	}
 	.txtControl {
 		width: -webkit-fill-available;
-		padding: 10px;
+		padding: 8px;
+		border-radius: 8px;
 		border: none;
 		outline: none;
-		background-color: var(--secundary-color);
-		border-bottom: solid 1px var(--fifty-color);
+		background-color: var(--secundary-color);		
 		color: var(--font-primary-color);
 	}
 	.txtControl:active,
@@ -688,7 +688,7 @@ const MainMenu = css`
 	.ElementDetail {
 		padding: 10px;
 		background-color: var(--primary-color);
-		border-radius: 10px;
+		border-radius: 8px;
 		margin: 10px;
 		font-size: 12px;
 		grid-column: span 2;
@@ -763,7 +763,7 @@ const selectBoxStyle = css`
 		height: 1.15em;
 		padding: 13px;
 		border: 0.15em solid #999;
-		border-radius: 0.15em;
+		border-radius: 8px;
 		display: grid;
 		place-content: center;
 	}

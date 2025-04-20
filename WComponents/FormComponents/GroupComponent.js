@@ -6,7 +6,7 @@ import { css } from "../../WModules/WStyledRender.js";
 export class GroupComponent extends HTMLElement {
 	/**
 	 * @typedef {Object} GroupConfig
-	 * @property {string} Name
+	 * @property {string} [Name]
 	 * @property {boolean} [WithAcordeon]
 	 * @property {string} [className]
 	 */
@@ -19,7 +19,7 @@ export class GroupComponent extends HTMLElement {
 		/** @type {GroupConfig} */
 		this.Config = Config;
 		this.classList.add(Config.className ?? "div");
-		this.classList.add(Config.Name.replaceAll(" ", ""));
+		this.classList.add(Config.Name?.replaceAll(" ", "") ?? "formulario");
 		this.Content = html`<div class="group-content divForm"></div>`;
 	}
 

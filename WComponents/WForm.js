@@ -205,7 +205,7 @@ class WForm extends HTMLElement {
 		//verifica que el modelo existe,
 		//sino es asi le asigna el valor de un objeto existente
 		const Model = this.Config.ModelObject ?? this.Config.EditObject;
-		const Form = new GroupComponent({ Name: this.Config.Title ?? "Formulario" });
+		const Form = new GroupComponent({ Name: this.Config.Title ?? undefined });
 		this.GroupsForm = [Form];
 		this.Config.Groups?.forEach(group => {
 			// Crear el contenedor principal del grupo
@@ -475,7 +475,8 @@ class WForm extends HTMLElement {
 					/**
 					 * @type {?HTMLInputElement | undefined | any}
 					 */
-					const control = this.DivForm?.querySelector("#ControlValue" + prop);
+					const control = this.Controls[prop];
+					//const control = this.DivForm?.querySelector("#ControlValue" + prop);
 					if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
 						if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
 							return false;

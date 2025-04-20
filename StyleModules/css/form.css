@@ -220,6 +220,7 @@ textarea {
 	font-size: 12px;
 	font-weight: 400;
 	line-height: 1.5;
+	min-height: 36px;
 	color: var(--font-primary-color);
 	-webkit-appearance: none;
 	-moz-appearance: none;
