@@ -111,7 +111,7 @@ class WFilterOptions extends HTMLElement {
 						ControlOptions.append(WRender.Create({
 							className: this.ModelObject[prop].type.toUpperCase() == "DATE"
 								|| this.ModelObject[prop].type.toUpperCase() == "MONEY" 
-								|| this.ModelObject[prop].type.toUpperCase() == "WSELECT"
+								//|| this.ModelObject[prop].type.toUpperCase() == "WSELECT"
 								//|| this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" 
 								? "multi-control-container" : "",
 							children: [this.ModelObject[prop].label ? WOrtograficValidation.es(this.ModelObject[prop].label) : WOrtograficValidation.es(prop), filterControl]
