@@ -54,7 +54,10 @@ class WForm extends HTMLElement {
 
 		this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
 		this.shadowRoot?.append(StyleScrolls.cloneNode(true));
-		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));		
+		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
+
+		this.InizializeConfig(this.Config);
+		this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
 		if (this.Config.CustomStyle) {
 			this.shadowRoot?.append(this.Config.CustomStyle);
 		}
@@ -64,12 +67,12 @@ class WForm extends HTMLElement {
 
 		this.ExistChange = false;
 		this.ObjectProxy = this.ObjectProxy ?? undefined;
-
+		this.DrawComponent();
 	}
-
-
-
 	InizializeConfig(Config) {
+		if (this.IsInizialized == true) {
+			return;
+		}
 		for (const p in Config) {
 			this[p] = Config[p];
 		}
@@ -104,13 +107,18 @@ class WForm extends HTMLElement {
 				Url: undefined
 			};
 		}
-		this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
+		
 		this.FormObject = this.FormObject ?? this.Config.EditObject ?? {};
+		if (Config == undefined || Config == null || Object.keys(Config).length == 0) {
+			this.IsInizialized = true;
+		}
 	}
 
 	connectedCallback() {
 		this.InizializeConfig(this.Config);
-		this.DrawComponent();
+		if (this.IsInizialized == true) {
+			//this.DrawComponent();
+		}
 		this.CreateOriginalObject();
 		this.DivForm.addEventListener("click", (e) => this.undisplayMultiSelects(e));
 		this.DivForm.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
@@ -256,7 +264,7 @@ class WForm extends HTMLElement {
 						class: "ModalElement", children: [ControlLabel]
 					});
 					if (Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
-						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop) + (Model[prop].require == false ? "" : "*");						
+						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop) + (Model[prop].require == false ? "" : "*");
 						await this.CreateModelControl(Model, prop, ControlContainer, ObjectF, ControlLabel, onChangeEvent, DivForm);
 						//ControlContainer.append(InputControl);
 					}

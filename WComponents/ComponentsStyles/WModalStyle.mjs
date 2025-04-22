@@ -33,7 +33,7 @@ export const WModalStyle = css`
   }
 
   .ModalHeader {
-       color: var(--font-fourth-color);
+       color: var(--font-secundary-color);
        font-weight: bold;
        font-size: 20px;
        display: flex;

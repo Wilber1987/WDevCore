@@ -278,6 +278,11 @@ export class ModelPropertyFormBuilder {
 			&& !multiple) {
 			EditingObject[prop] = ModelProperty?.Dataset[0];
 			selectedItems.push(ModelProperty?.Dataset[0])
+		} else if ((EditingObject[prop] != null || EditingObject[prop] != undefined)
+			&& !multiple) {
+			selectedItems.push(EditingObject[prop])
+		} else if (EditingObject[prop] != null || EditingObject[prop] != undefined) {
+			selectedItems.push(...EditingObject[prop])
 		}
 
 		const Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
@@ -368,7 +373,7 @@ export class ModelPropertyFormBuilder {
 			Multiple: multiple,
 			require: require,
 			disabled: disabled,
-			Files:  EditingObject[prop]?.__proto__ == Array.prototype ? EditingObject[prop] : ( typeof  EditingObject[prop] === "string" && !multiple ?  [EditingObject[prop]] : []),
+			Files: EditingObject[prop]?.__proto__ == Array.prototype ? EditingObject[prop] : (typeof EditingObject[prop] === "string" && !multiple ? [EditingObject[prop]] : []),
 			Types: filesType,
 			action: disabled ? undefined : async () => {
 				EditingObject[prop] = InputControl.GetModelValue();
