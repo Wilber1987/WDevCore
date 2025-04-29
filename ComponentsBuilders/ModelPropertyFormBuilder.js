@@ -278,6 +278,11 @@ export class ModelPropertyFormBuilder {
 			&& !multiple) {
 			EditingObject[prop] = ModelProperty?.Dataset[0];
 			selectedItems.push(ModelProperty?.Dataset[0])
+		} else if ((EditingObject[prop] != null || EditingObject[prop] != undefined)
+			&& !multiple) {
+			selectedItems.push(EditingObject[prop])
+		} else if (EditingObject[prop] != null || EditingObject[prop] != undefined) {
+			selectedItems.push(...EditingObject[prop])
 		}
 
 		const Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
