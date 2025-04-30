@@ -123,7 +123,9 @@ class WOrtograficValidation {
         { error: ["EMAIL", "E-MAIL"], value: "correo electrónico" }, // Traducción al español
         { error: ["OK", "OKEY"], value: "bien" }, // Traducción al español
         { error: ["CHAT", "CHATEAR"], value: "charla" }, // Traducción al español
-    ];
+        { error: ["ARTICULO"], value: "artículo" },
+        { error: ["ARTICULOS"], value: "artículos" },
+];
 }
 
 export { WOrtograficValidation };
