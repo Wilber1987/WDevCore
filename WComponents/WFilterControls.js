@@ -623,7 +623,7 @@ class WFilterOptions extends HTMLElement {
 		.OptionContainer {
 			display: grid;
 			width: -webkit-fill-available;
-			grid-template-columns: repeat(4,calc(25% - 12px));
+			grid-template-columns: repeat(3,1fr);
 			grid-gap: 15px;
 			padding: 10px;		
 			transition: all 0.3s;

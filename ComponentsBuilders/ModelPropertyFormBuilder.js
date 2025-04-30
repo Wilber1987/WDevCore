@@ -415,7 +415,12 @@ export class ModelPropertyFormBuilder {
 			Files: EditingObject[prop]?.__proto__ == Array.prototype ? EditingObject[prop] : (typeof EditingObject[prop] === "string" && !multiple ? [EditingObject[prop]] : []),
 			Types: filesType,
 			action: disabled ? undefined : async () => {
-				EditingObject[prop] = InputControl.GetModelValue();
+				if(["IMG","IMAGE"].includes(ModelProperty.type?.toUpperCase())){
+					EditingObject[prop] = InputControl.GetModelValue()[0]?.Value;
+				} else {
+					EditingObject[prop] = InputControl.GetModelValue();
+				}
+
 				if (onChangeListener) {
 					onChangeListener();
 				}
