@@ -337,7 +337,7 @@ class WForm extends HTMLElement {
 				if (actionFunction != null) {
 					actionFunction(ObjectF, this, this.Controls[prop], prop)
 				}
-				console.log(ObjectF);
+				//console.log(ObjectF);
 			}
 		}
 		switch (ModelProperty.type?.toUpperCase()) {
