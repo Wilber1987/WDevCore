@@ -8,7 +8,8 @@ export const WFormStyle = css`
 	display: grid;
 	grid-template-rows: auto;
 	height: calc(100% - 70px);
-	gap: 10px;
+	column-gap: 10px;
+	row-gap: 5px;
 }
 .divComplexForm {
 	display: grid;
@@ -29,8 +30,15 @@ export const WFormStyle = css`
 }
 .divForm .textAreaContainer {
 	grid-row: span 2;
-
 }
+.TITLE {
+	grid-column: span 2 !important;
+	& h3 {
+		font-size: 24px;
+		margin: 10px 0px; 
+	}
+}
+
 input:-internal-autofill-selected {
 	appearance: menulist-button;
 	background-color: none !important;
@@ -276,9 +284,9 @@ input[type=radio] {
 	border-radius: 50%;
 	font: inherit;
 	color: currentColor;
-	width: 1.15em;
-	padding: 13px;
-	height: 1.15em;
+	width: 0.8em;
+	padding: 10px;
+	height: 0.8em;
 	border: 0.15em solid #999;
 	display: grid;
 	place-content: center;
@@ -286,10 +294,10 @@ input[type=radio] {
 
 input[type=radio]::before {
 	content: "";
-	width: 1em;
-	height: 1em;
+	width: 0.8em;
+	height: 0.8em;
 	transform: scale(0);
-	box-shadow: inset 1em 1em var(--form-control-color);
+	box-shadow: inset 0.8em 0.8em var(--form-control-color);
 	transform-origin: bottom left;
 	clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 }
@@ -310,7 +318,7 @@ input[type=radio]:checked::before {
 	.divForm {
 		display: grid;
 		grid-gap: 1rem;
-		grid-template-columns: calc(100% - 20px) !important;
+		grid-template-columns: calc(100% - 0px) !important;
 		grid-template-rows: auto;
 		justify-content: center;
 	}
@@ -323,7 +331,7 @@ input[type=radio]:checked::before {
 	.RICHTEXT,
 	.DRAW,
 	.CALENDAR,
-	.TEXTAREA, .PASSWORD {
+	.TEXTAREA, .PASSWORD, .MODEL {
 		grid-column: span 1 !important;
 	}
 
@@ -337,7 +345,7 @@ input[type=radio]:checked::before {
 		max-height: calc(100% - 80px);
 	}
 	.divComplexForm {
-		grid-template-columns: calc(100% - 20px);
+		grid-template-columns: calc(100% - 0px);
 	}
    
 }`;

@@ -1,5 +1,5 @@
 //@ts-check
-
+import { WForm } from "../WComponents/WForm.js";
 // @ts-ignore
 import { ModelProperty } from "../WModules/CommonModel.js";
 import { DateTime } from "../WModules/Types/DateTime.js";
@@ -7,7 +7,6 @@ import { WArrayF } from "../WModules/WArrayF.js";
 import { WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 export class ModelPropertyFormBuilder {
-
 
 	/**
 	 * @param {ModelProperty} ModelProperty
@@ -32,7 +31,7 @@ export class ModelPropertyFormBuilder {
 			tagName: "input",
 			id: "ControlValue" + prop,
 			className: prop,
-			value: EditingObject[prop] ?? defaultValue,
+			value:  this.PrepareVisualization(EditingObject[prop] ?? defaultValue, ModelProperty.type.toUpperCase()) ,
 			type: ModelProperty.type.toUpperCase() == "MONEY" || ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type,
 			min: min,
 			max: max,
@@ -43,6 +42,15 @@ export class ModelPropertyFormBuilder {
 			require: require
 		});
 		return InputControl;
+	}
+	static PrepareVisualization(value, type) {
+		if (type == "MONEY") {
+			return parseFloat(value).toFixed(2);
+		}
+		if (type == "PERCENTAGE") {
+			return parseFloat(value).toFixed(2);
+		}
+		return value;
 	}
 
 	/**
@@ -265,8 +273,10 @@ export class ModelPropertyFormBuilder {
 		ModelProperty.require = require;
 		//EditingObject[prop] = EditingObject[prop]?.__proto__ == Object.prototype ? EditingObject[prop] : null;		
 		ModelProperty.ModelObject = WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject);
+		ModelProperty.EntityModel = WArrayF.isModelFromFunction(ModelProperty.EntityModel, EditingObject);
+
 		const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
-		if (ModelProperty.Dataset == undefined && entity.Get) {
+		if ((ModelProperty.Dataset == undefined || ModelProperty.Dataset.length == 0) && entity.Get) {
 			ModelProperty.Dataset = await entity.Get();
 		}
 		const selectedItems = [];
@@ -315,6 +325,32 @@ export class ModelPropertyFormBuilder {
 		InputControl.id = "ControlValue" + prop;
 		return InputControl;
 	}
+	/**
+	* @param {ModelProperty} ModelProperty
+	* @param {Object} EditingObject
+	* @param {String} prop
+	* @param {WForm} fatherForm
+	* @returns {Promise<WForm>}
+	*/
+	static async CreateModel(ModelProperty, EditingObject, prop, fatherForm) {
+		const { require, disabled } = await this.DefineRequireAndDisable(ModelProperty, EditingObject);
+		ModelProperty.ModelObject = WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject);
+		ModelProperty.EntityModel = WArrayF.isModelFromFunction(ModelProperty.EntityModel, EditingObject);
+
+		EditingObject[prop] = EditingObject[prop] ?? {};
+		const form = new WForm({
+			ModelObject: ModelProperty.ModelObject,
+			EntityModel: ModelProperty.EntityModel,
+			EditObject: EditingObject[prop],
+			limit: fatherForm.limit,
+            DivColumns: fatherForm.DivColumns,
+			Options: false
+		});
+		form.style.pointerEvents = disabled ? "none" : "auto";
+		
+		return form;
+	}
+
 
 	/**
 	 * @param {ModelProperty} ModelProperty
@@ -329,13 +365,16 @@ export class ModelPropertyFormBuilder {
 		const { WTableComponent } = await import('../WComponents/WTableComponent.js');
 		EditingObject[prop] = WArrayF.isArray(EditingObject[prop]) ? EditingObject[prop] : [];
 		ModelProperty.require = require;
+		ModelProperty.ModelObject = WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject);
+		ModelProperty.EntityModel = WArrayF.isModelFromFunction(ModelProperty.EntityModel, EditingObject);
 		const tableAction = () => {
 			if (onChangeListener) onChangeListener();
 		}
 		const InputControl = new WTableComponent({
 			Dataset: EditingObject[prop],
 			AddItemsFromApi: false,
-			ModelObject: WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject),
+			ModelObject: ModelProperty.ModelObject,
+			EntityModel: ModelProperty.EntityModel,
 			ParentEntity: EditingObject,
 			ImageUrlPath: ImageUrlPath,
 			Options: {
@@ -593,7 +632,7 @@ export class ModelPropertyFormBuilder {
 	static DefineMultiSelectConfig(ModelProperty) {
 		let multiple = ["WRADIO", "WSELECT"].includes(ModelProperty.type?.toUpperCase()) ? false : true;
 		let modType = ["WRADIO", "WCHECKBOX"].includes(ModelProperty.type?.toUpperCase()) ? "SELECT_BOX" : "SELECT";
-		console.log(multiple, modType);
+		//console.log(multiple, modType);
 
 		return { multiple, modType }
 	}
