@@ -84,6 +84,8 @@ class WSimpleModal extends HTMLElement {
                 padding: 2em;
                 background-color: var(--secundary-color);;
                 border-radius: 20px;
+                max-width: 100%;
+                box-sizing: border-box;
             }
 
             .BtnClose{

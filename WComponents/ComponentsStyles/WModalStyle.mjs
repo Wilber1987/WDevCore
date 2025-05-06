@@ -96,6 +96,11 @@ export const WModalStyle = css`
   }
 
   @media (max-width: 800px) {
+     .ModalContent {
+          display: block;
+          padding: 10px;
+          overflow-y:auto;
+     }
        .ContainerFormWModal {
             position: fixed;
             top: 0px;
