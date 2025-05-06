@@ -1,7 +1,7 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { EntityClass } from '../WModules/EntityClass.js';
-import { WRender } from '../WModules/WComponentsTools.js';
+import { html, WRender } from '../WModules/WComponentsTools.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css } from '../WModules/WStyledRender.js';
 import { ModelPropertyFormBuilder } from '../ComponentsBuilders/ModelPropertyFormBuilder.js';
@@ -107,7 +107,7 @@ class WForm extends HTMLElement {
 				Url: undefined
 			};
 		}
-		
+
 		this.FormObject = this.FormObject ?? this.Config.EditObject ?? {};
 		if (Config == undefined || Config == null || Object.keys(Config).length == 0) {
 			this.IsInizialized = true;
@@ -260,9 +260,7 @@ class WForm extends HTMLElement {
 						tagName: "label", class: "inputTitle label_" + prop,
 						innerText: WOrtograficValidation.es(prop)
 					});
-					const ControlContainer = WRender.Create({
-						class: "ModalElement", children: [ControlLabel]
-					});
+					const ControlContainer = WRender.Create({ class: "ModalElement" });
 					if (Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
 						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop) + (Model[prop].require == false ? "" : "*");
 						await this.CreateModelControl(Model, prop, ControlContainer, ObjectF, ControlLabel, onChangeEvent, DivForm);
@@ -327,6 +325,7 @@ class WForm extends HTMLElement {
 		const ModelProperty = Model[prop];
 		const actionFunction = ModelProperty.action ?? null;
 		ObjectF[prop] = ObjectF[prop];
+		let addLabel = true;
 
 		const onchangeListener = async (ev) => {
 			// @ts-ignore
@@ -337,10 +336,14 @@ class WForm extends HTMLElement {
 				if (actionFunction != null) {
 					actionFunction(ObjectF, this, this.Controls[prop], prop)
 				}
-				console.log(ObjectF);
+				//console.log(ObjectF);
 			}
 		}
 		switch (ModelProperty.type?.toUpperCase()) {
+			case "TITLE":
+				addLabel = false;
+				this.Controls[prop] = html`<h3>${ModelProperty.label ?? WOrtograficValidation.es(prop)}</h3>`;
+				break;
 			case "IMG": case "IMAGES": case "IMAGE": case "FILE": case "FILES":
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateFileInput(ModelProperty,
 					ObjectF, prop, onchangeListener);
@@ -393,12 +396,19 @@ class WForm extends HTMLElement {
 					innerText: ObjectF[prop]
 				});
 				break;
+			case "MODEL":
+				this.Controls[prop] = await ModelPropertyFormBuilder.CreateModel(
+					ModelProperty, ObjectF, prop, this)
+				break;
 			default:
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateInput(
 					ModelProperty, ObjectF, prop, onchangeListener)
 				break;
 		}
 		ControlContainer.classList.add(ModelProperty.type?.toUpperCase())
+		if (addLabel) {
+			ControlContainer.append(ControlLabel);
+		}
 		ControlContainer.append(this.Controls[prop])
 		Form.Add(ControlContainer);
 	}
@@ -722,8 +732,8 @@ class WForm extends HTMLElement {
 				grid-column: span  ${this.limit};
 				padding-bottom: 10px;
 			}
-			.TEXTAREA, .PASSWORD {
-				grid-column: span  ${(this.limit ?? 1) > 1 ? 2 : 1};
+			.TEXTAREA, .PASSWORD, .MODEL {
+				grid-column: span  ${(this.limit ?? 1) > 1 ? this.limit : 1};
 			}
 		`;
 		return WRender.Create({ style: { display: "none" }, children: [style, wstyle] });

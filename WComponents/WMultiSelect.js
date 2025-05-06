@@ -82,7 +82,7 @@ class MultiSelect extends HTMLElement {
 			tagName: "input",
 			class: "txtControl",
 			placeholder: "Buscar...",
-			onclick: async  (ev) => {
+			onclick: async (ev) => {
 				ev.stopPropagation();
 				if (this.Config.clickAction) {
 					await this.Config.clickAction(this);
@@ -137,7 +137,7 @@ class MultiSelect extends HTMLElement {
 				}
 			}
 		});
-		
+
 		this.ControlsContainer?.append(
 			this.LabelMultiselect,
 			StyleScrolls.cloneNode(true),
@@ -159,7 +159,7 @@ class MultiSelect extends HTMLElement {
 		}
 		this.LabelMultiselect.onclick = async (e) => {
 			e.stopPropagation();
-			
+
 			if (this.Config.clickAction) {
 				await this.Config.clickAction(this);
 			}
@@ -170,8 +170,12 @@ class MultiSelect extends HTMLElement {
 			}
 			setTimeout(() => {
 				this.SearchControl.focus();
+				this.tool?.scrollTo({
+					top: 0,
+					behavior: "smooth"
+				  });
 			}, 100);
-			
+
 		}
 	}
 
@@ -271,49 +275,11 @@ class MultiSelect extends HTMLElement {
 				tagName: "input",
 				id: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
 				type: OType,
-				hidden: OType == "radio" && this.Config.Mode != "SELECT_BOX" ? true : false,
+				//hidden: OType == "radio" && this.Config.Mode != "SELECT_BOX" ? true : true,
 				name: element.name,
 				checked: WArrayF.FindInArray(element, this.selectedItems),
 				className: "Option", onchange: (ev) => {
-					this.selectedItems = OType == "checkbox" ? this.selectedItems : [];
-					const control = ev.target;
-					const index = this.selectedItems.indexOf(element);
-					if (index == -1 && control.checked == true) {
-						this.NameSelected = element.name;
-						this.FieldName = element.FieldName;
-						this.SubOptionsFieldName = element.SubOptionsFieldName;
-						if (WArrayF.FindInArray(element, this.selectedItems) == false) {
-							this.selectedItems.push(element);
-						} else {
-							console.log("Item Existente")
-						}
-
-						this.shadowRoot?.querySelectorAll(".OContainer").forEach((nodo) => {
-							nodo.classList.remove("OContainerActive");
-							const nodoOption = nodo.querySelector(".Option");
-							// @ts-ignore
-							if (nodoOption?.checked == true) {
-								nodo.classList.add("OContainerActive");
-							} else {
-								nodo.classList.remove("OContainerActive");
-							}
-						})
-
-					} else {
-						this.selectedItems.splice(index, 1);
-						if (this.selectedItems.length == 0) {
-							this.NameSelected = "";
-							this.FieldName = "";
-							this.SubOptionsFieldName = "";
-						}
-					}
-					if (this.Config.action) {
-						this.Config.action(this.selectedItems, this);
-					}
-					this.DrawLabel();
-					if (!this.MultiSelect && this.Config.Mode != "SELECT_BOX") {
-						this.tool?.remove();
-					}
+					this.SelectItem(OType, ev.target, element);
 				}
 
 			});
@@ -343,6 +309,11 @@ class MultiSelect extends HTMLElement {
 			this.OptionsContainer.append(Options);
 			if (this.FullDetail && typeof element !== "string") {
 				const detail = this.BuilDetail(element);
+				detail.onclick = () => {
+					// @ts-ignore
+					Option.checked = !Option.checked;
+					this.SelectItem(OType, Option, element);
+				}
 				if (detail.childNodes.length > 0) {
 					Options.append(detail)
 				}
@@ -353,7 +324,7 @@ class MultiSelect extends HTMLElement {
 	SetOptions = () => {
 		if (this.Config.IsFilterControl) {
 			this.shadowRoot?.insertBefore(this.SearchControl, this.shadowRoot?.firstChild);
-			this.style.padding = "0px";		
+			this.style.padding = "0px";
 			this.SearchControl.onfocus = () => {
 				if (this.Config.IsFilterControl) {
 					this.DisplayOptions();
@@ -374,7 +345,7 @@ class MultiSelect extends HTMLElement {
 	DrawLabel = () => {
 		// @ts-ignore
 		this.LabelMultiselect.querySelector(".selecteds").innerHTML =
-			this.selectedItems.length == 0  && this.Config.IsFilterControl != true ? "Seleccionar." : "";
+			this.selectedItems.length == 0 && this.Config.IsFilterControl != true ? "Seleccionar." : "";
 		let sum = 0;
 		let add = 0;
 		let labelsWidth = 0;
@@ -428,6 +399,47 @@ class MultiSelect extends HTMLElement {
 			}))
 		}
 	}
+	SelectItem(OType, control, element) {
+		this.selectedItems = OType == "checkbox" ? this.selectedItems : [];
+		const index = this.selectedItems.indexOf(element);
+		if (index == -1 && control.checked == true) {
+			this.NameSelected = element.name;
+			this.FieldName = element.FieldName;
+			this.SubOptionsFieldName = element.SubOptionsFieldName;
+			if (WArrayF.FindInArray(element, this.selectedItems) == false) {
+				this.selectedItems.push(element);
+			} else {
+				console.log("Item Existente");
+			}
+
+			this.shadowRoot?.querySelectorAll(".OContainer").forEach((nodo) => {
+				nodo.classList.remove("OContainerActive");
+				const nodoOption = nodo.querySelector(".Option");
+				// @ts-ignore
+				if (nodoOption?.checked == true) {
+					nodo.classList.add("OContainerActive");
+				} else {
+					nodo.classList.remove("OContainerActive");
+				}
+			});
+
+		} else {
+			this.selectedItems.splice(index, 1);
+			if (this.selectedItems.length == 0) {
+				this.NameSelected = "";
+				this.FieldName = "";
+				this.SubOptionsFieldName = "";
+			}
+		}
+		if (this.Config.action) {
+			this.Config.action(this.selectedItems, this);
+		}
+		this.DrawLabel();
+		if (!this.MultiSelect && this.Config.Mode != "SELECT_BOX") {
+			this.tool?.remove();
+		}
+	}
+
 	DisplayText(element, index) {
 		if (typeof element === "string") {
 			return element
@@ -716,6 +728,35 @@ const MainMenu = css`
 		font-weight: 500;
 		top: 32px !important;
 	}
+	input[type=radio] {
+		cursor: pointer;
+		appearance: none;
+		background-color: var(--secundary-color);
+		border-radius: 50%;
+		font: inherit;
+		color: currentColor;
+		width: 20px;
+		padding: 10px;
+		height: 20px;
+		border: 0.15em solid #999;
+		display: grid;
+		place-content: center;
+	}
+
+	input[type=radio]::before {
+		content: "";
+		width: 1em;
+		height: 1em;
+		transform: scale(0);
+		box-shadow: inset 1em 1em var(--form-control-color);
+		transform-origin: bottom left;
+		clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+	}
+	input[type=radio]:checked::before {
+		content: " ";
+		background-color: cornflowerblue;
+		transform: scale(1);
+	}
 
 `
 const SubMenu = {
@@ -780,5 +821,5 @@ const selectBoxStyle = css`
 		box-shadow: inset 1em 1em var(--form-control-color);
 		transform-origin: bottom left;
 		clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-	}
+	}	
 `

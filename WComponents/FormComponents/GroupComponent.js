@@ -1,6 +1,7 @@
 //@ts-check
 
 import { html } from "../../WModules/WComponentsTools.js";
+import { WOrtograficValidation } from "../../WModules/WOrtograficValidation.js";
 import { css } from "../../WModules/WStyledRender.js";
 
 export class GroupComponent extends HTMLElement {
@@ -31,7 +32,7 @@ export class GroupComponent extends HTMLElement {
 		const groupContainer = html`<div class="group-container"></div>`;
 		// Agregar el título si existe
 		if (group.Name) {
-			const title = html`<h2 class="group-title">${group.Name}</h2>`;
+			const title = html`<h2 class="group-title">${WOrtograficValidation.es(group.Name)}</h2>`;
 			groupContainer.appendChild(title);
 		}
 		// Agregar la funcionalidad de acordeón si WithAcordeon es true
@@ -97,6 +98,7 @@ export class GroupComponent extends HTMLElement {
 			font-size: 1.2em;
 			color: var(--font-primary-color);
 			border-bottom: 1px solid var(--fifty-color);
+			text-transform: capitalize;
 		}
 
 		.toggle-icon {
