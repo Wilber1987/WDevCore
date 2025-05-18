@@ -31,16 +31,16 @@ class WTableComponent extends HTMLElement {
         this.isSelectAll = false;
         this.ModelObject = {};
         this.ThOptions = WRender.Create({ class: "thOptions" });
-        this.Table = WRender.Create({ tagName: "Table", className: this.TableClass, id: "MainTable"  });
+        this.Table = WRender.Create({ tagName: "Table", className: this.TableClass, id: "MainTable" });
         this.Tfooter = WRender.Create({ class: "tfooter" });
         this.divTableContainer = WRender.Create({ type: "div", class: "tableContainer", children: [this.Table] });
-        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);      
+        this.shadowRoot?.append(this.ThOptions, this.divTableContainer, this.Tfooter);
         this.maxElementByPage = 0;
         this.numPage = 0;
         this.ActualPage = 0;
         this.Dataset = [];
         this.Sorts = [];
-        
+
         this.withFilter = false;
         this.InicializeConfig(this.Config);
     }
@@ -61,8 +61,8 @@ class WTableComponent extends HTMLElement {
             ModelObject: Config.FilterModelObject ?? Config.ModelObject,
             EntityModel: Config.EntityModel,
             Display: Config.Options?.FilterDisplay ?? false,
-            UseEntityMethods: this.Config.UseEntityMethods ??  this.Config.AddItemsFromApi ?? true, //TODO
-            UseManualControlForFiltering : this.Config.Options?.UseManualControlForFiltering ?? false,
+            UseEntityMethods: this.Config.UseEntityMethods ?? this.Config.AddItemsFromApi ?? true, //TODO
+            UseManualControlForFiltering: this.Config.Options?.UseManualControlForFiltering ?? false,
             FilterFunction: (DFilt) => {
                 this.withFilter = true;
                 this.FilterDataset = DFilt;
@@ -517,7 +517,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "DATE": case "FECHA":
                     //td.append(value?.toString()?.toDateFormatEs());
-                    td.append(value? new DateTime(value).formatDateToDDMMYY(value): "")
+                    td.append(value ? new DateTime(value).formatDateToDDMMYY(value) : "")
                     tr.append(td);
                     break;
                 case "OPERATION":
@@ -927,14 +927,13 @@ class WCardTable extends HTMLElement {
                 case "MONEY":
                     this.CardTableContainer.append(WRender.Create({
                         tagName: "label",
-                        innerText: WOrtograficValidation.es(prop) + ": " + (value != undefined && value != null && value != "" ? `${ConvertToMoneyString(parseFloat(value))}` : "-")
-
+                        innerText: (Model[prop]?.label ?? WOrtograficValidation.es(prop)) + ": " + (value != undefined && value != null && value != "" ? `${ConvertToMoneyString(parseFloat(value))}` : "-")
                     }));
                     break;
                 default:
                     this.CardTableContainer.append(WRender.Create({
                         tagName: "label",
-                        innerHTML: WOrtograficValidation.es(prop) + ": " + WOrtograficValidation.es(value == null ? "" : value)
+                        innerHTML: (Model[prop]?.label ?? WOrtograficValidation.es(prop)) + ": " + WOrtograficValidation.es(value == null ? "" : value)
                     }));
                     break;
             }
