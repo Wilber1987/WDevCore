@@ -1,6 +1,8 @@
 //@ts-check
+import { WSecurity } from "../Security/WSecurity.js";
 import { LoadinModal } from "../WComponents/LoadinModal.js";
 import { ModalMessage } from "../WComponents/ModalMessage.js";
+import { WAlertMessage } from "../WComponents/WAlertMessage.js";
 
 
 class PostConfig {
@@ -44,6 +46,7 @@ class WAjaxTools {
                 const ProcessRequest = await WAjaxTools.ProcessRequest(response, Url);
                 loadinModal.close();
                 isComplete = true;
+                WSecurity.ValidateResponse(ProcessRequest)
                 return ProcessRequest;
             } catch (error) {
                 attempts++;
@@ -51,6 +54,7 @@ class WAjaxTools {
                     loadinModal.close();
                     isComplete = true;
                     console.error(`Error after ${retryCount} attempts:`, error);
+                    WAlertMessage.Danger(error.message, true);
                     throw error; // Si ya alcanzamos el máximo de intentos, lanzamos el error.
                 }
             }
@@ -89,7 +93,7 @@ class WAjaxTools {
             const messageError = await response.text();
             var lineas = messageError.split(/\r?\n/);
             console.log(lineas);
-            document.body.appendChild(ModalMessage(lineas[0]));
+            document.body.append(ModalMessage(lineas[0]));
             throw new Error(this.ProcessError(lineas[0])).message;
         } else {
             try {

@@ -454,7 +454,7 @@ class WArrayF {
      * @param {Object} [EditingObject]      
      */
     static ModelFromFunction(propierty, EditingObject) {
-        if (propierty.__proto__ == Function.prototype) {
+        if (propierty?.__proto__ == Function.prototype) {
             propierty = propierty(EditingObject);
         }
         return propierty;

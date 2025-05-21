@@ -1,12 +1,13 @@
 //@ts-check
 
 import { html } from "../../WModules/WComponentsTools.js";
+import { WOrtograficValidation } from "../../WModules/WOrtograficValidation.js";
 import { css } from "../../WModules/WStyledRender.js";
 
 export class GroupComponent extends HTMLElement {
 	/**
 	 * @typedef {Object} GroupConfig
-	 * @property {string} Name
+	 * @property {string} [Name]
 	 * @property {boolean} [WithAcordeon]
 	 * @property {string} [className]
 	 */
@@ -19,7 +20,7 @@ export class GroupComponent extends HTMLElement {
 		/** @type {GroupConfig} */
 		this.Config = Config;
 		this.classList.add(Config.className ?? "div");
-		this.classList.add(Config.Name.replaceAll(" ", ""));
+		this.classList.add(Config.Name?.replaceAll(" ", "") ?? "formulario");
 		this.Content = html`<div class="group-content divForm"></div>`;
 	}
 
@@ -31,7 +32,7 @@ export class GroupComponent extends HTMLElement {
 		const groupContainer = html`<div class="group-container"></div>`;
 		// Agregar el título si existe
 		if (group.Name) {
-			const title = html`<h2 class="group-title">${group.Name}</h2>`;
+			const title = html`<h2 class="group-title">${WOrtograficValidation.es(group.Name)}</h2>`;
 			groupContainer.appendChild(title);
 		}
 		// Agregar la funcionalidad de acordeón si WithAcordeon es true
@@ -97,6 +98,7 @@ export class GroupComponent extends HTMLElement {
 			font-size: 1.2em;
 			color: var(--font-primary-color);
 			border-bottom: 1px solid var(--fifty-color);
+			text-transform: capitalize;
 		}
 
 		.toggle-icon {

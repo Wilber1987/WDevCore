@@ -12,6 +12,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
  * @property {HTMLElement} [Header]
  * @property {String} [PageType]
  * @property {Function} [exportXlsAction]
+ * @property {boolean} [DocumentViewFirst]
  * @property {boolean} [exportPdf]
  * @property {boolean} [print]
  * @property {boolean} [exportPdfApi]
@@ -52,18 +53,27 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		this.RenderGroups(groupedData);
 		this.ReportContainer.appendChild(this.RenderMetrics(this.MetricLevels["General Summary"], 0));
 		this.SetOptions();
-		this.Manager.NavigateFunction("report", this.ReportContainer);
+		if (this.Config.DocumentViewFirst == true) {
+			this.GoToDocumentView();
+		} else {
+			this.Manager.NavigateFunction("report", this.ReportContainer);
+		}
+
 	}
 
 	SetOptions() {
-		this.OptionContainer.appendChild(html`<button class="BtnPrimary" onclick="${() => {
-			this.Manager.NavigateFunction("report");
+		this.OptionContainer.appendChild(html`<button class="Btn-Mini" onclick="${() => {
+			this.Manager.NavigateFunction("report", this.ReportContainer);
 		}}">Reporte</button>`);
 
-		this.OptionContainer.appendChild(html`<button class="BtnPrimary" onclick="${() => {
-			const documentViewer = this.ViewDocument();
-			this.Manager.NavigateFunction("documentViewer", documentViewer);
+		this.OptionContainer.appendChild(html`<button class="Btn-Mini" onclick="${() => {
+			this.GoToDocumentView();
 		}}">Vista de documento</button>`);
+	}
+
+	GoToDocumentView() {
+		const documentViewer = this.ViewDocument();
+		this.Manager.NavigateFunction("documentViewer", documentViewer);
 	}
 
 	ViewDocument() {
@@ -83,7 +93,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 	groupData2(data) {
 		const { GroupParams, EvalParams } = this.Config;
-		if (!GroupParams || GroupParams.length === 0) return { "All Data": data };
+		if (!GroupParams || GroupParams.length === 0) return { "Reporte": data };
 
 		const grouped = {};
 		this.MetricLevels = {};
@@ -102,21 +112,16 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 	}
 
 	groupData(data) {
-
 		const { GroupParams, EvalParams } = this.Config;
 		if (!GroupParams || GroupParams.length === 0) {
 			// @ts-ignore
-			this.MetricLevels["All Data"] = this.calculateSummary(data);
-			return { "All Data": data };
+			this.MetricLevels["Reporte"] = this.calculateSummary(data);
+			return { "Reporte": data };
 		}
-
 		const grouped = {};
-
-
 		data.forEach(item => {
 			let currentLevel = grouped;
 			let path = []; // Almacena el nivel de agrupación
-
 			GroupParams.forEach((param, index) => {
 				const key = item[param] ?? "Undefined";
 				path.push(key);
@@ -125,14 +130,11 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 				}
 				currentLevel = currentLevel[key];
 			});
-
 			currentLevel.push(item);
 		});
-
 		// Función recursiva para calcular los resúmenes de cada grupo
 		const processGroup = (group, path = []) => {
 			let allItems = [];
-
 			Object.keys(group).forEach(key => {
 				const currentPath = [...path, key];
 				if (Array.isArray(group[key])) {
@@ -146,25 +148,17 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 					allItems = allItems.concat(subItems);
 				}
 			});
-
 			// Resumen del nivel actual
 			if (allItems.length > 0) {
 				// @ts-ignore
 				this.MetricLevels[path.join(" > ")] = this.calculateSummary(allItems, data);
 			}
-
 			return allItems;
 		};
-
 		processGroup(grouped);
-
 		// Consolidado general
 		// @ts-ignore
 		this.MetricLevels["General Summary"] = this.calculateSummary(data);
-
-		console.log(this.MetricLevels);
-
-
 		return grouped;
 	}
 
@@ -183,7 +177,6 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 				? data.reduce((acc, item) => acc + (typeof item[param] === 'number' ? item[param] : 0), 0)
 				: undefined;
 
-
 			const totalElements = parentData?.length ?? data.length; // Total de elementos en data
 			const validCount = data.filter(item => item[param] !== undefined && item[param] !== null).length; // Cuenta los elementos válidos
 			const avg = totalElements > 0 ? (validCount / totalElements) * 100 : 0; // % de elementos válidos
@@ -194,38 +187,18 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 				avg // % de elementos válidos sobre el total
 			};
 			console.log(summary);
-			
+
 		});
 
 		return summary;
 	}
-
-
-
-
-	/*calculateMetrics(group, EvalParams) {
-		const metrics = {};
-		EvalParams?.forEach(param => {
-			const values = group.map(item => item[param]).filter(v => typeof v === 'number');
-			metrics[param] = {
-				sum: values.reduce((acc, v) => acc + v, 0),
-				count: values.length,
-				avg: values.length > 0 ? values.reduce((acc, v) => acc + v, 0) / values.length : 0
-			};
-		});
-		return metrics;
-	}*/
-
 	RenderGroups(groupedData, level = 0, path = []) {
 		Object.keys(groupedData).forEach(key => {
 			const currentPath = [...path, key]; // Construimos el identificador del grupo
 			const groupKey = currentPath.join(" > "); // Formato de clave para recuperar métricas
-
 			// Obtener resumen del grupo actual
 			// @ts-ignore
 			const summary = this.MetricLevels[groupKey] || {};
-
-
 			// Crear un contenedor para el grupo
 			const container = WRender.Create({
 				className: `group-level-${level} group-level`,
@@ -236,10 +209,8 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 					})
 				]
 			});
-
 			// Agregar al contenedor principal del reporte
 			this.ReportContainer.appendChild(container);
-
 			if (Array.isArray(groupedData[key])) {
 				// Si es una lista de datos, renderizar la tabla
 				this.CreateTable(groupedData[key], this.ReportContainer);
@@ -249,14 +220,16 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			}
 			this.ReportContainer.appendChild(this.RenderMetrics(summary, level + 1));
 		});
-
 	}
 
 	// Método auxiliar para renderizar métricas
 	RenderMetrics(summary, level) {
+		if (Object.keys(summary ?? {}).length === 0) {
+			return html`<span></span>`;
+		}
 		return WRender.Create({
 			className: "metrics-container  level" + level,
-			children:  Object.keys(summary ?? {}).map(metric =>
+			children: Object.keys(summary ?? {}).map(metric =>
 				WRender.Create({
 					className: "metric",
 					children: [this.ProcessMetricValue(metric, summary)]
@@ -272,8 +245,6 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		let sumValue = "";
 		let countValue = `Count: ${summary[metric].count}`;
 		let avgValue = `Avg: ${summary[metric].avg.toFixed(2)}%`;
-		
-		
 		if (isMoney || isNumber) {
 			sumValue = `${summary[metric].sum}`;
 			if (isMoney) {
@@ -400,6 +371,8 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		*{
 			-webkit-print-color-adjust: exact !important;
 			border-collapse: collapse;
+			box-sizing: border-box;
+			font-family: "Open Sans", sans-serif;		
 		}
 		w-report {
 			display: block;
@@ -455,14 +428,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		}
 		.report-container:first-child {
 			border-left: 1px solid #D2D2D2;
-		}
-		
-		* {
-			box-sizing: border-box;
-			font-family: "Open Sans", sans-serif;
-		}
-
-		
+		}		
 		/* Grupos */
 		.group-title {
 			font-size: 16px;
@@ -510,10 +476,13 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		.table-row {
 			border-bottom: 1px solid #ddd;
 		}
-
+		.table-row th { 
+			text-transform: capitalize;
+		}
 		.table-cell {
 			padding: 8px 12px;
 			text-align: left;
+			font-size: 12px;
 			border: 1px solid #ddd;
 		}
 

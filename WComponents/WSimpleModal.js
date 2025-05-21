@@ -84,6 +84,8 @@ class WSimpleModal extends HTMLElement {
                 padding: 2em;
                 background-color: var(--secundary-color);;
                 border-radius: 20px;
+                max-width: 100%;
+                box-sizing: border-box;
             }
 
             .BtnClose{
@@ -98,7 +100,7 @@ class WSimpleModal extends HTMLElement {
                 align-items: center;
                 text-transform: uppercase;
                 font-weight: 500;
-                color: var(--font-tertiary-color);
+                color: var(--font-secundary-color);
                 font-size: 20px;
                 text-align: center;
                 margin-bottom: 10px;

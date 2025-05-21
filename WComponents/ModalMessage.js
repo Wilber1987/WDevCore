@@ -1,11 +1,23 @@
 //@ts-check
+import { WAlertMessage } from "./WAlertMessage.js";
 
-import { WRender } from "../WModules/WComponentsTools.js";
-import { css } from "../WModules/WStyledRender.js";
-import { WSimpleModal } from "./WSimpleModal.js";
+window.addEventListener('load', async () => {
+	console.log(localStorage.getItem("reloadWAlertMessage"));
 
+	if (localStorage.getItem("reloadWAlertMessage") != null) {
+		const message = localStorage.getItem("reloadWAlertMessage");		
+		document.body.append(ModalMessage(message));
+		localStorage.removeItem("reloadWAlertMessage");
+	}
+})
 export const ModalMessage = (message, detail = "", reload = false) => {
-	const ModalCheck = new WSimpleModal({
+	if (reload == true) {
+		console.log("reload")
+		localStorage.setItem("reloadWAlertMessage", message);
+		window.location.reload();
+	}
+	return new WAlertMessage({ Message: message });
+	/*const ModalCheck = new WSimpleModal({
 		title: message,
 		CloseOption: false,
 		ObjectModal: [WRender.Create({ tagName: 'p', class: "modalP", innerText: detail }), WRender.Create({
@@ -24,5 +36,5 @@ export const ModalMessage = (message, detail = "", reload = false) => {
 			`]
 		})]
 	});
-	return ModalCheck;
+	return ModalCheck;*/
 }

@@ -1,5 +1,6 @@
 //@ts-check
 
+import { ModelFiles } from "../../WModules/CommonModel.js";
 import { html } from "../../WModules/WComponentsTools.js";
 import { css } from "../../WModules/WStyledRender.js";
 
@@ -42,7 +43,8 @@ export class FileComponent extends HTMLElement {
 		await this.mapConfigFilesToInternalFormat();
 		/**@type {HTMLInputElement} */
 		// @ts-ignore
-		const inputControl = html`<input type="file" id="file-input">`
+		const inputControl = html`<input type="file" id="file-input" style="display:none">`
+		const inputControlWrapper = html`<label for="file-input" class="custom-file-label">Seleccionar archivo</label>`;
 		//console.log( this.getAcceptTypes());
 		
 		inputControl.accept = this.getAcceptTypes();
@@ -51,6 +53,7 @@ export class FileComponent extends HTMLElement {
 		this.shadowRoot?.append(html`<div class="file-uploader">
 			${this.styles()}
 			${inputControl}
+			${inputControlWrapper}
 			${this.preview}
 		</div>`);
 
@@ -208,6 +211,14 @@ export class FileComponent extends HTMLElement {
 		const mimeType = base64.match(/^data:(.*);base64,/);
 		return mimeType ? mimeType[1] : 'application/octet-stream'; // Tipo por defecto si no se encuentra
 	}
+	GetModelValue() {
+		const modelFiles = this._files.map(file => new ModelFiles(file.name, file.data, file.type))
+		if (this._multiple) {
+			return modelFiles;
+		} else {
+			return [modelFiles[0]];
+		}
+	}
 	GetValue() {
 		if (this._multiple) {
 			return this._files.map(f => f.data);
@@ -247,7 +258,7 @@ export class FileComponent extends HTMLElement {
 				padding: 10px;
 				border: 1px solid #ddd;
 				background-color: #fff;
-				height: 300px;
+				min-height: 200px;
 				& img {
 					height: 100%;
 				}
@@ -273,6 +284,32 @@ export class FileComponent extends HTMLElement {
 				display: block;
 				text-overflow: ellipsis;
 				white-space: nowrap;
+			}
+			#file-input {
+				display: none;
+			}
+
+			.custom-file-label {
+				background-color: #6200ee;
+				color: white;
+				padding: 8px;
+				border-radius: 5px;
+				cursor: pointer;
+				display: inline-block;
+				font-size: 14px;
+			}
+
+			.custom-file-label:hover {
+				background-color: #3700b3;
+			}
+			@media (max-width: 768px) {
+				.file-item {
+					min-height: 200px;
+					& img {
+						height: auto;
+						width: 100%;
+					}
+				}
 			}
 		`;
 	}

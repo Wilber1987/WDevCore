@@ -12,10 +12,10 @@ function html(strings, ...values) {
         accumulator += currentString;
 
         if (index < values.length) {
-            let value = values[index];           
+            let value = values[index];
             if (value == undefined) {
                 value = "";
-            }           
+            }
             if (value instanceof HTMLElement || value.__proto__.__proto__ == HTMLElement.prototype) {
                 // Si el valor es un nodo HTML, lo añadimos al wrapper
                 const placeholder = document.createElement('div');
@@ -85,7 +85,7 @@ function html(strings, ...values) {
             const element = wrapper.querySelector(`[data-function-placeholder-${index}]`);
             const event = element.getAttribute(`data-function-placeholder-${index}`);
             element[event] = value
-         
+
 
         }
     });
@@ -96,7 +96,7 @@ function html(strings, ...values) {
 
 export { html }
 class WRender {
-    
+
     /**
      * 
      * @param {*} string 
@@ -279,7 +279,7 @@ class WRender {
     static async convertImagesToBase64InHtml(htmlContent) {
         const div = document.createElement('div');
         //div.appendChild(htmlContent);
-    
+
         const images = htmlContent.querySelectorAll('img');
         for (let img of images) {
             const src = img.getAttribute('src');
@@ -293,20 +293,20 @@ class WRender {
                             reader.onerror = reject;
                             reader.readAsDataURL(blob);
                         }));
-    
+
                     img.setAttribute('src', base64); // Reemplaza la URL con la versión en Base64
                 } catch (error) {
                     console.error(`Error al convertir la imagen: ${src}`, error);
                 }
             }
         }
-    
+
         return htmlContent;
     }
     static async convertImagesToCanvasInHtml(htmlContent) {
         const div = document.createElement('div');
         div.innerHTML = htmlContent; // Asegúrate de agregar el contenido HTML al div.
-    
+
         const images = htmlContent.querySelectorAll('img');
         for (let img of images) {
             const src = img.getAttribute('src');
@@ -321,44 +321,44 @@ class WRender {
                             reader.onerror = reject;
                             reader.readAsDataURL(blob);
                         }));
-    
+
                     img.setAttribute('src', base64); // Reemplaza la URL con la versión en Base64
-                    
+
                     // Crear un canvas para dibujar la imagen
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     const image = new Image();
-    
+
                     // Cuando la imagen esté cargada, dibujamos en el canvas
                     image.onload = () => {
                         // Establecemos el tamaño del canvas al de la imagen
                         canvas.width = image.width;
                         canvas.height = image.height;
                         ctx.drawImage(image, 0, 0);
-    
+
                         // Aquí puedes hacer lo que quieras con el canvas,
                         // como añadirlo al DOM o extraer datos de él
                         htmlContent.appendChild(canvas); // Por ejemplo, añadir el canvas al body
                     };
                     image.src = base64; // Cargar la imagen en base64 al objeto Image
-    
+
                 } catch (error) {
                     console.error(`Error al convertir la imagen: ${src}`, error);
                 }
             }
         }
-    
+
         return htmlContent; // Devolver el HTML modificado
     }
 
     static RemoveImagesToCanvasInHtml(htmlContent) {
-           
+
         const images = htmlContent.querySelectorAll('img');
         for (let img of images) {
-            htmlContent.removeChild(img);            
-        }    
+            htmlContent.removeChild(img);
+        }
         return htmlContent; // Devolver el HTML modificado
-    }    
+    }
 
 }
 export { WRender }
@@ -401,10 +401,11 @@ class ComponentsManager {
                 }
             }
             if (this.Config.WNavigator != undefined) {
+                this.Config.WNavigator.Inicialize = true
                 const hashD = window.location.hash.replace("#", "");
                 const navElment = this.Config.WNavigator.Elements.find(e => e.id == hashD)
                 if (navElment != null && navElment.action != undefined) {
-                    const elementNav = this.Config.WNavigator.shadowRoot.querySelector("#element" + navElment.id)
+                    const elementNav = this.Config.WNavigator.ElementNavControls.find(e => e.id == "element" + navElment.id);
                     if (elementNav != null) {
                         this.Config.WNavigator.InitialNav = () => {
                             elementNav.onclick()
@@ -462,8 +463,8 @@ class ComponentsManager {
         }
     }
     Exists = (IdComponent) => {
-        return this.DomComponents.find(node => node.id == IdComponent) != undefined 
-        && this.DomComponents.find(node => node.id == IdComponent) != null;
+        return this.DomComponents.find(node => node.id == IdComponent) != undefined
+            && this.DomComponents.find(node => node.id == IdComponent) != null;
     }
     AddComponent = async (IdComponent, ComponentsInstance, ContainerName, order = "last") => {
         if (this.MainContainer == undefined) {
@@ -688,7 +689,7 @@ HTMLElement.prototype.SetStyle = function (Style = (new ElementStyle())) {
  */
 function ConvertToMoneyString(numero, currency = undefined) {
 
-    return (currency?.toUpperCase() == "CORDOBAS" ? "C$ " : (currency?.toUpperCase() == "DOLARES" ? "$ ": "")) +  new Intl.NumberFormat('es-ES', {
+    return (currency?.toUpperCase() == "CORDOBAS" ? "C$ " : (currency?.toUpperCase() == "DOLARES" ? "$ " : "")) + new Intl.NumberFormat('es-ES', {
         style: 'decimal',
         currency: 'EUR',
         minimumFractionDigits: 2,
@@ -701,7 +702,7 @@ function ConvertToMoneyString(numero, currency = undefined) {
 export { ConvertToMoneyString }
 
 export function generateGUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         const r = (Math.random() * 16) | 0; // Genera un número aleatorio entre 0 y 15
         const v = c === 'x' ? r : (r & 0x3 | 0x8); // Maneja los bits para ajustar el GUID según el estándar
         return v.toString(16); // Convierte el número a hexadecimal

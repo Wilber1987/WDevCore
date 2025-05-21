@@ -63,7 +63,7 @@ export class WToolTip extends HTMLElement {
 			if (node.shadowRoot) {
 				node.shadowRoot.append(this)
 				const tooltipRect = this.getBoundingClientRect();
-				console.log(tooltipRect, this.offsetHeight, window.innerHeight);
+				//console.log(tooltipRect, this.offsetHeight, window.innerHeight);
 				const viewportHeight = window.innerHeight;
 				if (tooltipRect.bottom + 400 > viewportHeight) {
 					// @ts-ignore

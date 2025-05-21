@@ -33,7 +33,7 @@ export const WModalStyle = css`
   }
 
   .ModalHeader {
-       color: var(--font-fourth-color);
+       color: var(--font-secundary-color);
        font-weight: bold;
        font-size: 20px;
        display: flex;
@@ -96,6 +96,11 @@ export const WModalStyle = css`
   }
 
   @media (max-width: 800px) {
+     .ModalContent {
+          display: block;
+          padding: 10px;
+          overflow-y:auto;
+     }
        .ContainerFormWModal {
             position: fixed;
             top: 0px;

@@ -65,10 +65,10 @@ class WPrintExportToolBar extends HTMLElement {
 				</svg>
 				XLS
 			</button>`: ""}
-			${this.Confg.UploadAction ? html`<button class="toolbar-button red" onclick="${(ev) => {
-				// @ts-ignore
-				this.Confg.UploadAction(ev)
-			}}">
+				${this.Confg.UploadAction ? html`<button class="toolbar-button red" onclick="${(ev) => {
+					// @ts-ignore
+					this.Confg.UploadAction(ev)
+				}}">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 					<path d="M16 10v4H8v-4H5l7-7 7 7h-3zM5 18v-2h14v2H5z"/>
 				</svg>
@@ -424,13 +424,13 @@ class WPrintExportToolBar extends HTMLElement {
 		.toolbar-button {
 			background-color: #e7e7e7;
 			border: none;
-			border-radius: 4px;
-			padding: 10px;
+			border-radius: 8px;
+			padding: 5px 10px;
 			cursor: pointer;
 			display: flex;
 			align-items: center;
 			gap: 8px;
-			font-size: 12px;
+			font-size: 11px;
 			color: #ffffff;
 			transition: background-color 0.3s ease;
 			font-weight: bold;

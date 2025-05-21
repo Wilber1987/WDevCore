@@ -27,6 +27,7 @@ import { WToolTip } from "./FormComponents/WToolTip.js";
 	* @property {Object} [CrudOptions]
 	* @property {String} [Mode]  SELECT_BOX, SELECT ImageUrlPath
 	* @property {String} [ImageUrlPath]   
+	* @property {Function} [clickAction] dado que el multiselect elimina la propagacion de eventos se agrega el clickaction para poder usar un onclick
 **/
 
 class MultiSelect extends HTMLElement {
@@ -50,7 +51,9 @@ class MultiSelect extends HTMLElement {
 		this.SubOptionsFieldName = "";
 		this.ControlsContainer = WRender.Create({ className: "ControlContainer" });
 		WRender.SetStyle(this, {
-			display: this.Config.IsFilterControl == true ? "flex" : "block",
+			display: this.Config.IsFilterControl == true ? "grid" : "block",
+			gridTemplateColumns: "20% 80%",
+			transition: 'grid-template-columns 0.3s ease',
 			position: "relative",
 			fontSize: "12px",
 			height: "initial"
@@ -58,7 +61,9 @@ class MultiSelect extends HTMLElement {
 
 		if (this.Config.Mode == "SELECT_BOX") {
 			WRender.SetStyle(this, {
-				display: this.Config.IsFilterControl == true ? "flex" : "block",
+				display: this.Config.IsFilterControl == true ? "grid" : "block",
+				gridTemplateColumns: "20% 80%",
+				transition: 'grid-template-columns 0.3s ease',
 				position: "relative",
 				padding: "0px",
 				border: "none",
@@ -79,8 +84,11 @@ class MultiSelect extends HTMLElement {
 			tagName: "input",
 			class: "txtControl",
 			placeholder: "Buscar...",
-			onclick: (ev) => {
+			onclick: async (ev) => {
 				ev.stopPropagation();
+				if (this.Config.clickAction) {
+					await this.Config.clickAction(this);
+				}
 			},
 			onkeypress: async (ev) => {
 				if (this.ModelObject?.__proto__ == Function.prototype) {
@@ -131,6 +139,16 @@ class MultiSelect extends HTMLElement {
 				}
 			}
 		});
+		if (this.Config.IsFilterControl == true) {
+			this.SearchControl.addEventListener('focus', () => {
+				this.style.gridTemplateColumns = '80% 20%';
+			});
+
+			this.SearchControl.addEventListener('blur', () => {
+				this.style.gridTemplateColumns = '20% 80%';
+			});
+		}
+
 		this.ControlsContainer?.append(
 			this.LabelMultiselect,
 			StyleScrolls.cloneNode(true),
@@ -150,13 +168,25 @@ class MultiSelect extends HTMLElement {
 			this.shadowRoot?.append(selectBoxStyle.cloneNode(true));
 			this.DisplayOptions();
 		}
-		this.LabelMultiselect.onclick = (e) => {
+		this.LabelMultiselect.onclick = async (e) => {
 			e.stopPropagation();
+
+			if (this.Config.clickAction) {
+				await this.Config.clickAction(this);
+			}
 			if (!this.tool?.isConnected) {
 				this.DisplayOptions();
 			} else if (this.tool?.isConnected && Config.Mode != "SELECT_BOX") {
 				this.tool?.remove();
 			}
+			setTimeout(() => {
+				this.SearchControl.focus();
+				this.tool?.scrollTo({
+					top: 0,
+					behavior: "smooth"
+				});
+			}, 100);
+
 		}
 	}
 
@@ -174,6 +204,9 @@ class MultiSelect extends HTMLElement {
 		const addBtn = WRender.Create({
 			tagName: 'input', type: 'button', className: 'addBtn', value: 'Agregar+', onclick: async (e) => {
 				e.stopPropagation();
+				if (this.Config.clickAction) {
+					await this.Config.clickAction(this);
+				}
 				if (this.ModelObject != undefined) {
 					this.ModalCRUD(undefined, targetControl, addBtn);
 				} else {
@@ -253,49 +286,11 @@ class MultiSelect extends HTMLElement {
 				tagName: "input",
 				id: "OType" + (element.id_ ?? element.id ?? "ElementIndex_" + index),
 				type: OType,
-				hidden: OType == "radio" && this.Config.Mode != "SELECT_BOX" ? true : false,
+				//hidden: OType == "radio" && this.Config.Mode != "SELECT_BOX" ? true : true,
 				name: element.name,
 				checked: WArrayF.FindInArray(element, this.selectedItems),
 				className: "Option", onchange: (ev) => {
-					this.selectedItems = OType == "checkbox" ? this.selectedItems : [];
-					const control = ev.target;
-					const index = this.selectedItems.indexOf(element);
-					if (index == -1 && control.checked == true) {
-						this.NameSelected = element.name;
-						this.FieldName = element.FieldName;
-						this.SubOptionsFieldName = element.SubOptionsFieldName;
-						if (WArrayF.FindInArray(element, this.selectedItems) == false) {
-							this.selectedItems.push(element);
-						} else {
-							console.log("Item Existente")
-						}
-
-						this.shadowRoot?.querySelectorAll(".OContainer").forEach((nodo) => {
-							nodo.classList.remove("OContainerActive");
-							const nodoOption = nodo.querySelector(".Option");
-							// @ts-ignore
-							if (nodoOption?.checked == true) {
-								nodo.classList.add("OContainerActive");
-							} else {
-								nodo.classList.remove("OContainerActive");
-							}
-						})
-
-					} else {
-						this.selectedItems.splice(index, 1);
-						if (this.selectedItems.length == 0) {
-							this.NameSelected = "";
-							this.FieldName = "";
-							this.SubOptionsFieldName = "";
-						}
-					}
-					if (this.Config.action) {
-						this.Config.action(this.selectedItems);
-					}
-					this.DrawLabel();
-					if (!this.MultiSelect && this.Config.Mode != "SELECT_BOX") {
-						this.tool?.remove();
-					}
+					this.SelectItem(OType, ev.target, element);
 				}
 
 			});
@@ -325,6 +320,11 @@ class MultiSelect extends HTMLElement {
 			this.OptionsContainer.append(Options);
 			if (this.FullDetail && typeof element !== "string") {
 				const detail = this.BuilDetail(element);
+				detail.onclick = () => {
+					// @ts-ignore
+					Option.checked = !Option.checked;
+					this.SelectItem(OType, Option, element);
+				}
 				if (detail.childNodes.length > 0) {
 					Options.append(detail)
 				}
@@ -334,9 +334,8 @@ class MultiSelect extends HTMLElement {
 	}
 	SetOptions = () => {
 		if (this.Config.IsFilterControl) {
-			this.shadowRoot?.append(this.SearchControl);
+			this.shadowRoot?.insertBefore(this.SearchControl, this.shadowRoot?.firstChild);
 			this.style.padding = "0px";
-			this.SearchControl.style.borderRadius = "0 10px 10px 0";
 			this.SearchControl.onfocus = () => {
 				if (this.Config.IsFilterControl) {
 					this.DisplayOptions();
@@ -357,7 +356,7 @@ class MultiSelect extends HTMLElement {
 	DrawLabel = () => {
 		// @ts-ignore
 		this.LabelMultiselect.querySelector(".selecteds").innerHTML =
-			this.selectedItems.length == 0 ? "Seleccionar: " : "";
+			this.selectedItems.length == 0 && this.Config.IsFilterControl != true ? "Seleccionar." : "";
 		let sum = 0;
 		let add = 0;
 		let labelsWidth = 0;
@@ -384,7 +383,7 @@ class MultiSelect extends HTMLElement {
 						this.DrawLabel();
 						this.Draw();
 						if (this.Config.action) {
-							this.Config.action(this.selectedItems);
+							this.Config.action(this.selectedItems, this);
 						}
 					}
 				}));
@@ -411,6 +410,47 @@ class MultiSelect extends HTMLElement {
 			}))
 		}
 	}
+	SelectItem(OType, control, element) {
+		this.selectedItems = OType == "checkbox" ? this.selectedItems : [];
+		const index = this.selectedItems.indexOf(element);
+		if (index == -1 && control.checked == true) {
+			this.NameSelected = element.name;
+			this.FieldName = element.FieldName;
+			this.SubOptionsFieldName = element.SubOptionsFieldName;
+			if (WArrayF.FindInArray(element, this.selectedItems) == false) {
+				this.selectedItems.push(element);
+			} else {
+				console.log("Item Existente");
+			}
+
+			this.shadowRoot?.querySelectorAll(".OContainer").forEach((nodo) => {
+				nodo.classList.remove("OContainerActive");
+				const nodoOption = nodo.querySelector(".Option");
+				// @ts-ignore
+				if (nodoOption?.checked == true) {
+					nodo.classList.add("OContainerActive");
+				} else {
+					nodo.classList.remove("OContainerActive");
+				}
+			});
+
+		} else {
+			this.selectedItems.splice(index, 1);
+			if (this.selectedItems.length == 0) {
+				this.NameSelected = "";
+				this.FieldName = "";
+				this.SubOptionsFieldName = "";
+			}
+		}
+		if (this.Config.action) {
+			this.Config.action(this.selectedItems, this);
+		}
+		this.DrawLabel();
+		if (!this.MultiSelect && this.Config.Mode != "SELECT_BOX") {
+			this.tool?.remove();
+		}
+	}
+
 	DisplayText(element, index) {
 		if (typeof element === "string") {
 			return element
@@ -518,7 +558,7 @@ class MultiSelect extends HTMLElement {
 						this.Draw(await WArrayF.FilterInArrayByValue(this.Dataset, targetControl.value));
 						this.DrawLabel();
 						if (this.Config.action != undefined) {
-							this.Config.action(this.selectedItems);
+							this.Config.action(this.selectedItems, this);
 						}
 						addBtn.remove();
 						const tool = targetControl.parentNode.querySelector(".ToolTip");
@@ -578,6 +618,7 @@ const MainMenu = css`
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		max-width: calc(100% - 65px);
 	}
 	.LabelMultiselect label button {
 		border: none;
@@ -637,11 +678,11 @@ const MainMenu = css`
 	}
 	.txtControl {
 		width: -webkit-fill-available;
-		padding: 10px;
+		padding: 8px;
+		border-radius: 8px;
 		border: none;
 		outline: none;
-		background-color: var(--secundary-color);
-		border-bottom: solid 1px var(--fifty-color);
+		background-color: var(--secundary-color);		
 		color: var(--font-primary-color);
 	}
 	.txtControl:active,
@@ -670,7 +711,7 @@ const MainMenu = css`
 	.ElementDetail {
 		padding: 10px;
 		background-color: var(--primary-color);
-		border-radius: 10px;
+		border-radius: 8px;
 		margin: 10px;
 		font-size: 12px;
 		grid-column: span 2;
@@ -697,6 +738,35 @@ const MainMenu = css`
 		font-size: 12px;
 		font-weight: 500;
 		top: 32px !important;
+	}
+	input[type=radio] {
+		cursor: pointer;
+		appearance: none;
+		background-color: var(--secundary-color);
+		border-radius: 50%;
+		font: inherit;
+		color: currentColor;
+		width: 20px;
+		padding: 10px;
+		height: 20px;
+		border: 0.15em solid #999;
+		display: grid;
+		place-content: center;
+	}
+
+	input[type=radio]::before {
+		content: "";
+		width: 1em;
+		height: 1em;
+		transform: scale(0);
+		box-shadow: inset 1em 1em var(--form-control-color);
+		transform-origin: bottom left;
+		clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+	}
+	input[type=radio]:checked::before {
+		content: " ";
+		background-color: cornflowerblue;
+		transform: scale(1);
 	}
 
 `
@@ -745,7 +815,7 @@ const selectBoxStyle = css`
 		height: 1.15em;
 		padding: 13px;
 		border: 0.15em solid #999;
-		border-radius: 0.15em;
+		border-radius: 8px;
 		display: grid;
 		place-content: center;
 	}
@@ -762,5 +832,5 @@ const selectBoxStyle = css`
 		box-shadow: inset 1em 1em var(--form-control-color);
 		transform-origin: bottom left;
 		clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-	}
+	}	
 `

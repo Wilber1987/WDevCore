@@ -1,7 +1,7 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { EntityClass } from '../WModules/EntityClass.js';
-import { WRender } from '../WModules/WComponentsTools.js';
+import { html, WRender } from '../WModules/WComponentsTools.js';
 import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css } from '../WModules/WStyledRender.js';
 import { ModelPropertyFormBuilder } from '../ComponentsBuilders/ModelPropertyFormBuilder.js';
@@ -54,7 +54,10 @@ class WForm extends HTMLElement {
 
 		this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
 		this.shadowRoot?.append(StyleScrolls.cloneNode(true));
-		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));		
+		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
+
+		this.InizializeConfig(this.Config);
+		this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
 		if (this.Config.CustomStyle) {
 			this.shadowRoot?.append(this.Config.CustomStyle);
 		}
@@ -64,12 +67,12 @@ class WForm extends HTMLElement {
 
 		this.ExistChange = false;
 		this.ObjectProxy = this.ObjectProxy ?? undefined;
-
+		this.DrawComponent();
 	}
-
-
-
 	InizializeConfig(Config) {
+		if (this.IsInizialized == true) {
+			return;
+		}
 		for (const p in Config) {
 			this[p] = Config[p];
 		}
@@ -104,13 +107,18 @@ class WForm extends HTMLElement {
 				Url: undefined
 			};
 		}
-		this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
+
 		this.FormObject = this.FormObject ?? this.Config.EditObject ?? {};
+		if (Config == undefined || Config == null || Object.keys(Config).length == 0) {
+			this.IsInizialized = true;
+		}
 	}
 
 	connectedCallback() {
 		this.InizializeConfig(this.Config);
-		this.DrawComponent();
+		if (this.IsInizialized == true) {
+			//this.DrawComponent();
+		}
 		this.CreateOriginalObject();
 		this.DivForm.addEventListener("click", (e) => this.undisplayMultiSelects(e));
 		this.DivForm.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
@@ -205,7 +213,7 @@ class WForm extends HTMLElement {
 		//verifica que el modelo existe,
 		//sino es asi le asigna el valor de un objeto existente
 		const Model = this.Config.ModelObject ?? this.Config.EditObject;
-		const Form = new GroupComponent({ Name: this.Config.Title ?? "Formulario" });
+		const Form = new GroupComponent({ Name: this.Config.Title ?? undefined });
 		this.GroupsForm = [Form];
 		this.Config.Groups?.forEach(group => {
 			// Crear el contenedor principal del grupo
@@ -252,11 +260,9 @@ class WForm extends HTMLElement {
 						tagName: "label", class: "inputTitle label_" + prop,
 						innerText: WOrtograficValidation.es(prop)
 					});
-					const ControlContainer = WRender.Create({
-						class: "ModalElement", children: [ControlLabel]
-					});
+					const ControlContainer = WRender.Create({ class: "ModalElement" });
 					if (Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
-						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop) + (Model[prop].require == false ? "" : "*");						
+						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop) + (Model[prop].require == false ? "" : "*");
 						await this.CreateModelControl(Model, prop, ControlContainer, ObjectF, ControlLabel, onChangeEvent, DivForm);
 						//ControlContainer.append(InputControl);
 					}
@@ -319,6 +325,7 @@ class WForm extends HTMLElement {
 		const ModelProperty = Model[prop];
 		const actionFunction = ModelProperty.action ?? null;
 		ObjectF[prop] = ObjectF[prop];
+		let addLabel = true;
 
 		const onchangeListener = async (ev) => {
 			// @ts-ignore
@@ -329,10 +336,14 @@ class WForm extends HTMLElement {
 				if (actionFunction != null) {
 					actionFunction(ObjectF, this, this.Controls[prop], prop)
 				}
-				console.log(ObjectF);
+				//console.log(ObjectF);
 			}
 		}
 		switch (ModelProperty.type?.toUpperCase()) {
+			case "TITLE":
+				addLabel = false;
+				this.Controls[prop] = html`<h3>${ModelProperty.label ?? WOrtograficValidation.es(prop)}</h3>`;
+				break;
 			case "IMG": case "IMAGES": case "IMAGE": case "FILE": case "FILES":
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateFileInput(ModelProperty,
 					ObjectF, prop, onchangeListener);
@@ -385,12 +396,19 @@ class WForm extends HTMLElement {
 					innerText: ObjectF[prop]
 				});
 				break;
+			case "MODEL":
+				this.Controls[prop] = await ModelPropertyFormBuilder.CreateModel(
+					ModelProperty, ObjectF, prop, this)
+				break;
 			default:
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateInput(
 					ModelProperty, ObjectF, prop, onchangeListener)
 				break;
 		}
 		ControlContainer.classList.add(ModelProperty.type?.toUpperCase())
+		if (addLabel) {
+			ControlContainer.append(ControlLabel);
+		}
 		ControlContainer.append(this.Controls[prop])
 		Form.Add(ControlContainer);
 	}
@@ -475,7 +493,8 @@ class WForm extends HTMLElement {
 					/**
 					 * @type {?HTMLInputElement | undefined | any}
 					 */
-					const control = this.DivForm?.querySelector("#ControlValue" + prop);
+					const control = this.Controls[prop];
+					//const control = this.DivForm?.querySelector("#ControlValue" + prop);
 					if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
 						if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
 							return false;
@@ -713,8 +732,8 @@ class WForm extends HTMLElement {
 				grid-column: span  ${this.limit};
 				padding-bottom: 10px;
 			}
-			.TEXTAREA, .PASSWORD {
-				grid-column: span  ${(this.limit ?? 1) > 1 ? 2 : 1};
+			.TEXTAREA, .PASSWORD, .MODEL {
+				grid-column: span  ${(this.limit ?? 1) > 1 ? this.limit : 1};
 			}
 		`;
 		return WRender.Create({ style: { display: "none" }, children: [style, wstyle] });
