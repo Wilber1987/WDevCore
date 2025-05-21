@@ -81,9 +81,9 @@ class WFilterOptions extends HTMLElement {
 		const FilterOptions = html`<div class="filter-options ${this.Display ? "OptionContainerActive" : ""}">
 			${ControlOptions} 
 			${this.UseManualControlForFiltering == true ? WRender.Create({
-						tagName: "button", className: "btn-go", innerText: "Filtrar",
-						onclick: async () => this.filterFunction(this.Sorts)
-					}) : ""}
+			tagName: "button", className: "btn-go", innerText: "Filtrar",
+			onclick: async () => this.filterFunction(this.Sorts)
+		}) : ""}
 			</div>`
 		this.FilterContainer.append(WRender.Create({
 			class: "options", children: [
@@ -110,7 +110,7 @@ class WFilterOptions extends HTMLElement {
 					if (filterControl != null) {
 						ControlOptions.append(WRender.Create({
 							className: this.ModelObject[prop].type.toUpperCase() == "DATE"
-								|| this.ModelObject[prop].type.toUpperCase() == "MONEY" 
+								|| this.ModelObject[prop].type.toUpperCase() == "MONEY"
 								//|| this.ModelObject[prop].type.toUpperCase() == "WSELECT"
 								//|| this.ModelObject[prop].type.toUpperCase() == "MULTISELECT" 
 								? "multi-control-container" : "",
@@ -141,7 +141,7 @@ class WFilterOptions extends HTMLElement {
 		const ModelProperty = Model[prop];
 		switch (ModelProperty.type?.toUpperCase()) {
 			case "TEXT": case "EMAIL": case "EMAIL": case "TEL": case "URL": case "TEXTAREA": case "NUMBER":
-				return this.CreateTextControl(prop);
+				return this.CreateTextControl(prop, ModelProperty);
 			case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
 				break;
 			case "DATE": case "FECHA": case "TIME":
@@ -465,15 +465,16 @@ class WFilterOptions extends HTMLElement {
 	}
 	/**
 	 * @param {String} prop 
+	  * @param {ModelProperty} modelProperty
 	 * @returns 
 	 */
-	CreateTextControl(prop) {
+	CreateTextControl(prop, modelProperty) {
 		let InputControl = WRender.Create({
 			tagName: "input",
 			type: "text",
 			className: prop,
 			id: prop,
-			placeholder: WOrtograficValidation.es(prop),
+			placeholder: modelProperty.placeholder ?? modelProperty.label ?? WOrtograficValidation.es(prop),
 			onchange: (ev) => { this.OnChange(); }
 		});
 		return InputControl;

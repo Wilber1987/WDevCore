@@ -52,7 +52,8 @@ class MultiSelect extends HTMLElement {
 		this.ControlsContainer = WRender.Create({ className: "ControlContainer" });
 		WRender.SetStyle(this, {
 			display: this.Config.IsFilterControl == true ? "grid" : "block",
-			gridTemplateColumns: "50% 50%",
+			gridTemplateColumns: "20% 80%",
+			transition: 'grid-template-columns 0.3s ease',
 			position: "relative",
 			fontSize: "12px",
 			height: "initial"
@@ -61,7 +62,8 @@ class MultiSelect extends HTMLElement {
 		if (this.Config.Mode == "SELECT_BOX") {
 			WRender.SetStyle(this, {
 				display: this.Config.IsFilterControl == true ? "grid" : "block",
-				gridTemplateColumns: "50% 50%",
+				gridTemplateColumns: "20% 80%",
+				transition: 'grid-template-columns 0.3s ease',
 				position: "relative",
 				padding: "0px",
 				border: "none",
@@ -137,6 +139,15 @@ class MultiSelect extends HTMLElement {
 				}
 			}
 		});
+		if (this.Config.IsFilterControl == true) {
+			this.SearchControl.addEventListener('focus', () => {
+				this.style.gridTemplateColumns = '80% 20%';
+			});
+
+			this.SearchControl.addEventListener('blur', () => {
+				this.style.gridTemplateColumns = '20% 80%';
+			});
+		}
 
 		this.ControlsContainer?.append(
 			this.LabelMultiselect,
@@ -173,7 +184,7 @@ class MultiSelect extends HTMLElement {
 				this.tool?.scrollTo({
 					top: 0,
 					behavior: "smooth"
-				  });
+				});
 			}, 100);
 
 		}

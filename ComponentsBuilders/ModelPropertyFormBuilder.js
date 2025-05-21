@@ -195,7 +195,7 @@ export class ModelPropertyFormBuilder {
 
 		ModelProperty.require = require;
 		EditingObject[prop] = EditingObject[prop] ?? ModelProperty.defaultValue ?? "";
-		const placeholderp = ModelProperty.placeholder ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
+		const placeholderp = ModelProperty.placeholder ?? ModelProperty.label ?? WArrayF.Capitalize(WOrtograficValidation.es(prop));
 		const pass = WRender.Create({
 			tagName: "input",
 			id: "ControlPass1" + prop,

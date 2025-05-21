@@ -1,6 +1,7 @@
 import { ComponentsManager, WRender } from "../WModules/WComponentsTools.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
+import { ModalMessage } from "../WComponents/ModalMessage.js";
 //import { WModalForm } from "../WComponents/WModalForm.js";
 // import "../WComponents/WLoginTemplate.js";
 
@@ -51,11 +52,11 @@ class WSecurity {
             //this.UserData = result;
             window.location = url ?? WSecurity.urlHomeView;
         } else if (result != false || result.success == false) {
-            alert(result?.message)
-            console.log("Fail to login");
+            //alert(result?.message)
+            document.body.append(ModalMessage(result?.message));
         } else {
-            alert("ERROR")
-            console.log("Fail to login");
+            //alert("ERROR")
+           document.body.append(ModalMessage("ERROR"));
         }
     }
     static RecoveryPassword = async (UserData, url) => {
@@ -74,8 +75,15 @@ class WSecurity {
         window.location = WSecurity.LoginInView;
         return result;
     }
-    static HavePermission(/**@type {String} */ permission) {        
+    static HavePermission(/**@type {String} */ permission) {
         return this.UserData.permissions.includes(permission) || this.UserData.permissions.includes(Permissions.ADMIN_ACCESS)
+    }
+    static async ValidateResponse(ProcessRequest) {
+        if (ProcessRequest.AuthVal == false) {   
+            const result = await WAjaxTools.PostRequest(WSecurity.urlLogOut);
+            localStorage.clear();        
+            ModalMessage("No autorizado", undefined, true);
+        }
     }
 }
 export { WSecurity }
@@ -105,10 +113,10 @@ const Permissions = {
     TECNICO_CASOS_DEPENDENCIA: "TECNICO_CASOS_DEPENDENCIA", // HELPDESK - TÉCNICO DE CASOS DEPENDENCIA
     QUESTIONNAIRES_MANAGER: "QUESTIONNAIRES_MANAGER", // ADMINISTRADOR DE CUESTIONARIOS
     QUESTIONNAIRES_GESTOR: "QUESTIONNAIRES_GESTOR", // GESTOR DE CUESTIONARIOS
-    ADMINISTRAR_CASOS_PROPIOS : "ADMINISTRAR_CASOS_PROPIOS",
+    ADMINISTRAR_CASOS_PROPIOS: "ADMINISTRAR_CASOS_PROPIOS",
     //Questionnaires
-    QUESTIONNAIRES_MANAGER : "QUESTIONNAIRES_MANAGER",
-    QUESTIONNAIRES_GESTOR : "QUESTIONNAIRES_GESTOR",
-    QUESTIONNAIRES_USER : "QUESTIONNAIRES_USER"
+    QUESTIONNAIRES_MANAGER: "QUESTIONNAIRES_MANAGER",
+    QUESTIONNAIRES_GESTOR: "QUESTIONNAIRES_GESTOR",
+    QUESTIONNAIRES_USER: "QUESTIONNAIRES_USER"
 };
 export { Permissions }

@@ -3,8 +3,14 @@ import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { html, WRender } from "../WModules/WComponentsTools.js";
 import { WSecurity } from "../Security/WSecurity.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
+import { WAlertMessage } from "../WComponents/WAlertMessage.js";
 
 const OnLoad = async () => {
+
+    //WAlertMessage.Info("TEST")
+    //WAlertMessage.Warning("ALERT")
+    //WAlertMessage.Success("ALERT")
+    //WAlertMessage.Danger("ALERT")
     const UserData = {
         mail: "",
         password: ""
