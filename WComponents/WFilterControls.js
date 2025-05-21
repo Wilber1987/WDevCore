@@ -729,8 +729,8 @@ class WFilterOptions extends HTMLElement {
 		}
 
 		@media (max-width: 900px) {
-			.OptionContainer {
-				display: flex;
+			.OptionContainer, .OptionContainer div {
+				display: flex !important;
 				flex-direction: column;
 			}
 			.filter-container {

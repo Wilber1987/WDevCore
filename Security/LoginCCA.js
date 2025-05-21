@@ -126,7 +126,7 @@ const GetLoginLayout = (loginForm, registerForm) => {
         <div class="col-md-5 svg-background">
             <div class="d-flex flex-column min-vh-100">
             <p class="text-white position-absolute bottom-left">
-            © <span id="year"></span> Colegio Centro América - Del Sagrado Corazón de Jesús, Nicaragua</p>
+            © <span id="year"></span> Colegio Centro América - del Sagrado Corazón de Jesús, Nicaragua</p>
             </div>            
         </div>  
         <div class="col-md-7 container">
