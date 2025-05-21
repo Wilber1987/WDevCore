@@ -231,7 +231,7 @@ class WAppNavigator extends HTMLElement {
 		if (this.Direction == "column") {
 			navDirection = "column";
 		}
-		return css`@import url(https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Montserrat:wght@400;500;600&amp;display=swap);
+		return css`
 			.nav,
 			.navInactive,
 			.navActive {
