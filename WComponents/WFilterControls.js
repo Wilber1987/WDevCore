@@ -421,7 +421,6 @@ class WFilterOptions extends HTMLElement {
 						break;
 				}
 				if (values != undefined || values != null) {
-					this.IsDataFromFilter = true;//indica que ha habido cambio en los controles de filtrado
 					if (this.EntityModel) {
 						this.EntityModel.FilterData.push({
 							PropName: propiertyName,
@@ -481,7 +480,7 @@ class WFilterOptions extends HTMLElement {
 	}
 	OnChange() {
 		if (!this.UseManualControlForFiltering) {
-
+			this.IsDataFromFilter = true;
 			this.filterFunction(this.Sorts);
 		}
 	}
