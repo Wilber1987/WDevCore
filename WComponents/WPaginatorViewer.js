@@ -66,8 +66,8 @@ class WPaginatorViewer extends HTMLElement {
     //#region tabla basica --------------------------------------------------------------
     Draw(Dataset = this.Dataset, filter = this.filter) {
         this.filter = filter;
-//alert(this.filter)
-        if (this.filter) {            
+        //alert(this.filter)
+        if (this.filter) {
             this.container.innerHTML = "";
             this.body = WRender.Create({ class: "paginator-pages-container", id: "MainBody" });
             this.pages = this.DrawPages(Dataset);
@@ -209,7 +209,10 @@ class WPaginatorViewer extends HTMLElement {
         tfooter.append(WRender.Create({
             tagName: "label", innerText: "<<", class: "pagBTN",
             onclick: () => {
-                this.ActualPage = this.ActualPage < 0 ? pages.length - 1 : this.ActualPage - 1;
+                this.ActualPage = this.ActualPage - 1;
+                if (this.ActualPage < 0) {
+                    this.ActualPage = pages.length - 1
+                }
                 SelectPage(this.ActualPage);
             }
         }))
@@ -217,7 +220,10 @@ class WPaginatorViewer extends HTMLElement {
         tfooter.append(WRender.Create({
             tagName: "label", innerText: ">>", class: "pagBTN",
             onclick: () => {
-                this.ActualPage = this.ActualPage > pages.length - 1 ? 0 : this.ActualPage + 1;
+                this.ActualPage = this.ActualPage + 1;
+                if (this.ActualPage > pages.length - 1) {
+                    this.ActualPage = 0
+                }
                 SelectPage(this.ActualPage);
             }
         }))

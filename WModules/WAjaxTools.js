@@ -27,7 +27,7 @@ class WAjaxTools {
     * @param {Partial<PostConfig>} [PostConfig]
     * @returns {Promise<any>}
     */
-    static Request = async (Url, Data = {}, PostConfig, retryCount = 3) => {
+    static Request = async (Url, Data = {}, PostConfig, retryCount = 1) => {
         const loadinModal = new LoadinModal();
         let isComplete = false;
     
@@ -39,7 +39,7 @@ class WAjaxTools {
     
         let attempts = 0;
     
-        while (attempts < retryCount) {
+        //while (attempts < retryCount) {
             try {
                 const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);
                 let response = await fetch(Url, config);
@@ -58,7 +58,7 @@ class WAjaxTools {
                     throw error; // Si ya alcanzamos el máximo de intentos, lanzamos el error.
                 }
             }
-        }
+        //}
     };
     /**
     * @param {String} Url

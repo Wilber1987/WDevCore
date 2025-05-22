@@ -53,7 +53,14 @@ export class WAlertMessage extends HTMLElement {
         * @param {{ Message: String, CloseOption?:  Boolean, Direction?: String , Temporal?: Boolean, Type?: String }} Config 
         */
     static Connect(Config) {
-        document.body.appendChild(new WAlertMessage(Config));
+        const alert = new WAlertMessage(Config);
+        document.body.appendChild(alert);
+        if (Config.Temporal == true) {
+            alert.style.opacity = "0";
+            setTimeout(() => {
+                alert.remove();
+            }, 500)
+        }
     }
     /**
     * conecta un nuevo alert warning en el document body

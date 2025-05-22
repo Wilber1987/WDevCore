@@ -180,7 +180,7 @@ class WFilterOptions extends HTMLElement {
 	* @param {Array<OrderData>} [sorts] 
 	*/
 	filterFunction = async (sorts) => {
-		this.IsDataFromFilter = true;
+		//this.IsDataFromFilter = true;
 		this.BuildFiltersAndSorts(sorts);
 		const Model = this.EntityModel ?? this.ModelObject;
 		if (Model.Get || this.Config.UseEntityMethods == false) {
@@ -421,7 +421,7 @@ class WFilterOptions extends HTMLElement {
 						break;
 				}
 				if (values != undefined || values != null) {
-					//this.IsDataFromFilter = true;
+					this.IsDataFromFilter = true;//indica que ha habido cambio en los controles de filtrado
 					if (this.EntityModel) {
 						this.EntityModel.FilterData.push({
 							PropName: propiertyName,
