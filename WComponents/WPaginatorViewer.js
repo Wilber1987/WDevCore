@@ -223,7 +223,7 @@ class WPaginatorViewer extends HTMLElement {
                 this.ActualPage = this.ActualPage + 1;
                 if (this.ActualPage > pages.length - 1) {
                     this.ActualPage = 0
-                }
+                }   
                 SelectPage(this.ActualPage);
             }
         }))
