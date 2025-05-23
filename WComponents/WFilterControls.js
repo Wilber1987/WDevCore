@@ -499,7 +499,7 @@ class WFilterOptions extends HTMLElement {
 					className: prop + " firstDate",
 					id: prop + "first",
 					value: this.Config.AutoSetDate == true ?  // @ts-ignore
-						(this.Config.DateRange == FilterDateRange.YEAR ? new Date().subtractDays(865).toISO() : new Date().subtractDays(30).toISO()) : undefined,
+						(this.GetFilterDate()) : undefined,
 					placeholder: prop,
 					onchange: (ev) => { this.OnChange(); }
 				}, {
@@ -516,6 +516,14 @@ class WFilterOptions extends HTMLElement {
 		});
 		return InputControl;
 	}
+	GetFilterDate() {
+		// @ts-ignore
+		return this.Config.DateRange == FilterDateRange.YEAR ? new Date().subtractDays(865).toISO() :
+			(this.Config.DateRange == FilterDateRange.MOUNT ?			
+				// @ts-ignore
+				new Date().subtractDays(30).toISO() : new Date().subtractDays(7).toISO());
+	}
+
 	CreateNumberControl(prop) {
 		let InputControl = WRender.Create({
 			id: prop,
@@ -748,5 +756,5 @@ class WFilterOptions extends HTMLElement {
 customElements.define("w-filter-option", WFilterOptions);
 export { WFilterOptions }
 export const FilterDateRange = {
-	YEAR: "YEAR", MOUNT: "MOUNT"
+	YEAR: "YEAR", MOUNT: "MOUNT", WEEK: "WEEK"
 }
