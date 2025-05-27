@@ -23,7 +23,23 @@ class ChartConfig {
  * * @property {Number} [MaxVal]
  * * @property {Array} [groupParams] 
  */
-const ColorsList = ["#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4", "#065e76", "#e63da4", "#6a549f"];
+const ColorsList = [
+  "#044fa2", "#0088ce", "#f6931e", "#eb1c24", "#01c0f4",
+  "#065e76", "#e63da4", "#6a549f", "#06b31d",
+
+  // Nuevos colores agregados:
+  "#0277bd", // azul medio
+  "#00acc1", // cian medio
+  "#ffa000", // naranja fuerte
+  "#d32f2f", // rojo intenso
+  "#26c6da", // celeste claro
+  "#00796b", // verde azulado oscuro
+  "#c2185b", // rosa fuerte
+  "#8e24aa", // púrpura intenso
+  "#2e7d32", // verde bosque
+  "#ff7043"  // naranja coral
+];
+
 class ColumChart extends HTMLElement {
     /**
      * 
@@ -177,7 +193,12 @@ class ColumChart extends HTMLElement {
         }
         Groups.data.forEach((Group) => {
             let trGroup = { type: "GroupSection", props: { class: "GroupSection" }, children: [WArrayF.Capitalize(Group[Groups.groupParam])] };
-            let groupBar = { type: "containerbar", props: { style: "padding:0px", class: "ContainerBars" }, children: [] };
+            let groupBar = {
+                type: "containerbar", props: {
+                    style: `padding: 10px; width: ${100 / (Groups.children?.length ?? 1)}%`, class: "ContainerBars"
+                }, children: []
+            };
+           // let groupBar = html`<div class="groupBar"></div>`
             if (GroupIndex == 0) {
                 trGroup.children.push(this.DrawBackgroundLine());
                 trGroup.children.push(this.DrawIconsGroups());
@@ -595,7 +616,7 @@ class RadialChart extends HTMLElement {
                     fill: "#fff",
                     "dominant-baseline": "middle",
                     "text-anchor": "middle",
-                    "font-size": "6",
+                    "font-size": "4",
                     transform: `translate(0,0),rotate(-${degs + (degs2)})`,
                 }
             })
@@ -633,7 +654,7 @@ class RadialChart extends HTMLElement {
         index = 0;
         return SectionChart;
     }
-    progressInitial(value, circle, val = 0) {
+    progressInitial2(value, circle, val = 0) {
         let RADIUS = 54;
         let Perimetro = 2 * Math.PI * RADIUS;
         circle.style.strokeDasharray = Perimetro;
@@ -646,12 +667,39 @@ class RadialChart extends HTMLElement {
                 attributeName: "stroke-dashoffset",
                 //attributeName: "stroke-dasharray",
                 from: `${circle.style.strokeDasharray}`,
-                to: `${dashoffset < 0 ? 0 : dashoffset - 6}`,
+                to: `${dashoffset < 0 ? 0 : dashoffset -6}`,
                 dur: "1s",
                 fill: "freeze",
             }
         }))
     }
+    progressInitial(value, circle, val = 0) {
+    const RADIUS = 54;
+    const PERIMETER = 2 * Math.PI * RADIUS;
+
+    // Establecer la longitud total del trazo
+    circle.style.strokeDasharray = PERIMETER;
+
+    // Calcular el progreso (proporción del perímetro a cubrir)
+    const progress = value / 100;
+    const dashoffset = PERIMETER * (1 - progress) - val;
+
+    // Forzar el estado inicial del dashoffset (totalmente oculto)
+    circle.style.strokeDashoffset = PERIMETER;
+
+    // Agregar la animación de forma precisa
+    circle.appendChild(WRender.createElementNS({
+        type: "animate",
+        props: {
+            attributeName: "stroke-dashoffset",
+            from: PERIMETER,
+            to: dashoffset < 0 ? 0 : dashoffset,
+            dur: "1s",
+            fill: "freeze",
+        }
+    }));
+}
+
 }
 const GenerateColor = () => {
     var hexadecimal = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
@@ -682,8 +730,8 @@ const WChartStyle = (ChartInstance) => {
         }
         .WChartContainerRadial {
             display: grid;
-            grid-template-columns: 70% 30%;
-            gap: 20px;
+            grid-template-columns: 60% 40%;
+            gap: 0px;
         }
         .WChartContainerRadial h3 {
             grid-column: span 2;
@@ -1017,7 +1065,7 @@ class GanttChart extends HTMLElement {
     }
     DrawComponent = async () => {
         this.Task.innerHTML = "";
-        this.TaskContainer.innerHTML ="";
+        this.TaskContainer.innerHTML = "";
         this.TimeLine.innerHTML = "";
         if (this.Dataset == undefined || this.Dataset == null || this.Dataset.length == 0) {
             this.TimeLine.innerHTML = "NO DATA";
@@ -1238,7 +1286,7 @@ class GanttChart extends HTMLElement {
         }
 
         .page-footer span {
-            color: #e31b23;
+            color: #47008a;
         }
     `
 }

@@ -519,7 +519,7 @@ class WFilterOptions extends HTMLElement {
 	GetFilterDate() {
 		// @ts-ignore
 		return this.Config.DateRange == FilterDateRange.YEAR ? new Date().subtractDays(865).toISO() :
-			(this.Config.DateRange == FilterDateRange.MOUNT ?			
+			(this.Config.DateRange == FilterDateRange.MOUNT ?
 				// @ts-ignore
 				new Date().subtractDays(30).toISO() : new Date().subtractDays(7).toISO());
 	}
@@ -609,8 +609,7 @@ class WFilterOptions extends HTMLElement {
 			margin: 10px;
 		}
 
-		.filter-container {  
-			padding: 10px;
+		.filter-container {
 			display: flex;
 			justify-content: center;
 			flex-direction: column;
@@ -623,7 +622,8 @@ class WFilterOptions extends HTMLElement {
 			gap: 20px;
 			align-items: center;
 			max-height: 0px;
-			overflow: hidden;      
+			overflow: hidden;  
+			width: 100%;
 			& .btn-go {
 				height: 40px;
 			}
@@ -636,17 +636,16 @@ class WFilterOptions extends HTMLElement {
 			padding: 10px;		
 			transition: all 0.3s;
 			border-radius: 10px; 
-			border-radius: 10px;   
-		   
-			
+			border-radius: 10px; 		   
+			container-type: inline-size;			
 		}
 
 		.OptionContainerActive {
 			max-height: inherit;
-			padding: 10px;
 			transition: all 0.3s;
 			border: 1px solid var(--fifty-color);
 			overflow: unset;
+			border-radius: 5px;
 		}
 
 		.OptionContainer label {
@@ -695,7 +694,7 @@ class WFilterOptions extends HTMLElement {
 		}
 		.multi-control {
 			display: flex !important;
-			gap: 15px;
+			gap: 15px;			
 		}
 
 		.BtnSuccess {
@@ -733,6 +732,11 @@ class WFilterOptions extends HTMLElement {
 		}
 		.secondNumber::before {
 			content: "Hasta: ";
+		}
+		@container (width < 400px) { 
+			.multi-control { 
+				flex-direction: column;
+			}
 		}
 
 		@media (max-width: 900px) {
