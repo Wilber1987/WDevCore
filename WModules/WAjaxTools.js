@@ -30,34 +30,36 @@ class WAjaxTools {
     static Request = async (Url, Data = {}, PostConfig, retryCount = 1) => {
         const loadinModal = new LoadinModal();
         let isComplete = false;
-    
+
         setTimeout(() => {
             if (!PostConfig?.WithoutLoading && !isComplete) {
                 document.body.appendChild(loadinModal);
             }
         }, 2000);
-    
+
         let attempts = 0;
-    
+
         //while (attempts < retryCount) {
-            try {
-                const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);
-                let response = await fetch(Url, config);
-                const ProcessRequest = await WAjaxTools.ProcessRequest(response, Url);
+        try {
+            const config = WAjaxTools.BuildConfigRequest(PostConfig, Data);
+            let response = await fetch(Url, config);
+            const ProcessRequest = await WAjaxTools.ProcessRequest(response, Url);
+            loadinModal.close();
+            isComplete = true;
+            if (!response) {
+                WSecurity.ValidateResponse(ProcessRequest)
+            }
+            return ProcessRequest;
+        } catch (error) {
+            attempts++;
+            if (attempts >= retryCount) {
                 loadinModal.close();
                 isComplete = true;
-                WSecurity.ValidateResponse(ProcessRequest)
-                return ProcessRequest;
-            } catch (error) {
-                attempts++;
-                if (attempts >= retryCount) {
-                    loadinModal.close();
-                    isComplete = true;
-                    console.error(`Error after ${retryCount} attempts:`, error);
-                    WAlertMessage.Danger(error.message, true);
-                    throw error; // Si ya alcanzamos el máximo de intentos, lanzamos el error.
-                }
+                console.error(`Error after ${retryCount} attempts:`, error);
+                WAlertMessage.Danger(error.message, true);
+                throw error; // Si ya alcanzamos el máximo de intentos, lanzamos el error.
             }
+        }
         //}
     };
     /**
@@ -89,25 +91,29 @@ class WAjaxTools {
         }
     }
     static ProcessRequest = async (response, Url) => {
-        if (response.status == 400 || response.status == 403 || response.status == 404 || response.status == 500) {
+        if ([400, 403, 404, 500].includes(response.status)) {
             const messageError = await response.text();
-            var lineas = messageError.split(/\r?\n/);
+            const lineas = messageError.split(/\r?\n/);
             console.log(lineas);
             document.body.append(ModalMessage(lineas[0]));
             throw new Error(this.ProcessError(lineas[0])).message;
         } else {
             try {
-                response = await response.json(response);
-                localStorage.setItem(Url, JSON.stringify(response));
-                return response;
+                const text = await response.text();
+                if (text.trim().length === 0) {
+                    return null; // o null, dependiendo de cómo quieres manejarlo
+                }
+                const json = JSON.parse(text);
+                return json;
             } catch (error) {
                 console.log(error);
                 console.log(response);
-                console.log(`ocurrio un error al procesar los datos de la respuesta - ${Url}`);
-                return response;
+                console.log(`Ocurrió un error al procesar los datos de la respuesta - ${Url}`);
+                return null; // o response, si prefieres retornar el objeto de respuesta sin procesar
             }
         }
     }
+
     /**
     * @param {Partial<PostConfig>} postConfig 
     * @param {any} Data 

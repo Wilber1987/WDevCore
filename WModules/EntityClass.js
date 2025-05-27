@@ -37,7 +37,8 @@ class EntityClass {
      * @param {String} Param 
      * @returns {any}
      */
-    Find = async () => {
+    Find = async (...filters) => {
+        this.FilterData = filters;
         let FindObject = await this.GetData(this.ApiMethods.Find);
         if (FindObject) {
             return (new this.constructor(FindObject));
@@ -101,7 +102,7 @@ class EntityClass {
         })
         // let Dataset = await fetch(this.ApiMethods.ApiRoute + this.constructor.name + '.json');
         //Dataset = await Dataset.json()
-        if (Dataset.__proto__ == Object.prototype) {
+        if (Dataset == null || Dataset.__proto__ == Object.prototype) {
             return Dataset;
         }
         return Dataset.map(ent => new this.constructor(ent));
@@ -147,5 +148,7 @@ class EntityClass {
         }
         return replacerElement;
     }
+    isRemovable;
+    isEditable;
 }
 export { EntityClass }

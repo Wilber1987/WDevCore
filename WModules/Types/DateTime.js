@@ -22,7 +22,20 @@ class DateTime extends Date {
     toISO() {
         return this.Date.toISO();
     }
-
+    /**
+     * Formatea una fecha a formato DD/MM/AA HH:mm
+     * @param {String|Date} date 
+     * @returns {String}
+     */
+    toISODateTime(date = this) {
+        const d = new Date(date);
+        const day = pad(d.getDate());
+        const month = pad(d.getMonth() + 1);
+        const year = d.getFullYear();
+        const hours = pad(d.getHours());
+        const minutes = pad(d.getMinutes());
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
     /**
     * @returns {String} ISO 8601 date string (YYYY-MM-DD)
     */
@@ -51,12 +64,13 @@ class DateTime extends Date {
         return `${day}/${month}/${year}`;
     }
 
+
     /**
      * Formatea una fecha a formato DD/MM/AA HH:mm
      * @param {String|Date} date 
      * @returns {String}
      */
-    formatDateTimeToDDMMYYHHMM(date) {
+    formatDateTimeToDDMMYYHHMM(date = this) {
         const d = new Date(date);
         const day = pad(d.getDate());
         const month = pad(d.getMonth() + 1);
@@ -65,76 +79,76 @@ class DateTime extends Date {
         const minutes = pad(d.getMinutes());
         return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
-/**
- * @returns {String} Formatted date string (dd de mes de a o)
- */
-toDateFormatEs() {
-    return this.Date.toString().toDateFormatEs();
-}
+    /**
+     * @returns {String} Formatted date string (dd de mes de a o)
+     */
+    toDateFormatEs() {
+        return this.Date.toString().toDateFormatEs();
+    }
 
-/**
- * @returns {String} Formatted date and time string (d de mes de a o, h:i a)
- */
-toDateTimeFormatEs() {
-    return this.Date.toString().toDateTimeFormatEs();
-}
+    /**
+     * @returns {String} Formatted date and time string (d de mes de a o, h:i a)
+     */
+    toDateTimeFormatEs() {
+        return this.Date.toString().toDateTimeFormatEs();
+    }
 
-/**
- * @returns {Date} A new Date object representing the start of the day
- * (i.e. the date at 00:00:00)
- */
-toStartDate() {
-    return this.Date.toStartDate();
-}
+    /**
+     * @returns {Date} A new Date object representing the start of the day
+     * (i.e. the date at 00:00:00)
+     */
+    toStartDate() {
+        return this.Date.toStartDate();
+    }
 
-/**
- * Adds the given number of days to the date
- * @param {Integer} days The number of days to add
- * @returns {DateTime} The modified DateTime object
- */
-addDays(days) {
-    this.Date.addDays(days);
-    return this;
-}
+    /**
+     * Adds the given number of days to the date
+     * @param {Integer} days The number of days to add
+     * @returns {DateTime} The modified DateTime object
+     */
+    addDays(days) {
+        this.Date.addDays(days);
+        return this;
+    }
 
-/**
- * Subtracts the given number of days from the date
- * @param {Integer} days The number of days to subtract
- * @returns {DateTime} The modified DateTime object
- */
-subtractDays(days) {
-    this.Date.subtractDays(days);
-    return this;
-}
+    /**
+     * Subtracts the given number of days from the date
+     * @param {Integer} days The number of days to subtract
+     * @returns {DateTime} The modified DateTime object
+     */
+    subtractDays(days) {
+        this.Date.subtractDays(days);
+        return this;
+    }
 
-/**
- * Modifies the month of the date by the given number of months
- * @param {Number} Meses The number of months to add (positive) or subtract (negative)
- * @returns {DateTime} The modified DateTime object
- */
-modifyMonth(Meses) {
-    this.Date.modifyMonth(Meses);
-    return this;
-}
+    /**
+     * Modifies the month of the date by the given number of months
+     * @param {Number} Meses The number of months to add (positive) or subtract (negative)
+     * @returns {DateTime} The modified DateTime object
+     */
+    modifyMonth(Meses) {
+        this.Date.modifyMonth(Meses);
+        return this;
+    }
 
-/**
- * @returns {String} Month as a string (e.g. 'enero', 'febrero', etc.)
- */
-getMonthFormatEs() {
-    if (this.Date == null || this.Date == undefined || this.Date == "") return "";
-    const fecha = new Date(this.Date);
-    return DateTime.Meses[fecha.getMonth()];
-}
+    /**
+     * @returns {String} Month as a string (e.g. 'enero', 'febrero', etc.)
+     */
+    getMonthFormatEs() {
+        if (this.Date == null || this.Date == undefined || this.Date == "") return "";
+        const fecha = new Date(this.Date);
+        return DateTime.Meses[fecha.getMonth()];
+    }
 
-/**
- * @returns {String} Day of the week as a string (e.g. 'lunes', 'martes', etc.)
- */
-getDayFormatEs() {
-    return this.Date.getDayFormatEs();
-}
-GetFullHour() {
-    return pad(this.Date.getHours()) + ':' + pad(this.Date.getMinutes()) + ':' + pad(this.Date.getSeconds());
-}  
+    /**
+     * @returns {String} Day of the week as a string (e.g. 'lunes', 'martes', etc.)
+     */
+    getDayFormatEs() {
+        return this.Date.getDayFormatEs();
+    }
+    GetFullHour() {
+        return pad(this.Date.getHours()) + ':' + pad(this.Date.getMinutes()) + ':' + pad(this.Date.getSeconds());
+    }
     static Meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     static MesesIngles = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
     static Dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];

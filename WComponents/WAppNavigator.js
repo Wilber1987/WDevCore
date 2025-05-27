@@ -108,7 +108,7 @@ class WAppNavigator extends HTMLElement {
 		}
 
 		this.Elements.forEach((element, Index) => {
-			if (element.Disabled == false) {
+			if (element.Disabled == false || element.rendered == false) {
 				return;
 			}
 			const elementNav = WRender.createElement({

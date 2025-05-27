@@ -16,7 +16,7 @@ class ResponseServices { }
 * @param {Object} [EditingObject] este objeto es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante
 * @returns {Object}
 */
-function ModelFunction(EditingObject) { 
+function ModelFunction(EditingObject) {
 	return {}
 }
 /**
@@ -440,6 +440,10 @@ class FilterData {
 	/**@type {String} */ FilterType;
 	/**@type {Array<any>}*/ Values;
 	/**@type {Array<FilterData>}*/ Filters;
+
+	/**@type {String}*/ JsonPropName;
+	/**@type {String}*/ FilterType;
+	/**@type {String}*/ PropSQLType;
 	// Static methods
 
 	static In(propName, ...values) {
@@ -515,6 +519,20 @@ class FilterData {
 
 	static Limit(value) {
 		return new FilterData({ FilterType: "limit", Values: [value.toString()] });
+	}
+
+	//json filters
+	static JsonPropEqual(propName, jsonPropName , value, type) {
+		if (value === null || value === undefined) {
+			throw new Error(`The value cannot be null or undefined for ${propName}`);
+		}
+		return new FilterData({
+			PropName: propName,
+			JsonPropName: jsonPropName,
+			FilterType: "JSONPROP_EQUAL",
+			PropSQLType: type,
+			Values: [value?.toString()]
+		});
 	}
 }
 class OrderData {

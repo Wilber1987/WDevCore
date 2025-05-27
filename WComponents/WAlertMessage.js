@@ -17,6 +17,7 @@ export class WAlertMessage extends HTMLElement {
         this.Direction = Config.Direction ?? 'top';
         this.Temporal = Config.Temporal ?? false;
         this.Type = Config.Type ?? 'info';
+        this.style.zIndex = "20001";
     }
 
     connectedCallback() {

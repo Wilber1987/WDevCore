@@ -557,7 +557,8 @@ class WTableComponent extends HTMLElement {
     }
 
     DeleteBTN = async (Options, element, tr) => {
-        if (this.Options?.Delete != undefined && this.Options.Delete == true) {
+        if (this.Options?.Delete != undefined
+            && this.Options.Delete == true && element.isRemovable != false) {
             Options.append(WRender.Create({
                 tagName: "button",
                 children: [{ tagName: 'img', class: "icon", src: WIcons["delete"] }],
@@ -595,7 +596,8 @@ class WTableComponent extends HTMLElement {
     }
 
     EditBTN(Options, element, tr) {
-        if (this.Options?.Edit != undefined && this.Options.Edit == true && element.isEditable != false) {
+        if (this.Options?.Edit != undefined
+            && this.Options.Edit == true && element.isEditable != false) {
             Options.append(WRender.Create({
                 tagName: "button",
                 children: [{ tagName: 'img', class: "icon", src: WIcons["edit"] }],

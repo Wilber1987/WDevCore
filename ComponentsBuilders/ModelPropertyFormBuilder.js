@@ -32,7 +32,7 @@ export class ModelPropertyFormBuilder {
 			id: "ControlValue" + prop,
 			className: prop,
 			value:  this.PrepareVisualization(EditingObject[prop] ?? defaultValue, ModelProperty.type.toUpperCase()) ,
-			type: ModelProperty.type.toUpperCase() == "MONEY" || ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type,
+			type: ModelPropertyFormBuilder.GetInputType(ModelProperty),
 			min: min,
 			max: max,
 			placeholder: calculatePlaceholder ?? placeholder,
@@ -43,12 +43,25 @@ export class ModelPropertyFormBuilder {
 		});
 		return InputControl;
 	}
+	static GetInputType(ModelProperty) {
+		if ( ModelProperty.type.toUpperCase() == "DATETIME") {
+			return "datetime-local"
+		}
+		return ModelProperty.type.toUpperCase() == "MONEY" || ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type;
+	}
+
 	static PrepareVisualization(value, type) {
 		if (type == "MONEY") {
-			return parseFloat(value).toFixed(2);
+			return parseFloat(value).toFixed(3);
 		}
 		if (type == "PERCENTAGE") {
 			return parseFloat(value).toFixed(2);
+		}
+		if (type == "DATE") {
+			return new DateTime(value).toISO();
+		}
+		if (type == "DATETIME") {
+			return new DateTime(value).toISODateTime();
 		}
 		return value;
 	}
@@ -550,8 +563,6 @@ export class ModelPropertyFormBuilder {
 		let max = ModelProperty.max;
 		let min = ModelProperty.min;
 		let defaultValue = ModelProperty.defaultValue;
-
-
 		switch (ModelProperty.type?.toUpperCase()) {
 			case "TIME":
 				min = min ?? "06:00";
@@ -566,11 +577,9 @@ export class ModelPropertyFormBuilder {
 			case "DATETIME":
 				max = max ?? '3000-01-01T23:59';
 				min = min ?? '1900-01-01T00:00';
-				defaultValue = defaultValue ?? new DateTime().toISO();
+				defaultValue = defaultValue ?? new DateTime().formatDateTimeToDDMMYYHHMM();
 				break;
 		}
-
-
 		return { max, min, defaultValue }
 	}
 	/**
