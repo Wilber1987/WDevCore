@@ -489,7 +489,8 @@ class WForm extends HTMLElement {
 	Validate = (ObjectF = this.FormObject) => {
 		if (this.DataRequire == true) {
 			for (const prop in ObjectF) {
-				if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require) {
+				if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require
+					&& this.Config.ModelObject[prop]?.hidden != true) {
 					/**
 					 * @type {?HTMLInputElement | undefined | any}
 					 */

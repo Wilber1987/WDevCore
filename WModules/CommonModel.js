@@ -442,7 +442,6 @@ class FilterData {
 	/**@type {Array<FilterData>}*/ Filters;
 
 	/**@type {String}*/ JsonPropName;
-	/**@type {String}*/ FilterType;
 	/**@type {String}*/ PropSQLType;
 	// Static methods
 

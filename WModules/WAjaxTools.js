@@ -103,6 +103,7 @@ class WAjaxTools {
                 if (text.trim().length === 0) {
                     return null; // o null, dependiendo de cómo quieres manejarlo
                 }
+                localStorage.setItem(Url,text);
                 const json = JSON.parse(text);
                 return json;
             } catch (error) {
