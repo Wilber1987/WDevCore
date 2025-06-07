@@ -31,7 +31,7 @@ export class ModelPropertyFormBuilder {
 			tagName: "input",
 			id: "ControlValue" + prop,
 			className: prop,
-			value:  this.PrepareVisualization(EditingObject[prop] ?? defaultValue, ModelProperty.type.toUpperCase()) ,
+			value: this.PrepareVisualization(EditingObject[prop] ?? defaultValue, ModelProperty.type.toUpperCase()),
 			type: ModelPropertyFormBuilder.GetInputType(ModelProperty),
 			min: min,
 			max: max,
@@ -44,7 +44,7 @@ export class ModelPropertyFormBuilder {
 		return InputControl;
 	}
 	static GetInputType(ModelProperty) {
-		if ( ModelProperty.type.toUpperCase() == "DATETIME") {
+		if (ModelProperty.type.toUpperCase() == "DATETIME") {
 			return "datetime-local"
 		}
 		return ModelProperty.type.toUpperCase() == "MONEY" || ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type;
@@ -358,11 +358,11 @@ export class ModelPropertyFormBuilder {
 			EntityModel: ModelProperty.EntityModel,
 			EditObject: EditingObject[prop],
 			limit: fatherForm.limit,
-            DivColumns: fatherForm.DivColumns,
+			DivColumns: fatherForm.DivColumns,
 			Options: false
 		});
 		form.style.pointerEvents = disabled ? "none" : "auto";
-		
+
 		return form;
 	}
 
@@ -430,7 +430,7 @@ export class ModelPropertyFormBuilder {
 			Files: EditingObject[prop]?.__proto__ == Array.prototype ? EditingObject[prop] : (typeof EditingObject[prop] === "string" && !multiple ? [EditingObject[prop]] : []),
 			Types: filesType,
 			action: disabled ? undefined : async () => {
-				if(["IMG","IMAGE"].includes(ModelProperty.type?.toUpperCase())){
+				if (["IMG", "IMAGE"].includes(ModelProperty.type?.toUpperCase())) {
 					EditingObject[prop] = InputControl.GetModelValue()[0]?.Value;
 				} else {
 					EditingObject[prop] = InputControl.GetModelValue();
@@ -599,7 +599,7 @@ export class ModelPropertyFormBuilder {
 				placeholder = "Ejem.: user@example.com";
 				break;
 			case "TEL":
-				pattern = pattern ?? "\\+?[0-9]{1,4}?[-.\\s]?\\(?[0-9]{1,3}?\\)?[-.\\s]?[0-9]{1,4}[-.\\s]?[0-9]{1,4}[-.\\s]?[0-9]{1,9}";
+				pattern = pattern ?? "^(\\+\\d{1,4})?\\d{7,8}$"
 				placeholder = "Ejem.: +1234567890";
 				break;
 			case "URL":

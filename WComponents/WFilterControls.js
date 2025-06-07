@@ -1,7 +1,7 @@
 //@ts-check
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 // @ts-ignore
-import { ModelProperty, OrderData } from "../WModules/CommonModel.js";
+import { FilterData, ModelProperty, OrderData } from "../WModules/CommonModel.js";
 import { EntityClass } from "../WModules/EntityClass.js";
 import { html, WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -329,6 +329,7 @@ class WFilterOptions extends HTMLElement {
 			if (this.ModelObject[control.id]) {
 				let values;
 				let filterType;
+				let propType;
 				/**
 				 * @type {ModelProperty}
 				 */
@@ -355,8 +356,8 @@ class WFilterOptions extends HTMLElement {
 					case "DATE": case "FECHA": case "TIME":
 						/**TODO */
 						filterType = "BETWEEN";
+						propType = "Date";
 						const inputs = control.querySelectorAll("input");
-						console.log(inputs);
 
 						if (inputs[0].value != '' || inputs[1].value != '') {
 							values = [];
@@ -421,18 +422,16 @@ class WFilterOptions extends HTMLElement {
 						break;
 				}
 				if (values != undefined || values != null) {
-					if (this.EntityModel) {
-						this.EntityModel.FilterData.push({
+					const filterData = new FilterData( {
 							PropName: propiertyName,
 							FilterType: filterType,
-							Values: values
+							Values: values, 
+							PropSQLType: propType
 						});
+					if (this.EntityModel) {
+						this.EntityModel.FilterData.push(filterData);
 					}
-					this.ModelObject.FilterData.push({
-						PropName: propiertyName,
-						FilterType: filterType,
-						Values: values
-					});
+					this.ModelObject.FilterData.push(filterData);
 				}
 
 			}
@@ -624,6 +623,7 @@ class WFilterOptions extends HTMLElement {
 			max-height: 0px;
 			overflow: hidden;  
 			width: 100%;
+			border-radius: 10px;
 			& .btn-go {
 				height: 40px;
 			}
@@ -632,10 +632,9 @@ class WFilterOptions extends HTMLElement {
 			display: grid;
 			width: -webkit-fill-available;
 			grid-template-columns: repeat(3,1fr);
-			grid-gap: 15px;
+			grid-gap: 10px;
 			padding: 10px;		
 			transition: all 0.3s;
-			border-radius: 10px; 
 			border-radius: 10px; 		   
 			container-type: inline-size;			
 		}
@@ -645,11 +644,11 @@ class WFilterOptions extends HTMLElement {
 			transition: all 0.3s;
 			border: 1px solid var(--fifty-color);
 			overflow: unset;
-			border-radius: 5px;
+			
 		}
 
 		.OptionContainer label {
-			padding: 10px;
+			padding-bottom: 10px;
 			display: block;
 			text-transform: capitalize;
 			color: var(--font-primary-color);
