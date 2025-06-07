@@ -52,6 +52,8 @@ export class ModelPropertyFormBuilder {
 
 	static PrepareVisualization(value, type) {
 		if (type == "MONEY") {
+			console.log(value, parseFloat(value));
+			
 			return parseFloat(value).toFixed(3);
 		}
 		if (type == "PERCENTAGE") {
@@ -390,7 +392,7 @@ export class ModelPropertyFormBuilder {
 			EntityModel: ModelProperty.EntityModel,
 			ParentEntity: EditingObject,
 			ImageUrlPath: ImageUrlPath,
-			Options: {
+			Options: ModelProperty.Options ??  {
 				Add: ModelProperty.Options?.Add ?? true,
 				Edit: ModelProperty.Options?.Edit ?? true,
 				Delete: ModelProperty.Options?.Delete ?? true,

@@ -22,6 +22,7 @@ export class GroupComponent extends HTMLElement {
 		this.classList.add(Config.className ?? "div");
 		this.classList.add(Config.Name?.replaceAll(" ", "") ?? "formulario");
 		this.Content = html`<div class="group-content divForm"></div>`;
+		this.nodesList = [];
 	}
 
 	connectedCallback() {
@@ -74,6 +75,7 @@ export class GroupComponent extends HTMLElement {
 	}
 
 	Add(node) {
+		this.nodesList.push(node)
 		this.Content.append(node);
 	}
 

@@ -13,6 +13,7 @@ import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
 import { GroupComponent } from './FormComponents/GroupComponent.js';
 import { ModalMessage } from './ModalMessage.js';
 import { ModalVericateAction } from './ModalVericateAction.js';
+import { WAlertMessage } from "./WAlertMessage.js";
 
 /**
  * @typedef {Object} FormConfig 
@@ -53,6 +54,7 @@ class WForm extends HTMLElement {
 		this.Controls = {};
 
 		this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
+		this.DivFormOptions = WRender.Create({ class: "ContainerFormWModal" });
 		this.shadowRoot?.append(StyleScrolls.cloneNode(true));
 		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
 
@@ -61,12 +63,13 @@ class WForm extends HTMLElement {
 		if (this.Config.CustomStyle) {
 			this.shadowRoot?.append(this.Config.CustomStyle);
 		}
-		this.shadowRoot?.append(this.DivForm);
-		/**@type {Array<GroupComponent>} */
-		this.GroupsForm = [];
+		this.shadowRoot?.append(this.DivForm, this.DivFormOptions);
+		//**@type {Array<GroupComponent>} */
+		//GroupsForm = [];
 
 		this.ExistChange = false;
 		this.ObjectProxy = this.ObjectProxy ?? undefined;
+		this.OptionsActive = false;
 		this.DrawComponent();
 	}
 	InizializeConfig(Config) {
@@ -82,8 +85,6 @@ class WForm extends HTMLElement {
 		this.Options = this.Options ?? true;
 		this.DataRequire = this.DataRequire ?? true;
 		this.StyleForm = this.Config.StyleForm;
-
-
 		if (!this.limit && !this.DivColumns) {
 			const props = Object.keys(this.ModelObject).filter(prop => !this.isNotDrawable(this.ModelObject, prop));
 			if (props.length < 5) {
@@ -115,7 +116,7 @@ class WForm extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.InizializeConfig(this.Config);
+		//this.InizializeConfig(this.Config);
 		if (this.IsInizialized == true) {
 			//this.DrawComponent();
 		}
@@ -141,8 +142,10 @@ class WForm extends HTMLElement {
 		const ObjectProxy = this.CreateProxy(Model);
 		this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
 		await this.CrudForm(ObjectProxy);
-		if (this.Options == true) {
-			this.DivForm.appendChild(await this.SaveOptions(ObjectProxy));
+		if (this.Options == true && !this.OptionsActive) {
+			this.OptionsActive = true;
+			this.DivFormOptions.appendChild(await this.SaveOptions(ObjectProxy));
+
 		}
 	}
 	CreateProxy(Model, FormObject = this.FormObject) {
@@ -166,8 +169,6 @@ class WForm extends HTMLElement {
 							// @ts-ignore
 							control.min = modelProperty.min ?? control.min;
 						}
-
-
 					}
 				}
 				if (this.Config.ProxyAction != undefined) {
@@ -209,19 +210,19 @@ class WForm extends HTMLElement {
 	* @param {Object} ObjectF 
 	*/
 	CrudForm = async (ObjectF = {}) => {
-
+		//GroupsForm.length = 0;
 		//verifica que el modelo existe,
 		//sino es asi le asigna el valor de un objeto existente
 		const Model = this.Config.ModelObject ?? this.Config.EditObject;
 		const Form = new GroupComponent({ Name: this.Config.Title ?? undefined });
-		this.GroupsForm = [Form];
+		const GroupsForm = [Form];
 		this.Config.Groups?.forEach(group => {
 			// Crear el contenedor principal del grupo
 			const groupContainer = new GroupComponent(group);
-			// Agregar el grupo al arreglo this.GroupsForm
-			this.GroupsForm?.push(groupContainer);
+			// Agregar el grupo al arreglo GroupsForm
+			GroupsForm?.push(groupContainer);
 		});
-		this.GroupsForm.forEach(DivForm => {
+		GroupsForm.forEach(DivForm => {
 			this.DivForm?.append(DivForm);
 		});
 		//const ModelComplexElements = Object.keys(this.Config.ModelObject).filter(o => this.Config.ModelObject[o]?.type?.toUpperCase() == "MASTERDETAIL"
@@ -230,7 +231,7 @@ class WForm extends HTMLElement {
 		//const ComplexForm = WRender.Create({ className: 'divComplexForm', style: ModelComplexElements.length <= 1 ? "grid-template-columns: unset" : "" });
 
 		for (const prop in Model) {
-			const DivForm = this.DefineContainer(prop);
+			const DivForm = this.DefineContainer(prop, GroupsForm);
 			try {
 				Model[prop] = Model[prop] != null ? Model[prop] : undefined;
 				if (this.isNotDrawable(Model, prop)) {
@@ -264,8 +265,11 @@ class WForm extends HTMLElement {
 					if (Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
 						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop) + (Model[prop].require == false ? "" : "*");
 						await this.CreateModelControl(Model, prop, ControlContainer, ObjectF, ControlLabel, onChangeEvent, DivForm);
+						//console.trace();
+						//console.log(DivForm.nodesList);
 						//ControlContainer.append(InputControl);
 					}
+
 				}
 
 			} catch (error) {
@@ -281,15 +285,16 @@ class WForm extends HTMLElement {
 
 	/**
 	 * @param {string} prop
+	*  @param {Array<GroupComponent>} GroupsForm
 	 * @returns {GroupComponent}
 	 */
-	DefineContainer(prop) {
+	DefineContainer(prop, GroupsForm) {
 		/** @type {GroupComponent} */
-		let div = this.GroupsForm[0];
+		let div = GroupsForm[0];
 		// Buscar si la propiedad está en algún grupo
 		for (const group of /** @type {Array<{Name: string, Propertys: string[]}>} */ (this.Config.Groups ?? [])) {
 			if (group.Propertys.includes(prop)) {
-				div = /** @type {GroupComponent} */ (this.GroupsForm?.find(d => d.className?.includes(group.Name?.replaceAll(" ", ""))));
+				div = /** @type {GroupComponent} */ (GroupsForm?.find(d => d.className?.includes(group.Name?.replaceAll(" ", ""))));
 				break;
 			}
 		}
@@ -672,11 +677,13 @@ class WForm extends HTMLElement {
 				this.shadowRoot?.append(loadinModal);
 				if (withModel) {
 					const response = await this.Config.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
-					if (response.status == 500 && response.message) {
+					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
-						this.shadowRoot?.append(ModalMessage(response.message))
+						WAlertMessage.Danger(response.message)
 						return;
+					} if (response.status == 200 && response.message) {
+						WAlertMessage.Success(response.message)
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				} else if (this.Config.ObjectOptions?.Url != undefined) {
