@@ -84,7 +84,7 @@ export const WChatStyle = css`
  }
 
  .default-text h1 {
-	 font-size: 3.3rem;
+	 font-size: 1.5em !important;
  }
 
  .default-text .pElement {
@@ -125,6 +125,9 @@ export const WChatStyle = css`
 	background: var(--incoming-chat-bg);
 	border: 1px solid var(--incoming-chat-border);
 }
+#ControlValueCorreo {
+	border: solid #eee 1px !important;
+}
 
  .chat .chat-content {
 	 display: flex;
@@ -164,9 +167,18 @@ export const WChatStyle = css`
 	 border-radius: 2px;
  }
 
+#send-btn {
+	color: #1571db;
+}
+#delete-btn {
+	color: #db6030;
+	width: 30px;
+}
+
+
  .chat .chat-details .pElement {
 	 white-space: pre-wrap;
-	 font-size: 1.05rem;
+	 font-size: 12px !important;
 	 padding: 0 50px 0 25px;
 	 color: var(--text-color);
 	 word-break: break-word;
@@ -246,13 +258,13 @@ export const WChatStyle = css`
 
  .typing-textarea textarea {
 	 resize: none;
-	 min-height: 55px;
-	 height: 55px;
+	 min-height: 45px;
+	 font-size: 14px !important;
+	 height: 45px;
 	 width: 100%;
 	 border: none;
 	 padding: 15px 45px 15px 20px;
 	 color: var(--text-color);
-	 font-size: 1rem;
 	 border-radius: 4px;
 	 max-height: 250px;
 	 overflow-y: auto;
@@ -302,9 +314,6 @@ export const WChatStyle = css`
  }
 
  w-form {
-	max-width: 400px;
-	padding: 40px 40px; 
-	background-color: var(--secundary-color)
  }
  .material-symbols-rounded{
 	max-width: 50px;
@@ -313,10 +322,6 @@ export const WChatStyle = css`
 
  /* Reponsive Media Query */
  @media screen and (max-width: 800px) {
-	 .default-text h1 {
-		 font-size: 2.3rem;
-	 }
-
 	 :where(.default-text .pElement, textarea, .chat .pElement) {
 		 font-size: 0.95rem !important;
 	 }
@@ -326,8 +331,8 @@ export const WChatStyle = css`
 	 }
 
 	 .chat-container .chat img {
-		 height: 32px;
-		 width: 32px;
+		 height: 25px;
+		 width: 25px;
 	 }
 
 	 .chat-container .chat .pElement {
@@ -358,7 +363,7 @@ export const WChatStyle = css`
 	 }
 	 
 	 .chat .chat-details .pElement {
-		padding: 0 20px 0 20px;
+		padding: 0 10px 0 10px;
 	 }
  }
 `

@@ -112,21 +112,20 @@ class WChatComponent extends HTMLElement {
 					// @ts-ignore
 					localStorage.setItem("identity", this.identity.Value)
 					form.remove();
-					header.remove();
+					//header.remove();
 					this.chatContainer.querySelector(".default-text")?.remove();
 					this.Draw();
 					this.update()
 				}
 			})
-			this.append(html`<div class="default-text">
-				${header}
+			this.append(html`<div class="default-text">				
 				${form}
 			</div>`);
 			return;
 		}
 		/**@type {HTMLInputElement} */
 		// @ts-ignore
-		const chatInput = html`<textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required></textarea>`
+		const chatInput = html`<textarea id="chat-input" spellcheck="false"  required></textarea>`
 		const sendButton = html`<span id="send-btn" class="material-symbols-rounded">send</span>`
 
 		const themeButton = html`<span id="theme-btn" class="material-symbols-rounded" style="display: none">light_mode</span>`;

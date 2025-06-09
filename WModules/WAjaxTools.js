@@ -101,19 +101,35 @@ class WAjaxTools {
             try {
                 const text = await response.text();
                 if (text.trim().length === 0) {
-                    return null; // o null, dependiendo de cómo quieres manejarlo
+                    return null;
                 }
-                localStorage.setItem(Url,text);
+
+                // Validar si la respuesta es almacenable (puedes personalizar esta lógica)
+                const isStorable = text.length < 1024 * 1024 * 2; // ejemplo: menor a 2MB
+
+                if (isStorable) {
+                    try {
+                        localStorage.setItem(Url, text);
+                    } catch (e) {
+                        if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                            console.warn(`No se pudo almacenar en localStorage: límite excedido (${Url})`);
+                        } else {
+                            console.warn(`Error desconocido al usar localStorage (${Url}):`, e);
+                        }
+                    }
+                }
+
                 const json = JSON.parse(text);
                 return json;
             } catch (error) {
                 console.log(error);
                 console.log(response);
                 console.log(`Ocurrió un error al procesar los datos de la respuesta - ${Url}`);
-                return null; // o response, si prefieres retornar el objeto de respuesta sin procesar
+                return null;
             }
         }
     }
+
 
     /**
     * @param {Partial<PostConfig>} postConfig 

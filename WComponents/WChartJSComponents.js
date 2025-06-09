@@ -42,7 +42,6 @@ const ColorsList = [
 
 class ColumChart extends HTMLElement {
     /**
-     * 
      * @param {ChartInstance} ChartInstance 
      */
     constructor(ChartInstance = (new ChartConfig())) {
@@ -833,20 +832,20 @@ const WChartStyle = (ChartInstance) => {
             width: 100%;
             flex-direction: ${ChartInstance.DirectionChart};
             align-items: flex-end;
-            justify-content: flex-end;
+            justify-content: center;
             overflow: hidden;
             border-bottom: 1px solid var(--fifty-color);
+            padding: 0px 10px;
         }
 
         .ContainerBars .Bars {
             height: 0px;
             transition:all 1s;
             display: block;
-            margin: 0 auto;
             margin-top: 0px;
             min-height: 10px;
             z-index: 1;
-            width: ${ChartInstance.TypeChart == "Line" ? "1px" : "60%"};
+            width: ${ChartInstance.TypeChart == "Line" ? "1px" : "50px"};
             background: linear-gradient(0deg, rgba(177, 177, 177, 1) 0%, rgba(209, 209, 209, 1) 53%);           
         }
         
