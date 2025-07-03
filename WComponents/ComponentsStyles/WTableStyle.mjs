@@ -406,4 +406,16 @@ input[type=radio]:checked::before {
 		padding: 5px 10px;
 		width: calc(100% - 20px);
 	}
-}`
+}
+@media print {
+	* {
+		-webkit-print-color-adjust: exact;  
+	}
+	tbody tr:nth-child(odd) {
+		background-color: var(--secundary-color);
+	}
+	.tdAction {
+		display: none;
+	}
+}
+`

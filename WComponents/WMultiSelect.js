@@ -524,7 +524,6 @@ class MultiSelect extends HTMLElement {
 				if (this.Config.Mode != "SELECT_BOX") {
 					m.tool?.remove();
 				}
-
 				// @ts-ignore
 				m.LabelMultiselect.querySelector("span").className = "btnSelect";
 			})

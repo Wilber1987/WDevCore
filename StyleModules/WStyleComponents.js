@@ -81,7 +81,7 @@ const StylesControlsV3 = css`
     .Block-Fourth,
     .Block-Fifth ,
     .Block-Basic  {
-        min-width: 100px;
+        min-width: 80px;
         background-color: #5995fd;
         border: none;
         outline: none;
@@ -95,7 +95,7 @@ const StylesControlsV3 = css`
         cursor: pointer;
         transition: 0.5s;
         width: 100%;
-        max-width: 250px;
+        max-width: 200px;
         text-align: left;
     }
     .Block-Success {

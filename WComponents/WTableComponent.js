@@ -1,7 +1,7 @@
 //@ts-check
 // @ts-ignore
 import { OrderData, TableConfig } from "../WModules/CommonModel.js";
-import { ConvertToMoneyString, WRender } from "../WModules/WComponentsTools.js";
+import { ConvertToMoneyString, html, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../ComponentsBuilders/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { WCssClass, WStyledRender, css } from "../WModules/WStyledRender.js";
@@ -12,6 +12,7 @@ import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WTableStyle } from "./ComponentsStyles/WTableStyle.mjs";
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { DateTime } from "../WModules/Types/DateTime.js";
+import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
 
 
 class WTableComponent extends HTMLElement {
@@ -227,9 +228,25 @@ class WTableComponent extends HTMLElement {
                     }
                 }))
             }
+            if (this.Options.Print || this.Options.XlsExport || this.Options.PdfExport) {
+                const printTool = new WPrintExportToolBar({
+                    PrintAction: this.Options.Print ? (/**@type {WPrintExportToolBar} */ toolbar) => { toolbar.Print(this.GetFragmentNodeToExport()) } : undefined,
+                    ExportXlsAction: this.Options.XlsExport ? (/**@type {WPrintExportToolBar} */ toolbar) => { } : undefined,
+                    ExportPdfAction: this.Options.PdfExport ? (/**@type {WPrintExportToolBar} */ toolbar) => { } : undefined
+                })
+                this.ThOptions.append(printTool);
+            }
             return this.ThOptions;
         }
         return null;
+    }
+    GetFragmentNodeToExport() {
+        return html`<div class="WTable">
+            <link rel="stylesheet" href="/WDevCore/StyleModules/css/variables.css">
+            ${WTableStyle.cloneNode(true)} 
+            ${StylesControlsV2.cloneNode(true)}
+            ${this.Table.cloneNode(true)}
+        </div>`;
     }
     DrawTHead = (element) => {
         const thead = WRender.Create({ tagName: "thead" });
@@ -249,7 +266,7 @@ class WTableComponent extends HTMLElement {
         }
         if (this.Options != undefined) {
             if (this.TrueOptions()) {
-                const th = WRender.Create({ tagName: "th", innerHTML: "Acciones" });
+                const th = WRender.Create({ tagName: "th", class: "tdAction", innerHTML: "Acciones" });
                 tr.append(th);
                 if (this.Config.Options?.MultiSelect == true) {
                     th.append(WRender.Create({

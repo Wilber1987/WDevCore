@@ -34,7 +34,7 @@ export class ZoomControl extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		this.disconnectedCallback();
+		this.removeEventListener("wheel", this.handleWheel);
 	}
 
 	handleWheel = (event) => {
