@@ -185,7 +185,21 @@ class WChatComponent extends HTMLElement {
 				};
 				/**@type {WebApiResponse} */
 				const response = await this.SendMessage(model);
-				pElement.innerHTML = response.Reply;
+
+				const raw = response.Reply ?? "";
+
+				// 2️⃣ Convierte las URLs en <a>
+				const urlRegex =
+					/((?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9\-._~:/?#@!$&'()*+,;=%]+\.[a-z]{2,})(?![^<]*>)/gi;
+
+				const processed = raw.replace(urlRegex, (match) => {
+					// Asegura que la URL tenga http/https para que el enlace funcione bien
+					const href = /^https?:\/\//i.test(match) ? match : `https://${match}`;
+					return `<a href="${href}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+				});
+
+				// 3️⃣ Escribe el contenido resultante en el párrafo
+				pElement.innerHTML = processed;
 				if (this.WithAgent != true) {
 					// Remove the typing animation, append the paragraph element and save the chats to local storage                   
 					incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
@@ -193,14 +207,19 @@ class WChatComponent extends HTMLElement {
 					incomingChatDiv.remove();
 					localStorage.removeItem("all-chats");
 				}
+				const oldWithAgent = this.WithAgent;
+				const condition = oldWithAgent != response.WithAgentResponse;
 				this.WithAgent = response.WithAgentResponse ?? false;
 				sessionStorage.setItem("WithAgent", this.WithAgent == true ? "true" : "false");
 				this.Id_Case = response.Id_Case;
 				sessionStorage.setItem("Id_Case", this.Id_Case?.toString());
+				if (condition) {
+					this.chatContainer.innerHTML = "";
+					this.update();
+				}
 				this.ActiveInterval();
 			} catch (error) { // Add error class to the paragraph element and set error text
 				console.log(error);
-
 				pElement.classList.add("error");
 				pElement.textContent = "Oops! Something went wrong while retrieving the response. Please try again.";
 			}
@@ -327,7 +346,7 @@ class WChatComponent extends HTMLElement {
 			//this.Dataset = response;         
 			this.chatContainer.querySelector(".default-text")?.remove();
 
-			response.forEach(comment => {
+			response.sort((a, b) => a.Id_Comentario - b.Id_Comentario).forEach(comment => {
 				if (this.chatContainer.querySelector("#Comment" + comment.Id_Comentario)) {
 					return;
 				}
@@ -359,7 +378,21 @@ class WChatComponent extends HTMLElement {
 				// Send POST request to API, get response and set the reponse as paragraph element text
 				try {
 
-					pElement.innerHTML = comment.Body ?? comment.mensaje;
+					// 1️⃣ Obtén el texto original
+					const raw = comment.Body ?? comment.mensaje ?? "";
+
+					// 2️⃣ Convierte las URLs en <a>
+					const urlRegex =
+						/((?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9\-._~:/?#@!$&'()*+,;=%]+\.[a-z]{2,})(?![^<]*>)/gi;
+
+					const processed = raw.replace(urlRegex, (match) => {
+						// Asegura que la URL tenga http/https para que el enlace funcione bien
+						const href = /^https?:\/\//i.test(match) ? match : `https://${match}`;
+						return `<a href="${href}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+					});
+
+					// 3️⃣ Escribe el contenido resultante en el párrafo
+					pElement.innerHTML = processed;
 					incomingChatDiv.querySelector(".chat-details")?.appendChild(pElement);
 				} catch (error) { // Add error class to the paragraph element and set error text
 					pElement.classList.add("error");
