@@ -33,6 +33,10 @@ export const WTableStyle = css`
 	vertical-align: top;
 	color: var(--font-primary-color) !important;
 	border-right: 1px var(--fifty-color) solid;
+	cursor: pointer;
+}
+w-card-table {
+	cursor: pointer;
 }
 
 .WTable td label {
@@ -67,6 +71,9 @@ export const WTableStyle = css`
 
 .WTable tbody tr:nth-child(odd) {
 	background-color: var(--secundary-color);
+}
+.WTable tbody tr:hover {
+	background-color: var(--tertiary-color);
 }
 
 .icon {
@@ -309,6 +316,48 @@ input[type=radio]:checked::before {
 	object-fit: cover;
 	box-shadow: 0 2px 5px 0 var(--fifty-color);
 }
+.LabelMultiselect {
+	padding: 0px 10px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	cursor: pointer;
+	height: 100%;
+}
+.LabelMultiselect .selecteds {       
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	width: calc(100% - 30px);
+	overflow-x: auto;
+}
+.LabelMultiselect label {
+	padding: 4px 7px;
+	border-radius: 0.2cm;
+	background-color: #1f58c7;
+	color: #fff;
+	margin: 0px 3px;
+	font-size: 14px;
+	align-items: center;
+	overflow: hidden;
+	display: flex;
+	line-height: 12px;
+	width: fit-content;
+	height: fit-content;        
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: calc(100% - 65px);
+}
+.LabelMultiselect label button {
+	border: none;
+	margin-left: 3px;
+	cursor: pointer;
+	font-weight: bold;
+	border-left: solid 2px var(--secundary-color);
+	background: none;
+	padding: 0px 5px;
+}
 
 @container (width < 600px) {
 	divForm div {
@@ -406,4 +455,16 @@ input[type=radio]:checked::before {
 		padding: 5px 10px;
 		width: calc(100% - 20px);
 	}
-}`
+}
+@media print {
+	* {
+		-webkit-print-color-adjust: exact;  
+	}
+	tbody tr:nth-child(odd) {
+		background-color: var(--secundary-color);
+	}
+	.tdAction {
+		display: none;
+	}
+}
+`

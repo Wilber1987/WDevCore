@@ -23,6 +23,7 @@ class WCommentsComponent extends HTMLElement {
         * AddObject?: boolean;
         * UseDestinatarios?: boolean; 
         * UseAttach?: boolean;
+        * UseOnlyFileName?: boolean;
         * isRichTextActive?: boolean;
         * CustomStyle?: HTMLStyleElement
      * }} props
@@ -38,11 +39,31 @@ class WCommentsComponent extends HTMLElement {
         this.UseDestinatarios = props.UseDestinatarios ?? true;
         this.UseAttach = props.UseAttach ?? true;
         this.User = props.User;
+        this.UseOnlyFileName = props.UseOnlyFileName ?? false;
         this.CommentsIdentify = props.CommentsIdentify;
         this.CommentsIdentifyName = props.CommentsIdentifyName;
         this.attachShadow({ mode: 'open' });
         this.CommentsContainer = WRender.Create({ className: "CommentsContainer" })
-        this.MessageInput = WRender.Create({ tagName: 'textarea' });
+        this.MessageInput = WRender.Create({
+            tagName: 'textarea', onkeydown: async (e) => {
+                // Verificar si es Enter (keyCode 13)
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    // Si está presionando Alt, entonces saltar línea
+                    if (e.altKey) {
+                        // Agregar salto de línea manualmente (opcional)
+                        const textarea = e.target;
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        textarea.setRangeText('\n', start, end, 'end');
+                        e.preventDefault(); // Evitar comportamiento por defecto
+                    } else {
+                        // No está con Alt: ejecutar saveComment()
+                        this.saveComment();
+                        e.preventDefault(); // Opcional: evitar submit default
+                    }
+                }
+            }
+        });
         this.autoScroll = true;
         this.updating = false;
         this.isRichTextActive = props.isRichTextActive ?? true;
@@ -121,48 +142,58 @@ class WCommentsComponent extends HTMLElement {
             this.shadowRoot?.append(this.RitchOptionContainer)
         } else if (this.UseAttach && this.RitchInput?.AddInputFileSection) {
             this.shadowRoot?.append(this.RitchInput?.AddInputFileSection)
-        }
+        };
+        this.isInSaveTransaction = false;
     }
     saveComment = async () => {
-        // @ts-ignore
-        if (this.MessageInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
-            return;
-        }
-        this.ClearEvents();
-        const Message = {
+        if (!this.isInSaveTransaction) {
+            this.isInSaveTransaction = true;
             // @ts-ignore
-            Body: this.MessageInput.value,
-            Id_User: this.User.UserId,
-            Attach_Files: this.RitchInput.Files,
-            Mails: this.UseDestinatarios == true ? this.MailsSelect?.selectedItems : undefined
+            if (this.MessageInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
+                return;
+            }
+            this.ClearEvents();
+            const Message = {
+                // @ts-ignore
+                Body: this.MessageInput.value,
+                Id_User: this.User.UserId,
+                Attach_Files: this.RitchInput.Files,
+                Mails: this.UseDestinatarios == true ? this.MailsSelect?.selectedItems : undefined
+            }
+            Message[this.CommentsIdentifyName] = this.CommentsIdentify
+            // @ts-ignore
+            const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
+            // @ts-ignore
+            this.MessageInput.value = "";
+            this.RitchInput.FunctionClear();
+            this.InicializarActualizacion();
+            this.isInSaveTransaction = false;
         }
-        Message[this.CommentsIdentifyName] = this.CommentsIdentify
-        // @ts-ignore
-        const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
-        // @ts-ignore
-        this.MessageInput.value = "";
-        this.RitchInput.FunctionClear();
-        this.InicializarActualizacion();
+
     }
     saveRitchComment = async () => {
-        // @ts-ignore
-        if (this.RitchInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
-            return;
-        }
-        this.ClearEvents();
-        const Message = {
+        if (!this.isInSaveTransaction) {
+            this.isInSaveTransaction = true;
             // @ts-ignore
-            Body: this.RitchInput.value,
-            Attach_Files: this.RitchInput.Files,
-            Id_User: this.User.UserI
+            if (this.RitchInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
+                return;
+            }
+            this.ClearEvents();
+            const Message = {
+                // @ts-ignore
+                Body: this.RitchInput.value,
+                Attach_Files: this.RitchInput.Files,
+                Id_User: this.User.UserI
+            }
+            Message[this.CommentsIdentifyName] = this.CommentsIdentify
+            // @ts-ignore
+            const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
+            // @ts-ignore
+            this.MessageInput.value = "";
+            this.RitchInput.FunctionClear();
+            this.InicializarActualizacion();
+            this.isInSaveTransaction = false;
         }
-        Message[this.CommentsIdentifyName] = this.CommentsIdentify
-        // @ts-ignore
-        const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
-        // @ts-ignore
-        this.MessageInput.value = "";
-        this.RitchInput.FunctionClear();
-        this.InicializarActualizacion();
     }
 
     connectedCallback() {
@@ -261,10 +292,10 @@ class WCommentsComponent extends HTMLElement {
                     || attach.Type.toUpperCase().includes("JPEG")
                     || attach.Type.toUpperCase().includes("PNG")) {
                     attachs.append(WRender.Create({
-                        tagName: "img", src: attach.Value.replace("wwwroot", ""), onclick: () => {
+                        tagName: "img", src: this.GetFileNameFromPath(attach.Value.replace("wwwroot", "")), onclick: () => {
                             this.shadowRoot?.append(new WModalForm({
                                 ObjectModal: WRender.Create({
-                                    tagName: "img", src: attach.Value.replace("wwwroot", ""), style: {
+                                    tagName: "img", src: this.GetFileNameFromPath(attach.Value.replace("wwwroot", "")), style: {
                                         width: "auto",
                                         objectFit: "cover",
                                         height: "calc(100% - 20px)",
@@ -281,7 +312,7 @@ class WCommentsComponent extends HTMLElement {
                         tagName: "a", innerText: attach.Name, onclick: () => {
                             this.shadowRoot?.append(new WModalForm({
                                 ObjectModal: WRender.Create({
-                                    tagName: "iframe", src: attach.Value.replace("wwwroot", ""), style: {
+                                    tagName: "iframe", src: this.GetFileNameFromPath(attach.Value.replace("wwwroot", "")), style: {
                                         height: "600px",
                                         width: "100%"
                                     }
@@ -363,6 +394,20 @@ class WCommentsComponent extends HTMLElement {
         if (!inicialize) {
             await this.DrawWCommentsComponent();
         }
+    }
+
+    GetFileNameFromPath(path) {
+        if (!this.UseOnlyFileName) {
+            return path;
+        }
+        if (!path) return '';
+
+        // Reemplaza las barras invertidas por barras normales para evitar problemas
+        const normalizedPath = path.replace(/\\/g, '/');
+
+        // Divide la ruta por '/' y obtiene el último elemento
+        const parts = normalizedPath.split('/');
+        return "/" + parts[parts.length - 1];
     }
     CustomStyle = css`    
         .CommentsContainer{

@@ -144,8 +144,18 @@ class DateTime extends Date {
      * @returns {String} Day of the week as a string (e.g. 'lunes', 'martes', etc.)
      */
     getDayFormatEs() {
-        return this.Date.getDayFormatEs();
+        return DateTime.Dias[this.Date?.getDay()];
     }
+
+    /**
+ * @returns {String} Day of the week + day of the month (e.g. 'lunes 5', 'martes 23', etc.)
+ */
+    getDayFormatWithDateEs() {
+        const dayName = this.constructor.Dias[this.Date?.getDay()];
+        const dayNumber = this.Date?.getDate();
+        return `${dayName} ${dayNumber}`;
+    }
+
     GetFullHour() {
         return pad(this.Date.getHours()) + ':' + pad(this.Date.getMinutes()) + ':' + pad(this.Date.getSeconds());
     }

@@ -20,7 +20,6 @@ window.addEventListener("load", async () => {
 	Aside.append(WRender.Create({ tagName: "h3", innerText: "Mantenimiento de Usuarios" }));
 	Aside.append(new WAppNavigator({
 		DarkMode: false,
-		Direction: "row",
 		NavStyle: "tab",
 		Elements: [
 			ElementTab("Roles", DOMManager, new Security_Roles({

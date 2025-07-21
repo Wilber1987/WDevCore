@@ -292,6 +292,7 @@ class ElementStyle { }
 	 * @property {Boolean} [checked]
 	 * @property {Boolean} [multiple]
 	 * @property {Boolean} [disabled]
+	 * @property {number} [colSpan] 
 	 * @property {String} [src]
 	 * @property {String} [href]
 	 * @property {String} [innerText]    
@@ -347,12 +348,15 @@ class WNode {
 	* @property {Boolean} [Search]
 	* @property {Boolean} [Select]
 	* @property {Boolean} [MultiSelect] funciona solo cuando select esta habilitado
+	* @property {Boolean} [Print]
+	* @property {Boolean} [XlsExport]
+	* @property {Boolean} [PdfExport]
 	* @property {Array<Actions?>} [UserActions]
 	* @property {Boolean} [UseManualControlForFiltering] le indica al filtro si debe usar opciones manuales, solo aplica si esta erl filtro activo
 	* @property {String} [UrlUpdate]
 	* @property {String} [UrlAdd]
 	* @property {String} [UrlDelete]
-	* @property {String} [UrlSearch]
+	* @property {String} [UrlSearch]	
 	* @property {Function} [AddAction] requiere Add en true, recibe como parametro el elemento y si esta funcion retorna false elimina el objeto agregado de la tabla
 	* @property {Function} [EditAction] requiere Edit en true, recibe como parametro el elemento
 	* @property {Function} [DeleteAction] requiere Delete en true, recibe como parametro el elemnto
