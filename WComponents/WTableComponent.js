@@ -1,6 +1,6 @@
 //@ts-check
 // @ts-ignore
-import { OrderData, TableConfig } from "../WModules/CommonModel.js";
+import { FilterData, OrderData, TableConfig } from "../WModules/CommonModel.js";
 import { ConvertToMoneyString, html, WRender } from "../WModules/WComponentsTools.js";
 import { ControlBuilder } from "../ComponentsBuilders/WControlBuilder.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -41,7 +41,12 @@ class WTableComponent extends HTMLElement {
         this.ActualPage = 0;
         this.Dataset = [];
         this.Sorts = [];
-
+        this.LabelMultiselect = WRender.Create({
+            className: "LabelMultiselect", children: [
+                { className: "selecteds" },
+                { tagName: "span", className: "btnSelect" }
+            ]
+        });
         this.withFilter = false;
         this.InicializeConfig(this.Config);
     }
@@ -236,6 +241,8 @@ class WTableComponent extends HTMLElement {
                 })
                 this.ThOptions.append(printTool);
             }
+            this.ThOptions.append(this.LabelMultiselect);
+
             return this.ThOptions;
         }
         return null;
@@ -298,10 +305,9 @@ class WTableComponent extends HTMLElement {
             .forEach((element, DatasetIndex) => {
                 if (element == undefined) {
                     return;
-
                 }
                 let tr = WRender.Create({ tagName: "tr" });
-                this.DrawTRow(tr, element);
+                this.DrawTRow(tr, element, DatasetIndex);
                 tbody.append(tr);
             });
 
@@ -324,7 +330,7 @@ class WTableComponent extends HTMLElement {
         }
         if (this.TrueOptions()) {
             const Options = WRender.Create({ tagName: "td", class: "tdAction" });
-            this.SelectBTN(element, Options, index);
+            this.SelectBTN(element, Options, index, tr);
             this.ShowBTN(Options, element);
             this.EditBTN(Options, element, tr);
             this.DeleteBTN(Options, element, tr);
@@ -590,7 +596,7 @@ class WTableComponent extends HTMLElement {
                             //console.log(this.Dataset);
                             //tr.parentNode.removeChild(tr);                                                  
                             if (this.Options?.DeleteAction) {
-                                this.Options?.DeleteAction(element)
+                                this.Options?.DeleteAction(element, this)
                             }
                             if (this.Options?.UrlDelete) {
                                 WAjaxTools.PostRequest(this.Options?.UrlDelete, element);
@@ -646,11 +652,11 @@ class WTableComponent extends HTMLElement {
         }
     }
 
-    SelectBTN(element, Options, index) {
+    SelectBTN(element, Options, index, tr) {
         if ((this.Options?.Select != undefined && this.Options.Select == true)
             || (this.Options?.MultiSelect != undefined && this.Options.MultiSelect == true)) {
             let Checked = WArrayF.FindInArray(element, this.selectedItems);
-            Options.append(WRender.Create({
+            const input = WRender.Create({
                 tagName: "input",
                 class: "Btn",
                 id: "select" + index,
@@ -658,8 +664,10 @@ class WTableComponent extends HTMLElement {
                 innerText: "Select",
                 name: "selectGrup",
                 checked: Checked,
-                onchange: async (ev) => {
-                    const control = ev.target;
+                onchange: async () => {
+                    /**@type {HTMLInputElement} */
+                    // @ts-ignore
+                    const control = input;
                     const index = this.selectedItems.indexOf(element);
                     if (index == -1 && control.checked == true) {
                         if (WArrayF.FindInArray(element, this.selectedItems) == false) {
@@ -667,6 +675,9 @@ class WTableComponent extends HTMLElement {
                                 this.selectedItems = [];
                             }
                             this.selectedItems.push(element);
+                            if (!this.Dataset.includes(element)) {
+                                this.Dataset.push(element);
+                            }
                         } else {
                             console.log("Item Existente");
                         }
@@ -674,10 +685,15 @@ class WTableComponent extends HTMLElement {
                         this.selectedItems.splice(index, 1);
                     }
                     if (this.Options?.SelectAction != undefined) {
-                        this.Options.SelectAction(element, ev.target);
+                        this.Options.SelectAction(element, this);
                     }
+                    this.DrawLabel();
                 }
-            }));
+            })
+            tr.querySelectorAll("label").forEach(label => {
+                label.htmlFor = "select" + index;
+            });
+            Options.append(input);
         }
     }
     async ModalCRUD(element, tr) {
@@ -702,7 +718,7 @@ class WTableComponent extends HTMLElement {
                         if (element == undefined) {
                             this.Dataset.push(NewObject);
                             if (this.Options?.AddAction != undefined) {
-                                const bool = this.Options.AddAction(element);
+                                const bool = this.Options.AddAction(element, this);
                                 if (bool == false) {
                                     this.Dataset.splice(this.Dataset.indexOf(NewObject), 1);
                                 }
@@ -711,7 +727,7 @@ class WTableComponent extends HTMLElement {
                         } else {
                             //this.DrawTRow(tr, element);
                             if (this.Options?.EditAction != undefined) {
-                                this.Options.EditAction(element);
+                                this.Options.EditAction(element, this);
                             }
                             this.DrawTable();
                         }
@@ -731,6 +747,27 @@ class WTableComponent extends HTMLElement {
                 );
                 this.DrawTable(Dataset.data);
             }
+        } else if (this.ModelObject?.Get != undefined) {
+            /**
+            * @type {Array<FilterData>}
+            */
+            const filterData = []
+            for (const prop in this.ModelObject) {
+                if ((this.ModelObject[prop]?.type?.toUpperCase() == "TEXT")
+                    && ev.target.value.replaceAll(" ", "") != "") {
+                    // @ts-ignore
+                    filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
+                } else if ((this.ModelObject[prop]?.type?.toUpperCase() == "NUMBER" && !isNaN(ev.target.value))
+                    && ev.target.value.replaceAll(" ", "") != "") {
+                    // @ts-ignore
+                    filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })
+                }
+            }
+            // @ts-ignore
+            const responseDataset = await new this.ModelObject.constructor({ FilterData: [{ FilterType: "or", Filters: filterData }] }).Get();
+            //this.Dataset = [...this.Dataset, ...responseDataset]
+            this.DrawTable(responseDataset);
+
         } else {
             const Dataset = await WArrayF.FilterInArrayByValue(this.Dataset, ev.target.value)
             if (Dataset.length == 0 && this.Options?.UrlSearch != undefined) {
@@ -882,6 +919,75 @@ class WTableComponent extends HTMLElement {
                 ClassList: ClassList
             }]
         })
+    }
+    DrawLabel = () => {
+        // @ts-ignore
+        this.LabelMultiselect.querySelector(".selecteds").innerHTML = "";
+        // @ts-ignore
+        let sum = 0;
+        let add = 0;
+        let labelsWidth = 0;
+        this.selectedItems.forEach((element, index) => {
+            if (!this.Options?.Select == true) {
+                // @ts-ignore
+                this.LabelMultiselect.querySelector(".selecteds").innerHTML = "";
+            }
+            const LabelM = WRender.Create({
+                tagName: "label",
+                innerText: this.DisplayText(element, index),
+            });
+            console.log(LabelM);
+            const selectedsContainer = this.LabelMultiselect.querySelector(".selecteds");
+            if (sum == 0) {
+                selectedsContainer?.append(LabelM);
+                labelsWidth = labelsWidth + LabelM.offsetWidth;
+                add++;
+            }
+            //console.log(labelsWidth + 100);
+            // @ts-ignore
+            if (selectedsContainer?.offsetWidth <= labelsWidth + 100) {
+                selectedsContainer?.append(LabelM);
+                labelsWidth = labelsWidth + LabelM.offsetWidth;
+                sum++;
+            }
+            //console.log(selectedsContainer.offsetWidth, labelsWidth);
+
+        });
+        if (this.selectedItems.length - add > 0) {
+            this.LabelMultiselect.querySelector(".selecteds")?.append(WRender.Create({
+                tagName: "label",
+                innerText: "+" + (this.selectedItems.length - add).toString()
+            }))
+        }
+        console.log(this.LabelMultiselect, this.selectedItems);
+
+    }
+    DisplayText(element, index) {
+        if (typeof element === "string") {
+            return element
+        }
+        this.DisplayName = undefined;
+        const keys = ["tipo",
+            "Title", "Titulo", "title", "titulo",
+            "Descripcion",
+            "descripcion",
+            "desc",
+            "name",
+            "Name",
+            "nombre",
+            "Nombre",
+            "Nombres",
+            "text",
+            "Text",
+            "Texto", "texto",
+            "Descripcion_Servicio", "Detalles"]
+        for (const key in element) {
+            if (keys.find(k => k == key) != null) {
+                this.DisplayName = key;
+                break;
+            }
+        }
+        return element[this.DisplayName ?? ""] ?? "Element" + index;
     }
 
     //#endregion FIN ESTILOS-----------------------------------------------------------------------------------

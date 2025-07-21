@@ -94,21 +94,6 @@ class MultiSelect extends HTMLElement {
 				if (this.ModelObject?.__proto__ == Function.prototype) {
 					this.ModelObject = this.ModelObject();
 				}
-				const filterDataset = this.Dataset.filter((element) => {
-					for (const prop in element) {
-						try {
-							if (WArrayF.evalValue(element[prop], ev.target.value) != null) {
-								return element;
-							}
-						} catch (error) {
-							console.log(element);
-						}
-					}
-				});
-				if (filterDataset.length != 0) {
-					this.DrawFilterData(filterDataset, ev);
-					return;
-				}
 
 				if (this.ModelObject?.Get != undefined) {
 					/**
@@ -116,14 +101,14 @@ class MultiSelect extends HTMLElement {
 					 */
 					const filterData = []
 					for (const prop in this.ModelObject) {
-						if (this.ModelObject[prop].hiddenFilter == true) {
+						if (this.ModelObject[prop]?.hiddenFilter == true) {
 							continue;
 						}
-						if ((this.ModelObject[prop].type?.toUpperCase() == "TEXT")
+						if ((this.ModelObject[prop]?.type?.toUpperCase() == "TEXT")
 							&& ev.target.value.replaceAll(" ", "") != "") {
 							// @ts-ignore
 							filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
-						} else if ((this.ModelObject[prop].type?.toUpperCase() == "NUMBER" && !isNaN(ev.target.value))
+						} else if ((this.ModelObject[prop]?.type?.toUpperCase() == "NUMBER" && !isNaN(ev.target.value))
 							&& ev.target.value.replaceAll(" ", "") != "") {
 							// @ts-ignore
 							filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })
@@ -133,6 +118,19 @@ class MultiSelect extends HTMLElement {
 					this.Dataset = [...this.Dataset, ...responseDataset]
 					this.DrawFilterData(responseDataset, ev);
 				} else {
+					/*const filterDataset = this.Dataset.filter((element) => {
+						for (const prop in element) {
+							try {
+								if (WArrayF.evalValue(element[prop], ev.target.value) != null) {
+									return element;
+								}
+							} catch (error) {
+								console.log(element);
+							}
+						}
+					});
+					this.DrawFilterData(filterDataset, ev);
+					return;*/
 					const Dataset = await WArrayF.FilterInArrayByValue(this.Dataset, ev.target.value);
 					this.Dataset = [...this.Dataset, ...Dataset]
 					this.DrawFilterData(Dataset, ev);

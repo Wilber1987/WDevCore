@@ -53,7 +53,7 @@ export class ModelPropertyFormBuilder {
 	static PrepareVisualization(value, type) {
 		if (type == "MONEY") {
 			console.log(value, parseFloat(value));
-			
+
 			return parseFloat(value).toFixed(3);
 		}
 		if (type == "PERCENTAGE") {
@@ -290,27 +290,7 @@ export class ModelPropertyFormBuilder {
 		ModelProperty.ModelObject = WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject);
 		ModelProperty.EntityModel = WArrayF.isModelFromFunction(ModelProperty.EntityModel, EditingObject);
 
-		const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
-		if ((ModelProperty.Dataset == undefined || ModelProperty.Dataset.length == 0) && entity.Get) {
-			ModelProperty.Dataset = await entity.Get();
-		}
-		const selectedItems = [];
-
-		if ((EditingObject[prop] == null || EditingObject[prop] == undefined)
-			&& require != false
-			&& ModelProperty.Dataset
-			&& ModelProperty.Dataset?.length > 0
-			&& !multiple) {
-			EditingObject[prop] = ModelProperty?.Dataset[0];
-			selectedItems.push(ModelProperty?.Dataset[0])
-		} else if ((EditingObject[prop] != null || EditingObject[prop] != undefined)
-			&& !multiple) {
-			selectedItems.push(EditingObject[prop])
-		} else if (EditingObject[prop] != null || EditingObject[prop] != undefined) {
-			selectedItems.push(...EditingObject[prop])
-		}
-
-		const Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
+		const { Dataset, selectedItems } = await ModelPropertyFormBuilder.GetDatasetsAndSelectsItems(ModelProperty, EditingObject, prop, require, multiple);
 
 		const InputControl = new MultiSelect({
 			MultiSelect: multiple,
@@ -340,6 +320,43 @@ export class ModelPropertyFormBuilder {
 		InputControl.id = "ControlValue" + prop;
 		return InputControl;
 	}
+	static async GetDatasetsAndSelectsItems(ModelProperty, EditingObject, prop, require, multiple) {
+
+		const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
+		if ((ModelProperty.Dataset == undefined || ModelProperty.Dataset.length == 0) && entity.Get) {
+			ModelProperty.Dataset = await entity.Get();
+		}
+		const selectedItems = [];
+		let Dataset = []
+		if (ModelProperty.type?.toUpperCase() != "WSELECT"
+			&& ModelProperty.type?.toUpperCase() != "WMULTISELECT"
+			&& ModelProperty.type?.toUpperCase() != "WGRIDSELECT"
+			&& ModelProperty.type?.toUpperCase() != "WGRIDMULTISELECT") {
+			Dataset = EditingObject[prop];
+			return { Dataset, selectedItems };
+		}
+
+		if ((EditingObject[prop] == null || EditingObject[prop] == undefined)
+			&& require != false
+			&& ModelProperty.Dataset
+			&& ModelProperty.Dataset?.length > 0
+			&& !multiple) {
+			EditingObject[prop] = ModelProperty?.Dataset[0];
+			selectedItems.push(ModelProperty?.Dataset[0]);
+		} else if ((EditingObject[prop] != null || EditingObject[prop] != undefined)
+			&& !multiple) {
+			selectedItems.push(EditingObject[prop]);
+		} else if (EditingObject[prop] != null || EditingObject[prop] != undefined) {
+			selectedItems.push(...EditingObject[prop]);
+		}
+
+		Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
+		return { Dataset, selectedItems };
+	}
+
+
+
+
 	/**
 	* @param {ModelProperty} ModelProperty
 	* @param {Object} EditingObject
@@ -382,26 +399,40 @@ export class ModelPropertyFormBuilder {
 		ModelProperty.require = require;
 		ModelProperty.ModelObject = WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject);
 		ModelProperty.EntityModel = WArrayF.isModelFromFunction(ModelProperty.EntityModel, EditingObject);
-		const tableAction = () => {
-			if (onChangeListener) onChangeListener();
+
+
+		const { Dataset, selectedItems } = await ModelPropertyFormBuilder.GetDatasetsAndSelectsItems(
+			ModelProperty,
+			EditingObject,
+			prop,
+			require,
+			ModelProperty.type?.toUpperCase() == "WGRIDMULTISELECT");
+
+		/**
+		* @param {Object} entity 
+		* @param {import("../WComponents/WTableComponent.js").WTableComponent} tableForm 
+		*/
+		const tableAction = (entity, tableForm) => {
+			if (ModelProperty.type?.toUpperCase() == "WGRIDSELECT") {
+				EditingObject[prop] = tableForm.selectedItems[0].id ?? tableForm.selectedItems[0].id_ ?? tableForm.selectedItems[0];
+			} else if (ModelProperty.type?.toUpperCase() == "WGRIDMULTISELECT") {
+				EditingObject[prop] = tableForm.selectedItems;
+			}
+			if (onChangeListener) {
+				onChangeListener()
+			}
 		}
+		// @ts-ignore
+		const options = ModelPropertyFormBuilder.BuildTableOptions(ModelProperty, tableAction);
 		const InputControl = new WTableComponent({
-			Dataset: EditingObject[prop],
+			Dataset: Dataset,
+			selectedItems: selectedItems,
 			AddItemsFromApi: false,
 			ModelObject: ModelProperty.ModelObject,
 			EntityModel: ModelProperty.EntityModel,
 			ParentEntity: EditingObject,
 			ImageUrlPath: ImageUrlPath,
-			Options: ModelProperty.Options ??  {
-				Add: ModelProperty.Options?.Add ?? true,
-				Edit: ModelProperty.Options?.Edit ?? true,
-				Delete: ModelProperty.Options?.Delete ?? true,
-				Search: ModelProperty.Options?.Search ?? true,
-				AddAction: tableAction,
-				EditAction: tableAction,
-				DeleteAction: tableAction,
-				SelectAction: tableAction
-			}
+			Options: options
 		});
 		InputControl.id = "ControlValue" + prop;
 		if (disabled) {
@@ -409,6 +440,32 @@ export class ModelPropertyFormBuilder {
 		}
 		// @ts-ignore
 		return InputControl;
+	}
+
+	/**
+	 * @param {ModelProperty} ModelProperty
+	 * @param {() => void} tableAction
+	 * @returns {import("../WModules/CommonModel.js").TableOptions}
+	 */
+	static BuildTableOptions(ModelProperty, tableAction) {
+		if (ModelProperty.type?.toUpperCase() == "WGRIDSELECT" || ModelProperty.type?.toUpperCase() == "WGRIDMULTISELECT") {
+			return {
+				Search: true,
+				Select: ModelProperty.type?.toUpperCase() == "WGRIDSELECT",
+				MultiSelect: ModelProperty.type?.toUpperCase() == "WGRIDMULTISELECT",
+				SelectAction: tableAction
+			}
+		}
+		return ModelProperty.Options ?? {
+			Add: ModelProperty.Options?.Add ?? true,
+			Edit: ModelProperty.Options?.Edit ?? true,
+			Delete: ModelProperty.Options?.Delete ?? true,
+			Search: ModelProperty.Options?.Search ?? true,
+			AddAction: tableAction,
+			EditAction: tableAction,
+			DeleteAction: tableAction,
+			SelectAction: tableAction
+		};
 	}
 
 	/**
@@ -573,12 +630,12 @@ export class ModelPropertyFormBuilder {
 				break;
 			case "DATE": case "FECHA":
 				max = max ?? '3000-01-01';
-				min = min ?? '1900-01-01';
+				min = min ?? '0001-01-01';
 				defaultValue = defaultValue ?? new DateTime().toISO();
 				break;
 			case "DATETIME":
 				max = max ?? '3000-01-01T23:59';
-				min = min ?? '1900-01-01T00:00';
+				min = min ?? '0001-01-01T00:00';
 				defaultValue = defaultValue ?? new DateTime().formatDateTimeToDDMMYYHHMM();
 				break;
 		}
@@ -648,7 +705,7 @@ export class ModelPropertyFormBuilder {
 		return { multiple, modType }
 	}
 
-	static CreateDatasetForMultiSelect(ModelProperty, val = {}) {
+	static CreateDatasetForMultiSelect(ModelProperty, val) {
 		if (val == null || val == undefined || Object.keys(val).length == 0) {
 			return ModelProperty.Dataset ?? [];
 		}
@@ -664,7 +721,11 @@ export class ModelPropertyFormBuilder {
 		});
 		const findvale = Dataset.find(item => item != null && val != null && WArrayF.compareObj(item, val));
 		if (!findvale) {
-			Dataset.push(val);
+			if (val.__proto__ == Object.prototype) {
+				Dataset.push(val);
+			} else if (val.__proto__ == Object.prototype) {
+				Dataset.push(...val);
+			}
 		}
 		return Dataset;
 	}

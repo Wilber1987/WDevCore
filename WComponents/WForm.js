@@ -357,11 +357,11 @@ class WForm extends HTMLElement {
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateSelect(ModelProperty,
 					ObjectF, prop, onchangeListener);
 				break;
-			case "MASTERDETAIL":
+			case "MASTERDETAIL":  case "WGRIDSELECT":
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
 					ObjectF, prop, this.Config?.ImageUrlPath ?? "", onchangeListener);
 				break;
-			case "MULTISELECT": case "WCHECKBOX": case "WSELECT":
+			case "MULTISELECT": case "WCHECKBOX": case "WSELECT": 
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateWSelect(ModelProperty,
 					ObjectF, prop, onchangeListener);
 				break;
@@ -736,7 +736,7 @@ class WForm extends HTMLElement {
 			.MASTERDETAIL,			
 			.RICHTEXT,
 			.DRAW,
-			.CALENDAR {
+			.CALENDAR, .WGRIDSELECT {
 				grid-column: span  ${this.limit};
 				padding-bottom: 10px;
 			}
