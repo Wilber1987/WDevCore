@@ -430,7 +430,8 @@ class WForm extends HTMLElement {
 				onclick: async (ev) => {
 					try {
 						ev.target.enabled = false
-						await this.Save(ObjectF);
+						const response = await this.Save(ObjectF);
+						
 					} catch (error) {
 						ev.target.enabled = true
 					}
@@ -694,6 +695,9 @@ class WForm extends HTMLElement {
 						ModalCheck.close();
 						this.shadowRoot?.append(ModalMessage(response.message))
 						return;
+					}
+					if (response.status == 200 && response.message) {						
+						this.shadowRoot?.append(ModalMessage(response.message))
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				}
