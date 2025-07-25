@@ -516,7 +516,7 @@ class WTableComponent extends HTMLElement {
                     }))
                     tr.append(td);
                     break;
-                case "MODEL": case "WSELECT":
+                case "MODEL": case "WSELECT": case "WGRIDSELECT":
                     tr.append(WRender.Create({
                         tagName: "td", className: "cardTable", children: [
                             new WCardTable(WArrayF.replacer(element[prop]), Model[prop].ModelObject, this.Config)
@@ -566,7 +566,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 default:
                     td.append(WRender.Create({
-                        tagName: "label", htmlFor: "select" + index,
+                        tagName: "p", htmlFor: "select" + index,
                         style: this.Options?.Select ? "cursor: pointer" : "",
                         innerHTML: value == "" ? "-" : WOrtograficValidation.es(value)
                     }));
