@@ -420,6 +420,7 @@ class WAppNavigator extends HTMLElement {
 					transition: all 0.6s;
 					/*border-bottom: solid 1px rgba(0, 0, 0, 0.2);*/
 					margin-bottom: 0px;
+					min-height:10px;
 					color: var(--font-secundary-color);
 					& button {
 						display: flex;
@@ -429,11 +430,11 @@ class WAppNavigator extends HTMLElement {
 						cursor: pointer;                       
 					}
 					& .zoomBtn svg {
-						height: 25px;
-						width: 25px;
+						height: 18px;
+						width: 18px;
 						position: absolute;
 						right: 10px;
-						top: 15px;
+						top: 5px;
 						transform: translateY(-100%);
 					} 
 					& .zoomBtn .btnZoomOut{

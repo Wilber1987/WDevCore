@@ -7,6 +7,7 @@ import { WModalForm } from "./WModalForm.js";
 import { MultiSelect } from "./WMultiSelect.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
+import { WSocketServices } from "../WModules/WSocketServices.js";
 
 class WCommentsComponent extends HTMLElement {
 
@@ -25,6 +26,7 @@ class WCommentsComponent extends HTMLElement {
         * UseAttach?: boolean;
         * UseOnlyFileName?: boolean;
         * isRichTextActive?: boolean;
+        * IsWithSocket?: boolean;
         * CustomStyle?: HTMLStyleElement
      * }} props
      */
@@ -42,6 +44,10 @@ class WCommentsComponent extends HTMLElement {
         this.UseOnlyFileName = props.UseOnlyFileName ?? false;
         this.CommentsIdentify = props.CommentsIdentify;
         this.CommentsIdentifyName = props.CommentsIdentifyName;
+
+        this.connection = null;
+        this.hubStarted = false;
+
         this.attachShadow({ mode: 'open' });
         this.CommentsContainer = WRender.Create({ className: "CommentsContainer" })
         this.MessageInput = WRender.Create({
@@ -144,14 +150,31 @@ class WCommentsComponent extends HTMLElement {
             this.shadowRoot?.append(this.RitchInput?.AddInputFileSection)
         };
         this.isInSaveTransaction = false;
+        this.IsWithSocket = props.IsWithSocket;
+    }
+
+    // --- Inicializar SignalR ---
+    async initSignalR() {
+        if (!this.IsWithSocket) {
+            return;
+        }
+        WSocketServices.InitSignalR(this, (mensaje) => {
+
+            // Solo agregar si es de la conversación actual
+            if (mensaje[this.CommentsIdentifyName] == this.CommentsIdentify) {
+                this.Dataset = [...this.Dataset, mensaje];
+                this.DrawWCommentsComponent();
+                this.scrollToBottom();
+            }
+        })
     }
     saveComment = async () => {
         if (!this.isInSaveTransaction) {
-            this.isInSaveTransaction = true;
             // @ts-ignore
-            if (this.MessageInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
+            if (this.MessageInput.value.toString().trim().length == 0 && this.RitchInput.Files?.length == 0) {
                 return;
             }
+            this.isInSaveTransaction = true;
             this.ClearEvents();
             const Message = {
                 // @ts-ignore
@@ -169,15 +192,14 @@ class WCommentsComponent extends HTMLElement {
             this.InicializarActualizacion();
             this.isInSaveTransaction = false;
         }
-
     }
     saveRitchComment = async () => {
         if (!this.isInSaveTransaction) {
-            this.isInSaveTransaction = true;
             // @ts-ignore
-            if (this.RitchInput.value.length < 3 && this.RitchInput.Files?.length == 0) {
+            if (this.MessageInput.value.toString().trim().length == 0 && this.RitchInput.Files?.length == 0) {
                 return;
             }
+            this.isInSaveTransaction = true;
             this.ClearEvents();
             const Message = {
                 // @ts-ignore
@@ -198,6 +220,7 @@ class WCommentsComponent extends HTMLElement {
 
     connectedCallback() {
         this.InicializarActualizacion();
+        this.initSignalR();
     }
     scrollToBottom = () => {
         if (this.autoScroll) {
@@ -209,16 +232,17 @@ class WCommentsComponent extends HTMLElement {
     }
     async InicializarActualizacion() {
         // Guardar referencia al intervalo para poder limpiarlo luego
-        this.Interval = setInterval(async () => {
-            if (this.updating) {
-                return;
-            }
-            this.updating = true;
-            await this.update();
-            this.scrollToBottom();
-            this.updating = false;
-        }, 5000);
-
+        if (!this.IsWithSocket) {
+            this.Interval = setInterval(async () => {
+                if (this.updating) {
+                    return;
+                }
+                this.updating = true;
+                await this.update();
+                this.scrollToBottom();
+                this.updating = false;
+            }, 5000);
+        }
         let isLoading = false;
 
         // Definir la función de manejo de scroll por separado
@@ -259,7 +283,9 @@ class WCommentsComponent extends HTMLElement {
 
 
     disconnectedCallback() {
-        this.ClearEvents()
+        this.connection?.stop();
+        this.hubStarted = false;
+        //this.ClearEvents()
     }
     ClearEvents() {
         if (this.Interval) {
@@ -387,12 +413,16 @@ class WCommentsComponent extends HTMLElement {
         } else {
             Message.FilterData = [{ FilterType: "PAGINATED", Values: ["1", "30"] }]
         }
-        // @ts-ignore
-        const response = await WAjaxTools.PostRequest(this.UrlSearch, Message, { WithoutLoading: true });
-        //console.log(response);
-        this.Dataset = response;
-        if (!inicialize) {
-            await this.DrawWCommentsComponent();
+        try {
+            // @ts-ignore
+            const response = await WAjaxTools.PostRequest(this.UrlSearch, Message, { WithoutLoading: true });
+            //console.log(response);
+            this.Dataset = response;
+            if (!inicialize) {
+                await this.DrawWCommentsComponent();
+            }
+        } catch (err) {
+            console.error("Error al cargar mensajes:", err);
         }
     }
 
