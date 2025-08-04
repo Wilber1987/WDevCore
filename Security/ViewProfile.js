@@ -44,7 +44,7 @@ class PerfilClass extends HTMLElement {
             {
                 name: "DATOS GENERALES",
                 action: async (ev) => {
-                    this.response = await WAjaxTools.PostRequest("../../api/Profile/TakeProfile",
+                    this.response = await WAjaxTools.PostRequest("../../api/ApiProfile/TakeProfile",
                         { Id_Perfil: this.Id_Perfil }
                     );
                     this.TabManager.NavigateFunction("Tab-Generales",
@@ -53,7 +53,7 @@ class PerfilClass extends HTMLElement {
             }, {
                 name: "Editar Perfil",
                 action: async (ev) => {
-                    this.response = await WAjaxTools.PostRequest("../../api/Profile/TakeProfile",
+                    this.response = await WAjaxTools.PostRequest("../../api/ApiProfile/TakeProfile",
                         { Id_Perfil: this.Id_Perfil }
                     );
                    // this.response.Tbl_Dependencias_Usuarios = undefined;
@@ -98,7 +98,7 @@ class PerfilClass extends HTMLElement {
                     ModelObject: InvestigadorModel,
                     EditObject: this.response,
                     ImageUrlPath: "",
-                    ObjectOptions: { Url: "../../api/Profile/SaveProfile" },
+                    ObjectOptions: { Url: "../../api/ApiProfile/SaveProfile" },
                 })
             ]
         });

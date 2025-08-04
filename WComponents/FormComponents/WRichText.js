@@ -53,8 +53,10 @@ class WRichText extends HTMLElement {
                 this.clearInnerHtml(this.Divinput.innerText);
                 // @ts-ignore
                 this.value = this.Divinput.innerHTML;
-                // @ts-ignore
-                this.Config?.action(this.value);
+                if (this.Config?.action) {
+                    this.Config?.action(this.value);
+                }
+
             }
         })
         this.clearInnerHtml(this.Divinput.innerText);

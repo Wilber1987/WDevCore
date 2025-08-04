@@ -39,7 +39,7 @@ w-card-table {
 	cursor: pointer;
 }
 
-.WTable td label {
+.WTable td label, .WTable td p {
 	overflow: hidden;
 	max-height: 200px;
 	text-overflow: ellipsis;
@@ -50,11 +50,11 @@ w-card-table {
 	padding: 0 5px;
 	max-width: 400px;
 }
-.WTable td label * {
+.WTable td label *, .WTable td p * {
 	color: var(--font-primary-color) !important;
  }
 
-.WTable td label * {
+.WTable td label *, .WTable td p * {
 	font-size: 12px !important;
 	text-align: justify !important;
 	padding: 0px !important;
