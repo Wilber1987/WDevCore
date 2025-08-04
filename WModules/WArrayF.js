@@ -34,7 +34,7 @@ class WArrayF {
         const index = Array.indexOf(Element);
         if (index == -1 && checked == true) {
             Array.push(Element);
-        } else {
+        } else if (checked != true) {
             Array.splice(index, 1);
         }
     }
