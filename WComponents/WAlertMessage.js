@@ -23,11 +23,16 @@ export class WAlertMessage extends HTMLElement {
     connectedCallback() {
         this.Draw();
         if (this.Temporal) {
-            setTimeout(() => this.Close(), 10000);
+            setTimeout(() => this.Close(), 5000);
         }
     }
     Close() {
-        this.remove();
+        this.style.transition = "all .5s";
+        this.style.opacity = "0";
+        setTimeout(() => {
+           this.remove();
+        }, 600);
+        
     }
 
     Draw() {
