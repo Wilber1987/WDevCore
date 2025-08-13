@@ -381,9 +381,9 @@ class WFilterOptions extends HTMLElement {
 							const foreynKeyExist = ModelProperty.ForeignKeyColumn != undefined;
 							if (!foreynKeyExist) {
 								for (const propiedad in ModelProperty.ModelObject) {
-									const keyNameSames = ModelProperty.ModelObject[propiedad].primary
-										&& ModelProperty.ModelObject.hasOwnProperty(propiedad)
-										&& this.ModelObject.hasOwnProperty(propiedad);
+									const keyNameSames = ModelProperty.ModelObject[propiedad]?.primary
+										&& ModelProperty.ModelObject?.hasOwnProperty(propiedad)
+										&& this.ModelObject?.hasOwnProperty(propiedad);
 									if (keyNameSames) {
 										foraingKeyName = propiedad;
 									}
@@ -397,7 +397,7 @@ class WFilterOptions extends HTMLElement {
 								propiertyName = foraingKeyName;
 								let primaryKey = null;
 								for (const key in control.ModelObject) {
-									if (control.ModelObject[key].primary) {
+									if (control.ModelObject[key]?.primary) {
 										primaryKey = key;
 										break;
 									}
