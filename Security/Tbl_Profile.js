@@ -8,7 +8,7 @@ import { EntityClass } from "../WModules/EntityClass.js";
 //@ts-check
 class Tbl_Profile extends EntityClass {
     constructor(props) {
-        super(props, 'EntityHelpdesk');
+        super(props, 'Profile');
         for (const prop in props) {
             this[prop] = props[prop];
         }
