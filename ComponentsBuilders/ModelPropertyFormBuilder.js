@@ -456,7 +456,8 @@ export class ModelPropertyFormBuilder {
 				SelectAction: tableAction
 			}
 		}
-		return ModelProperty.Options ?? {
+		/**@type {import("../WModules/CommonModel.js").TableOptions} */
+		const defaultOptions = {
 			Add: ModelProperty.Options?.Add ?? true,
 			Edit: ModelProperty.Options?.Edit ?? true,
 			Delete: ModelProperty.Options?.Delete ?? true,
@@ -466,6 +467,13 @@ export class ModelPropertyFormBuilder {
 			DeleteAction: tableAction,
 			SelectAction: tableAction
 		};
+		ModelProperty.Options = ModelProperty.Options ?? defaultOptions
+		//TODO REVISAR BIEN A POSTERIOR EL COMAND ORIGINAL
+		ModelProperty.Options.AddAction = tableAction
+		ModelProperty.Options.EditAction = tableAction
+		ModelProperty.Options.DeleteAction = tableAction
+		ModelProperty.Options.SelectAction = tableAction
+		return ModelProperty.Options
 	}
 
 	/**
@@ -762,6 +770,86 @@ export class ModelPropertyFormBuilder {
 	static findKey(object) {
 		if (!object || typeof object !== 'object') return ""; // Validación básica
 		return Object.keys(object).find(key => (typeof object[key] === 'string' || typeof object[key] === 'number') && key.includes('id_')) || "";
+	}
+
+
+	//onchange event
+	/**
+		* 
+		* @param { HTMLInputElement } targetControl 
+		* @param { HTMLInputElement | HTMLSelectElement | HTMLElement } currentTarget 
+		* @param { Object } ObjectF 
+		* @param { String } prop 
+		* @param { Object } Model 
+		* @returns 
+		*/
+	static OnChange = async (targetControl, currentTarget, ObjectF, prop, Model) => { //evento de actualizacion del componente
+		if (Model[prop].validateFunction) {
+			const result = Model[prop].validateFunction(ObjectF, targetControl?.value);
+			if (!result.success) {
+				alert(result.message);
+				return;
+			}
+		}
+		const tool = targetControl?.parentNode?.querySelector(".ToolTip");
+		if (tool) tool.remove();
+
+		if (currentTarget?.tagName?.toUpperCase().includes("W-CALENDAR-COMPONENT")) {
+			//TODO
+		} else if (["IMG", "IMAGE", "IMAGES", "FILE", "FILES"].includes(Model[prop].type.toUpperCase())) {
+			//TODO
+		} else if (targetControl?.type == "checkbox") {
+			ObjectF[prop] = targetControl?.checked;
+		} else if (targetControl?.type == "radio") {
+			ObjectF[prop] = targetControl?.value;
+		} else {
+			if (parseFloat(targetControl?.value) < parseFloat(targetControl?.min)) {
+				//targetControl.value = targetControl?.min;
+				this.CreateInfoToolTip(targetControl, `El valor mínimo permitido es: ${targetControl?.min}`);
+			}
+			if (parseFloat(targetControl?.value) > parseFloat(targetControl?.max)) {
+				//targetControl.value = targetControl?.max;
+				this.CreateInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
+			}
+			ObjectF[prop] = targetControl?.value;
+			if (targetControl?.pattern) {
+				let regex = new RegExp(targetControl?.pattern);
+				if (regex.test(ObjectF[prop])) {
+					WRender.SetStyle(targetControl, {
+						boxShadow: "none"
+					});
+				} else {
+					let regex = new RegExp(targetControl.pattern);
+					if (!regex.test(ObjectF[prop])) {
+						if (!targetControl.parentNode?.querySelector(".ToolTip")) {
+							targetControl.parentNode?.append(WRender.Create({
+								tagName: "span",
+								innerHTML: `Ingresar formato correcto: ${targetControl.placeholder}`,
+								className: "ToolTip"
+							}));
+						}
+						WRender.SetStyle(targetControl, {
+							boxShadow: "0 0 3px #ef4d00"
+						});
+					}
+				}
+			}
+		}		
+	}
+
+	static CreateInfoToolTip(control, message) {
+		if (!control.parentNode.querySelector(".ToolTip")) {
+			const toolTip = WRender.Create({
+				tagName: "span",
+				innerHTML: message,
+				className: "ToolTip ToolInfo"
+			});
+			control.parentNode.append(toolTip);
+		}
+		WRender.SetStyle(control, {
+			boxShadow: "0 0 3px #ef4d00"
+		});
+		control.focus();
 	}
 
 }

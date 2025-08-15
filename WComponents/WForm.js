@@ -579,58 +579,7 @@ class WForm extends HTMLElement {
 	* @returns 
 	*/
 	onChange = async (targetControl, currentTarget, ObjectF, prop, Model) => { //evento de actualizacion del componente
-
-		if (Model[prop].validateFunction) {
-			const result = Model[prop].validateFunction(ObjectF, targetControl?.value);
-			if (!result.success) {
-				alert(result.message);
-				return;
-			}
-		}
-		const tool = targetControl?.parentNode?.querySelector(".ToolTip");
-		if (tool) tool.remove();
-
-		if (currentTarget?.tagName?.toUpperCase().includes("W-CALENDAR-COMPONENT")) {
-			//TODO
-		} else if (["IMG", "IMAGE", "IMAGES", "FILE", "FILES"].includes(Model[prop].type.toUpperCase())) {
-			//TODO
-		} else if (targetControl?.type == "checkbox") {
-			ObjectF[prop] = targetControl?.checked;
-		} else if (targetControl?.type == "radio") {
-			ObjectF[prop] = targetControl?.value;
-		} else {
-			if (parseFloat(targetControl?.value) < parseFloat(targetControl?.min)) {
-				//targetControl.value = targetControl?.min;
-				this.createInfoToolTip(targetControl, `El valor mínimo permitido es: ${targetControl?.min}`);
-			}
-			if (parseFloat(targetControl?.value) > parseFloat(targetControl?.max)) {
-				//targetControl.value = targetControl?.max;
-				this.createInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
-			}
-			ObjectF[prop] = targetControl?.value;
-			if (targetControl?.pattern) {
-				let regex = new RegExp(targetControl?.pattern);
-				if (regex.test(ObjectF[prop])) {
-					WRender.SetStyle(targetControl, {
-						boxShadow: "none"
-					});
-				} else {
-					let regex = new RegExp(targetControl.pattern);
-					if (!regex.test(ObjectF[prop])) {
-						if (!targetControl.parentNode?.querySelector(".ToolTip")) {
-							targetControl.parentNode?.append(WRender.Create({
-								tagName: "span",
-								innerHTML: `Ingresar formato correcto: ${targetControl.placeholder}`,
-								className: "ToolTip"
-							}));
-						}
-						WRender.SetStyle(targetControl, {
-							boxShadow: "0 0 3px #ef4d00"
-						});
-					}
-				}
-			}
-		}
+		await ModelPropertyFormBuilder.OnChange(targetControl, currentTarget, ObjectF, prop, Model);
 		if (Model[prop].fieldRequire) {
 			this.shadowRoot?.querySelector(".label_" + Model[prop].fieldRequire)?.append("*")
 			Model[Model[prop].fieldRequire].require = true;
@@ -658,18 +607,7 @@ class WForm extends HTMLElement {
 		control.focus();
 	}
 	createInfoToolTip(control, message) {
-		if (!control.parentNode.querySelector(".ToolTip")) {
-			const toolTip = WRender.Create({
-				tagName: "span",
-				innerHTML: message,
-				className: "ToolTip ToolInfo"
-			});
-			control.parentNode.append(toolTip);
-		}
-		WRender.SetStyle(control, {
-			boxShadow: "0 0 3px #ef4d00"
-		});
-		control.focus();
+		ModelPropertyFormBuilder.CreateInfoToolTip(control, message);
 	}
 
 	async ModalCheck(ObjectF, withModel = false) {

@@ -512,8 +512,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "COLOR":
                     if (modelProperty.IsEditableInGrid) {
-                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, (ev) => { this.OnChangeAction(ev, element, prop, Model) }));
-                        td.classList.add("inputContainer")
+                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, () => { this.SaveAction(undefined, element) }))
                     } else {
                         td.append(WRender.Create({
                             style: {
@@ -544,9 +543,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "DATETIME":
                     if (modelProperty.IsEditableInGrid) {
-                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, (ev) => { this.OnChangeAction(ev, element, prop, Model) }));
-                        td.classList.add("inputContainer")
-
+                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, () => { this.SaveAction(undefined, element) }))
                     } else {
                         td.append(value ? new DateTime(value).formatDateTimeToDDMMYYHHMM(value) : "");
                     }
@@ -554,8 +551,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "DATE": case "FECHA":
                     if (modelProperty.IsEditableInGrid) {
-                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, (ev) => { this.OnChangeAction(ev, element, prop, Model) }));
-                        td.classList.add("inputContainer")
+                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, () => { this.SaveAction(undefined, element) }))
                     } else {
                         //td.append(value?.toString()?.toDateFormatEs());
                         td.append(value ? new DateTime(value).formatDateToDDMMYY(value) : "")
@@ -568,8 +564,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "MONEY":
                     if (modelProperty.IsEditableInGrid) {
-                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, (ev) => { this.OnChangeAction(ev, element, prop, Model) }));
-                        td.classList.add("inputContainer")
+                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, () => { this.SaveAction(undefined, element) }))
                     } else {
                         td.append(WRender.Create({
                             tagName: "label", htmlFor: "select" + index,
@@ -581,8 +576,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "NUMBER":
                     if (modelProperty.IsEditableInGrid) {
-                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, (ev) => { this.OnChangeAction(ev, element, prop, Model) }));
-                        td.classList.add("inputContainer")
+                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, () => { this.SaveAction(undefined, element) }))
                     } else {
                         td.append(WRender.Create({
                             tagName: "label", htmlFor: "select" + index,
@@ -595,8 +589,7 @@ class WTableComponent extends HTMLElement {
                     break;
                 default:
                     if (modelProperty.IsEditableInGrid) {
-                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, (ev) => { this.OnChangeAction(ev, element, prop, Model) }));
-                        td.classList.add("inputContainer")
+                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, () => { this.SaveAction(undefined, element) }))
                     } else {
                         td.append(WRender.Create({
                             tagName: "p", htmlFor: "select" + index,
@@ -611,20 +604,6 @@ class WTableComponent extends HTMLElement {
             td.innerHTML = value;
             tr.append(td)
         }
-    }
-    OnChangeAction = async (ev, ObjectF, prop, Model) => {
-        //console.log(ev);
-        /**
-         * @type {HTMLInputElement}
-         */
-        const targetControl = ev?.target
-        /**
-        * @type {HTMLInputElement}
-        */
-        const currentTarget = ev?.currentTarget
-
-        await ModelPropertyFormBuilder.OnChange(targetControl, currentTarget, ObjectF, prop, Model);
-        this.SaveAction(undefined, ObjectF)
     }
 
     DeleteBTN = async (Options, element, tr) => {
@@ -1076,6 +1055,7 @@ class WCardTable extends HTMLElement {
             value = this.Element[prop];
         }
         if (this.IsDrawableProp(this.Element, prop)) {
+
             switch (Model[prop]?.type?.toUpperCase()) {
                 case "IMAGE": case "IMAGES": case "IMG": case "IMAGECAPTURE":
                     this.CardTableContainer.style.gridTemplateColumns = "auto auto";
