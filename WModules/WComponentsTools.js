@@ -93,6 +93,97 @@ function html(strings, ...values) {
     return wrapper.childNodes.length > 1 ? wrapper.childNodes : wrapper.firstChild;
 }
 
+/** 
+ * @returns {HTMLElement|HTMLInputElement|HTMLSelectElement}
+ * @param {any} strings
+ * @param {any[]} values
+ */
+function htmlw(strings, ...values) {
+    const result = strings.reduce((accumulator, currentString, index) => {
+        accumulator += currentString;
+
+        if (index < values.length) {
+            let value = values[index];
+            if (value == undefined) {
+                value = "";
+            }
+
+            if (value instanceof HTMLElement || value?.__proto__.__proto__ == HTMLElement.prototype) {
+                const placeholder = document.createElement('div');
+                placeholder.setAttribute('data-placeholder', index);
+                accumulator += placeholder.outerHTML;
+            } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement)) {
+                value.forEach((_, i) => {
+                    const placeholder = document.createElement('div');
+                    placeholder.setAttribute('data-placeholder', `${index}-${i}`);
+                    accumulator += placeholder.outerHTML;
+                });
+            } else if (typeof value === 'function') {
+                let placeholder = '';
+                const patron = /(onclick=['"]|onload=['"]|onchange=['"])$/;
+                const coincidencia = accumulator.match(patron);
+
+                if (coincidencia) {
+                    const fragmentoAReemplazar = coincidencia[0];
+                    const patronEvent = /(onclick|onload|onchange)=['"]$/;
+                    const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
+                    const event = coincidenciaEvent[1];
+                    const quote = fragmentoAReemplazar.endsWith("'") ? "'" : '"';
+                    placeholder = `data-function-placeholder-${index}=${quote}${event}${quote}`;
+                    accumulator = accumulator.replace(patron, "");
+                }
+
+                accumulator += placeholder;
+            } else {
+                accumulator += value;
+            }
+        }
+
+        return accumulator;
+    }, '');
+
+    // 🚀 Nueva parte: Detectar y envolver en tabla si es necesario
+    const containsTableElements = /<(t[rdh]|thead|tbody|tfoot)>/i.test(result);
+    let htmlToParse = result;
+
+    if (containsTableElements) {
+        htmlToParse = `<table><tbody>${result}</tbody></table>`;
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = htmlToParse;
+
+    // Reemplazar marcadores de posición por nodos reales
+    values.forEach((value, index) => {
+        if (value instanceof HTMLElement) {
+            const placeholder = wrapper.querySelector(`[data-placeholder="${index}"]`);
+            if (placeholder) placeholder.replaceWith(value);
+        } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement)) {
+            value.forEach((node, i) => {
+                const placeholder = wrapper.querySelector(`[data-placeholder="${index}-${i}"]`);
+                if (placeholder) placeholder.replaceWith(node);
+            });
+        } else if (typeof value === 'function') {
+            const elements = wrapper.querySelectorAll(`[data-function-placeholder-${index}]`);
+            elements.forEach(element => {
+                const event = element.getAttribute(`data-function-placeholder-${index}`);
+                element[event] = value;
+            });
+        }
+    });
+
+    // 🚀 Extraer nodos reales si estábamos dentro de una tabla
+    if (containsTableElements) {
+        const tbody = wrapper.querySelector("tbody");
+        if (tbody) {
+            const nodes = [...tbody.childNodes];
+            return nodes.length > 1 ? nodes : nodes[0];
+        }
+    }
+
+    return wrapper.childNodes.length > 1 ? wrapper.childNodes : wrapper.firstChild;
+}
+
 
 export { html }
 class WRender {
