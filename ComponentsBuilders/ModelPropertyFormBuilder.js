@@ -52,8 +52,7 @@ export class ModelPropertyFormBuilder {
 
 	static PrepareVisualization(value, type) {
 		if (type == "MONEY") {
-			console.log(value, parseFloat(value));
-
+			//console.log(value, parseFloat(value));
 			return parseFloat(value).toFixed(3);
 		}
 		if (type == "PERCENTAGE") {

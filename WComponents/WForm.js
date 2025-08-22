@@ -80,7 +80,7 @@ class WForm extends HTMLElement {
 			this[p] = Config[p];
 		}
 
-		this.ModelObject = this.Config.ModelObject;
+		this.ModelObject = this.CreateModelProxy(Config.ModelObject);
 		this.ImageUrlPath = Config.ImageUrlPath;
 		this.Options = this.Options ?? true;
 		this.DataRequire = this.DataRequire ?? true;
@@ -138,14 +138,13 @@ class WForm extends HTMLElement {
 	}
 	#OriginalObject = {};
 	DrawComponent = async () => {
-		const Model = this.Config.ModelObject ?? this.Config.EditObject;
+		const Model = this.ModelObject ?? this.Config.EditObject;
 		const ObjectProxy = this.CreateProxy(Model);
 		this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
 		await this.CrudForm(ObjectProxy);
 		if (this.Options == true && !this.OptionsActive) {
 			this.OptionsActive = true;
 			this.DivFormOptions.appendChild(await this.SaveOptions(ObjectProxy));
-
 		}
 	}
 	CreateProxy(Model, FormObject = this.FormObject) {
@@ -181,8 +180,25 @@ class WForm extends HTMLElement {
 		const ObjectProxy = new Proxy(FormObject, ObjHandler);
 		return ObjectProxy;
 	}
-	SetOperationValues = (Model = this.Config.ModelObject, target = this.FormObject) => {
+	CreateModelProxy(Model, FormObject = this.FormObject) {
+		if (Model == undefined) {
+			return undefined;
+		}
+		const ObjHandler = {
+			get: (target, property) => {
+				return target[property];
+			}, set: (target, property, value) => {				
+				target[property] = value;				
+				this.SetOperationValues(Model, FormObject)
+				return true;
+			}
+		};
+		const ObjectProxy = new Proxy(Model, ObjHandler);
+		return ObjectProxy;
+	}
+	SetOperationValues = (Model = this.ModelObject, target = this.FormObject) => {
 		for (const prop in Model) {
+			const modelProperty = /** @type {ModelProperty} */ (Model[prop]);
 			if (Model[prop]?.__proto__ == Object.prototype) {
 				if (Model[prop].type?.toUpperCase() == "OPERATION") {
 					//if (Model[prop].type?.toUpperCase() == "OPERATION") {
@@ -190,6 +206,32 @@ class WForm extends HTMLElement {
 					const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
 					if (control) {
 						control.innerHTML = target[prop];
+					}
+				}/* else if (['WSELECT', 'MASTERDETAIL', "CALENDAR", "MULTISELECT", "WCHECKBOX", "RICHTEXT", "PASSWORD"].includes(Model[prop].type?.toUpperCase())) {
+					//if (Model[prop].type?.toUpperCase() == "OPERATION") 					
+				}*/else {
+					if (this.Controls[prop]) {
+						// --- 1. Evaluar `require` (estático o dinámico)
+						let { isHidden, isDisabled } = this.EvalHiddenDisabled(modelProperty, target);
+
+						if (isHidden || modelProperty.primary == true) {
+							this.Controls[prop].parentNode.style.display = "none";
+						} else {
+							this.Controls[prop].parentNode.style.display = "block";
+						}
+
+						if (isDisabled) {
+							this.Controls[prop].disabled = true;
+							this.Controls[prop].style.pointerEvents = "none";
+						} else {
+							this.Controls[prop].disabled = false;
+							this.Controls[prop].style.pointerEvents = "all";
+						}
+
+						if (['MODEL'].includes(Model[prop].type?.toUpperCase())) {
+							this.Controls[prop].FormObject = target[prop] ?? {}
+							this.Controls[prop]?.DrawComponent();
+						}
 					}
 				}
 			}
@@ -213,7 +255,7 @@ class WForm extends HTMLElement {
 		//GroupsForm.length = 0;
 		//verifica que el modelo existe,
 		//sino es asi le asigna el valor de un objeto existente
-		const Model = this.Config.ModelObject ?? this.Config.EditObject;
+		const Model = this.ModelObject ?? this.Config.EditObject;
 		const Form = new GroupComponent({ Name: this.Config.Title ?? undefined });
 		const GroupsForm = [Form];
 		this.Config.Groups?.forEach(group => {
@@ -225,11 +267,6 @@ class WForm extends HTMLElement {
 		GroupsForm.forEach(DivForm => {
 			this.DivForm?.append(DivForm);
 		});
-		//const ModelComplexElements = Object.keys(this.Config.ModelObject).filter(o => this.Config.ModelObject[o]?.type?.toUpperCase() == "MASTERDETAIL"
-		//	|| this.Config.ModelObject[o]?.type?.toUpperCase() == "CALENDAR")
-
-		//const ComplexForm = WRender.Create({ className: 'divComplexForm', style: ModelComplexElements.length <= 1 ? "grid-template-columns: unset" : "" });
-
 		for (const prop in Model) {
 			const DivForm = this.DefineContainer(prop, GroupsForm);
 			try {
@@ -283,6 +320,30 @@ class WForm extends HTMLElement {
 		}
 	}
 
+	EvalHiddenDisabled(modelProperty, target) {
+		let isRequired = false;
+		if (typeof modelProperty.require === "function") {
+			isRequired = Boolean(modelProperty.require(target, this));
+		} else {
+			isRequired = Boolean(modelProperty.require); // valor estático: true/false
+		}
+		// --- 2. Evaluar `disabled` (estático o dinámico)
+		let isDisabled = false;
+		if (typeof modelProperty.disabled === "function") {
+			isDisabled = Boolean(modelProperty.disabled(target, this));
+		} else {
+			isDisabled = Boolean(modelProperty.disabled);
+		}
+		// --- 3. Evaluar `hidden` (estático o dinámico)
+		let isHidden = false;
+		if (typeof modelProperty.hidden === "function") {
+			isHidden = Boolean(modelProperty.hidden(target, this));
+		} else {
+			isHidden = Boolean(modelProperty.hidden);
+		}
+		return { isHidden, isDisabled };
+	}
+
 	/**
 	 * @param {string} prop
 	*  @param {Array<GroupComponent>} GroupsForm
@@ -306,7 +367,9 @@ class WForm extends HTMLElement {
 			return true;
 		}
 		return (Model[prop]?.__proto__ == Object.prototype &&
-			(Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
+			(//Model[prop]?.primary
+				//|| Model[prop]?.hidden ||
+				!Model[prop]?.type))
 			|| Model[prop]?.__proto__ == Function.prototype
 			|| Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData" || prop == "OrderData";
 	}
@@ -357,11 +420,11 @@ class WForm extends HTMLElement {
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateSelect(ModelProperty,
 					ObjectF, prop, onchangeListener);
 				break;
-			case "MASTERDETAIL":  case "WGRIDSELECT":
+			case "MASTERDETAIL": case "WGRIDSELECT":
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
 					ObjectF, prop, this.Config?.ImageUrlPath ?? "", onchangeListener);
 				break;
-			case "MULTISELECT": case "WCHECKBOX": case "WSELECT": 
+			case "MULTISELECT": case "WCHECKBOX": case "WSELECT":
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateWSelect(ModelProperty,
 					ObjectF, prop, onchangeListener);
 				break;
@@ -414,7 +477,10 @@ class WForm extends HTMLElement {
 		if (addLabel) {
 			ControlContainer.append(ControlLabel);
 		}
-		ControlContainer.append(this.Controls[prop])
+		ControlContainer.append(this.Controls[prop]);
+		if (ModelProperty.hidden || ModelProperty.primary) {
+			ControlContainer.style.display = "none";
+		}
 		Form.Add(ControlContainer);
 	}
 
@@ -431,7 +497,7 @@ class WForm extends HTMLElement {
 					try {
 						ev.target.enabled = false
 						const response = await this.Save(ObjectF);
-						
+
 					} catch (error) {
 						ev.target.enabled = true
 					}
@@ -476,7 +542,7 @@ class WForm extends HTMLElement {
 			if (this.Config.ObjectOptions?.Url != undefined || this.Config.SaveFunction == undefined) {
 				const ModalCheck = await this.ModalCheck(ObjectF, this.Config.SaveFunction == undefined);
 				this.shadowRoot?.append(ModalCheck)
-			} else if (this.Config.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
+			} else if (this.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
 				const ModalCheck = await this.ModalCheck(ObjectF, true);
 				this.shadowRoot?.append(ModalCheck)
 			} else {
@@ -495,72 +561,81 @@ class WForm extends HTMLElement {
 	Validate = (ObjectF = this.FormObject) => {
 		if (this.DataRequire == true) {
 			for (const prop in ObjectF) {
-				if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require
-					&& this.Config.ModelObject[prop]?.hidden != true) {
+				if (!this.ModelObject[prop]) {
+					continue;
+				}
+				let { isHidden, isDisabled } = this.EvalHiddenDisabled(this.ModelObject[prop], ObjectF);
+				if (!prop.includes("_hidden")
+					&& this.ModelObject[prop]?.require
+					&& !this.ModelObject[prop]?.primary
+					&& isHidden != true) {
 					/**
 					 * @type {?HTMLInputElement | undefined | any}
 					 */
 					const control = this.Controls[prop];
 					//const control = this.DivForm?.querySelector("#ControlValue" + prop);
-					if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
+					if (this.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
 						if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
-							return false;
+							console.log(prop); return false;
 						}
-					} else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
+					} else if (this.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
 						const passwords = control.querySelectorAll("input");
 						if (passwords[0].value == null || passwords[0].value == "") {
 							this.createAlertToolTip(passwords[0], WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ` es requerido`);
-							return false;
+							console.log(prop); return false;
 						}
 						if (passwords[0].value != passwords[1].value) {
 							this.createAlertToolTip(passwords[0], `Las contraseñas deben ser iguales`);
-							return false;
+							console.log(prop); return false;
 						}
 
-					} else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
-						|| this.Config.ModelObject[prop]?.type.toUpperCase() == "CALENDAR") {
-						if (this.Config.ModelObject[prop].require == true) {
-							this.Config.ModelObject[prop].min = this.Config.ModelObject[prop]?.min ?? 1;
+					} else if (this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+						|| this.ModelObject[prop]?.type.toUpperCase() == "CALENDAR") {
+						if (this.ModelObject[prop].require == true) {
+							this.ModelObject[prop].min = this.ModelObject[prop]?.min ?? 1;
 						}
-						if (this.Config.ModelObject[prop]?.max
-							&& ObjectF[prop].length > this.Config.ModelObject[prop]?.max) {
+						if (this.ModelObject[prop]?.max
+							&& ObjectF[prop].length > this.ModelObject[prop]?.max) {
 							this.createAlertToolTip(control, `El máximo de registros permitidos es `
-								+ this.Config.ModelObject[prop]?.max);
-							return false;
+								+ this.ModelObject[prop]?.max);
+							console.log(prop); return false;
 						}
-						if (this.Config.ModelObject[prop]?.min
-							&& ObjectF[prop].length < this.Config.ModelObject[prop]?.min) {
+						if (this.ModelObject[prop]?.min
+							&& ObjectF[prop].length < this.ModelObject[prop]?.min) {
 							this.createAlertToolTip(control, `El mínimo de registros permitidos es `
-								+ this.Config.ModelObject[prop]?.min);
-							return false;
+								+ this.ModelObject[prop]?.min);
+							console.log(prop); return false;
 						}
 
 					} else if ((ObjectF[prop] == null || ObjectF[prop] == "") && control != null) {
 						this.createAlertToolTip(control, WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ` es requerido`);
-						return false;
+						console.log(prop); return false;
 					} else if (control != null && control.pattern) {
 						let regex = new RegExp(control.pattern);
 						if (!regex.test(ObjectF[prop])) {
 							this.createAlertToolTip(control, `Ingresar formato correcto: ${control.placeholder}`);
-							return false;
+							console.log(prop); return false;
 						}
 					} else if (control != null && control.type?.toString().toUpperCase() == "NUMBER") {
 						if (parseFloat(control.value) < parseFloat(control.min)) {
 							this.createAlertToolTip(control, `El valor mínimo permitido es: ${control.min}`);
-							return false;
+							console.log(prop); return false;
 						}
 						if (parseFloat(control.value) > parseFloat(control.max)) {
 							this.createAlertToolTip(control, `El valor máximo permitido es: ${control.max}`);
-							return false;
+							console.log(prop); return false;
 						}
 					} else if (control != null && control.type?.toString().toUpperCase() == "DATE") {
 						if (new Date(control.value) < new Date(control.min)) {
 							this.createAlertToolTip(control, `El valor mínimo permitido es: ${control.min}`);
-							return false;
+
+
+
+							console.log(prop); return false;
 						}
 						if (new Date(control.value) > new Date(control.max)) {
 							this.createAlertToolTip(control, `El valor máximo permitido es: ${control.max}`);
-							return false;
+							console.log(prop); return false;
 						}
 					}
 				}
@@ -616,7 +691,7 @@ class WForm extends HTMLElement {
 			try {
 				this.shadowRoot?.append(loadinModal);
 				if (withModel) {
-					const response = await this.Config.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
+					const response = await this.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
@@ -634,7 +709,7 @@ class WForm extends HTMLElement {
 						this.shadowRoot?.append(ModalMessage(response.message))
 						return;
 					}
-					if (response.status == 200 && response.message) {						
+					if (response.status == 200 && response.message) {
 						this.shadowRoot?.append(ModalMessage(response.message))
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);

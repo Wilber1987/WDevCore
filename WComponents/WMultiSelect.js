@@ -49,7 +49,9 @@ class MultiSelect extends HTMLElement {
 		this.FieldName = "";
 		this.FullDetail = this.Config.FullDetail ?? true;
 		this.SubOptionsFieldName = "";
-		this.ControlsContainer = WRender.Create({ className: "ControlContainer" });
+		this.ControlsContainer = WRender.Create({
+			className: `ControlContainer ${this.Config.MultiSelect ? "multi" : "select"}`
+		});
 		WRender.SetStyle(this, {
 			display: this.Config.IsFilterControl == true ? "grid" : "block",
 			gridTemplateColumns: "20% 80%",
@@ -588,6 +590,14 @@ const MainMenu = css`
 		width: calc(100% - 30px);
 		overflow-x: auto;
 	}
+
+	.select .LabelMultiselect .selecteds {    
+		width: calc(100% - 0px);
+	}
+	.select  .LabelMultiselect .selecteds label {
+		max-width: calc(100% - 25px);
+	}
+
 	.LabelMultiselect.IsFilterControl,  .LabelMultiselect.IsFilterControl .selecteds {   
 		width: calc(100%);
 		overflow-x: hidden;
