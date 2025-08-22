@@ -27,7 +27,7 @@ function ModelFunction(EditingObject) {
 	TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | imagecapture 
 	CALENDAR | OPERATION (requiere un action para funcionar y toma el valor que retorne el action)
 	* @property {Boolean|Function} [hidden] desabilita la propiedad y la oculta
-	* @property {Object} [Options] 
+	* @property {TableOptions} [Options] 
 	* @property {Boolean} [hiddenInTable] oculta en la tabla
 	* @property {Boolean|Function} [require]
 	* @property {Boolean} [primary]
@@ -51,7 +51,9 @@ function ModelFunction(EditingObject) {
 	* @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
 	* @property {() => { Agenda: Agenda[]; Calendario: Tbl_Calendario[]; }} [CalendarFunction] (obj) => {  }
 	* @property {String} [SelfChargeDataset] Si es un WSELECT con el valor de esta propiedad puede usar datos para llenar el desplegable a partir de la entidad padre, es funcional para relaciones recursivas dentro de un master detail
-
+   
+	SE AGREGARA SECCION UTIL PARA CONFIGURAR PROPIEDADES EDITABLES EN COMPONENTES TABLAS
+	* @property {Boolean} [IsEditableInGrid]
 **/
 class ModelProperty { }
 /**
@@ -77,7 +79,7 @@ class ModelProperty { }
 	* @property {Function} [SaveFunction]
 	* @property {Function} [ValidateFunction]
 	* @property {Function} [ProxyAction]
-	* @property {HTMLStyleElement} [CustomStyle]    
+	* @property {HTMLStyleElement} [CustomStyle] 
 	**/
 class FormConfig { };
 
@@ -363,6 +365,7 @@ class WNode {
 	* @property {Function} [SelectAction] requiere select en true, recibe como parametro el elemnto
 	* 
 **/
+
 /**
  * @typedef {Object} SearchItemsFromApi 
  * @property {String} [ApiUrl]
@@ -420,6 +423,7 @@ class TableConfig { };
 	* @property {Boolean} [CloseOption]
 	* @property {Function} [ProxyAction]
  **/
+
 class ModalConfig {
 	// ModelObject = {
 	//     property: undefined,

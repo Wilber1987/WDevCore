@@ -35,6 +35,17 @@ export const WTableStyle = css`
 	border-right: 1px var(--fifty-color) solid;
 	cursor: pointer;
 }
+.WTable td.inputContainer2 {
+	padding: 0px;
+	position: relative;
+	& input {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		border: none;
+		background-color: unset;
+	}
+}
 w-card-table {
 	cursor: pointer;
 }
@@ -120,6 +131,7 @@ th label {
 	position: relative;
 	z-index: 1;
 }
+
 
 input[type=text],
 input[type=string],
