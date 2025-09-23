@@ -330,6 +330,7 @@ export class ModelPropertyFormBuilder {
 		let Dataset = []
 		if (ModelProperty.type?.toUpperCase() != "WSELECT"
 			&& ModelProperty.type?.toUpperCase() != "WMULTISELECT"
+			&& ModelProperty.type?.toUpperCase() != "MULTISELECT"	
 			&& ModelProperty.type?.toUpperCase() != "WGRIDSELECT"
 			&& ModelProperty.type?.toUpperCase() != "WGRIDMULTISELECT") {
 			Dataset = EditingObject[prop];
