@@ -124,6 +124,7 @@ th label {
 	grid-template-columns: calc(100% - 160px) 150px;
 	gap: 10px;
 	justify-content: space-between;
+	margin: 5px 0px;
 }
 
 .thOptions w-filter-option {
@@ -328,40 +329,30 @@ input[type=radio]:checked::before {
 	object-fit: cover;
 	box-shadow: 0 2px 5px 0 var(--fifty-color);
 }
-.LabelMultiselect {
-	padding: 0px 10px;
+.SelectedItemsContainer {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	cursor: pointer;
 	height: 100%;
+	grid-column: span 2;
+	flex-direction: column;
 }
-.LabelMultiselect .selecteds {       
+.SelectedItemsContainer .selecteds {       
 	display: flex;
 	flex-wrap: nowrap;
 	align-items: center;
-	width: calc(100% - 30px);
+	width: calc(100%);
 	overflow-x: auto;
+	flex-direction: row;
+	align-items: flex-start;
+	w-card {
+		border-radius: 10px;
+		border: solid 1px #bcbdbd;
+		padding: 10px 30px 10px 10px;
+	}
 }
-.LabelMultiselect label {
-	padding: 4px 7px;
-	border-radius: 0.2cm;
-	background-color: #1f58c7;
-	color: #fff;
-	margin: 0px 3px;
-	font-size: 14px;
-	align-items: center;
-	overflow: hidden;
-	display: flex;
-	line-height: 12px;
-	width: fit-content;
-	height: fit-content;        
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	max-width: calc(100% - 65px);
-}
-.LabelMultiselect label button {
+.SelectedItemsContainer label button {
 	border: none;
 	margin-left: 3px;
 	cursor: pointer;

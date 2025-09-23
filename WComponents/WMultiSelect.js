@@ -5,7 +5,7 @@ import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 
 // @ts-ignore
 import { FilterData } from "../WModules/CommonModel.js";
-import { WCardTable } from "./WTableComponent.js";
+import { WCard } from "./WCard.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WToolTip } from "./FormComponents/WToolTip.js";
 
@@ -490,7 +490,7 @@ class MultiSelect extends HTMLElement {
 	}
 	BuilDetail = (element) => {
 		const elementDetail = WRender.Create({ className: "ElementDetail" });
-		elementDetail.append(new WCardTable(WArrayF.replacer(element), this.ModelObject, this.Config))
+		elementDetail.append(new WCard(WArrayF.replacer(element), this.ModelObject, this.Config))
 		// for (const prop in WArrayF.replacer(element)) {
 		//     if (this.IsDrawableProp(element, prop)) {
 		//         elementDetail.append(WRender.Create({ className: "ElementProp", innerHTML: WOrtograficValidation.es(prop) + ":" }));

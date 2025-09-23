@@ -51,11 +51,15 @@ function ModelFunction(EditingObject) {
 	* @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
 	* @property {() => { Agenda: Agenda[]; Calendario: Tbl_Calendario[]; }} [CalendarFunction] (obj) => {  }
 	* @property {String} [SelfChargeDataset] Si es un WSELECT con el valor de esta propiedad puede usar datos para llenar el desplegable a partir de la entidad padre, es funcional para relaciones recursivas dentro de un master detail
-   
+   	* @property {Boolean} [IsGridDisplay] Se  usa para el formulario con propiedades MULTISELECT o WSELECT y despliega una tabla en lugar de un combo
 	SE AGREGARA SECCION UTIL PARA CONFIGURAR PROPIEDADES EDITABLES EN COMPONENTES TABLAS
 	* @property {Boolean} [IsEditableInGrid]
 **/
-class ModelProperty { }
+class ModelProperty {
+	IsNumber() {
+		return this.type?.toUpperCase() == "NUMBER"
+	}
+}
 /**
  * @typedef {Object} FormConfig 
  *  * @property {Object} [ObjectDetail]

@@ -181,14 +181,15 @@ class WForm extends HTMLElement {
 		return ObjectProxy;
 	}
 	CreateModelProxy(Model, FormObject = this.FormObject) {
+		//return Model
 		if (Model == undefined) {
 			return undefined;
 		}
 		const ObjHandler = {
 			get: (target, property) => {
 				return target[property];
-			}, set: (target, property, value) => {				
-				target[property] = value;				
+			}, set: (target, property, value) => {
+				target[property] = value;
 				this.SetOperationValues(Model, FormObject)
 				return true;
 			}
@@ -227,7 +228,9 @@ class WForm extends HTMLElement {
 							this.Controls[prop].disabled = false;
 							this.Controls[prop].style.pointerEvents = "all";
 						}
-
+						if (["NUMBER", "MONEY"].includes(modelProperty.type.toUpperCase()) && this.Controls[prop].value.trim() == "") {
+							target[prop] = undefined;
+						}
 						if (['MODEL'].includes(Model[prop].type?.toUpperCase())) {
 							this.Controls[prop].FormObject = target[prop] ?? {}
 							this.Controls[prop]?.DrawComponent();
@@ -367,7 +370,7 @@ class WForm extends HTMLElement {
 			return true;
 		}
 		return (Model[prop]?.__proto__ == Object.prototype &&
-			(//Model[prop]?.primary
+			(//Model[prop]?.primary ||
 				//|| Model[prop]?.hidden ||
 				!Model[prop]?.type))
 			|| Model[prop]?.__proto__ == Function.prototype
@@ -420,13 +423,18 @@ class WForm extends HTMLElement {
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateSelect(ModelProperty,
 					ObjectF, prop, onchangeListener);
 				break;
-			case "MASTERDETAIL": case "WGRIDSELECT":
+			case "MASTERDETAIL":
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
 					ObjectF, prop, this.Config?.ImageUrlPath ?? "", onchangeListener);
 				break;
 			case "MULTISELECT": case "WCHECKBOX": case "WSELECT":
-				this.Controls[prop] = await ModelPropertyFormBuilder.CreateWSelect(ModelProperty,
-					ObjectF, prop, onchangeListener);
+				if (ModelProperty.IsGridDisplay) {
+					this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
+						ObjectF, prop, this.Config?.ImageUrlPath ?? "", onchangeListener);
+				} else {
+					this.Controls[prop] = await ModelPropertyFormBuilder.CreateWSelect(ModelProperty,
+						ObjectF, prop, onchangeListener);
+				}
 				break;
 			case "TEXTAREA":
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateTextArea(
@@ -474,6 +482,7 @@ class WForm extends HTMLElement {
 				break;
 		}
 		ControlContainer.classList.add(ModelProperty.type?.toUpperCase())
+		ControlContainer.classList.add(ModelProperty.IsGridDisplay ? "GRID_DISPLAY" : "ELEMENT_DYSPLAY")
 		if (addLabel) {
 			ControlContainer.append(ControlLabel);
 		}
@@ -527,7 +536,6 @@ class WForm extends HTMLElement {
 	}
 	Save = async (ObjectF = this.FormObject) => {
 		try {
-			//console.log(ObjectF);
 			if (this.Config.ValidateFunction != undefined &&
 				typeof this.Config.ValidateFunction === "function") {
 				const response = this.Config.ValidateFunction(ObjectF);
@@ -576,17 +584,17 @@ class WForm extends HTMLElement {
 					//const control = this.DivForm?.querySelector("#ControlValue" + prop);
 					if (this.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
 						if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
-							console.log(prop); return false;
+							return false;
 						}
 					} else if (this.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
 						const passwords = control.querySelectorAll("input");
 						if (passwords[0].value == null || passwords[0].value == "") {
 							this.createAlertToolTip(passwords[0], WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ` es requerido`);
-							console.log(prop); return false;
+							return false;
 						}
 						if (passwords[0].value != passwords[1].value) {
 							this.createAlertToolTip(passwords[0], `Las contraseñas deben ser iguales`);
-							console.log(prop); return false;
+							return false;
 						}
 
 					} else if (this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
@@ -598,44 +606,41 @@ class WForm extends HTMLElement {
 							&& ObjectF[prop].length > this.ModelObject[prop]?.max) {
 							this.createAlertToolTip(control, `El máximo de registros permitidos es `
 								+ this.ModelObject[prop]?.max);
-							console.log(prop); return false;
+							return false;
 						}
 						if (this.ModelObject[prop]?.min
 							&& ObjectF[prop].length < this.ModelObject[prop]?.min) {
 							this.createAlertToolTip(control, `El mínimo de registros permitidos es `
 								+ this.ModelObject[prop]?.min);
-							console.log(prop); return false;
+							return false;
 						}
 
 					} else if ((ObjectF[prop] == null || ObjectF[prop] == "") && control != null) {
 						this.createAlertToolTip(control, WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ` es requerido`);
-						console.log(prop); return false;
+						return false;
 					} else if (control != null && control.pattern) {
 						let regex = new RegExp(control.pattern);
 						if (!regex.test(ObjectF[prop])) {
 							this.createAlertToolTip(control, `Ingresar formato correcto: ${control.placeholder}`);
-							console.log(prop); return false;
+							return false;
 						}
 					} else if (control != null && control.type?.toString().toUpperCase() == "NUMBER") {
 						if (parseFloat(control.value) < parseFloat(control.min)) {
 							this.createAlertToolTip(control, `El valor mínimo permitido es: ${control.min}`);
-							console.log(prop); return false;
+							return false;
 						}
 						if (parseFloat(control.value) > parseFloat(control.max)) {
 							this.createAlertToolTip(control, `El valor máximo permitido es: ${control.max}`);
-							console.log(prop); return false;
+							return false;
 						}
 					} else if (control != null && control.type?.toString().toUpperCase() == "DATE") {
 						if (new Date(control.value) < new Date(control.min)) {
 							this.createAlertToolTip(control, `El valor mínimo permitido es: ${control.min}`);
-
-
-
-							console.log(prop); return false;
+							return false;
 						}
 						if (new Date(control.value) > new Date(control.max)) {
 							this.createAlertToolTip(control, `El valor máximo permitido es: ${control.max}`);
-							console.log(prop); return false;
+							return false;
 						}
 					}
 				}
@@ -750,10 +755,11 @@ class WForm extends HTMLElement {
 			.IMAGE,
 			.FILE,
 			.FILES,
-			.MASTERDETAIL,			
+			.MASTERDETAIL,
+			.GRID_DISPLAY,
 			.RICHTEXT,
 			.DRAW,
-			.CALENDAR, .WGRIDSELECT {
+			.CALENDAR {
 				grid-column: span  ${this.limit};
 				padding-bottom: 10px;
 			}

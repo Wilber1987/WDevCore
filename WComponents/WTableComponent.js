@@ -14,6 +14,7 @@ import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { DateTime } from "../WModules/Types/DateTime.js";
 import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
 import { ModelPropertyFormBuilder } from "../ComponentsBuilders/ModelPropertyFormBuilder.js";
+import { WCard } from "./WCard.js";
 
 
 class WTableComponent extends HTMLElement {
@@ -42,8 +43,8 @@ class WTableComponent extends HTMLElement {
         this.ActualPage = 0;
         this.Dataset = [];
         this.Sorts = [];
-        this.LabelMultiselect = WRender.Create({
-            className: "LabelMultiselect", children: [
+        this.SelectedItemsContainer = WRender.Create({
+            className: "SelectedItemsContainer", children: [
                 { className: "selecteds" },
                 { tagName: "span", className: "btnSelect" }
             ]
@@ -57,7 +58,7 @@ class WTableComponent extends HTMLElement {
         this.Config = Config ?? {};
         this.Config.isActiveSorts = this.Config.isActiveSorts ?? true;
         this.Config.isActiveMultiSorts = this.Config.isActiveMultiSorts ?? false;
-        this.Dataset = this.Config.Dataset ?? [];
+        this.Dataset = this.Config.Dataset;
 
         /**@type {Array<OrderData>} */
         this.Sorts = [];
@@ -73,6 +74,7 @@ class WTableComponent extends HTMLElement {
             FilterFunction: (DFilt) => {
                 this.withFilter = true;
                 this.FilterDataset = DFilt;
+                this.Dataset = [];
                 if (this.Dataset.length == 0) {
                     this.Dataset = [...this.Dataset, ...DFilt];
                 } else {
@@ -95,7 +97,7 @@ class WTableComponent extends HTMLElement {
         /**@type {Number} */
         this.maxElementByPage = this.Config.maxElementByPage ?? 10;
         /**@type {Number} */
-        this.numPage = this.Dataset.length / this.maxElementByPage;
+        this.numPage = this.Dataset?.length / this.maxElementByPage;
         /**@type {Number} */
         this.ActualPage = 1;
         if (this.Config.selectedItems == undefined) {
@@ -178,7 +180,7 @@ class WTableComponent extends HTMLElement {
         const isWithtModel = this.Config.ModelObject?.Get != undefined
         this.AddItemsFromApi = this.Config.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         let chargeWithFilter = false;
-        if ((Dataset.length == 0 || Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
+        if (( Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
             if (isWithtUrl) {
                 // @ts-ignore
                 Dataset = await WAjaxTools.PostRequest(this.Config?.Options?.UrlSearch);
@@ -205,8 +207,6 @@ class WTableComponent extends HTMLElement {
                 });
             }
         }
-
-
     }
     DrawHeadOptions() {
         if (this.ThOptions.innerHTML != "") return;
@@ -216,7 +216,7 @@ class WTableComponent extends HTMLElement {
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
                     tagName: "input", class: "txtControl", type: "text",
-                    placeholder: "Buscar...", style: "margin: 10px 0px",
+                    placeholder: "Buscar...", 
                     onchange: async (ev) => {
                         this.SearchFunction(ev);
                     }
@@ -242,7 +242,7 @@ class WTableComponent extends HTMLElement {
                 })
                 this.ThOptions.append(printTool);
             }
-            this.ThOptions.append(this.LabelMultiselect);
+            this.ThOptions.append(this.SelectedItemsContainer);
 
             return this.ThOptions;
         }
@@ -300,7 +300,7 @@ class WTableComponent extends HTMLElement {
         let tbody = WRender.Create({ tagName: "tbody" });
 
         if (Dataset == undefined) {
-            Dataset = [{ Description: "No Data!!!" }];
+            //Dataset = [{ Description: "No Data!!!" }];
         }
         Dataset?.slice((this.ActualPage - 1) * this.maxElementByPage, this.ActualPage * this.maxElementByPage)
             .forEach((element, DatasetIndex) => {
@@ -506,7 +506,7 @@ class WTableComponent extends HTMLElement {
                     //         `${element[prop].map(object => {
                     //             const FObject = Model[prop].Dataset?.find(i => WArrayF.compareObj(object, i));
                     //             const label = FObject?.Descripcion ?? FObject?.descripcion ?? FObject?.Correo_institucional ?? FObject;
-                    //             return `<label class="labelMultiselect">${label}</label>`;
+                    //             return `<label class="SelectedItemsContainer">${label}</label>`;
                     //         }).join('')}`
                     // }));
                     break;
@@ -524,17 +524,17 @@ class WTableComponent extends HTMLElement {
                     }
                     tr.append(td);
                     break;
-                case "MODEL": case "WSELECT": case "WGRIDSELECT":
+                case "MODEL": case "WSELECT":
                     tr.append(WRender.Create({
                         tagName: "td", className: "cardTable", children: [
-                            new WCardTable(WArrayF.replacer(element[prop]), Model[prop].ModelObject, this.Config)
+                            new WCard(WArrayF.replacer(element[prop]), Model[prop].ModelObject, this.Config)
                         ]
                     }));
                     break;
                 case "CALENDAR":
                     const label = `${element[prop]?.map(object => {
                         const label = object?.Fecha_Inicio.toDateFormatEs() + " al " + object?.Fecha_Final.toDateFormatEs();
-                        return `<label class="labelMultiselect">${label}</label>`;
+                        return `<label class="SelectedItemsContainer">${label}</label>`;
                     }).join('')}`
                     tr.append(WRender.Create({
                         tagName: "td", className: "tdAcordeon", innerHTML: label == "undefined" ? "" : label
@@ -971,7 +971,7 @@ class WTableComponent extends HTMLElement {
     }
     DrawLabel = () => {
         // @ts-ignore
-        this.LabelMultiselect.querySelector(".selecteds").innerHTML = "";
+        this.SelectedItemsContainer.querySelector(".selecteds").innerHTML = "";
         // @ts-ignore
         let sum = 0;
         let add = 0;
@@ -979,14 +979,11 @@ class WTableComponent extends HTMLElement {
         this.selectedItems.forEach((element, index) => {
             if (!this.Options?.Select == true) {
                 // @ts-ignore
-                this.LabelMultiselect.querySelector(".selecteds").innerHTML = "";
+                this.SelectedItemsContainer.querySelector(".selecteds").innerHTML = "";
             }
-            const LabelM = WRender.Create({
-                tagName: "label",
-                innerText: this.DisplayText(element, index),
-            });
+            const LabelM = new WCard(element, this.ModelObject, this.Config);
             console.log(LabelM);
-            const selectedsContainer = this.LabelMultiselect.querySelector(".selecteds");
+            const selectedsContainer = this.SelectedItemsContainer.querySelector(".selecteds");
             if (sum == 0) {
                 selectedsContainer?.append(LabelM);
                 labelsWidth = labelsWidth + LabelM.offsetWidth;
@@ -1003,41 +1000,15 @@ class WTableComponent extends HTMLElement {
 
         });
         if (this.selectedItems.length - add > 0) {
-            this.LabelMultiselect.querySelector(".selecteds")?.append(WRender.Create({
+            this.SelectedItemsContainer.querySelector(".selecteds")?.append(WRender.Create({
                 tagName: "label",
                 innerText: "+" + (this.selectedItems.length - add).toString()
             }))
         }
-        console.log(this.LabelMultiselect, this.selectedItems);
+        //console.log(this.SelectedItemsContainer, this.selectedItems);
 
     }
-    DisplayText(element, index) {
-        if (typeof element === "string") {
-            return element
-        }
-        this.DisplayName = undefined;
-        const keys = ["tipo",
-            "Title", "Titulo", "title", "titulo",
-            "Descripcion",
-            "descripcion",
-            "desc",
-            "name",
-            "Name",
-            "nombre",
-            "Nombre",
-            "Nombres",
-            "text",
-            "Text",
-            "Texto", "texto",
-            "Descripcion_Servicio", "Detalles"]
-        for (const key in element) {
-            if (keys.find(k => k == key) != null) {
-                this.DisplayName = key;
-                break;
-            }
-        }
-        return element[this.DisplayName ?? ""] ?? "Element" + index;
-    }
+
 
     //#endregion FIN ESTILOS-----------------------------------------------------------------------------------
 }
@@ -1051,117 +1022,3 @@ const WIcons = {
 const Money = { Euro: "€", Dollar: "$", Cordoba: "C$" }
 customElements.define("w-table-basic", WTableComponent);
 export { WTableComponent };
-class WCardTable extends HTMLElement {
-    constructor(Element, Model, Config) {
-        super();
-        if (Model?.__proto__ == Function.prototype) {
-            Model = Model();
-        }
-        this.Element = Element;
-        this.Model = Model ?? this.Element;
-        this.Config = Config;
-        this.CardTableContainer = WRender.Create({ className: "CardTableContainer" });
-        this.append(this.CardTableContainer, this.CardStyle);
-        this.DrawWCardTable();
-    }
-    connectedCallback() { }
-    DrawWCardTable = async () => {
-        for (const prop in this.Model) {
-            this.EvalModelPrototype(prop, this.Model);
-        }
-    }
-    EvalModelPrototype(prop, Model) {
-        let value = "";
-        if (this.Element != null && this.Element[prop] != null) {
-            value = this.Element[prop];
-        }
-        if (this.IsDrawableProp(this.Element, prop)) {
-            switch (Model[prop]?.type?.toUpperCase()) {
-                case "IMAGE": case "IMAGES": case "IMG": case "IMAGECAPTURE":
-                    this.CardTableContainer.style.gridTemplateColumns = "auto auto";
-                    this.CardTableContainer.append(ControlBuilder.BuildImage(value, this.Config.ImageUrlPath));
-                    break;
-                case "DATE": case "FECHA":
-                    this.CardTableContainer.append(
-                        WRender.Create({
-                            // @ts-ignore
-                            tagName: "label", innerText: WOrtograficValidation.es(prop) + ": " + value?.toString()?.toDateFormatEs()
-                        }))
-                case "SELECT": case "WSELECT":
-                    break;
-                case "MULTISELECT":
-                    break;
-                case "COLOR":
-                    break;
-                case "MODEL":
-                    break;
-                case "MASTERDETAIL":
-                    break;
-                case "MONEY":
-                    this.CardTableContainer.append(WRender.Create({
-                        tagName: "label",
-                        innerText: (Model[prop]?.label ?? WOrtograficValidation.es(prop)) + ": " + (value != undefined && value != null && value != "" ? `${ConvertToMoneyString(parseFloat(value))}` : "-")
-                    }));
-                    break;
-                default:
-                    this.CardTableContainer.append(WRender.Create({
-                        tagName: "label",
-                        innerHTML: (Model[prop]?.label ?? WOrtograficValidation.es(prop)) + ": " + WOrtograficValidation.es(value == null ? "" : value)
-                    }));
-                    break;
-            }
-        }
-    }
-
-    CardStyle = css`
-        .CardTableContainer{
-            display: grid;
-            grid-template-columns: 1px auto;
-            grid-template-rows: auto;
-            gap: 5px;
-            overflow: hidden;
-            grid-auto-flow: column;
-        }
-        .CardTableContainer img {
-            grid-column: 1/2;
-            margin-bottom: 5px;
-            grid-row: span 4;
-        }
-        .CardTableContainer label {
-            min-width: 180px;
-            grid-column: 2/3;
-        }
-        .CardTableContainer label::first-letter {
-            text-transform: uppercase;
-        }
-        .imgPhoto {
-            width: 50px;
-            border-radius: 50%;
-            height: 50px;
-            size: 100%;
-            display: block;
-            margin: auto;
-            object-fit: cover;
-            box-shadow: 0 2px 5px 0 rgb(0 0 0 / 30%);
-        }
-    `
-    IsDrawableProp(element, prop) {
-        if (this.Model == undefined && (typeof element[prop] == "number" || typeof element[prop] == "string")) {
-            return true;
-        }
-        else if ((this.Model[prop]?.type == undefined
-            || this.Model[prop]?.type.toUpperCase() == "MASTERDETAIL"
-            || this.Model[prop]?.primary == true
-            || this.Model[prop]?.hidden == true
-            || this.Model[prop]?.hiddenInTable == true)
-            || element == null
-            || element[prop] == null || element[prop] == undefined
-            || element[prop]?.__proto__ == Function.prototype
-            || element[prop]?.__proto__.constructor.name == "AsyncFunction") {
-            return false;
-        }
-        return true;
-    }
-}
-customElements.define('w-card-table', WCardTable);
-export { WCardTable }
