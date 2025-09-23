@@ -158,11 +158,12 @@ class WCommentsComponent extends HTMLElement {
         if (!this.IsWithSocket) {
             return;
         }
-        WSocketServices.InitSignalR(this, (mensaje) => {
+        WSocketServices.InitSignalR(this, async (mensaje) => {
 
             // Solo agregar si es de la conversación actual
             if (mensaje[this.CommentsIdentifyName] == this.CommentsIdentify) {
-                this.Dataset = [...this.Dataset, mensaje];
+                //this.Dataset = [...this.Dataset, mensaje];
+                await this.update();
                 this.DrawWCommentsComponent();
                 this.scrollToBottom();
             }
