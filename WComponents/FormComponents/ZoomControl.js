@@ -3,7 +3,7 @@
 import { html } from "../../WModules/WComponentsTools.js";
 import { css } from "../../WModules/WStyledRender.js";
 /**
-* @typedef {Object} ZoomControlConfig
+* @typedef {Object.<string, any>} ZoomControlConfig
 * @property {HTMLElement[]} Nodes
 */
 

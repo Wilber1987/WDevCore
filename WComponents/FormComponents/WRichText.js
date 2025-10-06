@@ -12,7 +12,7 @@ class ModelFiles {
     Type = "";
 }
 /**
- * @typedef {Object} Config 
+ * @typedef {Object.<string, any>} Config 
     * @property {String} [value]
     * @property {Function} [action]
     * @property {Boolean} [activeAttached]

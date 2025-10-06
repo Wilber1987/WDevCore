@@ -6,7 +6,7 @@ import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css } from '../WModules/WStyledRender.js';
 import { ModelPropertyFormBuilder } from '../ComponentsBuilders/ModelPropertyFormBuilder.js';
 // @ts-ignore
-import { ModelProperty } from '../WModules/CommonModel.js';
+import { ModelProperty, TableConfig } from '../WModules/CommonModel.js';
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
@@ -16,14 +16,14 @@ import { ModalVericateAction } from './ModalVericateAction.js';
 import { WAlertMessage } from "./WAlertMessage.js";
 
 /**
- * @typedef {Object} FormConfig 
-	* @property {Object} [EditObject] obejto que se esta editando en caso de ser null crea un objeto interno al que le agrega las propiedades
+ * @typedef {Object.<string, any>} FormConfig 
+	* @property {Object.<string, any>} [EditObject] obejto que se esta editando en caso de ser null crea un objeto interno al que le agrega las propiedades
 	* @property {Array<{Name:string, WithAcordeon?: Boolean, Propertys:string[]}>} [Groups] arreglo de objetos que contienen el nombre del grupo y las propiedades que contiene esto es para separar las propiedades en contenedores separados
-	* @property {Object} [ParentModel] objejeto que contiene al objeto modelo del padre del que se esta editando
-	* @property {Object} [ParentEntity] objeto que contiene al objeto padre del que se esta editando
-	* @property {Array<{ name:string, action: (EditingObject)=> {}}>} [UserActions] acciones personalizadas que se pueden agregar al formulario, estas se representan como botones adicionales
-	* @property {Object} [ModelObject] objeto que contiene las propiedades del modelo que se va a editar
-	* @property {Object} [EntityModel] objeto que contiene el modelo de la entidad que se esta editando
+	* @property {Object.<string, any>} [ParentModel] objejeto que contiene al objeto modelo del padre del que se esta editando
+	* @property {Object.<string, any>} [ParentEntity] objeto que contiene al objeto padre del que se esta editando
+	* @property {Array<{ name:string, action: (EditingObject: {})=> {}}>} [UserActions] acciones personalizadas que se pueden agregar al formulario, estas se representan como botones adicionales
+	* @property {Object.<string, any>} [ModelObject] objeto que contiene las propiedades del modelo que se va a editar
+	* @property {Object.<string, any>} [EntityModel] objeto que contiene el modelo de la entidad que se esta editando
 	* @property {Boolean} [AutoSave] indica si el formulario se guarda automaticamente y debe hacer una peticion ajax a los metodos entity del modelo ejemplo Save o Update
 	* @property {Boolean} [WSelectAddObject] indica si el formulario permitira que un control wselect podra agregar un objeto nuevo
 	* @property {Boolean} [DataRequire]  indica si los datos son requeridos   
@@ -38,6 +38,7 @@ import { WAlertMessage } from "./WAlertMessage.js";
 	* @property {Function} [ValidateFunction] funcion de validacion del formulario, esta funcion debe retornar un objeto con la propiedad validate y un mensaje de error
 	* @property {Function} [ProxyAction] funcion que se ejecuta al cambiar un valor en el formulario
 	* @property {HTMLStyleElement} [CustomStyle] estilo personalizado que se agregara al formulario, dado que este componente posee un shadowRoot se puede agregar estilos personalizados 
+	* @property {Array<HTMLElement>} [Groups]  limite de columnas que se mostraran en el formulario
 **/
 class WForm extends HTMLElement {
 	/**
@@ -50,7 +51,9 @@ class WForm extends HTMLElement {
 			//height: "90%",
 			display: "block"
 		})
+		/**@type {FormConfig} */
 		this.Config = Config;
+		/**@type {Object.<string, any>} */
 		this.Controls = {};
 
 		this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
@@ -72,11 +75,15 @@ class WForm extends HTMLElement {
 		this.OptionsActive = false;
 		this.DrawComponent();
 	}
+	/**
+	* @param {FormConfig} Config 
+	*/
 	InizializeConfig(Config) {
 		if (this.IsInizialized == true) {
 			return;
 		}
 		for (const p in Config) {
+			// @ts-ignore
 			this[p] = Config[p];
 		}
 
@@ -124,7 +131,7 @@ class WForm extends HTMLElement {
 		this.DivForm.addEventListener("click", (e) => this.undisplayMultiSelects(e));
 		this.DivForm.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
 	}
-	undisplayMultiSelects = (e) => {
+	undisplayMultiSelects = (/** @type {Event} */ e) => {
 		// @ts-ignore
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
@@ -147,11 +154,17 @@ class WForm extends HTMLElement {
 			this.DivFormOptions.appendChild(await this.SaveOptions(ObjectProxy));
 		}
 	}
+	/**
+	 * @param {{ [x: string]: ModelProperty; }} Model
+	 */
 	CreateProxy(Model, FormObject = this.FormObject) {
 		const ObjHandler = {
+			// @ts-ignore
 			get: (target, property) => {
 				return target[property];
-			}, set: (target, property, value, receiver) => {
+
+			}, // @ts-ignore
+			set: (target, property, value, receiver) => {
 				this.ExistChange = true;
 				target[property] = value;
 				//console.log(value);   
@@ -180,15 +193,20 @@ class WForm extends HTMLElement {
 		const ObjectProxy = new Proxy(FormObject, ObjHandler);
 		return ObjectProxy;
 	}
+	/**
+	 * @param {Object | undefined} Model
+	 */
 	CreateModelProxy(Model, FormObject = this.FormObject) {
-		//return Model
 		if (Model == undefined) {
 			return undefined;
 		}
 		const ObjHandler = {
+			// @ts-ignore
 			get: (target, property) => {
 				return target[property];
-			}, set: (target, property, value) => {
+			},
+			// @ts-ignore
+			set: (target, property, value) => {
 				target[property] = value;
 				this.SetOperationValues(Model, FormObject)
 				return true;
@@ -252,7 +270,7 @@ class WForm extends HTMLElement {
 	}
 	/**
 	* 
-	* @param {Object} ObjectF 
+	* @param {Object.<string, any>} ObjectF 
 	*/
 	CrudForm = async (ObjectF = {}) => {
 		//GroupsForm.length = 0;
@@ -381,10 +399,10 @@ class WForm extends HTMLElement {
 			|| Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "ApiMethods" || prop == "FilterData" || prop == "OrderData";
 	}
 	/**
-	 * @param {Object} Model
+	 * @param {Object.<string, any>} Model
 	 * @param {String} prop
 	 * @param {HTMLElement} ControlContainer
-	 * @param {Object} ObjectF
+	 * @param {Object.<string, any>} ObjectF
 	 * @param {HTMLLabelElement} ControlLabel
 	 * @param {Function} onChangeEvent
 	 * @param {GroupComponent} Form
@@ -653,9 +671,9 @@ class WForm extends HTMLElement {
 	* 
 	* @param { HTMLInputElement } targetControl 
 	* @param { HTMLInputElement | HTMLSelectElement | HTMLElement } currentTarget 
-	* @param { Object } ObjectF 
+	* @param {Object.<string, any>} ObjectF 
 	* @param { String } prop 
-	* @param { Object } Model 
+	* @param {Object.<string, any>} Model 
 	* @returns 
 	*/
 	onChange = async (targetControl, currentTarget, ObjectF, prop, Model) => { //evento de actualizacion del componente

@@ -1,0 +1,12 @@
+main {
+    max-width: 1400px;
+    width: 100%;
+    margin: auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 300px calc(100% - 300px);
+    gap: 20px
+}
+.tab {
+    padding-top: 30px;
+}

@@ -12,7 +12,7 @@ class ChartConfig {
     // groupParams = [];
 }
 /**
- * @typedef {Object} ChartInstance
+ * @typedef {Object.<string, any>} ChartInstance
  * * @property {String} [TypeChart] staked, Line, bar
  * * @property {Array} [Dataset]
  * * @property {Array} [Colors]

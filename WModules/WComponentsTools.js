@@ -454,7 +454,7 @@ class WRender {
 }
 export { WRender }
 /**
- * @typedef {Object} ConfigDOMManager
+ * @typedef {Object.<string, any>} ConfigDOMManager
      * @property {Boolean} [SPAManage]
      * @property {WAppNavigator} [WNavigator]
      * @property {HTMLElement} [MainContainer]

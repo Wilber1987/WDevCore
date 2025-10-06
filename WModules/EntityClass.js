@@ -70,7 +70,7 @@ class EntityClass {
     }
     /**
      * 
-     * @returns {Object}
+     * @returns {Object.<string, any>}
      */
     Save = async () => {
         return await this.SaveData(this.ApiMethods.Set, this);
@@ -120,7 +120,7 @@ class EntityClass {
     }
     /**
     * @param {String} Path 
-    * @param {Object} Data 
+    * @param {Object.<string, any>} Data 
     * @returns {any}
     */
     Post = async (Path, Data) => {
