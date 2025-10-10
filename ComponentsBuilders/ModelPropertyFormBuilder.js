@@ -409,7 +409,7 @@ export class ModelPropertyFormBuilder {
 	 * @param {Object.<string, any>} EditingObject
 	 * @param {string} prop	  
 	 * @param {string} ImageUrlPath	
-	 * @param {() => void} onChangeListener
+	 * @param {(ev: any) => Promise<void>} onChangeListener
 	 * @returns {Promise<WTableComponent>}
 	 */
 	static async CreateTable(ModelProperty, EditingObject, prop, ImageUrlPath, onChangeListener) {
@@ -435,8 +435,8 @@ export class ModelPropertyFormBuilder {
 			} else if (ModelProperty.type?.toUpperCase() == "MULTISELECT") {
 				EditingObject[prop] = tableForm.selectedItems;
 			}
-			if (onChangeListener) {
-				onChangeListener()
+			if (onChangeListener) {				
+				onChangeListener(undefined)
 			}
 		}
 		// @ts-ignore
