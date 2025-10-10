@@ -346,7 +346,7 @@ export class ModelPropertyFormBuilder {
 
 		const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
 		if ((ModelProperty.Dataset == undefined || ModelProperty.Dataset.length == 0)
-			&& entity.Get
+			&& entity?.Get
 			&& !isWTableControl) {
 			ModelProperty.Dataset = await entity.Get();
 		}
@@ -369,8 +369,10 @@ export class ModelPropertyFormBuilder {
 		} else if (EditingObject[prop] != null || EditingObject[prop] != undefined) {
 			selectedItems.push(...EditingObject[prop]);
 		}
-
-		Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
+		if (ModelProperty.type?.toUpperCase() == "WSELECT"
+			&& ModelProperty.type?.toUpperCase() == "MULTISELECT") {
+			Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
+		}
 		return { Dataset, selectedItems };
 	}
 
@@ -426,7 +428,7 @@ export class ModelPropertyFormBuilder {
 			require,
 			ModelProperty.type?.toUpperCase() == "MULTISELECT");
 		/**
-		* @param {Object} entity 
+		* @param {Object.<string, any>} entity 
 		* @param {import("../WComponents/WTableComponent.js").WTableComponent} tableForm 
 		*/
 		const tableAction = (entity, tableForm) => {

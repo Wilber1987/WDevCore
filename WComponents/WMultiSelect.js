@@ -10,21 +10,21 @@ import { WArrayF } from "../WModules/WArrayF.js";
 import { WToolTip } from "./FormComponents/WToolTip.js";
 
 /**
- * @typedef {Object} ConfigMS 
+ * @typedef {Object.<string, any>} ConfigMS 
  *  * @property {Array} Dataset
 	* @property {Array} [selectedItems]
 	* @property {Function} [action]
 	* @property {Function} [ValidateFunction]
 	* @property {String} [id]
 	* @property {Boolean} [IsFilterControl]
-	* @property {Object} [ModelObject]
-	* @property {Object} [EntityModel]
+	* @property {Object.<string, any>} [ModelObject]
+	* @property {Object.<string, any>} [EntityModel]
 	* @property {Boolean} [MultiSelect]
 	* @property {Boolean} [FullDetail]
 	* @property {Boolean} [AddObject]
 	* @property {Boolean} [AutoSave]
 	* @property {String} [AddPatern]
-	* @property {Object} [CrudOptions]
+	* @property {Object.<string, any>} [CrudOptions]
 	* @property {String} [Mode]  SELECT_BOX, SELECT ImageUrlPath
 	* @property {String} [ImageUrlPath]   
 	* @property {Function} [clickAction] dado que el multiselect elimina la propagacion de eventos se agrega el clickaction para poder usar un onclick

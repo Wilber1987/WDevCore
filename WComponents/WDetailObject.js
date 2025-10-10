@@ -9,12 +9,12 @@ import { WTableComponent } from './WTableComponent.js';
 let photoB64;
 
 /**
- * @typedef {Object} Config 
+ * @typedef {Object.<string, any>} Config 
     * @property {ComponentsManager} [DOMManager]
-    *  @property {Object} [EntityModel]
-    *  @property {Object} [ModelObject]
+    *  @property {Object.<string, any>} [EntityModel]
+    *  @property {Object.<string, any>} [ModelObject]
     *  @property {String} [ImageUrlPath]
-    *  @property {Object} [ObjectDetail]
+    *  @property {Object.<string, any>} [ObjectDetail]
 **/
 class WDetailObject extends HTMLElement {
     /**

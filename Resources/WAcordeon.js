@@ -3,8 +3,8 @@ import { html } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css } from "../WModules/WStyledRender.js";
 /**
- * @typedef {Object} Config 
-    * @property {Object} [ModelObject]
+ * @typedef {Object.<string, any>} Config 
+    * @property {Object.<string, any>} [ModelObject]
     * @property {Function} [action]
     * @property {Array<Object>} [Dataset]
 **/

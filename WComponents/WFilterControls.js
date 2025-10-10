@@ -9,7 +9,7 @@ import { css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 /**
- * @typedef {Object} FilterConfig 
+ * @typedef {Object.<string, any>} FilterConfig 
  *  * @property {Array} [Dataset]  
 	* @property {Function} FilterFunction
 	* @property {String} [DateRange]
@@ -22,8 +22,8 @@ import { WArrayF } from "../WModules/WArrayF.js";
 	* @property {Boolean} [IsDataFromFilter] indica se se ha realizado un filtro y los datos son resultado de este
 	* @property {Boolean} [UseManualControlForFiltering]
 	* @property {Boolean} [FullDetail]
-	* @property {Object} [ModelObject]
-	* @property {Object} [EntityModel]
+	* @property {Object.<string, any>} [ModelObject]
+	* @property {Object.<string, any>} [EntityModel]
 	
 **/
 
@@ -132,7 +132,7 @@ class WFilterOptions extends HTMLElement {
 	}
 	/**
 	 * 
-	 * @param {Object} Model 
+	 * @param {Object.<string, any>} Model 
 	 * @param {String} prop 
 	 * @param {Array} Dataset 
 	 * @returns 

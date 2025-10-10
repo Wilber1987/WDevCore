@@ -45,7 +45,7 @@ const calendarioSeleccionados = [
 ];
 
 /**
- * @typedef {Object} Config 
+ * @typedef {Object.<string, any>} Config 
  * @property {Function} [action]
  * @property {()=>  {Agenda: Agenda[], Calendario: Tbl_Calendario[]}} [CalendarFunction] debe retornar un objeto que sobreescribe la Agenda y Calendario_Ocupados
  * @property {Array<Agenda>} [Agenda] agenda disponible para marcar
@@ -157,6 +157,21 @@ export class WCalendarComponent extends HTMLElement {
 		return days;
 	}
 
+getDaysOfWeek2() {
+	const startOfWeek = new Date(this.currentDate);
+	startOfWeek.setDate(this.currentDate.getDate() - this.currentDate.getDay()); // Domingo
+	const days = Array.from({ length: 7 }).map((_, i) => {
+		const day = new Date(startOfWeek);
+		day.setDate(startOfWeek.getDate() + i);
+		// Devolvemos string local, sin UTC
+		const year = day.getFullYear();
+		const month = String(day.getMonth() + 1).padStart(2, '0');
+		const date = String(day.getDate()).padStart(2, '0');
+		return `${year}-${month}-${date}`; // Ej: "2025-10-04"
+	});
+	return days;
+}
+
 	// Renderiza un día de la semana
 	renderDay(day) {
 		const dayAgenda = this.agenda?.filter(a => a.Dia.toUpperCase() === this.getDayName(day).toUpperCase());
@@ -241,8 +256,6 @@ export class WCalendarComponent extends HTMLElement {
 	// Verifica si una hora está dentro de un rango ocupado
 	isTimeInRange(time, start, end, day) {
 
-
-
 		// Convertir la hora (time) a una fecha completa usando el día proporcionado
 		const slotDateTime = new Date(start); // Usamos la fecha de inicio como base
 		const [hours, minutes] = time.split(':');
@@ -271,7 +284,7 @@ export class WCalendarComponent extends HTMLElement {
 			// Eliminar solo el slot específico del calendario ocupado seleccionado
 			const [hours, minutes] = slot.split(':');
 			this.selectedCalendarioOcupados = this.selectedCalendarioOcupados.filter(c => {
-				const cFechaInicio = new Date(c.Fecha_Inicio);
+				const cFechaInicio = new DateTime(c.Fecha_Inicio);
 				cFechaInicio.setSeconds(0, 0); // Establecer segundos y milisegundos a 0
 
 				return !(
@@ -283,16 +296,16 @@ export class WCalendarComponent extends HTMLElement {
 		} else {
 			// Seleccionar
 			// Agregar al calendario ocupado seleccionado
-			const fechaInicio = new Date(day);
+			const fechaInicio = new DateTime(day);
 			const [hours, minutes] = slot.split(':');
 			fechaInicio.setHours(parseInt(hours), parseInt(minutes), 0, 0); // Establecer segundos y milisegundos a 0
 
-			const fechaFinal = new Date(fechaInicio);
+			const fechaFinal = new DateTime(fechaInicio);
 			fechaFinal.setMinutes(fechaFinal.getMinutes() + 30);
 
 			this.selectedCalendarioOcupados.push({
-				Fecha_Inicio: fechaInicio,
-				Fecha_Final: fechaFinal,
+				Fecha_Inicio: fechaInicio.toISODateTime(),
+				Fecha_Final: fechaFinal.toISODateTime(),
 				Descripcion: Descripcion
 			});
 		}

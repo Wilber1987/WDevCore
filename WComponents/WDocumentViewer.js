@@ -15,7 +15,7 @@ const PageType = {
 
 class WDocumentViewer extends HTMLElement {
 	/**
-	 * @typedef {Object} WDocumentViewerConfig
+	 * @typedef {Object.<string, any>} WDocumentViewerConfig
 	 * @property {boolean} [exportPdf]
 	 * @property {boolean} [exportPdfApi]
 	 * @property {boolean} [exportXls]

@@ -6,7 +6,7 @@ import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css } from '../WModules/WStyledRender.js';
 import { ModelPropertyFormBuilder } from '../ComponentsBuilders/ModelPropertyFormBuilder.js';
 // @ts-ignore
-import { ModelProperty } from '../WModules/CommonModel.js';
+import { ModelProperty, TableConfig } from '../WModules/CommonModel.js';
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
@@ -17,7 +17,7 @@ import { WAlertMessage } from "./WAlertMessage.js";
 
 /**
  * @typedef {Object} FormConfig 
-	* @property {Object} [EditObject] obejto que se esta editando en caso de ser null crea un objeto interno al que le agrega las propiedades
+	* @property {Object.<string, any>} [EditObject] obejto que se esta editando en caso de ser null crea un objeto interno al que le agrega las propiedades
 	* @property {Array<{Name:string, WithAcordeon?: Boolean, Propertys:string[]}>} [Groups] arreglo de objetos que contienen el nombre del grupo y las propiedades que contiene esto es para separar las propiedades en contenedores separados
 	* @property {Object} [ParentModel] objejeto que contiene al objeto modelo del padre del que se esta editando
 	* @property {Object} [ParentEntity] objeto que contiene al objeto padre del que se esta editando
@@ -38,6 +38,7 @@ import { WAlertMessage } from "./WAlertMessage.js";
 	* @property {Function} [ValidateFunction] funcion de validacion del formulario, esta funcion debe retornar un objeto con la propiedad validate y un mensaje de error
 	* @property {Function} [ProxyAction] funcion que se ejecuta al cambiar un valor en el formulario
 	* @property {HTMLStyleElement} [CustomStyle] estilo personalizado que se agregara al formulario, dado que este componente posee un shadowRoot se puede agregar estilos personalizados 
+	* @property {Array<HTMLElement>} [Groups]  limite de columnas que se mostraran en el formulario
 **/
 class WForm extends HTMLElement {
 	/**
@@ -50,6 +51,7 @@ class WForm extends HTMLElement {
 			//height: "90%",
 			display: "block"
 		})
+		/**@type {FormConfig} */
 		this.Config = Config;
 		/**@type {Object.<string,HTMLElement>} */
 		this.Controls = {};

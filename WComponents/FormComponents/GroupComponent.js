@@ -6,7 +6,7 @@ import { css } from "../../WModules/WStyledRender.js";
 
 export class GroupComponent extends HTMLElement {
 	/**
-	 * @typedef {Object} GroupConfig
+	 * @typedef {Object.<string, any>} GroupConfig
 	 * @property {string} [Name]
 	 * @property {boolean} [WithAcordeon]
 	 * @property {string} [className]

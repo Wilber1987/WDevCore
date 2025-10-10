@@ -8,7 +8,7 @@ import "../libs/html2pdf.js"
 import { PageType } from "./WReportComponent.js";
 
 /**
- * @typedef {Object} Config 
+ * @typedef {Object.<string, any>} Config 
 	* @property {Function} [PrintAction]
 	* @property {Function} [ExportPdfAction]
 	* @property {Function} [ExportCvsAction]
