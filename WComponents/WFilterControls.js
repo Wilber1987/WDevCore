@@ -257,7 +257,7 @@ class WFilterOptions extends HTMLElement {
 							else if (objectlement?.__proto__ == Array.prototype)
 								find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
 							else
-								find = multiSelect.selectedItems.find(x => x == objectlement);
+								find = multiSelect.selectedItems.find(x => x[multiSelect.id] == objectlement);
 							if (find == undefined) {
 								flagObj = false;
 							}
@@ -631,7 +631,7 @@ class WFilterOptions extends HTMLElement {
 		.OptionContainer {
 			display: grid;
 			width: -webkit-fill-available;
-			grid-template-columns: repeat(3,1fr);
+			grid-template-columns: repeat(3,32%);
 			grid-gap: 10px;
 			padding: 10px;		
 			transition: all 0.3s;

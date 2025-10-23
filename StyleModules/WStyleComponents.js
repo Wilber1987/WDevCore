@@ -1,7 +1,29 @@
 
 import { css } from "../WModules/WStyledRender.js";
 //#region  GENERIC STYLESSS#####################################################################################
-const StyleScrolls = css`@import url(/WDevCore/StyleModules/css/scrolls.css);`;
+const StyleScrolls = css`*::-webkit-scrollbar {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 0;
+    background-color: transparent;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--fourth-color);
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #646464;
+    background-clip: content-box;
+}`;
 const StylesControlsV1 = css`
     .BtnAlert,.BtnPrimary, .BtnSuccess,.BtnSecundary,.Btn {
         font-weight: bold;

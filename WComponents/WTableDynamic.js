@@ -1,5 +1,6 @@
 import { StyleScrolls } from "../StyleModules/WStyleComponents.js";
 import { ModelProperty } from "../WModules/CommonModel.js";
+import { Money } from "../WModules/Types/Money.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WRender } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
@@ -14,7 +15,7 @@ class DinamicConfigModel {
         this.action = action
     }
     /**@type {ModelProperty}*/ Grafico = { type: 'radio', Dataset: ["Barras", "Linea"], action: (element) => this.action(element) };
-    /**@type {ModelProperty}*/ Data = { type: 'radio', Dataset: [ "Porcentaje", "Totales"], action: (element) => this.action(element) };
+    /**@type {ModelProperty}*/ Data = { type: 'radio', Dataset: ["Porcentaje", "Totales"], action: (element) => this.action(element) };
 }
 class WTableDynamicComp extends HTMLElement {
     constructor(TableConfig = {}) {
@@ -29,9 +30,9 @@ class WTableDynamicComp extends HTMLElement {
         this.EvalValue = this.TableConfig.EvalValue ?? null;
         this.AttNameEval = this.TableConfig.AttNameEval ?? null;
         this.OperationsType = "sum";//"sum" count;
-        this.ModelObject =  this.TableConfig.ModelObject;
+        this.ModelObject = this.TableConfig.ModelObject;
         this.Config = TableConfig.ConfigOptions ?? {}
-        this.ChartDisplayConfig( this.Config );
+        this.ChartDisplayConfig(this.Config);
         this.ConfigForm = new WForm({
             DivColumns: "calc(33% - 5px)  calc(33% - 5px) calc(33% - 5px)", Options: false,
             EditObject: this.Config, ModelObject: new DinamicConfigModel((element) => {
@@ -49,7 +50,7 @@ class WTableDynamicComp extends HTMLElement {
             type: "div",
             props: { id: "Chart" + this.id, className: "CharttableReport" },
         });
-        this.FilterControl =this.FilterOptions();
+        this.FilterControl = this.FilterOptions();
         this.ConfigControl = this.CreateConfig();
     }
     ChartDisplayConfig(element) {
@@ -61,7 +62,7 @@ class WTableDynamicComp extends HTMLElement {
         if (element.Grafico == "Linea") {
             this.TableConfig.TypeChart = "Line";
         } else {
-            this.TableConfig.TypeChart = undefined ;
+            this.TableConfig.TypeChart = undefined;
         }
     }
 
@@ -93,12 +94,15 @@ class WTableDynamicComp extends HTMLElement {
                 display: grid;
                 border: solid 1px #d1cfcf;
                 border-radius: 0.2cm;
-                grid-template-columns: calc(100% - 350px) 350px;
-                grid-template-rows: auto auto;
+                grid-template-columns: 30% calc(70% - 370px) 350px;
+                grid-template-rows:  auto;
                 font-size: 12px;
                 grid-gap: 5px;
                 padding: 10px;
                 transition: all 1s;
+                max-width: 100%;                
+                box-sizing: border-box;
+                width:100%;
             }
         `);
         this.GridTC = "1/3";
@@ -167,24 +171,29 @@ class WTableDynamicComp extends HTMLElement {
                     this.EvalArray.forEach(Eval => {
                         arrayP[this.AttNameEval] = Eval[this.AttNameEval];
                         const Data = this.FindData(arrayP)
-                        dataGroup.children.push({ type: "TData", children: [Data] });
+                        if (typeof Data === "number" && Data.toString() != "NaN") {
+                            dataGroup.children.push({ type: "TData",  children: [new Money(Data).toString()] });
+                        } else {
+                            dataGroup.children.push({ type: "TData", children: [Data] });
+                        }
+
                         let NewObject = {};
                         for (const prop in arrayP) {
                             NewObject[prop] = arrayP[prop];
                         }
-                        if (parseFloat(Data).toString() != "NaN") {
+                        if (typeof Data === "number" && parseFloat(Data).toString() != "NaN") {
                             NewObject[this.EvalValue] = Data;
                             this.ProcessData.push(NewObject)
-                        }
+                        } 
                     });
                     let sum = 0;
                     dataGroup.children.forEach(element => {
-                        const value = parseFloat(element.children[0]);
+                        const value = parseFloat(element.children[0].replace("$", "").replace(",", ""));
                         if (typeof value === "number" && value.toString() != "NaN") {
                             sum = sum + value;
                         }
                     });
-                    dataGroup.children.push({ type: "TDataTotal", children: [sum] });
+                    dataGroup.children.push({ type: "TDataTotal", children: [new Money(sum).toString()] });
                 }
             }
             div.children.push(trGroup);
@@ -342,7 +351,7 @@ class WTableDynamicComp extends HTMLElement {
                 }, {//Print
                     type: 'button', props: {
                         class: 'BtnDinamictT', innerText: '', onclick: async () => {
-                            const MainTable = this.MainTable.innerHTML + `<style>${this.TableStyle.innerHTML}</style>`  ;
+                            const MainTable = this.MainTable.innerHTML + `<style>${this.TableStyle.innerHTML}</style>`;
                             const MainChart = this.ChartContainer.querySelector("w-colum-chart");
                             const PrintNode = MainTable + MainChart.shadowRoot.innerHTML;
                             //console.log(PrintNode);
@@ -372,7 +381,7 @@ class WTableDynamicComp extends HTMLElement {
             ]
         });
         TOpcion.append(divBTNS, divAtt,
-            WRender.createElement({  type: 'div', props: {  class: 'TableOptionsAtribs OptionsAtribsGroup' }, children: [divEvalAttib, divEvalGroups, divEvalValue]}), this.ConfigForm)
+            WRender.createElement({ type: 'div', props: { class: 'TableOptionsAtribs OptionsAtribsGroup' }, children: [divEvalAttib, divEvalGroups, divEvalValue] }), this.ConfigForm)
         return TOpcion;
     }
     DrawChart() {
@@ -526,7 +535,6 @@ class WTableDynamicComp extends HTMLElement {
             Dataset: this.TableConfig.Dataset,
             DisplayFilts: this.DisplayFilts,
             AutoSetDate: true,
-            UseManualControlForFiltering : true,
             ModelObject: this.ModelObject,
             Display: true,
             FilterFunction: (DFilt) => {
@@ -569,14 +577,15 @@ class WTableDynamicComp extends HTMLElement {
             }        
             .tableContainer {
                 overflow: auto;
-                grid-row: 1/2;
+                grid-row: 1/3;
                 grid-column: ${this.GridTC};
+                border: 1px solid #d1cfcf;
             }            
             .WTable {
                 font-family: Verdana, sans-serif;
                 width: 100%;
                 border-collapse: collapse;
-                font-size: 12px;
+                font-size: 1rem;
                 position: relative;
             }            
             .TContainer {
@@ -588,7 +597,7 @@ class WTableDynamicComp extends HTMLElement {
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-end;
-                background-color: rgb(236, 235, 235);
+                background-color: #fafafa;
                 font-weight: bold;
             }            
             .TContainerBlockData {
@@ -596,18 +605,18 @@ class WTableDynamicComp extends HTMLElement {
             }            
             Tlabel {
                 display: block;
-                border-bottom: 1px solid #126e8d;
+                border-bottom: 1px solid #707070;
                 overflow-y: hidden;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 min-width: 60px;
-                background-color: #eee;
-                padding: 3px;
-                font-size: 9px;
+                background-color: #fafafa;
+                padding: 10px;
+                font-size: 11px;
                 text-align: left;
                 font-weight: bold;
-                color: #126e8d;
+                color: #2c2c2c;
             }            
             .TContainerBlockData .Cajon {
                 overflow: hidden;
@@ -623,8 +632,8 @@ class WTableDynamicComp extends HTMLElement {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 min-width: 60px;
-                padding: 5px;
-                font-size: 9px;
+                padding: 10px;
+                font-size: 11px;
                 text-align: left;
             }            
             TDataTotal {
@@ -635,8 +644,8 @@ class WTableDynamicComp extends HTMLElement {
                 min-width: 60px;
                 border-top: solid 1px #ccc;
                 text-align: left;
-                font-size: 9px;
-                padding: 5px;
+                font-size: 11px;
+                padding: 10px;
                 font-weight: bold;
             }            
             .Cajon {
@@ -645,13 +654,12 @@ class WTableDynamicComp extends HTMLElement {
             .TableOptions {
                 display: grid;
                 grid-gap: 10px;
-                background-color: #eee;
                 padding: 10px;
                 min-height: 500px;
                 max-height: 700px;
                 transition: all 1s;
                 overflow: hidden;
-                grid-column: 2/3;
+                grid-column: 3/4;
                 grid-row: 1/3;
                 grid-template-columns: 49% 49%;
                 grid-template-rows: 50px 70% auto;
@@ -710,7 +718,6 @@ class WTableDynamicComp extends HTMLElement {
             .BtnDinamictT {
                 font-weight: bold;
                 border: none;
-                padding: 5px;
                 margin: 2px;
                 text-align: center;
                 display: inline-block;
@@ -719,6 +726,9 @@ class WTableDynamicComp extends HTMLElement {
                 background-color: #4894aa;
                 color: #fff;
                 border-radius: 0.2cm;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }           
             .BtnDinamictT {
                 width: 30px;
@@ -753,7 +763,7 @@ class WTableDynamicComp extends HTMLElement {
                 border: none;
                 color: #126e8d;
                 outline: none;
-                padding: 5px;
+                padding: 10px;
                 outline-width: 0;
                 margin: 0px;
                 font: 400 12px Arial;
@@ -763,7 +773,7 @@ class WTableDynamicComp extends HTMLElement {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 5px;
+                padding: 10px;
                 background-color: var(--secundary-color);
                 cursor: pointer;
                 border-bottom: solid 2px #efefef;
@@ -776,9 +786,10 @@ class WTableDynamicComp extends HTMLElement {
             }            
             .CharttableReport {
                 display: grid;
-                grid-template-columns: 33% 33% 33%;
-                grid-row: 2/3;
-                grid-column: ${this.GridTC};
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                grid-row: 1/3;
+                grid-column: 2/3;
             }
             .CharttableReport w-colum-chart {
                 grid-column: span 3;

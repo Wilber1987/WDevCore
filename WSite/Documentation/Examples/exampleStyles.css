@@ -1,12 +1,20 @@
 main {
-    max-width: 1400px;
+    min-width: 1400px;
+    max-width: 100%;
     width: 100%;
     margin: auto;
     padding: 20px;
-    display: grid;
-    grid-template-columns: 300px calc(100% - 300px);
-    gap: 20px
+    gap: 20px;
+    box-sizing: border-box;
+    w-app-navigator {
+        width: 100%;
+        display: block;        
+        box-sizing: border-box;
+    }
 }
+
 .tab {
     padding-top: 30px;
+    height: 90vh;
+    box-sizing: border-box;
 }

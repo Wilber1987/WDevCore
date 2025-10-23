@@ -4,15 +4,14 @@ import { WTableDynamicComp } from "../../../../../WDevCore/WComponents/WTableDyn
 import { data, ModelObject } from "../data.js";
 
 const tab = WRender.Create({ className: "tab" })
-const navigator = new WAppNavigator({
-    Direction: "column",
+const navigator = new WAppNavigator({  
     Inicialize: true,
     Elements: [{
         id: "Tab-dasboard", name: "Tabla con parametros de evaluación definidos", action: async (ev) => {
             const TableConfigG = {
                 Dataset: data,
-                EvalValue: "value",
-                AttNameEval: "homeTown",
+                EvalValue: "total_sale",
+                AttNameEval: "category",
                 groupParams: ["year"],
                 AddChart: true,
                 ModelObject : new ModelObject()
@@ -35,10 +34,10 @@ const navigator = new WAppNavigator({
             const TableConfigG = {
                 Dataset: data,
                 AddChart: true,
-                EvalValue: "value",
-                AttNameEval: "homeTown",
+                EvalValue: "total_sale",
+                AttNameEval: "category",
                 ModelObject: new ModelObject(),
-                groupParams: ["year", "mes"],
+                groupParams: ["year", "month"],
                 DisplayOptions: false
             };
             const WTableReport = new WTableDynamicComp(TableConfigG);
@@ -50,7 +49,7 @@ const navigator = new WAppNavigator({
                 Dataset: data,
                 EvalValue: "value",
                 AttNameEval: "homeTown",
-                groupParams: ["year", "mes"],
+                groupParams: ["year", "month"],
                 ModelObject: new ModelObject(),
                 AddChart: false
             };
