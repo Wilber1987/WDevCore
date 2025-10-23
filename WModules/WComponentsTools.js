@@ -32,7 +32,7 @@ function html(strings, ...values) {
                 // Insertamos un marcador de posición para la función
                 let placeholder = ``;
                 // Expresión regular para detectar las combinaciones al final del string
-                const patron = /(onclick=['"]|onload=['"]|onchange=['"])$/;
+                const patron = /(onclick=['"]|onload=['"]|ontransitionend=['"]|onload=['"]|onchange=['"])$/;
                 // Buscar la coincidencia al final del string
                 const coincidencia = accumulator.match(patron);
                 //console.log(accumulator);
@@ -40,7 +40,7 @@ function html(strings, ...values) {
                 if (coincidencia) {
                     // Almacenar el fragmento que se va a reemplazar en una constante
                     const fragmentoAReemplazar = coincidencia[0];
-                    const patronEvent = /(onclick|onload|onchange)=['"]$/;
+                    const patronEvent = /(onclick|onload|ontransitionend|onchange)=['"]$/;
                     const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
                     // Almacenar solo la palabra (onclick, onload, onchange) en una constante
                     const event = coincidenciaEvent[1];
@@ -598,6 +598,7 @@ class ComponentsManager {
             //     });
             // }, 100);
             ventanaM.style.transition = "all ease 0.3s";
+            ventanaM.style.pointerEvents = "all";
             ventanaM.style.display = "block";
             setTimeout(() => {
                 ventanaM.style.opacity = 1;
@@ -605,6 +606,7 @@ class ComponentsManager {
         } else {
             ventanaM.style.transition = "all ease 0.3s";
             ventanaM.style.opacity = 0;
+            ventanaM.style.pointerEvents = "none";
             setTimeout(() => {
                 ventanaM.style.display = "none";
             }, 333);

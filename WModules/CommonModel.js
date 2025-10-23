@@ -20,7 +20,7 @@ function ModelFunction(EditingObject) {
 	return {}
 }
 /**
- * @typedef {Object.<string, any>} ModelProperty 
+ * @typedef {Object} ModelProperty 
 	* @property {String} type - RADIO | DRAW | PASSWORD |
 	CHECKBOX | TEXT | IMG | NUMBER | DATE | EMAIL | FILE 
 	| MONEY (se trata como number)| PERCENTAGE (se trata como number)|
