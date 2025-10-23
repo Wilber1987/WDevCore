@@ -12,7 +12,7 @@ class ChartConfig {
     // groupParams = [];
 }
 /**
- * @typedef {Object} ChartInstance
+ * @typedef {Object.<string, any>} ChartInstance
  * * @property {String} [TypeChart] staked, Line, bar
  * * @property {Array} [Dataset]
  * * @property {Array} [Colors]
@@ -194,7 +194,7 @@ class ColumChart extends HTMLElement {
             let trGroup = { type: "GroupSection", props: { class: "GroupSection" }, children: [WArrayF.Capitalize(Group[Groups.groupParam])] };
             let groupBar = {
                 type: "containerbar", props: {
-                    style: `padding: 10px; width: ${100 / (Groups.children?.length ?? 1)}%`, class: "ContainerBars"
+                    style: `width: ${100 / (Groups.children?.length ?? 1)}%`, class: "ContainerBars"
                 }, children: []
             };
            // let groupBar = html`<div class="groupBar"></div>`
@@ -726,6 +726,7 @@ const WChartStyle = (ChartInstance) => {
             max-height: 450px;
             position: relative;
             font-family: Verdana, Geneva, Tahoma, sans-serif;
+            box-sizing: border-box;
         }
         .WChartContainerRadial {
             display: grid;

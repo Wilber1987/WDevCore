@@ -272,6 +272,7 @@ export class FileComponent extends HTMLElement {
 				height: auto;
 				display: block;
 				margin-bottom: 10px;
+				max-width: 400px;
 			}
 			.file-pdf {
 				width: 100%;

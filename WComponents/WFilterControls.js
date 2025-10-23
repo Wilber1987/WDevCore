@@ -9,7 +9,7 @@ import { css } from "../WModules/WStyledRender.js";
 import { MultiSelect } from "./WMultiSelect.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 /**
- * @typedef {Object} FilterConfig 
+ * @typedef {Object.<string, any>} FilterConfig 
  *  * @property {Array} [Dataset]  
 	* @property {Function} FilterFunction
 	* @property {String} [DateRange]
@@ -22,8 +22,8 @@ import { WArrayF } from "../WModules/WArrayF.js";
 	* @property {Boolean} [IsDataFromFilter] indica se se ha realizado un filtro y los datos son resultado de este
 	* @property {Boolean} [UseManualControlForFiltering]
 	* @property {Boolean} [FullDetail]
-	* @property {Object} [ModelObject]
-	* @property {Object} [EntityModel]
+	* @property {Object.<string, any>} [ModelObject]
+	* @property {Object.<string, any>} [EntityModel]
 	
 **/
 
@@ -132,7 +132,7 @@ class WFilterOptions extends HTMLElement {
 	}
 	/**
 	 * 
-	 * @param {Object} Model 
+	 * @param {Object.<string, any>} Model 
 	 * @param {String} prop 
 	 * @param {Array} Dataset 
 	 * @returns 
@@ -257,7 +257,7 @@ class WFilterOptions extends HTMLElement {
 							else if (objectlement?.__proto__ == Array.prototype)
 								find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
 							else
-								find = multiSelect.selectedItems.find(x => x == objectlement);
+								find = multiSelect.selectedItems.find(x => x[multiSelect.id] == objectlement);
 							if (find == undefined) {
 								flagObj = false;
 							}
@@ -381,9 +381,9 @@ class WFilterOptions extends HTMLElement {
 							const foreynKeyExist = ModelProperty.ForeignKeyColumn != undefined;
 							if (!foreynKeyExist) {
 								for (const propiedad in ModelProperty.ModelObject) {
-									const keyNameSames = ModelProperty.ModelObject[propiedad].primary
-										&& ModelProperty.ModelObject.hasOwnProperty(propiedad)
-										&& this.ModelObject.hasOwnProperty(propiedad);
+									const keyNameSames = ModelProperty.ModelObject[propiedad]?.primary
+										&& ModelProperty.ModelObject?.hasOwnProperty(propiedad)
+										&& this.ModelObject?.hasOwnProperty(propiedad);
 									if (keyNameSames) {
 										foraingKeyName = propiedad;
 									}
@@ -631,7 +631,7 @@ class WFilterOptions extends HTMLElement {
 		.OptionContainer {
 			display: grid;
 			width: -webkit-fill-available;
-			grid-template-columns: repeat(3,1fr);
+			grid-template-columns: repeat(3,32%);
 			grid-gap: 10px;
 			padding: 10px;		
 			transition: all 0.3s;

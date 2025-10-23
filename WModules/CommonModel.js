@@ -1,20 +1,20 @@
 
 /**
- * @typedef {Object} ObjectOptions 
+ * @typedef {Object.<string, any>} ObjectOptions 
  *  * @property {Boolean} [AddObject]
 	* @property {String} [Url]
 	* @property {Function} [SaveFunction]
 **/
 /**
- * @typedef {Object} ResponseServices 
+ * @typedef {Object.<string, any>} ResponseServices 
  *  * @property {int} [status]
 	* @property {String} [message]
 **/
 class ResponseServices { }
 
 /**
-* @param {Object} [EditingObject] este objeto es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante
-* @returns {Object}
+* @param {Object.<string, any>} [EditingObject] este objeto es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante
+* @returns {Object.<string, any>}
 */
 function ModelFunction(EditingObject) {
 	return {}
@@ -27,7 +27,7 @@ function ModelFunction(EditingObject) {
 	TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | imagecapture 
 	CALENDAR | OPERATION (requiere un action para funcionar y toma el valor que retorne el action)
 	* @property {Boolean|Function} [hidden] desabilita la propiedad y la oculta
-	* @property {Object} [Options] 
+	* @property {TableOptions} [Options] 
 	* @property {Boolean} [hiddenInTable] oculta en la tabla
 	* @property {Boolean|Function} [require]
 	* @property {Boolean} [primary]
@@ -51,18 +51,24 @@ function ModelFunction(EditingObject) {
 	* @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
 	* @property {() => { Agenda: Agenda[]; Calendario: Tbl_Calendario[]; }} [CalendarFunction] (obj) => {  }
 	* @property {String} [SelfChargeDataset] Si es un WSELECT con el valor de esta propiedad puede usar datos para llenar el desplegable a partir de la entidad padre, es funcional para relaciones recursivas dentro de un master detail
-
+   	* @property {Boolean} [IsGridDisplay] Se  usa para el formulario con propiedades MULTISELECT o WSELECT y despliega una tabla en lugar de un combo
+	SE AGREGARA SECCION UTIL PARA CONFIGURAR PROPIEDADES EDITABLES EN COMPONENTES TABLAS
+	* @property {Boolean} [IsEditableInGrid]
 **/
-class ModelProperty { }
+class ModelProperty {
+	IsNumber() {
+		return this.type?.toUpperCase() == "NUMBER"
+	}
+}
 /**
- * @typedef {Object} FormConfig 
- *  * @property {Object} [ObjectDetail]
-	* @property {Object} [EditObject]
-	* @property {Object} [ParentModel]
-	* @property {Object} [ParentEntity]
-	* @property {Object} [UserActions]
-	* @property {Object} [ModelObject]
-	* @property {Object} [EntityModel]     
+ * @typedef {Object.<string, any>} FormConfig 
+ *  * @property {Object.<string, any>} [ObjectDetail]
+	* @property {Object.<string, any>} [EditObject]
+	* @property {Object.<string, any>} [ParentModel]
+	* @property {Object.<string, any>} [ParentEntity]
+	* @property {Object.<string, any>} [UserActions]
+	* @property {Object.<string, any>} [ModelObject]
+	* @property {Object.<string, any>} [EntityModel]     
 	* @property {Boolean} [DarkMode]
 	* @property {Boolean} [AutoSave]
 	* @property {Boolean} [WSelectAddObject]
@@ -77,12 +83,12 @@ class ModelProperty { }
 	* @property {Function} [SaveFunction]
 	* @property {Function} [ValidateFunction]
 	* @property {Function} [ProxyAction]
-	* @property {HTMLStyleElement} [CustomStyle]    
+	* @property {HTMLStyleElement} [CustomStyle] 
 	**/
 class FormConfig { };
 
 /**
- * @typedef {Object} ElementStyle
+ * @typedef {Object.<string, any>} ElementStyle
 	 * @property {?String | undefined} [alignContent]
 	 * @property {?String | undefined} [alignItems]
 	 * @property {?String | undefined} [alignSelf]
@@ -278,7 +284,7 @@ class FormConfig { };
 	 */
 class ElementStyle { }
 /**
- * @typedef {Object} WNode
+ * @typedef {Object.<string, any>} WNode
 	 * @property {String} [tagName]
 	 * @property {String} [id]
 	 * @property {String} [type]
@@ -314,7 +320,7 @@ class ElementStyle { }
 	 * @property {Function} [onkeypress]
 	 * @property {Function} [onload]
 	 * @property {Function} [oninput]
-	 * @property {Object} [object]
+	 * @property {Object.<string, any>} [object]
 	 * @property {String} [autocomplete]
  **/
 class WNode {
@@ -329,13 +335,13 @@ class WNode {
 	}
 }
 /**
- * @typedef {Object} Actions 
+ * @typedef {Object.<string, any>} Actions 
  * @property {String} name
  * @property {Function} action
  * @property {Function|Boolean} [rendered] funcion que debe retornar true o false
  * **/
 /**
- * @typedef {Object} TableOptions 
+ * @typedef {Object.<string, any>} TableOptions 
  *  * @property {Boolean} [AddObject]
 	* @property {Boolean} [Show]
 	* @property {Boolean} [Filter]
@@ -363,21 +369,22 @@ class WNode {
 	* @property {Function} [SelectAction] requiere select en true, recibe como parametro el elemnto
 	* 
 **/
+
 /**
- * @typedef {Object} SearchItemsFromApi 
+ * @typedef {Object.<string, any>} SearchItemsFromApi 
  * @property {String} [ApiUrl]
  * @property {Function} [action]
  * **/
 /**
- * @typedef {Object} TableConfig 
+ * @typedef {Object.<string, any>} TableConfig 
  *  * @property {Array} [Dataset]
 	* @property {Array} [selectedItems]
-	* @property {Object} [ModelObject]  
-	* @property {Object} [UseEntityMethods]  
-	* @property {Object} [FilterModelObject]
-	* @property {Object} [EntityModel] 
-	* @property {Object} [ParentModel]  
-	* @property {Object} [ParentEntity]
+	* @property {Object.<string, any>} [ModelObject]  
+	* @property {Object.<string, any>} [UseEntityMethods]  
+	* @property {Object.<string, any>} [FilterModelObject]
+	* @property {Object.<string, any>} [EntityModel] 
+	* @property {Object.<string, any>} [ParentModel]  
+	* @property {Object.<string, any>} [ParentEntity]
 	* @property {Boolean} [WSelectAddObject]
 	* @property {Boolean} [DarkMode]
 	* @property {Boolean} [paginate] 
@@ -398,19 +405,19 @@ class WNode {
  **/
 class TableConfig { };
 /**
- * @typedef {Object} ModalConfig 
+ * @typedef {Object.<string, any>} ModalConfig 
  *  * @property {Boolean} [ShadowRoot]
 	* @property {String} [icon]
 	* @property {String} [title]  
 	* @property {Boolean} [HeadOptions]    
 	* @property {String} [StyleForm]   columnX1 | columnX3 | columnX3
 	* @property {String} [ImageUrlPath] 
-	* @property {Object} [ModelObject] 
-	* @property {Object} [EntityModel] 
-	* @property {Object} [ObjectDetail]
-	* @property {Object} [EditObject] 
-	* @property {Object} [ParentModel]  
-	* @property {Object} [ParentEntity]   
+	* @property {Object.<string, any>} [ModelObject] 
+	* @property {Object.<string, any>} [EntityModel] 
+	* @property {Object.<string, any>} [ObjectDetail]
+	* @property {Object.<string, any>} [EditObject] 
+	* @property {Object.<string, any>} [ParentModel]  
+	* @property {Object.<string, any>} [ParentEntity]   
 	* @property {Array} [UserActions] 
 	* @property {ObjectOptions} [ObjectOptions] //recibe las opcions del formulario incluido el SaveFunction si esque existiera alguna
 	* @property {Boolean} [AutoSave]
@@ -420,6 +427,7 @@ class TableConfig { };
 	* @property {Boolean} [CloseOption]
 	* @property {Function} [ProxyAction]
  **/
+
 class ModalConfig {
 	// ModelObject = {
 	//     property: undefined,

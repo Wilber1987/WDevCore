@@ -23,7 +23,7 @@ class PostConfig {
 class WAjaxTools {
     /**
     * @param {String} Url
-    * @param {Object} [Data]
+    * @param {Object.<string, any>} [Data]
     * @param {Partial<PostConfig>} [PostConfig]
     * @returns {Promise<any>}
     */
@@ -64,7 +64,7 @@ class WAjaxTools {
     };
     /**
     * @param {String} Url
-    * @param {Object} Data
+    * @param {Object.<string, any>} Data
     * @param {Partial<PostConfig>} postConfig 
     * @returns {Promise<any>}
     */

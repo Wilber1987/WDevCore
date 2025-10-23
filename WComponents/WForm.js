@@ -6,7 +6,7 @@ import { WOrtograficValidation } from '../WModules/WOrtograficValidation.js';
 import { css } from '../WModules/WStyledRender.js';
 import { ModelPropertyFormBuilder } from '../ComponentsBuilders/ModelPropertyFormBuilder.js';
 // @ts-ignore
-import { ModelProperty } from '../WModules/CommonModel.js';
+import { ModelProperty, TableConfig } from '../WModules/CommonModel.js';
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
@@ -17,11 +17,11 @@ import { WAlertMessage } from "./WAlertMessage.js";
 
 /**
  * @typedef {Object} FormConfig 
-	* @property {Object} [EditObject] obejto que se esta editando en caso de ser null crea un objeto interno al que le agrega las propiedades
+	* @property {Object.<string, any>} [EditObject] obejto que se esta editando en caso de ser null crea un objeto interno al que le agrega las propiedades
 	* @property {Array<{Name:string, WithAcordeon?: Boolean, Propertys:string[]}>} [Groups] arreglo de objetos que contienen el nombre del grupo y las propiedades que contiene esto es para separar las propiedades en contenedores separados
 	* @property {Object} [ParentModel] objejeto que contiene al objeto modelo del padre del que se esta editando
 	* @property {Object} [ParentEntity] objeto que contiene al objeto padre del que se esta editando
-	* @property {Array<{ name:string, action: (EditingObject)=> {}}>} [UserActions] acciones personalizadas que se pueden agregar al formulario, estas se representan como botones adicionales
+	* @property {Array<{ name:string, action: (EditingObject:Object)=> {}}>} [UserActions] acciones personalizadas que se pueden agregar al formulario, estas se representan como botones adicionales
 	* @property {Object} [ModelObject] objeto que contiene las propiedades del modelo que se va a editar
 	* @property {Object} [EntityModel] objeto que contiene el modelo de la entidad que se esta editando
 	* @property {Boolean} [AutoSave] indica si el formulario se guarda automaticamente y debe hacer una peticion ajax a los metodos entity del modelo ejemplo Save o Update
@@ -38,6 +38,7 @@ import { WAlertMessage } from "./WAlertMessage.js";
 	* @property {Function} [ValidateFunction] funcion de validacion del formulario, esta funcion debe retornar un objeto con la propiedad validate y un mensaje de error
 	* @property {Function} [ProxyAction] funcion que se ejecuta al cambiar un valor en el formulario
 	* @property {HTMLStyleElement} [CustomStyle] estilo personalizado que se agregara al formulario, dado que este componente posee un shadowRoot se puede agregar estilos personalizados 
+	* @property {Array<HTMLElement>} [Groups]  limite de columnas que se mostraran en el formulario
 **/
 class WForm extends HTMLElement {
 	/**
@@ -50,37 +51,44 @@ class WForm extends HTMLElement {
 			//height: "90%",
 			display: "block"
 		})
+		/**@type {FormConfig} */
 		this.Config = Config;
+		/**@type {Object.<string,HTMLElement>} */
 		this.Controls = {};
 
 		this.DivForm = WRender.Create({ class: "ContainerFormWModal" });
 		this.DivFormOptions = WRender.Create({ class: "ContainerFormWModal" });
 		this.shadowRoot?.append(StyleScrolls.cloneNode(true));
 		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
+		/**@type {Object.<string,any>} */
+		this.ModelObject = this.CreateModelProxy(Config.ModelObject);
 
 		this.InizializeConfig(this.Config);
+
 		this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
 		if (this.Config.CustomStyle) {
 			this.shadowRoot?.append(this.Config.CustomStyle);
 		}
 		this.shadowRoot?.append(this.DivForm, this.DivFormOptions);
-		//**@type {Array<GroupComponent>} */
-		//GroupsForm = [];
-
 		this.ExistChange = false;
 		this.ObjectProxy = this.ObjectProxy ?? undefined;
 		this.OptionsActive = false;
 		this.DrawComponent();
 	}
+	/**
+	* @param {FormConfig} Config 
+	*/
 	InizializeConfig(Config) {
 		if (this.IsInizialized == true) {
 			return;
 		}
+		//TODO CREO QUE ESTO ES INNECESARIO
 		for (const p in Config) {
+			// @ts-ignore
 			this[p] = Config[p];
 		}
-
-		this.ModelObject = this.Config.ModelObject;
+		/**@type {Object.<string,any>} */
+		this.ModelObject = this.CreateModelProxy(Config.ModelObject);
 		this.ImageUrlPath = Config.ImageUrlPath;
 		this.Options = this.Options ?? true;
 		this.DataRequire = this.DataRequire ?? true;
@@ -115,16 +123,12 @@ class WForm extends HTMLElement {
 		}
 	}
 
-	connectedCallback() {
-		//this.InizializeConfig(this.Config);
-		if (this.IsInizialized == true) {
-			//this.DrawComponent();
-		}
+	connectedCallback() {		
 		this.CreateOriginalObject();
 		this.DivForm.addEventListener("click", (e) => this.undisplayMultiSelects(e));
 		this.DivForm.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
 	}
-	undisplayMultiSelects = (e) => {
+	undisplayMultiSelects = (/** @type {Event} */ e) => {
 		// @ts-ignore
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
@@ -136,35 +140,38 @@ class WForm extends HTMLElement {
 			})
 		}
 	}
+	/**@type {Object.<string,any>} */
 	#OriginalObject = {};
 	DrawComponent = async () => {
-		const Model = this.Config.ModelObject ?? this.Config.EditObject;
+		/**@type {Object.<string,any>} */		
+		const Model = this.ModelObject;
 		const ObjectProxy = this.CreateProxy(Model);
 		this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
 		await this.CrudForm(ObjectProxy);
 		if (this.Options == true && !this.OptionsActive) {
 			this.OptionsActive = true;
 			this.DivFormOptions.appendChild(await this.SaveOptions(ObjectProxy));
-
 		}
 	}
+	/**
+	 * @param { Object.<string, ModelProperty>} Model
+	 */
 	CreateProxy(Model, FormObject = this.FormObject) {
+		/**@type {Object.<string,any>} */
 		const ObjHandler = {
-			get: (target, property) => {
+			get: (/** @type {{ [x: string]: any; }} */ target, /** @type {string | number} */ property) => {
 				return target[property];
-			}, set: (target, property, value, receiver) => {
+			}, set: (/** @type {{ [x: string]: any; }} */ target, /** @type {string} */ property, /** @type {any} */ value, /** @type {any} */ receiver) => {
 				this.ExistChange = true;
 				target[property] = value;
-				//console.log(value);   
-				//console.log(property, Model[property]);
 				if (!["IMG", "FILE", "DATE", "DATETIME"].includes(Model[property]?.type?.toUpperCase())) {
+					/**@type {Object.<string, any>} */// @ts-ignore
 					const control = this.shadowRoot?.querySelector("#ControlValue" + property);
 					if (control) {
 						// @ts-ignore
 						control.value = target[property];
 						/**@type {ModelProperty} */ const modelProperty = Model[property];
 						if (modelProperty) {
-							// @ts-ignore
 							control.max = modelProperty.max ?? control.max;
 							// @ts-ignore
 							control.min = modelProperty.min ?? control.min;
@@ -181,8 +188,43 @@ class WForm extends HTMLElement {
 		const ObjectProxy = new Proxy(FormObject, ObjHandler);
 		return ObjectProxy;
 	}
-	SetOperationValues = (Model = this.Config.ModelObject, target = this.FormObject) => {
+	/**
+	 * @param {Object.<string,any> | undefined} Model
+	 * @returns {Object.<string, any>}
+	 */
+	CreateModelProxy(Model, FormObject = this.FormObject) {
+		if (Model == undefined) {
+			/**@type {Object.<string, ModelProperty>} */
+			const Model = {}
+			Object.keys(this.FormObject).forEach(prop => {
+				/**@type {ModelProperty} */
+				const modelProp = { type: this.CalculeType(this.FormObject[prop]) }
+				Model[prop] = modelProp
+			})
+			return Model;
+		}
+		/**@type {Object.<string,any>} */
+		const ObjHandler = {
+			get: (/** @type {{ [x: string]: any; }} */ target, /** @type {string | number} */ property) => {
+				return target[property];
+			}, set: (/** @type {{ [x: string]: any; }} */ target, /** @type {string | number} */ property, /** @type {any} */ value) => {
+				target[property] = value;
+				this.SetOperationValues(Model, FormObject)
+				return true;
+			}
+		};
+		const ObjectProxy = new Proxy(Model, ObjHandler);
+		return ObjectProxy;
+	}
+	/**
+	 * @param {any} value
+	 */
+	CalculeType(value) {
+		return typeof value;
+	}
+	SetOperationValues = (Model = this.ModelObject, target = this.FormObject) => {
 		for (const prop in Model) {
+			const modelProperty = /** @type {ModelProperty} */ (Model[prop]);
 			if (Model[prop]?.__proto__ == Object.prototype) {
 				if (Model[prop].type?.toUpperCase() == "OPERATION") {
 					//if (Model[prop].type?.toUpperCase() == "OPERATION") {
@@ -190,6 +232,41 @@ class WForm extends HTMLElement {
 					const control = this.shadowRoot?.querySelector("#ControlValue" + prop);
 					if (control) {
 						control.innerHTML = target[prop];
+					}
+				}/* else if (['WSELECT', 'MASTERDETAIL', "CALENDAR", "MULTISELECT", "WCHECKBOX", "RICHTEXT", "PASSWORD"].includes(Model[prop].type?.toUpperCase())) {
+					//if (Model[prop].type?.toUpperCase() == "OPERATION") 					
+				}*/else {
+					if (this.Controls[prop] && this.Controls[prop] != null) {
+						// --- 1. Evaluar `require` (estático o dinámico)
+						let { isHidden, isDisabled } = this.EvalHiddenDisabled(modelProperty, target);
+
+						if (isHidden || modelProperty.primary == true) {
+							// @ts-ignore
+							this.Controls[prop].parentNode.style.display = "none";
+						} else {
+							// @ts-ignore
+							this.Controls[prop].parentNode.style.display = "block";
+						}
+
+						if (isDisabled) {
+							// @ts-ignore
+							this.Controls[prop].disabled = true;
+							this.Controls[prop].style.pointerEvents = "none";
+						} else {
+							// @ts-ignore
+							this.Controls[prop].disabled = false;
+							this.Controls[prop].style.pointerEvents = "all";
+						}
+						// @ts-ignore
+						if (["NUMBER", "MONEY"].includes(modelProperty.type.toUpperCase()) && this.Controls[prop].value.trim() == "") {
+							target[prop] = undefined;
+						}
+						if (['MODEL'].includes(Model[prop].type?.toUpperCase())) {
+							// @ts-ignore
+							this.Controls[prop].FormObject = target[prop] ?? {}
+							// @ts-ignore
+							this.Controls[prop]?.DrawComponent();
+						}
 					}
 				}
 			}
@@ -207,13 +284,14 @@ class WForm extends HTMLElement {
 	}
 	/**
 	* 
-	* @param {Object} ObjectF 
+	* @param {Object.<string, any>} ObjectF 
 	*/
 	CrudForm = async (ObjectF = {}) => {
 		//GroupsForm.length = 0;
 		//verifica que el modelo existe,
 		//sino es asi le asigna el valor de un objeto existente
-		const Model = this.Config.ModelObject ?? this.Config.EditObject;
+		/**@type {Object.<string,ModelProperty>} */
+		const Model = this.ModelObject;
 		const Form = new GroupComponent({ Name: this.Config.Title ?? undefined });
 		const GroupsForm = [Form];
 		this.Config.Groups?.forEach(group => {
@@ -225,22 +303,17 @@ class WForm extends HTMLElement {
 		GroupsForm.forEach(DivForm => {
 			this.DivForm?.append(DivForm);
 		});
-		//const ModelComplexElements = Object.keys(this.Config.ModelObject).filter(o => this.Config.ModelObject[o]?.type?.toUpperCase() == "MASTERDETAIL"
-		//	|| this.Config.ModelObject[o]?.type?.toUpperCase() == "CALENDAR")
-
-		//const ComplexForm = WRender.Create({ className: 'divComplexForm', style: ModelComplexElements.length <= 1 ? "grid-template-columns: unset" : "" });
-
 		for (const prop in Model) {
 			const DivForm = this.DefineContainer(prop, GroupsForm);
 			try {
-				Model[prop] = Model[prop] != null ? Model[prop] : undefined;
+				//Model[prop] = Model[prop] != null ? Model[prop] : undefined;
 				if (this.isNotDrawable(Model, prop)) {
 					if (!this.isMethod(Model, prop)) {
-						ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.value ?? undefined;
+						ObjectF[prop] = ObjectF[prop] ?? Model[prop]?.defaultValue ?? undefined;
 					}
 				} else {
 					//ObjectF[prop] = val;
-					const onChangeEvent = async (ev) => {
+					const onChangeEvent = async (/** @type {{ target: HTMLInputElement; currentTarget: HTMLInputElement; }} */ ev) => {
 						//console.log(ev);
 						/**
 						 * @type {HTMLInputElement}
@@ -262,7 +335,7 @@ class WForm extends HTMLElement {
 						innerText: WOrtograficValidation.es(prop)
 					});
 					const ControlContainer = WRender.Create({ class: "ModalElement" });
-					if (Model[prop] != undefined && Model[prop].__proto__ == Object.prototype) {
+					if (Model[prop] != undefined) {
 						ControlLabel.innerHTML = Model[prop].label ?? WOrtograficValidation.es(prop) + (Model[prop].require == false ? "" : "*");
 						await this.CreateModelControl(Model, prop, ControlContainer, ObjectF, ControlLabel, onChangeEvent, DivForm);
 						//console.trace();
@@ -284,6 +357,34 @@ class WForm extends HTMLElement {
 	}
 
 	/**
+	 * @param {ModelProperty} modelProperty
+	 * @param {any} target
+	 */
+	EvalHiddenDisabled(modelProperty, target) {
+		let isRequired = false;
+		if (typeof modelProperty.require === "function") {
+			isRequired = Boolean(modelProperty.require(target, this));
+		} else {
+			isRequired = Boolean(modelProperty.require); // valor estático: true/false
+		}
+		// --- 2. Evaluar `disabled` (estático o dinámico)
+		let isDisabled = false;
+		if (typeof modelProperty.disabled === "function") {
+			isDisabled = Boolean(modelProperty.disabled(target, this));
+		} else {
+			isDisabled = Boolean(modelProperty.disabled);
+		}
+		// --- 3. Evaluar `hidden` (estático o dinámico)
+		let isHidden = false;
+		if (typeof modelProperty.hidden === "function") {
+			isHidden = Boolean(modelProperty.hidden(target, this));
+		} else {
+			isHidden = Boolean(modelProperty.hidden);
+		}
+		return { isHidden, isDisabled };
+	}
+
+	/**
 	 * @param {string} prop
 	*  @param {Array<GroupComponent>} GroupsForm
 	 * @returns {GroupComponent}
@@ -301,24 +402,34 @@ class WForm extends HTMLElement {
 		return div;
 	}
 
+	/**
+	 * @param {Object.<string,any>} Model
+	 * @param {string} prop
+	 */
 	isNotDrawable(Model, prop) {
 		if (Model[prop] == undefined) {
 			return true;
 		}
 		return (Model[prop]?.__proto__ == Object.prototype &&
-			(Model[prop]?.primary || Model[prop]?.hidden || !Model[prop]?.type))
+			(//Model[prop]?.primary ||
+				//|| Model[prop]?.hidden ||
+				!Model[prop]?.type))
 			|| Model[prop]?.__proto__ == Function.prototype
 			|| Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData" || prop == "OrderData";
 	}
+	/**
+	 * @param {Object.<string, any>} Model
+	 * @param {string} prop
+	 */
 	isMethod(Model, prop) {
 		return Model[prop]?.__proto__ == Function.prototype
 			|| Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "ApiMethods" || prop == "FilterData" || prop == "OrderData";
 	}
 	/**
-	 * @param {Object} Model
+	 * @param {Object.<string,ModelProperty>} Model
 	 * @param {String} prop
 	 * @param {HTMLElement} ControlContainer
-	 * @param {Object} ObjectF
+	 * @param {Object.<string,any>} ObjectF
 	 * @param {HTMLLabelElement} ControlLabel
 	 * @param {Function} onChangeEvent
 	 * @param {GroupComponent} Form
@@ -332,7 +443,7 @@ class WForm extends HTMLElement {
 		ObjectF[prop] = ObjectF[prop];
 		let addLabel = true;
 
-		const onchangeListener = async (ev) => {
+		const onchangeListener = async (/** @type {any} */ ev) => {
 			// @ts-ignore
 			if (!ModelProperty.disabled) {
 				if (ev) {
@@ -357,13 +468,20 @@ class WForm extends HTMLElement {
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateSelect(ModelProperty,
 					ObjectF, prop, onchangeListener);
 				break;
-			case "MASTERDETAIL":  case "WGRIDSELECT":
+			case "MASTERDETAIL":
+				// @ts-ignore
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
 					ObjectF, prop, this.Config?.ImageUrlPath ?? "", onchangeListener);
 				break;
-			case "MULTISELECT": case "WCHECKBOX": case "WSELECT": 
-				this.Controls[prop] = await ModelPropertyFormBuilder.CreateWSelect(ModelProperty,
-					ObjectF, prop, onchangeListener);
+			case "MULTISELECT": case "WCHECKBOX": case "WSELECT":
+				if (ModelProperty.IsGridDisplay) {
+					// @ts-ignore
+					this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
+						ObjectF, prop, this.Config?.ImageUrlPath ?? "", onchangeListener);
+				} else {
+					this.Controls[prop] = await ModelPropertyFormBuilder.CreateWSelect(ModelProperty,
+						ObjectF, prop, onchangeListener);
+				}
 				break;
 			case "TEXTAREA":
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateTextArea(
@@ -411,10 +529,14 @@ class WForm extends HTMLElement {
 				break;
 		}
 		ControlContainer.classList.add(ModelProperty.type?.toUpperCase())
+		ControlContainer.classList.add(ModelProperty.IsGridDisplay ? "GRID_DISPLAY" : "ELEMENT_DYSPLAY")
 		if (addLabel) {
 			ControlContainer.append(ControlLabel);
 		}
-		ControlContainer.append(this.Controls[prop])
+		ControlContainer.append(this.Controls[prop]);
+		if (ModelProperty.hidden || ModelProperty.primary) {
+			ControlContainer.style.display = "none";
+		}
 		Form.Add(ControlContainer);
 	}
 
@@ -427,11 +549,11 @@ class WForm extends HTMLElement {
 				class: 'Btn',
 				type: "button",
 				innerText: 'GUARDAR',
-				onclick: async (ev) => {
+				onclick: async (/** @type {{ target: { enabled: boolean; }; }} */ ev) => {
 					try {
 						ev.target.enabled = false
 						const response = await this.Save(ObjectF);
-						
+
 					} catch (error) {
 						ev.target.enabled = true
 					}
@@ -446,13 +568,18 @@ class WForm extends HTMLElement {
 				class: "Btn",
 				type: "button",
 				innerText: Action.name,
-				onclick: async (ev) => {
-					try {
-						ev.target.enabled = false
-						Action.action(ev.target);
-					} catch (error) {
-						ev.target.enabled = true
+				onclick: async (/** @type {Event} */ ev) => {
+					if (ev.target) {
+						try {
+							// @ts-ignore
+							ev.target.enabled = false
+							Action.action(ev.target);
+						} catch (error) {
+							// @ts-ignore
+							ev.target.enabled = true
+						}
 					}
+
 				}
 			}));
 		});
@@ -461,7 +588,6 @@ class WForm extends HTMLElement {
 	}
 	Save = async (ObjectF = this.FormObject) => {
 		try {
-			//console.log(ObjectF);
 			if (this.Config.ValidateFunction != undefined &&
 				typeof this.Config.ValidateFunction === "function") {
 				const response = this.Config.ValidateFunction(ObjectF);
@@ -476,7 +602,7 @@ class WForm extends HTMLElement {
 			if (this.Config.ObjectOptions?.Url != undefined || this.Config.SaveFunction == undefined) {
 				const ModalCheck = await this.ModalCheck(ObjectF, this.Config.SaveFunction == undefined);
 				this.shadowRoot?.append(ModalCheck)
-			} else if (this.Config.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
+			} else if (this.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
 				const ModalCheck = await this.ModalCheck(ObjectF, true);
 				this.shadowRoot?.append(ModalCheck)
 			} else {
@@ -495,18 +621,24 @@ class WForm extends HTMLElement {
 	Validate = (ObjectF = this.FormObject) => {
 		if (this.DataRequire == true) {
 			for (const prop in ObjectF) {
-				if (!prop.includes("_hidden") && this.Config.ModelObject[prop]?.require
-					&& this.Config.ModelObject[prop]?.hidden != true) {
+				if (!this.ModelObject[prop]) {
+					continue;
+				}
+				let { isHidden, isDisabled } = this.EvalHiddenDisabled(this.ModelObject[prop], ObjectF);
+				if (!prop.includes("_hidden")
+					&& this.ModelObject[prop]?.require
+					&& !this.ModelObject[prop]?.primary
+					&& isHidden != true) {
 					/**
 					 * @type {?HTMLInputElement | undefined | any}
 					 */
 					const control = this.Controls[prop];
 					//const control = this.DivForm?.querySelector("#ControlValue" + prop);
-					if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
+					if (this.ModelObject[prop]?.type.toUpperCase() == "MODEL") {
 						if (control?.Validate != undefined && !control.Validate(control.FormObject)) {
 							return false;
 						}
-					} else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
+					} else if (this.ModelObject[prop]?.type.toUpperCase() == "PASSWORD") {
 						const passwords = control.querySelectorAll("input");
 						if (passwords[0].value == null || passwords[0].value == "") {
 							this.createAlertToolTip(passwords[0], WArrayF.Capitalize(WOrtograficValidation.es(prop)) + ` es requerido`);
@@ -517,21 +649,21 @@ class WForm extends HTMLElement {
 							return false;
 						}
 
-					} else if (this.Config.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
-						|| this.Config.ModelObject[prop]?.type.toUpperCase() == "CALENDAR") {
-						if (this.Config.ModelObject[prop].require == true) {
-							this.Config.ModelObject[prop].min = this.Config.ModelObject[prop]?.min ?? 1;
+					} else if (this.ModelObject[prop]?.type.toUpperCase() == "MASTERDETAIL"
+						|| this.ModelObject[prop]?.type.toUpperCase() == "CALENDAR") {
+						if (this.ModelObject[prop].require == true) {
+							this.ModelObject[prop].min = this.ModelObject[prop]?.min ?? 1;
 						}
-						if (this.Config.ModelObject[prop]?.max
-							&& ObjectF[prop].length > this.Config.ModelObject[prop]?.max) {
+						if (this.ModelObject[prop]?.max
+							&& ObjectF[prop].length > this.ModelObject[prop]?.max) {
 							this.createAlertToolTip(control, `El máximo de registros permitidos es `
-								+ this.Config.ModelObject[prop]?.max);
+								+ this.ModelObject[prop]?.max);
 							return false;
 						}
-						if (this.Config.ModelObject[prop]?.min
-							&& ObjectF[prop].length < this.Config.ModelObject[prop]?.min) {
+						if (this.ModelObject[prop]?.min
+							&& ObjectF[prop].length < this.ModelObject[prop]?.min) {
 							this.createAlertToolTip(control, `El mínimo de registros permitidos es `
-								+ this.Config.ModelObject[prop]?.min);
+								+ this.ModelObject[prop]?.min);
 							return false;
 						}
 
@@ -573,64 +705,13 @@ class WForm extends HTMLElement {
 	* 
 	* @param { HTMLInputElement } targetControl 
 	* @param { HTMLInputElement | HTMLSelectElement | HTMLElement } currentTarget 
-	* @param { Object } ObjectF 
+	* @param { Object.<string, any> } ObjectF 
 	* @param { String } prop 
-	* @param { Object } Model 
+	* @param { Object.<string, any> } Model 
 	* @returns 
 	*/
 	onChange = async (targetControl, currentTarget, ObjectF, prop, Model) => { //evento de actualizacion del componente
-
-		if (Model[prop].validateFunction) {
-			const result = Model[prop].validateFunction(ObjectF, targetControl?.value);
-			if (!result.success) {
-				alert(result.message);
-				return;
-			}
-		}
-		const tool = targetControl?.parentNode?.querySelector(".ToolTip");
-		if (tool) tool.remove();
-
-		if (currentTarget?.tagName?.toUpperCase().includes("W-CALENDAR-COMPONENT")) {
-			//TODO
-		} else if (["IMG", "IMAGE", "IMAGES", "FILE", "FILES"].includes(Model[prop].type.toUpperCase())) {
-			//TODO
-		} else if (targetControl?.type == "checkbox") {
-			ObjectF[prop] = targetControl?.checked;
-		} else if (targetControl?.type == "radio") {
-			ObjectF[prop] = targetControl?.value;
-		} else {
-			if (parseFloat(targetControl?.value) < parseFloat(targetControl?.min)) {
-				//targetControl.value = targetControl?.min;
-				this.createInfoToolTip(targetControl, `El valor mínimo permitido es: ${targetControl?.min}`);
-			}
-			if (parseFloat(targetControl?.value) > parseFloat(targetControl?.max)) {
-				//targetControl.value = targetControl?.max;
-				this.createInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
-			}
-			ObjectF[prop] = targetControl?.value;
-			if (targetControl?.pattern) {
-				let regex = new RegExp(targetControl?.pattern);
-				if (regex.test(ObjectF[prop])) {
-					WRender.SetStyle(targetControl, {
-						boxShadow: "none"
-					});
-				} else {
-					let regex = new RegExp(targetControl.pattern);
-					if (!regex.test(ObjectF[prop])) {
-						if (!targetControl.parentNode?.querySelector(".ToolTip")) {
-							targetControl.parentNode?.append(WRender.Create({
-								tagName: "span",
-								innerHTML: `Ingresar formato correcto: ${targetControl.placeholder}`,
-								className: "ToolTip"
-							}));
-						}
-						WRender.SetStyle(targetControl, {
-							boxShadow: "0 0 3px #ef4d00"
-						});
-					}
-				}
-			}
-		}
+		await ModelPropertyFormBuilder.OnChange(targetControl, currentTarget, ObjectF, prop, Model);
 		if (Model[prop].fieldRequire) {
 			this.shadowRoot?.querySelector(".label_" + Model[prop].fieldRequire)?.append("*")
 			Model[Model[prop].fieldRequire].require = true;
@@ -643,42 +724,42 @@ class WForm extends HTMLElement {
 			this.FormObject[prop] = this.#OriginalObject[prop];
 		}
 	}
+	/**
+	 * @param {HTMLElement} control
+	 * @param {string} message
+	 */
 	createAlertToolTip(control, message) {
-		if (!control.parentNode.querySelector(".ToolTip")) {
+		if (!control.parentNode?.querySelector(".ToolTip")) {
 			const toolTip = WRender.Create({
 				tagName: "span",
 				innerHTML: message,
 				className: "ToolTip"
 			});
-			control.parentNode.append(toolTip);
+			control.parentNode?.append(toolTip);
 		}
 		WRender.SetStyle(control, {
 			boxShadow: "0 0 3px #ef4d00"
 		});
 		control.focus();
 	}
+	/**
+	 * @param {HTMLElement} control
+	 * @param {string} message
+	 */
 	createInfoToolTip(control, message) {
-		if (!control.parentNode.querySelector(".ToolTip")) {
-			const toolTip = WRender.Create({
-				tagName: "span",
-				innerHTML: message,
-				className: "ToolTip ToolInfo"
-			});
-			control.parentNode.append(toolTip);
-		}
-		WRender.SetStyle(control, {
-			boxShadow: "0 0 3px #ef4d00"
-		});
-		control.focus();
+		ModelPropertyFormBuilder.CreateInfoToolTip(control, message);
 	}
 
+	/**
+	 * @param {Object | undefined} ObjectF
+	 */
 	async ModalCheck(ObjectF, withModel = false) {
 		const { LoadinModal } = await import("./LoadinModal.js");
-		const modalCheckFunction = async (loadinModal) => {
+		const modalCheckFunction = async ( /** @type {import("./LoadinModal.js").LoadinModal} */ loadinModal) => {
 			try {
-				this.shadowRoot?.append(loadinModal);
+				this.shadowRoot?.appendChild(loadinModal);
 				if (withModel) {
-					const response = await this.Config.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
+					const response = await this.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
@@ -696,7 +777,7 @@ class WForm extends HTMLElement {
 						this.shadowRoot?.append(ModalMessage(response.message))
 						return;
 					}
-					if (response.status == 200 && response.message) {						
+					if (response.status == 200 && response.message) {
 						this.shadowRoot?.append(ModalMessage(response.message))
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
@@ -710,7 +791,7 @@ class WForm extends HTMLElement {
 				this.shadowRoot?.append(ModalMessage(error));
 			}
 		}
-		const ModalCheck = ModalVericateAction(async (ev) => {
+		const ModalCheck = ModalVericateAction(async (/** @type {{ target: { enabled: boolean; }; }} */ ev) => {
 			ev.target.enabled = false;
 			const loadinModal = new LoadinModal();
 			ModalCheck.shadowRoot?.append(loadinModal);
@@ -719,6 +800,10 @@ class WForm extends HTMLElement {
 
 		return ModalCheck;
 	}
+	/**
+	 * @param {any} ObjectF
+	 * @param {any} response
+	 */
 	async ExecuteSaveFunction(ObjectF, response) {
 		if (this.Config.SaveFunction != undefined) {
 			await this.Config.SaveFunction(ObjectF, response, this);
@@ -737,10 +822,11 @@ class WForm extends HTMLElement {
 			.IMAGE,
 			.FILE,
 			.FILES,
-			.MASTERDETAIL,			
+			.MASTERDETAIL,
+			.GRID_DISPLAY,
 			.RICHTEXT,
 			.DRAW,
-			.CALENDAR, .WGRIDSELECT {
+			.CALENDAR {
 				grid-column: span  ${this.limit};
 				padding-bottom: 10px;
 			}

@@ -2,7 +2,7 @@ import { css } from "../../WModules/WStyledRender.js";
 
 export class DrawComponent extends HTMLElement {
 	/**
-	 * @typedef {Object} Config 
+	 * @typedef {Object.<string, any>} Config 
 	 * @property {String} [value]
 	 * @property {Function} [action]
 	 * @property {String} [color]

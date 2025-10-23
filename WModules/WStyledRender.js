@@ -12,18 +12,18 @@ class WCssClass {
     }
 }
 /**
- * @typedef {Object} MediaQuery 
+ * @typedef {Object.<string, any>} MediaQuery 
  * @property {String} condicion
  * @property {Array<WCssClass>} ClassList
  * **/
 /**
- * @typedef {Object} KeyFrame 
+ * @typedef {Object.<string, any>} KeyFrame 
  * @property {String} animate
  * @property {Array<WCssClass>} ClassList
  * **/
 
 /**
- * @typedef {Object} StyleConfig
+ * @typedef {Object.<string, any>} StyleConfig
  * @property {Array<WCssClass>} ClassList
  * @property {Array<MediaQuery>} [action]
  * **/

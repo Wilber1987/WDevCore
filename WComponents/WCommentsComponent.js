@@ -45,7 +45,7 @@ class WCommentsComponent extends HTMLElement {
         this.CommentsIdentify = props.CommentsIdentify;
         this.CommentsIdentifyName = props.CommentsIdentifyName;
 
-        this.connection = null;
+        //this.connection = null;
         this.hubStarted = false;
 
         this.attachShadow({ mode: 'open' });
@@ -158,11 +158,12 @@ class WCommentsComponent extends HTMLElement {
         if (!this.IsWithSocket) {
             return;
         }
-        WSocketServices.InitSignalR(this, (mensaje) => {
+        WSocketServices.InitSignalR(this, async (mensaje) => {
 
             // Solo agregar si es de la conversación actual
             if (mensaje[this.CommentsIdentifyName] == this.CommentsIdentify) {
-                this.Dataset = [...this.Dataset, mensaje];
+                //this.Dataset = [...this.Dataset, mensaje];
+                await this.update();
                 this.DrawWCommentsComponent();
                 this.scrollToBottom();
             }
@@ -283,7 +284,7 @@ class WCommentsComponent extends HTMLElement {
 
 
     disconnectedCallback() {
-        this.connection?.stop();
+        //this.connection?.stop();
         this.hubStarted = false;
         //this.ClearEvents()
     }

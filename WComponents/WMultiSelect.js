@@ -5,26 +5,26 @@ import { css, WCssClass, WStyledRender } from "../WModules/WStyledRender.js";
 
 // @ts-ignore
 import { FilterData } from "../WModules/CommonModel.js";
-import { WCardTable } from "./WTableComponent.js";
+import { WCard } from "./WCard.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WToolTip } from "./FormComponents/WToolTip.js";
 
 /**
- * @typedef {Object} ConfigMS 
+ * @typedef {Object.<string, any>} ConfigMS 
  *  * @property {Array} Dataset
 	* @property {Array} [selectedItems]
 	* @property {Function} [action]
 	* @property {Function} [ValidateFunction]
 	* @property {String} [id]
 	* @property {Boolean} [IsFilterControl]
-	* @property {Object} [ModelObject]
-	* @property {Object} [EntityModel]
+	* @property {Object.<string, any>} [ModelObject]
+	* @property {Object.<string, any>} [EntityModel]
 	* @property {Boolean} [MultiSelect]
 	* @property {Boolean} [FullDetail]
 	* @property {Boolean} [AddObject]
 	* @property {Boolean} [AutoSave]
 	* @property {String} [AddPatern]
-	* @property {Object} [CrudOptions]
+	* @property {Object.<string, any>} [CrudOptions]
 	* @property {String} [Mode]  SELECT_BOX, SELECT ImageUrlPath
 	* @property {String} [ImageUrlPath]   
 	* @property {Function} [clickAction] dado que el multiselect elimina la propagacion de eventos se agrega el clickaction para poder usar un onclick
@@ -49,7 +49,9 @@ class MultiSelect extends HTMLElement {
 		this.FieldName = "";
 		this.FullDetail = this.Config.FullDetail ?? true;
 		this.SubOptionsFieldName = "";
-		this.ControlsContainer = WRender.Create({ className: "ControlContainer" });
+		this.ControlsContainer = WRender.Create({
+			className: `ControlContainer ${this.Config.MultiSelect ? "multi" : "select"}`
+		});
 		WRender.SetStyle(this, {
 			display: this.Config.IsFilterControl == true ? "grid" : "block",
 			gridTemplateColumns: "20% 80%",
@@ -488,7 +490,7 @@ class MultiSelect extends HTMLElement {
 	}
 	BuilDetail = (element) => {
 		const elementDetail = WRender.Create({ className: "ElementDetail" });
-		elementDetail.append(new WCardTable(WArrayF.replacer(element), this.ModelObject, this.Config))
+		elementDetail.append(new WCard(WArrayF.replacer(element), this.ModelObject, this.Config))
 		// for (const prop in WArrayF.replacer(element)) {
 		//     if (this.IsDrawableProp(element, prop)) {
 		//         elementDetail.append(WRender.Create({ className: "ElementProp", innerHTML: WOrtograficValidation.es(prop) + ":" }));
@@ -588,6 +590,14 @@ const MainMenu = css`
 		width: calc(100% - 30px);
 		overflow-x: auto;
 	}
+
+	.select .LabelMultiselect .selecteds {    
+		width: calc(100% - 0px);
+	}
+	.select  .LabelMultiselect .selecteds label {
+		max-width: calc(100% - 25px);
+	}
+
 	.LabelMultiselect.IsFilterControl,  .LabelMultiselect.IsFilterControl .selecteds {   
 		width: calc(100%);
 		overflow-x: hidden;

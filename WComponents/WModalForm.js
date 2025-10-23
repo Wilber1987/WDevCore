@@ -21,7 +21,7 @@ class WModalForm extends HTMLElement {
             this[p] = Config[p];
         }
         this.DivColumns = this.Config.DivColumns;
-        this.StyleForm = this.Config.DivColumns == "FullScreen" ? this.WidthContainer = "60%" : this.WidthContainer = "90%"
+        this.StyleForm = this.Config.DivColumns == "FullScreen" ? this.WidthContainer = "90%" : this.WidthContainer = "60%"
         /*if (this.StyleForm == "columnX1") {
             this.WidthContainer = "40%";
             this.Config.DivColumns = "calc(100%)";

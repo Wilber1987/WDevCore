@@ -53,7 +53,7 @@ class Tbl_Profile extends EntityClass {
     // /**
     //   * @param {Array<Tbl_Profile>} perfiles
     //   * @param {Cat_Dependencias} dependencia
-    //   * @returns {Object}
+    //   * @returns {Object.<string, any>}
     //   */
     // AsignarDependencias = async (perfiles, dependencia) => {
     //     return await WAjaxTools.PostRequest("/api/Proyect/AsignarDependencias", {

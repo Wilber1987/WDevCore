@@ -7,9 +7,9 @@ import { css } from "../WModules/WStyledRender.js";
 import { WDocumentViewer } from "./WDocumentViewer.js";
 
 /**
- * @typedef {Object} ReportConfig
+ * @typedef {Object.<string, any>} ReportConfig
  * @property {Array} [Dataset]
- * @property {Object} [ModelObject]
+ * @property {Object.<string, any>} [ModelObject]
  * @property {HTMLElement} [Header]
  * @property {HTMLStyleElement} [CustomStyle]
  * @property {String} [PageType]
