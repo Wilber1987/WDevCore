@@ -397,7 +397,7 @@ class WFilterOptions extends HTMLElement {
 								propiertyName = foraingKeyName;
 								let primaryKey = null;
 								for (const key in control.ModelObject) {
-									if (control.ModelObject[key].primary) {
+									if (control.ModelObject[key]?.primary) {
 										primaryKey = key;
 										break;
 									}
