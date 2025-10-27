@@ -93,7 +93,7 @@ h2 {
 
 
 .proyects-container {
-   
+
     gap: 30px;
 }
 
@@ -108,22 +108,25 @@ h2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+
     .description {
         padding: 30px;
         display: flex;
         flex-direction: column;
         gap: 20px;
         text-align: justify;
+
         .options {
             display: flex;
             gap: 20px;
             align-items: center;
         }
     }
+
     @media (max-width: 600px) {
         grid-template-columns: 1fr;
     }
-    
+
 }
 
 .proyect-card .proyect-logo {
@@ -214,6 +217,3 @@ h2 {
     }
 
 }
-
-
-

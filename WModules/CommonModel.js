@@ -1,12 +1,12 @@
 
 /**
- * @typedef {Object.<string, any>} ObjectOptions 
+ * @typedef {Object} ObjectOptions 
  *  * @property {Boolean} [AddObject]
 	* @property {String} [Url]
 	* @property {Function} [SaveFunction]
 **/
 /**
- * @typedef {Object.<string, any>} ResponseServices 
+ * @typedef {Object} ResponseServices 
  *  * @property {int} [status]
 	* @property {String} [message]
 **/
@@ -61,7 +61,7 @@ class ModelProperty {
 	}
 }
 /**
- * @typedef {Object.<string, any>} FormConfig 
+ * @typedef {Object} FormConfig 
  *  * @property {Object.<string, any>} [ObjectDetail]
 	* @property {Object.<string, any>} [EditObject]
 	* @property {Object.<string, any>} [ParentModel]
@@ -88,7 +88,7 @@ class ModelProperty {
 class FormConfig { };
 
 /**
- * @typedef {Object.<string, any>} ElementStyle
+ * @typedef {Object} ElementStyle
 	 * @property {?String | undefined} [alignContent]
 	 * @property {?String | undefined} [alignItems]
 	 * @property {?String | undefined} [alignSelf]
@@ -284,7 +284,7 @@ class FormConfig { };
 	 */
 class ElementStyle { }
 /**
- * @typedef {Object.<string, any>} WNode
+ * @typedef {Object} WNode
 	 * @property {String} [tagName]
 	 * @property {String} [id]
 	 * @property {String} [type]
@@ -335,13 +335,13 @@ class WNode {
 	}
 }
 /**
- * @typedef {Object.<string, any>} Actions 
+ * @typedef {Object} Actions 
  * @property {String} name
  * @property {Function} action
  * @property {Function|Boolean} [rendered] funcion que debe retornar true o false
  * **/
 /**
- * @typedef {Object.<string, any>} TableOptions 
+ * @typedef {Object} TableOptions 
  *  * @property {Boolean} [AddObject]
 	* @property {Boolean} [Show]
 	* @property {Boolean} [Filter]
@@ -371,12 +371,12 @@ class WNode {
 **/
 
 /**
- * @typedef {Object.<string, any>} SearchItemsFromApi 
+ * @typedef {Object} SearchItemsFromApi 
  * @property {String} [ApiUrl]
  * @property {Function} [action]
  * **/
 /**
- * @typedef {Object.<string, any>} TableConfig 
+ * @typedef {Object} TableConfig 
  *  * @property {Array} [Dataset]
 	* @property {Array} [selectedItems]
 	* @property {Object.<string, any>} [ModelObject]  
@@ -405,7 +405,7 @@ class WNode {
  **/
 class TableConfig { };
 /**
- * @typedef {Object.<string, any>} ModalConfig 
+ * @typedef {Object} ModalConfig 
  *  * @property {Boolean} [ShadowRoot]
 	* @property {String} [icon]
 	* @property {String} [title]  

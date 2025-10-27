@@ -7,7 +7,7 @@ class WCarousel extends HTMLElement {
      * @param {HTMLElement[]} items - Array de elementos HTML a mostrar en el carrusel
      */
     constructor(items = []) {
-         super();
+        super();
         this.items = Array.isArray(items) ? [...items] : []; // Solo si viene del constructor
         this.currentIndex = 0;
         this.append(this.CustomStyle);

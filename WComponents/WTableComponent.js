@@ -26,10 +26,12 @@ class WTableComponent extends HTMLElement {
         super();
         this.attachShadow({ mode: "open" });
         this.Config = Config
-        for (const p in Config) {
-            this[p] = Config[p];
-        }
+        // @ts-ignore
+        for (const p in Config) {this[p] = Config[p];}
         this.TableClass = "WTable WScroll";
+        /**
+         * @type {any[]}
+         */
         this.selectedItems = [];
         this.isSelectAll = false;
         this.ModelObject = {};
@@ -41,7 +43,13 @@ class WTableComponent extends HTMLElement {
         this.maxElementByPage = 0;
         this.numPage = 0;
         this.ActualPage = 0;
+        /**
+         * @type {any[]}
+         */
         this.Dataset = [];
+        /**
+         * @type {OrderData[]}
+         */
         this.Sorts = [];
         this.SelectedItemsContainer = WRender.Create({
             className: "SelectedItemsContainer", children: [
@@ -191,7 +199,7 @@ class WTableComponent extends HTMLElement {
             } else if (isWithtModel) {
                 const model = this.Config.EntityModel ?? this.Config.ModelObject;
                 Dataset = await model.Get();
-                this.Dataset = [...this.Dataset, ...Dataset];
+                this.Dataset = [...(this.Dataset ?? []), ...Dataset];
             }
         }
         this.withFilter = false;

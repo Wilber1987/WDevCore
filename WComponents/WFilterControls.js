@@ -23,8 +23,7 @@ import { WArrayF } from "../WModules/WArrayF.js";
 	* @property {Boolean} [UseManualControlForFiltering]
 	* @property {Boolean} [FullDetail]
 	* @property {Object.<string, any>} [ModelObject]
-	* @property {Object.<string, any>} [EntityModel]
-	
+	* @property {Object.<string, any>} [EntityModel]	
 **/
 
 class WFilterOptions extends HTMLElement {
@@ -46,7 +45,7 @@ class WFilterOptions extends HTMLElement {
 			this.FilterContainer.style.alignItems = "flex-start";
 			this.FilterContainer.style.gap = "10px";
 		}
-		/** @type {Array} */
+		/** @type {Array<any>} */
 		this.FilterControls = [];
 		this.attachShadow({ mode: "open" });
 		this.shadowRoot?.append(StyleScrolls.cloneNode(true));
@@ -65,7 +64,7 @@ class WFilterOptions extends HTMLElement {
 		this.shadowRoot?.addEventListener("click", (e) => this.undisplayMultiSelects(e));
 		this.shadowRoot?.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
 	}
-	undisplayMultiSelects = (e) => {
+	undisplayMultiSelects = (/** @type {Event} */ e) => {
 		// @ts-ignore
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
@@ -90,12 +89,13 @@ class WFilterOptions extends HTMLElement {
 				this.Display != true ? {
 					tagName: "button",
 					className: "accordion-button" + (this.Display ? " active-btn" : ""),
-					innerText: "Filtros", onclick: async (ev) => {
+					innerText: "Filtros", onclick: async (/** @type {Event} */ ev) => {
 						if (!FilterOptions.className.includes("OptionContainerActive")) {
 							FilterOptions.className = "filter-options OptionContainerActive";
 						} else {
 							FilterOptions.className = "filter-options";
 						}
+						// @ts-ignore
 						ev.target.className = ev.target.className.includes("active-btn") ? "accordion-button" : "accordion-button active-btn";
 					}
 				} : ""
@@ -119,6 +119,7 @@ class WFilterOptions extends HTMLElement {
 						this.FilterControls.push(filterControl);
 					}
 				} else {
+					// @ts-ignore
 					const filterControl = this.CreateWSelect(SelectData, prop);
 					ControlOptions.append(WRender.Create({ children: [WOrtograficValidation.es(prop), filterControl] }));
 					this.FilterControls.push(filterControl);
@@ -134,7 +135,7 @@ class WFilterOptions extends HTMLElement {
 	 * 
 	 * @param {Object.<string, any>} Model 
 	 * @param {String} prop 
-	 * @param {Array} Dataset 
+	 * @param {Array<any>} Dataset 
 	 * @returns 
 	 */
 	CreateModelControl = (Model, prop, Dataset) => {
@@ -167,6 +168,10 @@ class WFilterOptions extends HTMLElement {
 		}
 		return null
 	}
+	/**
+	 * @param {Object.<string, any>} Model
+	 * @param {string} prop
+	 */
 	isDrawable(Model, prop) {
 		if (Model[prop] == null || prop == "FilterData") {
 			return false;
@@ -209,7 +214,7 @@ class WFilterOptions extends HTMLElement {
 			return;
 		}
 		if (this.Dataset.length > 0) {
-			const DFilt = this.Dataset.filter(obj => {
+			const DFilt = this.Dataset.filter((/**@type {Object.<string, any>} */ obj) => {
 				let flagObj = true;
 				this.FilterControls.forEach(control => {
 					if (this.ModelObject[control.id]?.__proto__ == Object.prototype) {
@@ -253,11 +258,11 @@ class WFilterOptions extends HTMLElement {
 							//@ts-ignore  
 							const objectlement = obj[multiSelect.id];
 							if (objectlement?.__proto__ == Object.prototype)
-								find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
+								find = multiSelect.selectedItems.find((/**@type {Object.<string, any>} */ x) => WArrayF.evalValue(objectlement, x) != undefined);
 							else if (objectlement?.__proto__ == Array.prototype)
-								find = multiSelect.selectedItems.find(x => WArrayF.evalValue(objectlement, x) != undefined);
+								find = multiSelect.selectedItems.find((/**@type {Object.<string, any>} */ x) => WArrayF.evalValue(objectlement, x) != undefined);
 							else
-								find = multiSelect.selectedItems.find(x => x[multiSelect.id] == objectlement);
+								find = multiSelect.selectedItems.find((/**@type {Object.<string, any>} */ x) => x[multiSelect.id] == objectlement);
 							if (find == undefined) {
 								flagObj = false;
 							}
@@ -279,6 +284,10 @@ class WFilterOptions extends HTMLElement {
 						return obj[input.id]
 					}
 
+					/**
+					 * @param {string} firstDate
+					 * @param {string} secondDate
+					 */
 					function findElementByDate(firstDate, secondDate) {
 						if (firstDate != "" && new Date(obj[control.id]) < new Date(firstDate + "T00:00:00")) {
 							flagObj = false;
@@ -308,6 +317,9 @@ class WFilterOptions extends HTMLElement {
 
 
 	}
+	/**
+	 * @param {any[] | undefined} sorts
+	 */
 	BuildFiltersAndSorts(sorts) {
 		this.ModelObject.FilterData = [];
 		this.ModelObject.OrderData = [];
@@ -402,7 +414,7 @@ class WFilterOptions extends HTMLElement {
 										break;
 									}
 								}
-								control.selectedItems?.forEach(element => {
+								control.selectedItems?.forEach((/**@type {Object.<string, any>} */ element) => {
 									// @ts-ignore
 									values.push(element[primaryKey]?.toString());
 								});
@@ -442,7 +454,7 @@ class WFilterOptions extends HTMLElement {
 
 	/**
 	 * @param {String} prop 
-	 * @param {Array} Dataset 
+	 * @param {Array<any>} Dataset 
 	 * @returns 
 	 */
 	CreateSelectControl(prop, Dataset) {
@@ -473,7 +485,7 @@ class WFilterOptions extends HTMLElement {
 			className: prop,
 			id: prop,
 			placeholder: modelProperty.placeholder ?? modelProperty.label ?? WOrtograficValidation.es(prop),
-			onchange: (ev) => { this.OnChange(); }
+			onchange: () => { this.OnChange(); }
 		});
 		return InputControl;
 	}
@@ -500,7 +512,7 @@ class WFilterOptions extends HTMLElement {
 					value: this.Config.AutoSetDate == true ?  // @ts-ignore
 						(this.GetFilterDate()) : undefined,
 					placeholder: prop,
-					onchange: (ev) => { this.OnChange(); }
+					onchange: () => { this.OnChange(); }
 				}, {
 					tagName: "input",
 					type: "date",
@@ -509,7 +521,7 @@ class WFilterOptions extends HTMLElement {
 					value: this.Config.AutoSetDate == true ? new Date().addDays(1).toISO() : undefined,
 					id: prop + "second",
 					placeholder: prop,
-					onchange: (ev) => { this.OnChange(); }
+					onchange: () => { this.OnChange(); }
 				}
 			]
 		});
@@ -523,6 +535,9 @@ class WFilterOptions extends HTMLElement {
 				new Date().subtractDays(30).toISO() : new Date().subtractDays(7).toISO());
 	}
 
+	/**
+	 * @param {string | undefined} prop
+	 */
 	CreateNumberControl(prop) {
 		let InputControl = WRender.Create({
 			id: prop,
@@ -533,19 +548,23 @@ class WFilterOptions extends HTMLElement {
 					className: prop + " firstNumber",
 					id: prop + "first",
 					placeholder: WOrtograficValidation.es(prop),
-					onchange: (ev) => { this.OnChange(); }
+					onchange: () => { this.OnChange(); }
 				}, {
 					tagName: "input",
 					type: "number",
 					className: prop + " secondNumber",
 					id: prop + "second",
 					placeholder: WOrtograficValidation.es(prop),
-					onchange: (ev) => { this.OnChange(); }
+					onchange: () => { this.OnChange(); }
 				}
 			]
 		});
 		return InputControl;
 	}
+	/**
+	 * @param {ModelProperty} ModelProperty
+	 * @param {string} prop
+	 */
 	CreateWSelect(ModelProperty, prop) {
 		// Envolvemos el dataset con un Proxy
 		ModelProperty.Dataset = new Proxy(ModelProperty.Dataset || [], {
@@ -585,11 +604,12 @@ class WFilterOptions extends HTMLElement {
 				if (entity.Get) {
 					const newData = await entity.Get();
 					// Actualizamos el array por referencia
+					// @ts-ignore
 					ModelProperty.Dataset.length = 0;
-					ModelProperty.Dataset.push(...newData);
+					ModelProperty.Dataset?.push(...newData);
 					// No necesitas llamar a Draw aquí porque el proxy lo hará automáticamente
 				}
-			}, action: (element) => {
+			}, action: (/** @type {any} */ element) => {
 				if (ModelProperty.action) {
 					ModelProperty.action(element);
 				}

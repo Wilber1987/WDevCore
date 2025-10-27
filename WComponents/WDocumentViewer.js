@@ -4,7 +4,7 @@ import { css } from '../WModules/WStyledRender.js';
 import { ZoomControl } from './FormComponents/ZoomControl.js';
 import { WPrintExportToolBar } from './WPrintExportToolBar.mjs';
 
-const PageType = {
+export const PageType = {
 	A4: "A4",
 	A4_HORIZONTAL: "A4-horizontal",
 	CARTA: "carta",
@@ -15,11 +15,11 @@ const PageType = {
 
 class WDocumentViewer extends HTMLElement {
 	/**
-	 * @typedef {Object.<string, any>} WDocumentViewerConfig
+	 * @typedef {Object} WDocumentViewerConfig
 	 * @property {boolean} [exportPdf]
 	 * @property {boolean} [exportPdfApi]
 	 * @property {boolean} [exportXls]
-	 * @property {any[]} Dataset
+	 * @property {any[]} [Dataset]
 	 * @property {boolean} [print]
 	 * @property {Function} [exportXlsAction]
 	 * @property {string} [PageType]
@@ -54,6 +54,9 @@ class WDocumentViewer extends HTMLElement {
 		});
 		this.ComponentContainer.append(this.TopOptions, this.DocumentContainer, this.FooterOptions);
 
+		/**
+		 * @type {HTMLElement[]}
+		 */
 		this.Pages = [];
 
 		this.shadowRoot?.append(this.ComponentContainer);
@@ -61,16 +64,7 @@ class WDocumentViewer extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.Header = this.Config.Header;
-		this.Dataset = this.Config.Dataset;
-		this.exportXlsAction = this.Config.exportXlsAction;
-		this.Pages = [];
-		this.FooterOptions.innerHTML = "";
-		this.FooterOptions.append(new ZoomControl({ Nodes: this.Pages }));
-		this.DocumentContainer.innerHTML = "";
-		this.TopOptions.innerHTML = "";
-		this.InicializeToolBar()
-		this.DrawWDocumentViewer();
+		this.Update();
 	}
 
 	/**
@@ -81,19 +75,32 @@ class WDocumentViewer extends HTMLElement {
 		this.RenderPages();
 	};
 
+	Update() {
+		this.Header = this.Config.Header;
+		this.Dataset = this.Dataset ?? this.Config.Dataset ?? [];
+		this.exportXlsAction = this.Config.exportXlsAction;
+		this.Pages = [];
+		this.FooterOptions.innerHTML = "";
+		this.FooterOptions.append(new ZoomControl({ Nodes: this.Pages }));
+		this.DocumentContainer.innerHTML = "";
+		this.TopOptions.innerHTML = "";
+		this.InicializeToolBar();
+		this.DrawWDocumentViewer();
+	}
+
 	/**
 	 * Renderiza las páginas asegurando que los elementos se distribuyan correctamente.
 	 */
 	RenderPages() {
 		let currentPage = this.CreateNewPage();
 		//let availableSpace = currentPage.offsetHeight - 40; // Margen de seguridad
-
-		this.Dataset?.forEach((element) => {
-
+		this.Dataset?.forEach((/** @type {string | HTMLElement} */ element) => {
 			const elementClone = typeof element !== "string" ? element.cloneNode(true) : element;
-			//currentPage.append(elementClone);
+			// @ts-ignore
+			const elementFitsInPage = this.elementFitsInPage(currentPage, elementClone)
 			let isSplited = false;
-			if (!this.elementFitsInPage(currentPage, elementClone)) {
+			if (!elementFitsInPage) {
+				// @ts-ignore
 				isSplited = this.SplitElementIntoPages(elementClone, currentPage);
 				if (!isSplited) {
 					//currentPage = this.CreateNewPage();
@@ -110,7 +117,7 @@ class WDocumentViewer extends HTMLElement {
 				//currentPage.append(elementClone)
 			}
 			if (!isSplited) {
-				currentPage.append(elementClone)
+				currentPage.append(element)
 			}
 		});
 	}
@@ -265,7 +272,7 @@ class WDocumentViewer extends HTMLElement {
 	}
 
 
-	GetPageStyle = (pageType) => {
+	GetPageStyle = (/** @type {string | number} */ pageType) => {
 		const styles = {
 			[PageType.A4]: css`
 					.page {
@@ -311,11 +318,11 @@ class WDocumentViewer extends HTMLElement {
 	InicializeToolBar() {
 		if (this.Config.exportPdf || this.Config.print || this.Config.exportPdfApi) {
 			this.TopOptions.append(new WPrintExportToolBar({
-				PrintAction: this.Config.print ? (tool) => {
+				PrintAction: this.Config.print ? (/** @type {{ Print: (arg0: HTMLElement | HTMLInputElement | HTMLSelectElement) => void; }} */ tool) => {
 					const body = this.GetExportBody();
 					tool.Print(body);
 				} : undefined,
-				ExportPdfAction: this.Config.exportPdf ? async (tool) => {
+				ExportPdfAction: this.Config.exportPdf ? async (/** @type {{ ExportPdf: (arg0: HTMLElement | HTMLInputElement | HTMLSelectElement, arg1: string | undefined, arg2: boolean) => void; }} */ tool) => {
 					const body = this.GetExportBody();
 					tool.ExportPdf(body, this.Config.PageType, this.Config.exportPdfApi ?? false);
 				} : undefined
@@ -326,6 +333,9 @@ class WDocumentViewer extends HTMLElement {
 	CompStyle = css`
 		#ComponentContainer {
 			border: 1px solid #dfdfdf;
+			height: 100%;
+			box-sizing: border-box;
+			display: grid;
 		}
 		.document-container {
 			align-items: center;

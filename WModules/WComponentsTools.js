@@ -32,7 +32,7 @@ function html(strings, ...values) {
                 // Insertamos un marcador de posición para la función
                 let placeholder = ``;
                 // Expresión regular para detectar las combinaciones al final del string
-                const patron = /(onclick=['"]|onload=['"]|ontransitionend=['"]|onload=['"]|onchange=['"])$/;
+                const patron = /(onclick=['"]|onload=['"]|ontransitionend=['"]|onload=['"]|onchange=['"]|onkeypress=['"]|onkeydown=['"])$/;
                 // Buscar la coincidencia al final del string
                 const coincidencia = accumulator.match(patron);
                 //console.log(accumulator);
@@ -40,7 +40,7 @@ function html(strings, ...values) {
                 if (coincidencia) {
                     // Almacenar el fragmento que se va a reemplazar en una constante
                     const fragmentoAReemplazar = coincidencia[0];
-                    const patronEvent = /(onclick|onload|ontransitionend|onchange)=['"]$/;
+                    const patronEvent = /(onclick|onload|ontransitionend|onchange|onkeypress|onkeydown)=['"]$/;
                     const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
                     // Almacenar solo la palabra (onclick, onload, onchange) en una constante
                     const event = coincidenciaEvent[1];
