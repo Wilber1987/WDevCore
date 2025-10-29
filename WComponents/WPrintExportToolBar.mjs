@@ -8,12 +8,13 @@ import "../libs/html2pdf.js"
 import { PageType } from "./WReportComponent.js";
 
 /**
- * @typedef {Object} Config 
+ * @typedef {Object.<string, any>} Config 
 	* @property {Function} [PrintAction]
 	* @property {Function} [ExportPdfAction]
 	* @property {Function} [ExportCvsAction]
 	* @property {Function} [ExportXlsAction]
 	* @property {Function} [UploadAction]
+	* @property {Array<any>} [Controls]
 **/
 
 class WPrintExportToolBar extends HTMLElement {
@@ -30,6 +31,7 @@ class WPrintExportToolBar extends HTMLElement {
 	connectedCallback() { }
 	Draw = async () => {
 		this.shadowRoot?.append(html`<div class="toolbar">
+			${ this.Confg.Controls ?? []}
 			${this.Confg.PrintAction ? html`<button class="toolbar-button cyan" onclick="${(ev) => {
 				// @ts-ignore
 				this.Confg.PrintAction(this)
@@ -73,7 +75,7 @@ class WPrintExportToolBar extends HTMLElement {
 					<path d="M16 10v4H8v-4H5l7-7 7 7h-3zM5 18v-2h14v2H5z"/>
 				</svg>
 				Subir
-			</button>`: ""}
+			</button>`: ""}				
 		</div>`)
 	}
 	update() {

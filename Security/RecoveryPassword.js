@@ -16,17 +16,17 @@ const OnLoad = async () => {
             { tagName: 'img', src: "/Media/img/logo2.png", class: 'className' },
             { tagName: 'h3', innerText: "Recuperación de contraseña", class: 'className' },
             {
-                children: ["Correo", {
-                    tagName: 'input', type: 'text', placeholder: 'Correo', onchange: (ev) => {
+                children: ["Digite su usuario", {
+                    tagName: 'input', type: 'text', placeholder: 'Usuario', onchange: (ev) => {
                         UserData.mail = ev.target.value;
                     }
                 }]
             }, {
                 children: [{
-                    tagName: 'input', type: 'button', className: 'Btn', value: 'Regresar',
+                    tagName: 'input', type: 'button', className: 'Btn', value: 'Volver',
                     onclick: () => window.history.back()
                 },{
-                    tagName: 'input', type: 'button', className: 'Btn', value: 'Enviar petición',
+                    tagName: 'input', type: 'button', className: 'Btn', value: 'Recuperar',
                     onclick: async () => WSecurity.RecoveryPassword(UserData)
                 }]
             }
