@@ -637,13 +637,15 @@ class WFilterOptions extends HTMLElement {
 		}
 
 		.filter-options {
-			display: flex;	
-			gap: 20px;
+			display: flex;
+			gap: 10px;
 			align-items: center;
 			max-height: 0px;
-			overflow: hidden;  
+			overflow: hidden;
 			width: 100%;
-			border-radius: 10px;
+			border-radius: 10px;			
+			box-sizing: border-box;
+			padding: 0px 20px;
 			& .btn-go {
 				height: 40px;
 			}
@@ -653,7 +655,7 @@ class WFilterOptions extends HTMLElement {
 			width: -webkit-fill-available;
 			grid-template-columns: repeat(3,32%);
 			grid-gap: 10px;
-			padding: 10px;		
+			padding: 0px;		
 			transition: all 0.3s;
 			border-radius: 10px; 		   
 			container-type: inline-size;			
@@ -664,6 +666,7 @@ class WFilterOptions extends HTMLElement {
 			transition: all 0.3s;
 			border: 1px solid var(--fifty-color);
 			overflow: unset;
+			padding: 20px;
 			
 		}
 

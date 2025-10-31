@@ -10,8 +10,8 @@ class WArrayF {
             const exclude = ["Filterdata", "ApiMethods", "OrderData"]
             /**@type {ModelProperty} */
             const propValue = model[prop];
-            if (propValue.__proto__ != Function.Property &&
-                propValue.__proto__.constructor.name != "AsyncFunction" &&
+            if (propValue?.__proto__ != Function.Property &&
+                propValue?.__proto__.constructor.name != "AsyncFunction" &&
                 prop != "FilterData" &&
                 prop != "OrderData" &&
                 prop != "ApiMethods" &&

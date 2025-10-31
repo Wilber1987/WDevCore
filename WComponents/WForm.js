@@ -133,7 +133,7 @@ class WForm extends HTMLElement {
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
 				// @ts-ignore
-				if (m.tool) {
+				if (m.tool && !m.tool.className.includes("SELECT_BOX")) {
 					// @ts-ignore
 					m.tool.className = "toolInactive";
 				}
@@ -473,7 +473,7 @@ class WForm extends HTMLElement {
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
 					ObjectF, prop, this.Config?.ImageUrlPath ?? "", onchangeListener);
 				break;
-			case "MULTISELECT": case "WCHECKBOX": case "WSELECT":
+			case "MULTISELECT": case "WCHECKBOX": case "WSELECT": case "WRADIO":
 				if (ModelProperty.IsGridDisplay) {
 					// @ts-ignore
 					this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
@@ -825,10 +825,14 @@ class WForm extends HTMLElement {
 			.MASTERDETAIL,
 			.GRID_DISPLAY,
 			.RICHTEXT,
+			.WRADIO,
 			.DRAW,
 			.CALENDAR {
 				grid-column: span  ${this.limit};
 				padding-bottom: 10px;
+				@media (max-width: 600px) {
+					grid-column: span 1;
+				}
 			}
 			.TEXTAREA, .PASSWORD, .MODEL {
 				grid-column: span  ${(this.limit ?? 1) > 1 ? this.limit : 1};
