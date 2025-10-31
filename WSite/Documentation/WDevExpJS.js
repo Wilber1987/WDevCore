@@ -9,7 +9,7 @@ window.onload = async () => {
 }
 
 async function buildLinks(path, pathList = []) {
-    const route = "./WComponents/Examples/" + path;
+    const route = "./Examples/" + path;
     //const dir = await fetch(route);
     //const response = await dir.text();
     //const container = WRender.Create({ innerHTML: response });

@@ -18,6 +18,7 @@ export class WAlertMessage extends HTMLElement {
         this.Temporal = Config.Temporal ?? false;
         this.Type = Config.Type ?? 'info';
         this.style.zIndex = "20001";
+        this.style.transition = "all .5s";
     }
 
     connectedCallback() {
@@ -31,7 +32,7 @@ export class WAlertMessage extends HTMLElement {
         this.style.opacity = "0";
         setTimeout(() => {
            this.remove();
-        }, 600);
+        }, 700);
         
     }
 
@@ -61,12 +62,6 @@ export class WAlertMessage extends HTMLElement {
     static Connect(Config) {
         const alert = new WAlertMessage(Config);
         document.body.appendChild(alert);
-        if (Config.Temporal == true) {
-            alert.style.opacity = "0";
-            setTimeout(() => {
-                alert.remove();
-            }, 500)
-        }
     }
     /**
     * conecta un nuevo alert warning en el document body
@@ -120,6 +115,7 @@ export class WAlertMessage extends HTMLElement {
         align-items: center;
         animation: fadeIn 0.3s ease-out;
         font-family: sans-serif;
+        transition: all 0.6s;
         & svg {
             content: '';
             position: absolute;
@@ -132,8 +128,7 @@ export class WAlertMessage extends HTMLElement {
             fill: none;
             stroke: #f8eaea;
         }
-    }
-    
+    }   
 
     .top {
         top: 1rem;

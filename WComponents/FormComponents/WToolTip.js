@@ -51,10 +51,10 @@ export class WToolTip extends HTMLElement {
 	}
 	Display = async () => {
 		setTimeout(() => {
-			if (this.className == "active") {
-				this.className = "";
+			if (this.className.includes("active")) {
+				this.className = this.className.replace("active", "");
 			} else {
-				this.className = "active"
+				this.className += " active"
 			}
 		}, 100);
 	}

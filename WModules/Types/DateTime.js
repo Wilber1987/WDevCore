@@ -77,7 +77,21 @@ class DateTime extends Date {
         const year = d.getFullYear().toString().slice(-2); // Últimos 2 dígitos
         const hours = pad(d.getHours());
         const minutes = pad(d.getMinutes());
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
+/**
+     * Formatea una fecha a formato YYYY/MM/DD HH:mm
+     * @param {String|Date} date 
+     * @returns {String}
+     */
+    formatDateTimeToYYYYMMDDHHMM(date = this) {
+        const d = new Date(date);
+        const day = pad(d.getDate());
+        const month = pad(d.getMonth() + 1);
+        const year = d.getFullYear().toString(); // Últimos 2 dígitos
+        const hours = pad(d.getHours());
+        const minutes = pad(d.getMinutes());
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
     /**
      * @returns {String} Formatted date string (dd de mes de a o)

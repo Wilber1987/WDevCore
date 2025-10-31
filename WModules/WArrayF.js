@@ -10,8 +10,8 @@ class WArrayF {
             const exclude = ["Filterdata", "ApiMethods", "OrderData"]
             /**@type {ModelProperty} */
             const propValue = model[prop];
-            if (propValue.__proto__ != Function.Property &&
-                propValue.__proto__.constructor.name != "AsyncFunction" &&
+            if (propValue?.__proto__ != Function.Property &&
+                propValue?.__proto__.constructor.name != "AsyncFunction" &&
                 prop != "FilterData" &&
                 prop != "OrderData" &&
                 prop != "ApiMethods" &&
@@ -26,7 +26,7 @@ class WArrayF {
 
     /**
      * Agrega o Elimina un elemento de un arreglo seg n un parametro de seleccion
-     * @param {Object} Element Elemento a agregar o eliminar
+     * @param {Object.<string, any>} Element Elemento a agregar o eliminar
      * @param {Array} Array Arreglo en el que se va a agregar o eliminar el elemento
      * @param {Boolean} checked Parametro de seleccion
      */
@@ -134,7 +134,7 @@ class WArrayF {
         return DataArraySR;
     }
     /**
-     * @typedef {Object} Consolidado 
+     * @typedef {Object.<string, any>} Consolidado 
         * @property {String} EvalProperty
         * @property {Number} Max
         * @property {Number} Min
@@ -209,7 +209,7 @@ class WArrayF {
     /**
      * Agrupa un arreglo por medio de un parametros
      * @param {Array} DataArray arreglo original
-     * @param {Object} param Objeto con el cual por la cual se va a evaluar el arreglo agrupado
+     * @param {Object.<string, any>} param Objeto con el cual por la cual se va a evaluar el arreglo agrupado
      * @param {String} sumParam parametro a sumar
      * @returns Arreglo agrupado por parametro con su contador y suma
      */
@@ -441,8 +441,8 @@ class WArrayF {
     }
 
     /**
-     * @param {Object} Model
-     * @param {Object} [EditingObject]
+     * @param {Object.<string, any>} Model
+     * @param {Object.<string, any>} [EditingObject]
      * @param {string} prop
      */
     static isModelFromFunction(Model, EditingObject) {
@@ -450,8 +450,8 @@ class WArrayF {
     }
 
     /**
-     * @param {Object} propierty
-     * @param {Object} [EditingObject]      
+     * @param {Object.<string, any>} propierty
+     * @param {Object.<string, any>} [EditingObject]      
      */
     static ModelFromFunction(propierty, EditingObject) {
         if (propierty?.__proto__ == Function.prototype) {
@@ -491,8 +491,8 @@ class WArrayF {
 
     /**
      * @param {Array} Array Arreglo para ordenar
-     * @param {Object} [Model] Arreglo para ordenar
-     * @returns {Object}
+     * @param {Object.<string, any>} [Model] Arreglo para ordenar
+     * @returns {Object.<string, any>}
      */
     static Consolidado(Array, Model) {
         Model = Model ?? Array[0];

@@ -5,7 +5,7 @@ import { css } from "../WModules/WStyledRender.js";
 
 
 /**
- * @typedef {Object} NavConfig 
+ * @typedef {Object.<string, any>} NavConfig 
  *  * @property {Boolean} [Inicialize] 
 	* @property {String} [NavTitle] flex-end
 	* @property {String} [alignItems] flex-end
@@ -183,6 +183,9 @@ class WAppNavigator extends HTMLElement {
 		this.Manager = new ComponentsManager({ MainContainer: this.TabContainer, SPAManage: false });
 		this.append(this.TabContainer);
 	}
+	/**
+	 * @param {HTMLElement | HTMLInputElement | HTMLSelectElement} objectWrapper
+	 */
 	ZoomInOrOut(objectWrapper) {
 		if (objectWrapper.className.includes("activeZoom")) {
 			objectWrapper.className = objectWrapper.className.replace("activeZoom", "");
@@ -317,6 +320,7 @@ class WAppNavigator extends HTMLElement {
 			.TabContainer {
 				padding: 20px 0px 10px 0px;
 				margin-top: 10px;
+				height: calc(100% - 100px);
 			}
 		
 			.elementNav:hover {
@@ -409,6 +413,8 @@ class WAppNavigator extends HTMLElement {
 			.ObjectWrapper {
 				display: flex;
 				flex-direction: column;
+				height: 100%;
+				box-sizing: border-box;
 				& .container {
 					flex-grow: 1;
 				}

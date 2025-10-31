@@ -2,7 +2,7 @@ export class WSocketServices {
     constructor() {
     }
     // --- Inicializar SignalR ---
-    static async InitSignalR(manager, action) {
+    static async InitSignalR(manager, action, signalName = "chatHub") {
         
         // @ts-ignore
         if (manager.hubStarted || !window.signalR) return;
@@ -11,14 +11,14 @@ export class WSocketServices {
         const { HubConnectionBuilder } = window.signalR;
 
         manager.connection = new HubConnectionBuilder()
-            .withUrl("/chatHub", {
+            .withUrl("/" + signalName, {
                 accessTokenFactory: () => localStorage.getItem("token") || null
             })
             .withAutomaticReconnect()
             .build();
 
         // Escuchar mensajes nuevos
-        manager.connection.on("MensajeRecibido", (mensaje) => {
+        manager.connection.on("ReadSignal", (mensaje) => {
             if (action) {
                 action(mensaje)
             }          

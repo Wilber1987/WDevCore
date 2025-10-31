@@ -32,9 +32,9 @@ export class Money extends Number {
 
     /**
      * Formatea el número como moneda.
-     * @param {Object} [opts]
+     * @param {Object.<string, any>} [opts]
      * @param {string} [opts.locale]   Locale a usar (si no, se toma el del registro o 'en-US')
-     * @param {Object} [opts.formatOptions]  Cualquier otra opción válida de Intl.NumberFormat
+     * @param {Object.<string, any>} [opts.formatOptions]  Cualquier otra opción válida de Intl.NumberFormat
      * @returns {string}
      */
     Format(opts = {}) {

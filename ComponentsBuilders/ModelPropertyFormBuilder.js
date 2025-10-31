@@ -10,7 +10,7 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	 * @param {ModelProperty} ModelProperty
-	 * @param {Object} EditingObject
+	 * @param {Object.<string, any>} EditingObject
 	 * @param {string} prop	 * 
 	 * @param {(event: Event) => void} onChangeEvent
 	 * @returns {Promise<HTMLInputElement>}
@@ -43,6 +43,10 @@ export class ModelPropertyFormBuilder {
 		});
 		return InputControl;
 	}
+	/**
+	* @param {ModelProperty} ModelProperty 
+	* @returns {String}
+	*/
 	static GetInputType(ModelProperty) {
 		if (ModelProperty.type.toUpperCase() == "DATETIME") {
 			return "datetime-local"
@@ -50,10 +54,13 @@ export class ModelPropertyFormBuilder {
 		return ModelProperty.type.toUpperCase() == "MONEY" || ModelProperty.type.toUpperCase() == "PERCENTAGE" ? "number" : ModelProperty.type;
 	}
 
+	/**
+	 * @param {string} value
+	 * @param {string} type
+	 */
 	static PrepareVisualization(value, type) {
 		if (type == "MONEY") {
-			console.log(value, parseFloat(value));
-
+			//console.log(value, parseFloat(value));
 			return parseFloat(value).toFixed(3);
 		}
 		if (type == "PERCENTAGE") {
@@ -70,7 +77,7 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	 * @param {ModelProperty} ModelProperty
-	 * @param {Object} EditingObject
+	 * @param {Object.<string, any>} EditingObject
 	 * @param {String} prop
 	 * @param {Function} [onChangeEvent]
 	 * @returns {Promise<HTMLSelectElement>}
@@ -120,6 +127,12 @@ export class ModelPropertyFormBuilder {
 	}
 
 
+	/**
+	 * @param {ModelProperty} ModelProperty
+	 * @param {Object.<string, any>} EditingObject
+	 * @param {string} prop
+	 * @param {Function | undefined} onChangeListener
+	 */
 	static async CreateTextArea(ModelProperty, EditingObject, prop, onChangeListener) {
 		const { require, disabled } = await this.DefineRequireAndDisable(ModelProperty, EditingObject);
 		EditingObject[prop] = EditingObject[prop] ?? ModelProperty.defaultValue ?? "";
@@ -135,7 +148,7 @@ export class ModelPropertyFormBuilder {
 	}
 	/**
 	 * @param {ModelProperty} ModelProperty
-	 * @param {Object} EditingObject
+	 * @param {Object.<string, any>} EditingObject
 	 * @param {String} prop
 	 * @param {Function} [onChangeListener]
 	 * @returns {Promise<HTMLElement>}
@@ -199,7 +212,7 @@ export class ModelPropertyFormBuilder {
 	}
 	/**
 	 * @param {ModelProperty} ModelProperty
-	 * @param {Object} EditingObject
+	 * @param {Object.<string, any>} EditingObject
 	 * @param {String} prop
 	 * @param {Function} [onChangeListener]
 	 * @param {Function} [createAlertToolTip]
@@ -250,7 +263,7 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	 * @param {ModelProperty} ModelProperty
-	 * @param {Object} EditingObject
+	 * @param {Object.<string, any>} EditingObject
 	 * @param {String} prop
 	 * @param {Function} [onChangeListener]
 	 * @returns {Promise<HTMLElement>}
@@ -275,12 +288,14 @@ export class ModelPropertyFormBuilder {
 	//COMPLEX COMPONENTS######################################################################################### 
 	/**
 	* @param {ModelProperty} ModelProperty
-	* @param {Object} EditingObject
+	* @param {Object.<string, any>} EditingObject
 	* @param {String} prop
 	* @param {Function} onChangeListener
 	* @returns {Promise<HTMLElement>}
 	*/
 	static async CreateWSelect(ModelProperty, EditingObject, prop, onChangeListener) {
+		console.log(prop);
+		
 		const { MultiSelect } = await import("../WComponents/WMultiSelect.js");
 		//const { EntityClass } = await import("../WModules/EntityClass.js");
 		const { require, disabled } = await this.DefineRequireAndDisable(ModelProperty, EditingObject);
@@ -300,7 +315,7 @@ export class ModelPropertyFormBuilder {
 			selectedItems: selectedItems,
 			//AddObject: ModelProperty.type?.toUpperCase() != "WRADIO" && this.Config.WSelectAddObject,
 			ModelObject: ModelProperty.ModelObject,
-			action: (ItemSelects) => {
+			action: (/** @type {any[]} */ ItemSelects) => {
 				if (!multiple) {
 					EditingObject[prop] = ItemSelects[0].id ?? ItemSelects[0].id_ ?? ItemSelects[0];
 				}
@@ -320,20 +335,28 @@ export class ModelPropertyFormBuilder {
 		InputControl.id = "ControlValue" + prop;
 		return InputControl;
 	}
+	/**
+	 * @param {ModelProperty} ModelProperty
+	 * @param {Object.<string, any>} EditingObject
+	 * @param {String} prop
+	 * @param {boolean} require
+	 * @param {boolean} multiple
+	 */
 	static async GetDatasetsAndSelectsItems(ModelProperty, EditingObject, prop, require, multiple) {
+		const isWTableControl = (ModelProperty.type?.toUpperCase() != "WSELECT" 
+			&& ModelProperty.type?.toUpperCase() != "WRADIO"
+			&& ModelProperty.type?.toUpperCase() != "MULTISELECT") || ModelProperty.IsGridDisplay == true
 
 		const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
-		if ((ModelProperty.Dataset == undefined || ModelProperty.Dataset.length == 0) && entity.Get) {
+		if ((ModelProperty.Dataset == undefined || ModelProperty.Dataset.length == 0)
+			&& entity?.Get
+			&& !isWTableControl) {
 			ModelProperty.Dataset = await entity.Get();
 		}
 		const selectedItems = [];
 		let Dataset = []
-		if (ModelProperty.type?.toUpperCase() != "WSELECT"
-			&& ModelProperty.type?.toUpperCase() != "WMULTISELECT"
-			&& ModelProperty.type?.toUpperCase() != "WGRIDSELECT"
-			&& ModelProperty.type?.toUpperCase() != "WGRIDMULTISELECT") {
+		if (isWTableControl) {
 			Dataset = EditingObject[prop];
-			return { Dataset, selectedItems };
 		}
 
 		if ((EditingObject[prop] == null || EditingObject[prop] == undefined)
@@ -349,8 +372,11 @@ export class ModelPropertyFormBuilder {
 		} else if (EditingObject[prop] != null || EditingObject[prop] != undefined) {
 			selectedItems.push(...EditingObject[prop]);
 		}
-
-		Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
+		if (ModelProperty.type?.toUpperCase() == "WSELECT"
+			|| ModelProperty.type?.toUpperCase() == "WRADIO"
+			|| ModelProperty.type?.toUpperCase() == "MULTISELECT") {
+			Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
+		}
 		return { Dataset, selectedItems };
 	}
 
@@ -359,7 +385,7 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	* @param {ModelProperty} ModelProperty
-	* @param {Object} EditingObject
+	* @param {Object.<string, any>} EditingObject
 	* @param {String} prop
 	* @param {WForm} fatherForm
 	* @returns {Promise<WForm>}
@@ -386,10 +412,10 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	 * @param {ModelProperty} ModelProperty
-	 * @param {Object} EditingObject
+	 * @param {Object.<string, any>} EditingObject
 	 * @param {string} prop	  
 	 * @param {string} ImageUrlPath	
-	 * @param {() => void} onChangeListener
+	 * @param {(ev: any) => Promise<void>} onChangeListener
 	 * @returns {Promise<WTableComponent>}
 	 */
 	static async CreateTable(ModelProperty, EditingObject, prop, ImageUrlPath, onChangeListener) {
@@ -399,27 +425,24 @@ export class ModelPropertyFormBuilder {
 		ModelProperty.require = require;
 		ModelProperty.ModelObject = WArrayF.isModelFromFunction(ModelProperty.ModelObject, EditingObject);
 		ModelProperty.EntityModel = WArrayF.isModelFromFunction(ModelProperty.EntityModel, EditingObject);
-
-
 		const { Dataset, selectedItems } = await ModelPropertyFormBuilder.GetDatasetsAndSelectsItems(
 			ModelProperty,
 			EditingObject,
 			prop,
 			require,
-			ModelProperty.type?.toUpperCase() == "WGRIDMULTISELECT");
-
+			ModelProperty.type?.toUpperCase() == "MULTISELECT");
 		/**
-		* @param {Object} entity 
+		* @param {Object.<string, any>} entity 
 		* @param {import("../WComponents/WTableComponent.js").WTableComponent} tableForm 
 		*/
 		const tableAction = (entity, tableForm) => {
-			if (ModelProperty.type?.toUpperCase() == "WGRIDSELECT") {
+			if (ModelProperty.type?.toUpperCase() == "WSELECT") {
 				EditingObject[prop] = tableForm.selectedItems[0].id ?? tableForm.selectedItems[0].id_ ?? tableForm.selectedItems[0];
-			} else if (ModelProperty.type?.toUpperCase() == "WGRIDMULTISELECT") {
+			} else if (ModelProperty.type?.toUpperCase() == "MULTISELECT") {
 				EditingObject[prop] = tableForm.selectedItems;
 			}
-			if (onChangeListener) {
-				onChangeListener()
+			if (onChangeListener) {				
+				onChangeListener(undefined)
 			}
 		}
 		// @ts-ignore
@@ -432,6 +455,7 @@ export class ModelPropertyFormBuilder {
 			EntityModel: ModelProperty.EntityModel,
 			ParentEntity: EditingObject,
 			ImageUrlPath: ImageUrlPath,
+			maxElementByPage: 4,
 			Options: options
 		});
 		InputControl.id = "ControlValue" + prop;
@@ -448,15 +472,16 @@ export class ModelPropertyFormBuilder {
 	 * @returns {import("../WModules/CommonModel.js").TableOptions}
 	 */
 	static BuildTableOptions(ModelProperty, tableAction) {
-		if (ModelProperty.type?.toUpperCase() == "WGRIDSELECT" || ModelProperty.type?.toUpperCase() == "WGRIDMULTISELECT") {
+		if (ModelProperty.type?.toUpperCase() == "WSELECT" || ModelProperty.type?.toUpperCase() == "MULTISELECT") {
 			return {
 				Search: true,
-				Select: ModelProperty.type?.toUpperCase() == "WGRIDSELECT",
-				MultiSelect: ModelProperty.type?.toUpperCase() == "WGRIDMULTISELECT",
+				Select: ModelProperty.type?.toUpperCase() == "WSELECT",
+				MultiSelect: ModelProperty.type?.toUpperCase() == "MULTISELECT",
 				SelectAction: tableAction
 			}
 		}
-		return ModelProperty.Options ?? {
+		/**@type {import("../WModules/CommonModel.js").TableOptions} */
+		const defaultOptions = {
 			Add: ModelProperty.Options?.Add ?? true,
 			Edit: ModelProperty.Options?.Edit ?? true,
 			Delete: ModelProperty.Options?.Delete ?? true,
@@ -466,11 +491,18 @@ export class ModelPropertyFormBuilder {
 			DeleteAction: tableAction,
 			SelectAction: tableAction
 		};
+		ModelProperty.Options = ModelProperty.Options ?? defaultOptions
+		//TODO REVISAR BIEN A POSTERIOR EL COMAND ORIGINAL
+		ModelProperty.Options.AddAction = tableAction
+		ModelProperty.Options.EditAction = tableAction
+		ModelProperty.Options.DeleteAction = tableAction
+		ModelProperty.Options.SelectAction = tableAction
+		return ModelProperty.Options
 	}
 
 	/**
 	* @param {ModelProperty} ModelProperty
-	* @param {Object} EditingObject
+	* @param {Object.<string, any>} EditingObject
 	* @param {String} prop
 	* @param {Function} [onChangeListener]
 	* @returns {Promise<HTMLElement>}
@@ -507,7 +539,7 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	* @param {ModelProperty} ModelProperty
-	* @param {Object} EditingObject
+	* @param {Object.<string, any>} EditingObject
 	* @param {String} prop
 	* @param {Function} [onChangeListener]
 	* @returns {Promise<HTMLElement>}
@@ -519,7 +551,7 @@ export class ModelPropertyFormBuilder {
 		const InputControl = new WRichText({
 			value: EditingObject[prop],
 			activeAttached: false,
-			action: (value) => {
+			action: (/** @type {any} */ value) => {
 				EditingObject[prop] = value;
 				if (onChangeListener) {
 					onChangeListener()
@@ -537,7 +569,7 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	* @param {ModelProperty} ModelProperty
-	* @param {Object} EditingObject
+	* @param {Object.<string, any>} EditingObject
 	* @param {String} prop
 	* @param {Function} [onChangeListener]
 	* @returns {Promise<HTMLElement>}
@@ -548,7 +580,7 @@ export class ModelPropertyFormBuilder {
 		ModelProperty.require = require;
 		const InputControl = new DrawComponent({
 			value: typeof EditingObject[prop] === "string" ? EditingObject[prop] : "",
-			action: (value) => {
+			action: (/** @type {any} */ value) => {
 				EditingObject[prop] = value;
 				if (onChangeListener) {
 					onChangeListener();
@@ -562,7 +594,7 @@ export class ModelPropertyFormBuilder {
 	}
 	/**
 	* @param {ModelProperty} ModelProperty
-	* @param {Object} EditingObject
+	* @param {Object.<string, any>} EditingObject
 	* @param {String} prop
 	* @param {Function} [onChangeListener]
 	* @returns {Promise<HTMLElement>}
@@ -574,7 +606,7 @@ export class ModelPropertyFormBuilder {
 		const { WCalendarComponent } = await import("../WComponents/FormComponents/WCalendarComponent.js");
 		const InputControl = new WCalendarComponent({
 			SelectedBlocks: EditingObject[prop],
-			action: (value) => {
+			action: () => {
 				if (onChangeListener) {
 					onChangeListener();
 				}
@@ -636,7 +668,7 @@ export class ModelPropertyFormBuilder {
 			case "DATETIME":
 				max = max ?? '3000-01-01T23:59';
 				min = min ?? '0001-01-01T00:00';
-				defaultValue = defaultValue ?? new DateTime().formatDateTimeToDDMMYYHHMM();
+				defaultValue = defaultValue ?? new DateTime().formatDateTimeToYYYYMMDDHHMM();
 				break;
 		}
 		return { max, min, defaultValue }
@@ -646,33 +678,33 @@ export class ModelPropertyFormBuilder {
 	 */
 	static DefinePatternAndPlaceholder(ModelProperty) {
 		let pattern;
-		let placeholder;
+		let calculatePlaceholder;
 		if (ModelProperty.pattern) {
 			pattern = ModelProperty.pattern;
 		}
 		switch (ModelProperty.type?.toUpperCase()) {
 			case "EMAIL":
 				pattern = pattern ?? "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
-				placeholder = "Ejem.: user@example.com";
+				calculatePlaceholder = "Ejem.: user@example.com";
 				break;
 			case "TEL":
 				pattern = pattern ?? "^(\\+\\d{1,4})?\\d{7,8}$"
-				placeholder = "Ejem.: +1234567890";
+				calculatePlaceholder = "Ejem.: +1234567890";
 				break;
 			case "URL":
 				pattern = pattern ?? "https?://.+";
-				placeholder = "Ejem.: https://site.com";
+				calculatePlaceholder = "Ejem.: https://site.com";
 				break;
 			default:
 				pattern = "";
 				break;
 		}
-		return { pattern, placeholder }
+		return { pattern, calculatePlaceholder }
 	}
 
 	/**
 	 * @param {ModelProperty} ModelProperty
-	 * @param {Object} EditingObject	 * 
+	 * @param {Object.<string, any>} EditingObject	 * 
 	 */
 	static async DefineRequireAndDisable(ModelProperty, EditingObject) {
 		/**@type {Boolean} */
@@ -696,7 +728,9 @@ export class ModelPropertyFormBuilder {
 
 		return { require, disabled };
 	}
-
+	/**
+	 * @param {ModelProperty} ModelProperty 
+	 */
 	static DefineMultiSelectConfig(ModelProperty) {
 		let multiple = ["WRADIO", "WSELECT"].includes(ModelProperty.type?.toUpperCase()) ? false : true;
 		let modType = ["WRADIO", "WCHECKBOX"].includes(ModelProperty.type?.toUpperCase()) ? "SELECT_BOX" : "SELECT";
@@ -704,12 +738,16 @@ export class ModelPropertyFormBuilder {
 
 		return { multiple, modType }
 	}
-
+	/**
+	* @param {ModelProperty} ModelProperty 
+	* @param {any} val
+	 */
 	static CreateDatasetForMultiSelect(ModelProperty, val) {
 		if (val == null || val == undefined || Object.keys(val).length == 0) {
 			return ModelProperty.Dataset ?? [];
 		}
 		const Dataset = ModelProperty.Dataset?.map(item => {
+			/**@type {Object.<string, any>} */
 			const MapObject = {};
 			for (const key in item) {
 				const element = item[key];
@@ -718,7 +756,7 @@ export class ModelPropertyFormBuilder {
 				}
 			}
 			return MapObject;
-		});
+		}) ?? [];
 		const findvale = Dataset.find(item => item != null && val != null && WArrayF.compareObj(item, val));
 		if (!findvale) {
 			if (val.__proto__ == Object.prototype) {
@@ -732,14 +770,15 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	* Busca y agrega elementos seleccionados en un control de entrada.
-	* @param {Array|Object|string|number} val - Valor o valores a buscar.
-	* @param {Object} InputControl - Control de entrada con Dataset y selectedItems.
+	* @param {Array<any>|Object|string|number} val - Valor o valores a buscar.
+	* @param {Object.<string, any>} InputControl - Control de entrada con Dataset y selectedItems.
 	*/
 	static FindObjectMultiselect(val, InputControl) {
 		if (!val || !InputControl?.Dataset) return; // Validación básica
 
-		const addSelectedItem = (item) => {
-			const FindItem = InputControl.Dataset.find(i => WArrayF.compareObj(i, item) || i.id === item || i.id_ === item || i[this.findKey(i)] === item);
+		const addSelectedItem = (/** @type {string | number | Object} */ item) => {
+			const FindItem = InputControl.Dataset.find((/** @type {Object.<string, any>} */ i) =>
+				WArrayF.compareObj(i, item) || i.id === item || i.id_ === item || i[this.findKey(i)] === item);
 			if (FindItem) {
 				InputControl.selectedItems.push(FindItem);
 			}
@@ -756,12 +795,96 @@ export class ModelPropertyFormBuilder {
 
 	/**
 	 * Encuentra la clave que contiene "id_" en un objeto.
-	 * @param {Object} object - Objeto en el que buscar la clave.
+	 * @param {Object.<string, any>} object - Objeto en el que buscar la clave.
 	 * @returns {string} - La clave encontrada o una cadena vacía si no se encuentra.
 	 */
 	static findKey(object) {
 		if (!object || typeof object !== 'object') return ""; // Validación básica
 		return Object.keys(object).find(key => (typeof object[key] === 'string' || typeof object[key] === 'number') && key.includes('id_')) || "";
+	}
+
+
+	//onchange event
+	/**
+		* 
+		* @param { HTMLInputElement } targetControl 
+		* @param { HTMLInputElement | HTMLSelectElement | HTMLElement } currentTarget 
+		* @param { Object.<string, any> } ObjectF 
+		* @param { String } prop 
+		* @param { Object.<string, any> } Model 
+		* @returns 
+		*/
+	static OnChange = async (targetControl, currentTarget, ObjectF, prop, Model) => { //evento de actualizacion del componente
+		if (Model[prop].validateFunction) {
+			const result = Model[prop].validateFunction(ObjectF, targetControl?.value);
+			if (!result.success) {
+				alert(result.message);
+				return;
+			}
+		}
+		const tool = targetControl?.parentNode?.querySelector(".ToolTip");
+		if (tool) tool.remove();
+
+		if (currentTarget?.tagName?.toUpperCase().includes("W-CALENDAR-COMPONENT")) {
+			//TODO
+		} else if (["IMG", "IMAGE", "IMAGES", "FILE", "FILES"].includes(Model[prop].type.toUpperCase())) {
+			//TODO
+		} else if (targetControl?.type == "checkbox") {
+			ObjectF[prop] = targetControl?.checked;
+		} else if (targetControl?.type == "radio") {
+			ObjectF[prop] = targetControl?.value;
+		} else {
+			if (parseFloat(targetControl?.value) < parseFloat(targetControl?.min)) {
+				//targetControl.value = targetControl?.min;
+				this.CreateInfoToolTip(targetControl, `El valor mínimo permitido es: ${targetControl?.min}`);
+			}
+			if (parseFloat(targetControl?.value) > parseFloat(targetControl?.max)) {
+				//targetControl.value = targetControl?.max;
+				this.CreateInfoToolTip(targetControl, `El valor máximo permitido es: ${targetControl?.max}`);
+			}
+			ObjectF[prop] = targetControl?.value;
+			if (targetControl?.pattern) {
+				let regex = new RegExp(targetControl?.pattern);
+				if (regex.test(ObjectF[prop])) {
+					WRender.SetStyle(targetControl, {
+						boxShadow: "none"
+					});
+				} else {
+					let regex = new RegExp(targetControl.pattern);
+					if (!regex.test(ObjectF[prop])) {
+						if (!targetControl.parentNode?.querySelector(".ToolTip")) {
+							targetControl.parentNode?.append(WRender.Create({
+								tagName: "span",
+								innerHTML: `Ingresar formato correcto: ${targetControl.placeholder}`,
+								className: "ToolTip"
+							}));
+						}
+						WRender.SetStyle(targetControl, {
+							boxShadow: "0 0 3px #ef4d00"
+						});
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param {HTMLElement} control
+	 * @param {string} message
+	 */
+	static CreateInfoToolTip(control, message) {
+		if (!control.parentNode?.querySelector(".ToolTip")) {
+			const toolTip = WRender.Create({
+				tagName: "span",
+				innerHTML: message,
+				className: "ToolTip ToolInfo"
+			});
+			control.parentNode?.append(toolTip);
+		}
+		WRender.SetStyle(control, {
+			boxShadow: "0 0 3px #ef4d00"
+		});
+		control.focus();
 	}
 
 }

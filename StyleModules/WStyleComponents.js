@@ -1,7 +1,29 @@
 
 import { css } from "../WModules/WStyledRender.js";
 //#region  GENERIC STYLESSS#####################################################################################
-const StyleScrolls = css`@import url(/WDevCore/StyleModules/css/scrolls.css);`;
+const StyleScrolls = css`*::-webkit-scrollbar {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 0;
+    background-color: transparent;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--fourth-color);
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #646464;
+    background-clip: content-box;
+}`;
 const StylesControlsV1 = css`
     .BtnAlert,.BtnPrimary, .BtnSuccess,.BtnSecundary,.Btn {
         font-weight: bold;
@@ -312,7 +334,7 @@ w-multi-select {
 }
 
 select {
-	--bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231f2224' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231f2224' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 	display: block;
 	width: 100%;
 	padding: .47rem 1.75rem .47rem .75rem;

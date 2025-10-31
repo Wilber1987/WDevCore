@@ -19,8 +19,8 @@ const responseMapping = {
 };
 
 /**
- * @typedef {Object} ComponentConfig
- * * @property {Object} [propierty]
+ * @typedef {Object.<string, any>} ComponentConfig
+ * * @property {Object.<string, any>} [propierty]
  */
 class WEstadisicAnalitic extends HTMLElement {
     /**
