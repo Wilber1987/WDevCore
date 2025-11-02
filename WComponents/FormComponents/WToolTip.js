@@ -47,7 +47,7 @@ export class WToolTip extends HTMLElement {
 		this.Display()
 	}
 	disconnectedCallback() {
-		this.className = "";
+		this.className = this.className.replace("active", "");
 	}
 	Display = async () => {
 		setTimeout(() => {

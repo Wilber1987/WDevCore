@@ -135,7 +135,7 @@ class WForm extends HTMLElement {
 				// @ts-ignore
 				if (m.tool && !m.tool.className.includes("SELECT_BOX")) {
 					// @ts-ignore
-					m.tool.className = "toolInactive";
+					m.tool.className += " toolInactive";
 				}
 			})
 		}

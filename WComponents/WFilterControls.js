@@ -69,7 +69,10 @@ class WFilterOptions extends HTMLElement {
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
 				// @ts-ignore
-				m.tool.className = "toolInactive";
+				if (m.tool && !m.tool.className.includes("SELECT_BOX")) {
+					// @ts-ignore
+					m.tool.className += " toolInactive";
+				}
 				//TODO HACER LO DEL SPAN
 			})
 		}

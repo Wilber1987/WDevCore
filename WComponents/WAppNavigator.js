@@ -106,7 +106,7 @@ class WAppNavigator extends HTMLElement {
 		} else {
 			this.CreateTabControllers();
 		}
-
+		let activeIndex = 0
 		this.Elements.forEach((element, Index) => {
 			if (element.Disabled == false || element.rendered == false) {
 				return;
@@ -171,11 +171,12 @@ class WAppNavigator extends HTMLElement {
 				this.ElementNavControls.push(elementNav);
 
 			}
-			if (Index == 0 && element.SubNav == undefined) {
+			if (activeIndex == 0 && element.SubNav == undefined) {
 				this.InitialNav = () => {
 					elementNav.onclick();
 				}
 			}
+			activeIndex ++;
 		});
 	}
 	CreateTabControllers = () => {
