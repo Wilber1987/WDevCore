@@ -42,7 +42,7 @@ export class TemplateData_ModelComponent extends EntityClass {
         for (const prop in props) { this[prop] = props[prop]; }
     }
     /**@type {ModelProperty} */ Id_Template = { type: "NUMBER", primary: true };
-    /**@type {ModelProperty} */ Description = { type: "TEXT" };
+    /**@type {ModelProperty} */ Descripcion = { type: "TEXT" };
     //**@type {ModelProperty} */ Sections =  { type: "NUMBER", primary: true};
 }
 
