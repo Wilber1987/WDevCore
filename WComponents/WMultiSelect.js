@@ -757,9 +757,9 @@ const MainMenu = css`
 		.OptionsContainer  {
 			flex-direction: column;
 			background-color: unset;
-			.OContainer, .OContainer:hover, .OContainerActive {
+			.OContainer, .OContainer:hover, .OContainerActive, .OptionLabel {
 				background-color: unset;
-				font-size: 13px;
+				font-size: 14px !important;
 				display: flex;
 				flex-direction: row;
 				position: relative;
