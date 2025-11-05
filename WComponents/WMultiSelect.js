@@ -757,6 +757,9 @@ const MainMenu = css`
 		.OptionsContainer  {
 			flex-direction: column;
 			background-color: unset;
+			.OContainer::first-letter, .OContainerActive::first-letter, .OptionLabel::first-letter {
+				text-transform: capitalize;
+			}
 			.OContainer, .OContainer:hover, .OContainerActive, .OptionLabel {
 				background-color: unset;
 				font-size: 14px !important;
@@ -765,7 +768,6 @@ const MainMenu = css`
 				position: relative;
 				padding-left: 30px;
 				align-items: center;
-				text-transform: capitalize;
 				input[type=radio] {
 					position: absolute;
 					left: 0;
