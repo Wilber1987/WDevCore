@@ -521,7 +521,7 @@ class MultiSelect extends HTMLElement {
 	}
 	undisplayMultiSelects = (e) => {
 		// @ts-ignore
-		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
+		if (!e.target?.tagName?.includes("W-MULTI-SELECT")) {
 			// @ts-ignore
 			document.querySelectorAll("w-multi-select").forEach((/**@type {MultiSelect} */ m) => {
 				if (this.Config.Mode != "SELECT_BOX") {
