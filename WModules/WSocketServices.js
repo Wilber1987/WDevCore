@@ -3,7 +3,7 @@ export class WSocketServices {
     }
     // --- Inicializar SignalR ---
     static async InitSignalR(manager, action, signalName = "chatHub") {
-        
+
         // @ts-ignore
         if (manager.hubStarted || !window.signalR) return;
 
@@ -21,7 +21,7 @@ export class WSocketServices {
         manager.connection.on("ReadSignal", (mensaje) => {
             if (action) {
                 action(mensaje)
-            }          
+            }
         });
 
         // Confirmación de envío
@@ -43,5 +43,20 @@ export class WSocketServices {
         } catch (err) {
             console.error("Error al conectar SignalR:", err);
         }
+    }
+
+    // 🔥 Nuevo método para desconectar
+    static async StopSignalR(manager) {
+        if (manager?.connection) {
+            try {
+                await manager.connection.stop();
+                console.log("SignalR desconectado");
+            } catch (err) {
+                console.error("Error al desconectar SignalR:", err);
+            }
+        }
+
+        manager.hubStarted = false;
+        manager.connection = null;
     }
 }

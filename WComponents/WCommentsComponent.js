@@ -282,10 +282,10 @@ class WCommentsComponent extends HTMLElement {
         };
     }
 
-
     disconnectedCallback() {
         //this.connection?.stop();
         this.hubStarted = false;
+        WSocketServices.StopSignalR(this);
         //this.ClearEvents()
     }
     ClearEvents() {
