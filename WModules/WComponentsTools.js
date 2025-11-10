@@ -557,6 +557,12 @@ class ComponentsManager {
         return this.DomComponents.find(node => node.id == IdComponent) != undefined
             && this.DomComponents.find(node => node.id == IdComponent) != null;
     }
+    Remove = (IdComponent) => {
+        if(this.Exists(IdComponent)) {
+            const component = this.DomComponents.find(node => node.id == IdComponent);
+            this.DomComponents.splice(this.DomComponents.indexOf(component), 1);
+        }
+    }
     AddComponent = async (IdComponent, ComponentsInstance, ContainerName, order = "last") => {
         if (this.MainContainer == undefined) {
             this.MainContainer = ContainerName;

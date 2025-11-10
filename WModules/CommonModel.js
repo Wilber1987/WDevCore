@@ -380,7 +380,7 @@ class WNode {
  *  * @property {Array} [Dataset]
 	* @property {Array} [selectedItems]
 	* @property {Object.<string, any>} [ModelObject]  
-	* @property {Object.<string, any>} [UseEntityMethods]  
+	* @property {Boolean} [UseEntityMethods]  
 	* @property {Object.<string, any>} [FilterModelObject]
 	* @property {Object.<string, any>} [EntityModel] 
 	* @property {Object.<string, any>} [ParentModel]  
