@@ -626,6 +626,11 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			color: #222;
 		}
 
+		.document-container .table-cell {
+			padding: 5px;
+			font-size: 12px;
+			border: solid 1px #eee;
+		}
 
 		/* Modo impresión */
 		@media print {
