@@ -33,7 +33,8 @@ class WCommentsComponent extends HTMLElement {
     constructor(props) {
         super();
         this.Dataset = props.Dataset ?? [];
-        //this.Destinatarios = props.Destinatarios ?? [];
+        this.attachShadow({ mode: 'open' });
+        //CONFIGURACIONES
         this.ModelObject = props.ModelObject;
         this.AddObject = props.AddObject ?? false;
         this.UrlSearch = props.UrlSearch;
@@ -43,13 +44,21 @@ class WCommentsComponent extends HTMLElement {
         this.User = props.User;
         this.UseOnlyFileName = props.UseOnlyFileName ?? false;
         this.CommentsIdentify = props.CommentsIdentify;
-        this.CommentsIdentifyName = props.CommentsIdentifyName;
-
-        //this.connection = null;
+        this.CommentsIdentifyName = props.CommentsIdentifyName;        
         this.hubStarted = false;
+        this.autoScroll = true;
+        this.updating = false;
+        this.isRichTextActive = props.isRichTextActive ?? true;
+        
+        //UI ELEMENTS
+        this.append(css`
+            w-coment-component {
+                display: flex;
+                flex-direction: column;
+            }    
+        `)
+        this.CommentsContainer = WRender.Create({ className: "CommentsContainer" });  
 
-        this.attachShadow({ mode: 'open' });
-        this.CommentsContainer = WRender.Create({ className: "CommentsContainer" })
         this.MessageInput = WRender.Create({
             tagName: 'textarea', onkeydown: async (e) => {
                 // Verificar si es Enter (keyCode 13)
@@ -70,11 +79,6 @@ class WCommentsComponent extends HTMLElement {
                 }
             }
         });
-        this.autoScroll = true;
-        this.updating = false;
-        this.isRichTextActive = props.isRichTextActive ?? true;
-
-        //this.style.backgroundColor = "#fff";
         this.OptionContainer = WRender.Create({
             className: "OptionContainer", children: [
                 this.MessageInput,
@@ -85,12 +89,10 @@ class WCommentsComponent extends HTMLElement {
                     }
                 }
             ]
-        })
-
+        });
         this.RitchInput = new WRichText({
             activeAttached: this.UseAttach
         });
-        //this.AddInputFileSection
         this.RitchOptionContainer = WRender.Create({
             className: "RichOptionContainer", style: { display: "none" }, children: [
                 this.RitchInput,
@@ -101,8 +103,7 @@ class WCommentsComponent extends HTMLElement {
                     }
                 }
             ]
-        })
-
+        });
         this.TypeTextContainer = WRender.Create({
             className: "textContainer", children: [
                 {
@@ -122,7 +123,8 @@ class WCommentsComponent extends HTMLElement {
                     }
                 } : ""
             ]
-        })
+        });
+
         this.Mails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.EvalProperty);
         this.SelectedMails = WArrayF.GroupBy(this.Dataset, "Mail").map(comment => comment.EvalProperty);
         this.shadowRoot?.append(
@@ -149,6 +151,7 @@ class WCommentsComponent extends HTMLElement {
         } else if (this.UseAttach && this.RitchInput?.AddInputFileSection) {
             this.shadowRoot?.append(this.RitchInput?.AddInputFileSection)
         };
+         //CONFIGURACIONES
         this.isInSaveTransaction = false;
         this.IsWithSocket = props.IsWithSocket;
     }
@@ -158,7 +161,7 @@ class WCommentsComponent extends HTMLElement {
         if (!this.IsWithSocket) {
             return;
         }
-        WSocketServices.InitSignalR(this, async (mensaje) => {
+        WSocketServices.InitSignalR(this, async (/** @type {{ [x: string]: number; }} */ mensaje) => {
 
             // Solo agregar si es de la conversación actual
             if (mensaje[this.CommentsIdentifyName] == this.CommentsIdentify) {
@@ -184,6 +187,7 @@ class WCommentsComponent extends HTMLElement {
                 Attach_Files: this.RitchInput.Files,
                 Mails: this.UseDestinatarios == true ? this.MailsSelect?.selectedItems : undefined
             }
+            // @ts-ignore
             Message[this.CommentsIdentifyName] = this.CommentsIdentify
             // @ts-ignore
             const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });

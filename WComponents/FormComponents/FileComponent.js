@@ -258,9 +258,13 @@ export class FileComponent extends HTMLElement {
 				padding: 10px;
 				border: 1px solid #ddd;
 				background-color: #fff;
-				min-height: 200px;
+				max-height: 200px;
+				display: flex;
+				flex-direction: column;
+				max-width: 200px;
 				& img {
-					height: 100%;
+					height: 82%;
+					object-fit: contain;
 				}
 			}
 			.multiple .file-item { 

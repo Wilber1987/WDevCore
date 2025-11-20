@@ -5,17 +5,17 @@ import { css } from "../WModules/WStyledRender.js";
 
 
 /**
- * @typedef {Object.<string, any>} NavConfig 
+ * @typedef {Object} NavConfig 
  *  * @property {Boolean} [Inicialize] 
 	* @property {String} [NavTitle] flex-end
 	* @property {String} [alignItems] flex-end
 	* @property {String} [DisplayMode] right
-	* @property {Array} [Elements]
+	* @property {Array<Object<string, any>>} [Elements]
 	* @property {Boolean} [DarkMode]
 	* @property {Boolean} [isMediaQuery]
 	* @property {String} [Direction] row | column
 	* @property {String} [NavStyle] nav | tab
-	* @property {HTMLStyleElement} [CustomStyle]
+	* @property {HTMLStyleElement|Node} [CustomStyle]
 	* @property {HTMLElement} [TabContainer]
 **/
 class WAppNavigator extends HTMLElement {
@@ -40,6 +40,9 @@ class WAppNavigator extends HTMLElement {
 				display: "block"
 			})
 		}
+		/**
+		 * @type {any[]}
+		 */
 		this.ElementNavControls = [];
 		this.DrawAppNavigator();
 		this.Elements = this.Elements ?? [];
@@ -57,7 +60,7 @@ class WAppNavigator extends HTMLElement {
 			this.InitialNav();
 		}
 	}
-	ActiveMenu = (ev) => {
+	ActiveMenu = (/** @type {{ className: string; }} */ ev) => {
 		var navs = this.parentNode?.querySelectorAll("w-app-navigator");
 		navs?.forEach(nav => {
 			nav.querySelectorAll(".elementNavActive").forEach(elementNavActive => {

@@ -16,7 +16,7 @@ export class TemplateData extends EntityClass {
     constructor(props) {
         super(props, 'DocumentsData');
         // @ts-ignore
-        for (const prop in props) { this[prop] = props[prop]; }
+        Object.assign(this, props);
     }
     /**@type {Number?} */ Id_Template = null;
     /**@type {String?} */ Description = null;
@@ -27,7 +27,7 @@ export class Section {
     /** @param {Partial<Section>} [props] */
     constructor(props) {
         // @ts-ignore
-        for (const prop in props) { this[prop] = props[prop]; }
+        Object.assign(this, props);
     }
     /**@type {string?} */ Id_Section = null;
     /**@type {Object?} */ Data = null;
@@ -39,7 +39,7 @@ export class TemplateData_ModelComponent extends EntityClass {
     constructor(props) {
         super(props, 'DocumentsData');
         // @ts-ignore
-        for (const prop in props) { this[prop] = props[prop]; }
+        Object.assign(this, props);
     }
     /**@type {ModelProperty} */ Id_Template = { type: "NUMBER", primary: true };
     /**@type {ModelProperty} */ Descripcion = { type: "TEXT" };

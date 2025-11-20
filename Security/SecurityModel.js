@@ -6,9 +6,7 @@ import { Tbl_Profile } from "./Tbl_Profile.js";
 class Security_Roles extends EntityClass {
 	constructor(props) {
 		super(props, "EntitySECURITY");
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	Id_Role = { type: "number", primary: true };
 	Descripcion = { type: "text" };
@@ -20,9 +18,7 @@ class Security_Roles extends EntityClass {
 export { Security_Roles }
 class Security_Permissions {
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	Id_Permission = { type: "number", primary: true };
 	Descripcion = { type: "text" };
@@ -33,9 +29,7 @@ export { Security_Permissions }
 
 class Security_Permissions_Roles {
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	Id_Role = { type: "number", primary: true };
 	Id_Permission = { type: "number", primary: true };
@@ -45,9 +39,7 @@ export { Security_Permissions_Roles }
 
 class Security_Users_Roles {
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	Id_Role = { type: "number", primary: true };
 	Id_User = { type: "number", primary: true };
@@ -59,9 +51,7 @@ export { Security_Users_Roles }
 class Security_Users  extends EntityClass{
 	constructor(props) {
 		super(props, "EntitySECURITY");
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	/**@type {ModelProperty} */
 	//Tbl_Profiles = { type: "masterdetail", ModelObject: new Tbl_Profile(), max: 1 };
@@ -78,9 +68,7 @@ class Security_Users  extends EntityClass{
 export { Security_Users }
 class ChangePasswordModel {
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	Id_User = { type: "number", primary: true };
 	Password = { type: "password", hiddenInTable: true };
@@ -88,9 +76,7 @@ class ChangePasswordModel {
 export { ChangePasswordModel }
 class ChangeStateModel {
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	Id_User = { type: "number", primary: true };
 	Estado = { type: "radio", hiddenInTable: true, Dataset: ["ACTIVO", "INACTIVO"] };
@@ -98,9 +84,7 @@ class ChangeStateModel {
 export { ChangeStateModel }
 class ChangeRolesModel {
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	Id_User = { type: "number", primary: true };
 	Security_Users_Roles = {

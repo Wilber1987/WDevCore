@@ -9,9 +9,7 @@ import { EntityClass } from "../WModules/EntityClass.js";
 class Tbl_Profile extends EntityClass {
     constructor(props) {
         super(props, 'Profile');
-        for (const prop in props) {
-            this[prop] = props[prop];
-        }
+        Object.assign(this, props);
     }
     Id_Perfil = { type: 'number', primary: true };
     Nombres = { type: 'text' };

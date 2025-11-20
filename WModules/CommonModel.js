@@ -329,9 +329,7 @@ class WNode {
 	 * @param {*} props 
 	 */
 	constructor(props = {}) {
-		for (const prop in props) {
-			this[prop] = props[prop]
-		}
+		Object.assign(this, props);
 	}
 }
 /**
@@ -444,9 +442,7 @@ class FilterData {
 	 * @param {Partial<FilterData>} [props] 
 	 */
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	/**@type {String}*/ PropName;
 	/**@type {String} */ FilterType;
@@ -551,9 +547,7 @@ class OrderData {
 	* @param {Partial<OrdeData>} [props] 
 	*/
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	PropName;
 	OrderType;

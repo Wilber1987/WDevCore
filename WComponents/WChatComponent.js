@@ -1,5 +1,5 @@
 //@ts-check
-import { OrderData } from "../WModules/CommonModel.js";
+import { FilterData, OrderData } from "../WModules/CommonModel.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { generateGUID, html, WRender } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
@@ -36,7 +36,7 @@ class WChatComponent extends HTMLElement {
 		this.append(css`
 			body {
 				overflow: hidden;
-			}
+			}			
 		`)
 		let themeColor = localStorage.getItem("themeColor");
 		if (!themeColor) {
@@ -319,7 +319,7 @@ class WChatComponent extends HTMLElement {
 				this.updating = true;
 				await this.update();
 				this.updating = false;
-			}, 5000);
+			}, 15000);
 		}
 	}
 
@@ -331,12 +331,14 @@ class WChatComponent extends HTMLElement {
 	}
 
 	async update() {
+		this.Id_ComentarioCargados = this.Id_ComentarioCargados ?? ["-1"]
 		if (this.WithAgent == true) {
 			const Message = {}
 			Message["Id_Case"] = this.Id_Case
 			this.maxMessage = 30;
 			this.actualPage = this.actualPage ?? 1;
-			Message.FilterData = [{ FilterType: "limit", Values: ["30"] }]
+			//Message.FilterData = [{ FilterType: "limit", Values: ["30"] }]
+			Message.FilterData = [FilterData.NotIn("Id_Comentario", ...this.Id_ComentarioCargados  )]
 			Message.OrderData = [OrderData.Asc("Fecha")]
 
 
@@ -347,9 +349,11 @@ class WChatComponent extends HTMLElement {
 			this.chatContainer.querySelector(".default-text")?.remove();
 
 			response.sort((a, b) => a.Id_Comentario - b.Id_Comentario).forEach(comment => {
+				this.Id_ComentarioCargados.push(comment.Id_Comentario.toString())
 				if (this.chatContainer.querySelector("#Comment" + comment.Id_Comentario)) {
 					return;
 				}
+				
 				//TODO MEJORAR ESTO Y HACERLO MAS ESPECIFICO
 				const val = Array.from(document.querySelectorAll(`.chat.outgoing`))
 					// @ts-ignore
@@ -357,11 +361,13 @@ class WChatComponent extends HTMLElement {
 				if (val) {
 					return;
 				}
+				const classN = comment.NickName == this.identity.Value ? "outgoing" : "incoming";
 				// Create an incoming chat div with typing animation and append it to chat container
-				const incomingChatDiv = html`<div class="chat ${comment.NickName == this.identity.Value ? "outgoing" : "incoming"}" id="Comment${comment.Id_Comentario}">
+				const incomingChatDiv = html`<div class="chat ${classN}" id="Comment${comment.Id_Comentario}">
 					<div class="chat-content">						
 						<div class="chat-details">
 							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="6" r="4" fill="#77cef3"></circle> <path opacity="0.5" d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z" fill="#77cef3"></path> </g></svg>
+							
 							<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
 							<div class="typing-animation">
 								<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
