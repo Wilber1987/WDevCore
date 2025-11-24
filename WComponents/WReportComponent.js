@@ -630,6 +630,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			padding: 5px;
 			font-size: 12px;
 			border: solid 1px #eee;
+			text-transform: capitalize;
 		}
 
 		/* Modo impresión */
