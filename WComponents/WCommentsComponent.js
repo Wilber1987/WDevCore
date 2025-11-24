@@ -162,7 +162,6 @@ class WCommentsComponent extends HTMLElement {
             return;
         }
         WSocketServices.InitSignalR(this, async (/** @type {{ [x: string]: number; }} */ mensaje) => {
-
             // Solo agregar si es de la conversación actual
             if (mensaje[this.CommentsIdentifyName] == this.CommentsIdentify) {
                 //this.Dataset = [...this.Dataset, mensaje];

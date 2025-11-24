@@ -308,7 +308,7 @@ class ElementStyle { }
 	 * @property {String} [innerHTML]
 	 * @property {String} [placeholder]
 	 * @property {String} [pattern]
-	 * @property {Array<HTMLElement | String | WNode | Object<string, any>>} [children]
+	 * @property {Array<HTMLElement | String |Partial<WNode>| Object<string, any> | undefined>} [children]
 	 * @property {Function} [onclick] 
 	 * @property {Function} [ondragover]
 	 * @property {Boolean} [draggable]
