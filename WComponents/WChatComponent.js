@@ -460,9 +460,11 @@ class WChatComponent extends HTMLElement {
 		const attachs = WRender.Create({ className: "attachs" });
 		comment.Attach_Files?.filter((/**@type {Object.<string, any>} */ attach) => attach != null && attach != undefined)
 			?.forEach((/**@type {Object.<string, any>} */ attach) => {
-				if (attach != null && attach != undefined && attach.Type.toUpperCase().includes("JPG")
-					|| attach.Type.toUpperCase().includes("JPEG")
-					|| attach.Type.toUpperCase().includes("PNG")) {
+				if (attach != null && attach != undefined && attach?.Type?.toUpperCase()?.includes("JPG")
+					|| attach?.Type?.toUpperCase()?.includes("JPEG")
+					|| attach?.Type?.toUpperCase()?.includes("PNG")
+					|| attach?.Value?.toUpperCase()?.includes(".JPEG")
+                    || attach?.Value?.toUpperCase()?.includes(".PNG")) {
 					attachs.append(WRender.Create({
 						tagName: "img", src: this.GetFileNameFromPath(attach.Value.replace("wwwroot", "")), onclick: () => {
 							document.body.append(new WModalForm({
@@ -479,7 +481,7 @@ class WChatComponent extends HTMLElement {
 							}));
 						}
 					}));
-				} else if (attach.Type.toUpperCase().includes("PDF")) {
+				} else if (attach?.Type?.toUpperCase()?.includes("PDF") || attach?.Value?.toUpperCase()?.includes(".PDF")) {
 					attachs.append(WRender.Create({
 						tagName: "a", innerText: attach.Name, onclick: () => {
 							this.shadowRoot?.append(new WModalForm({
