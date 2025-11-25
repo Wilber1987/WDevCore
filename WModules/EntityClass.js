@@ -18,7 +18,7 @@ class EntityClass {
     OrderData = []
     /**
      * @param {String} Param 
-     * @returns {Array}
+     * @returns {Promise<Array<any>>}
      */
     Get = async () => {
         let Data = await this.GetData(this.ApiMethods.Get);

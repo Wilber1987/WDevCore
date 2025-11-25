@@ -14,9 +14,7 @@ export const Paises = [{ Id: 1, Texto: "Nicaragua" }, { Id: 2, Texto: "Salvador"
 class Example_ModelComponent {
 	/** @param {Partial<Example_ModelComponent>} [props] */
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	/**@type {ModelProperty}*/ Date = { type: 'date', defaultValue: new DateTime().toISO() };
 	/**@type {ModelProperty}*/ DateTime = { type: 'datetime-local', defaultValue: new DateTime().toISO() };
@@ -62,9 +60,7 @@ export class Adress_ModelComponent {
 class Paises_ModelComponent {
 	/** @param {Partial<Paises_ModelComponent>} [props] */
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	/**@type {ModelProperty}*/ Id_pais = { type: 'number', primary: true };
 	/**@type {ModelProperty}*/ Idtpais = { type: 'number', primary: true };

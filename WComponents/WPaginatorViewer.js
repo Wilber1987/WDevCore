@@ -1,6 +1,6 @@
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { WArrayF } from "../WModules/WArrayF.js";
-import { WRender } from "../WModules/WComponentsTools.js";
+import { html, WRender } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 class PaginatorConfig {
     Dataset = [];
@@ -38,6 +38,9 @@ class WPaginatorViewer extends HTMLElement {
     connectedCallback() {
         this.DrawPaginator();
     }
+    disconnectedCallback() {
+                
+    }
     DrawPaginator = async () => {
         this.DarkMode = this.DarkMode ?? false;
         if (this.innerHTML != "") {
@@ -70,30 +73,35 @@ class WPaginatorViewer extends HTMLElement {
         if (this.filter) {
             this.container.innerHTML = "";
             this.body = WRender.Create({ class: "paginator-pages-container", id: "MainBody" });
-            this.pages = this.DrawPages(Dataset);
+              if (Dataset?.length > 0) {
+                this.Dataset = Dataset.map(element => html`<div class="elementWrapper" id="${element.id}wrapper">${element}</div>`);
+                this.filter = false;
+            }
+            this.pages = this.DrawPages(this.Dataset);
             this.pages.forEach(page => {
                 this.body.append(page);
             });
             this.container.append(this.body);
             this.container.append(this.DrawTFooter(this.pages));
-            if (Dataset?.length > 0) {
-                this.Dataset = [...Dataset]
-                this.filter = false;
-            }
+          
             return;
         }
         /* this.Dataset.filter(item1 => 
             !Dataset.some(item2 => item1.id === item2.id)
         ).forEach(element => { element.style.display = "none" });*/
         Dataset.forEach(element => {
-            const findElement = this.Dataset.find(e => e.id == element.id);
+            const findElement = this.Dataset.find(e => e.id.replace("wrapper", "") == element.id);
             if (findElement == undefined) {
-                this.Dataset.push(element);
-                this.pages[0].insertBefore(element, this.pages[0].firstChild);
+                const elementWrapper = html`<div class="elementWrapper" id="${element.id}wrapper">${element}</div>`;
+                this.Dataset.push(elementWrapper);
+                if (this.pages[0]?.firstChild) {
+                    this.pages[0].insertBefore(elementWrapper, this.pages[0].firstChild);
+                } else {
+                    this.pages[0].append(elementWrapper);
+                }               
             } else {
-                if (findElement.innerHTML !== element.innerHTML) {
-                    findElement.innerHTML = element.innerHTML;
-                }
+                findElement.innerHTML = "";
+                findElement.append(element);
             }
         });
 
@@ -122,6 +130,7 @@ class WPaginatorViewer extends HTMLElement {
     DrawPages = (Dataset = this.Dataset) => {
         let pages = [];
         this.numPage = Dataset.length / this.maxElementByPage;
+        this.numPage = this.numPage > 0 ? this.numPage : 1;
         for (let index = 0; index < this.numPage; index++) {
             let tBodyStyle = "display:none";
             if (index == 0) {
@@ -136,12 +145,6 @@ class WPaginatorViewer extends HTMLElement {
                 page++;
             }
         });
-        if (pages.length == 0) {
-            pages.push(WRender.Create({
-                type: "h5", style: { padding: "20px" },
-                innerText: "No hay elementos que mostrar"
-            }));
-        }
         return pages;
     }
 

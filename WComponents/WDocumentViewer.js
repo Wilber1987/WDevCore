@@ -78,6 +78,7 @@ class WDocumentViewer extends HTMLElement {
 	Update() {
 		this.Header = this.Config.Header;
 		this.Dataset = this.Dataset ?? this.Config.Dataset ?? [];
+		this.exportXls = this.Config.exportXls;
 		this.exportXlsAction = this.Config.exportXlsAction;
 		this.Pages = [];
 		this.FooterOptions.innerHTML = "";
@@ -95,7 +96,8 @@ class WDocumentViewer extends HTMLElement {
 		let currentPage = this.CreateNewPage();
 		//let availableSpace = currentPage.offsetHeight - 40; // Margen de seguridad
 		this.Dataset?.forEach((/** @type {string | HTMLElement} */ element) => {
-			const elementClone = typeof element !== "string" ? element.cloneNode(true) : element;
+			// @ts-ignore
+			const elementClone = typeof element !== "string"  ? element.cloneNode(true) : element;
 			// @ts-ignore
 			const elementFitsInPage = this.elementFitsInPage(currentPage, elementClone)
 			let isSplited = false;
@@ -117,7 +119,12 @@ class WDocumentViewer extends HTMLElement {
 				//currentPage.append(elementClone)
 			}
 			if (!isSplited) {
-				currentPage.append(element)
+				// @ts-ignore
+				if (element?.className?.includes("wrapper")) {
+					currentPage.append(element);
+				} else {
+					currentPage.append(elementClone);
+				}				
 			}
 		});
 	}
@@ -325,7 +332,11 @@ class WDocumentViewer extends HTMLElement {
 				ExportPdfAction: this.Config.exportPdf ? async (/** @type {{ ExportPdf: (arg0: HTMLElement | HTMLInputElement | HTMLSelectElement, arg1: string | undefined, arg2: boolean) => void; }} */ tool) => {
 					const body = this.GetExportBody();
 					tool.ExportPdf(body, this.Config.PageType, this.Config.exportPdfApi ?? false);
-				} : undefined
+				} : undefined, 
+				ExportXlsAction: this.Config.exportXls ? async (/**@type {WPrintExportToolBar} */ tool) => {
+					// @ts-ignore
+					this.Config.exportXlsAction(tool)
+				}: undefined
 			}));
 		}
 	}

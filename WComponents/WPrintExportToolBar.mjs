@@ -8,7 +8,7 @@ import "../libs/html2pdf.js"
 import { PageType } from "./WReportComponent.js";
 
 /**
- * @typedef {Object.<string, any>} Config 
+ * @typedef {Object} Config 
 	* @property {Function} [PrintAction]
 	* @property {Function} [ExportPdfAction]
 	* @property {Function} [ExportCvsAction]
@@ -31,7 +31,7 @@ class WPrintExportToolBar extends HTMLElement {
 	connectedCallback() { }
 	Draw = async () => {
 		this.shadowRoot?.append(html`<div class="toolbar">
-			${ this.Confg.Controls ?? []}
+			${this.Confg.Controls ?? []}
 			${this.Confg.PrintAction ? html`<button class="toolbar-button cyan" onclick="${(ev) => {
 				// @ts-ignore
 				this.Confg.PrintAction(this)
@@ -68,9 +68,9 @@ class WPrintExportToolBar extends HTMLElement {
 				XLS
 			</button>`: ""}
 				${this.Confg.UploadAction ? html`<button class="toolbar-button red" onclick="${(ev) => {
-					// @ts-ignore
-					this.Confg.UploadAction(ev)
-				}}">
+				// @ts-ignore
+				this.Confg.UploadAction(ev)
+			}}">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 					<path d="M16 10v4H8v-4H5l7-7 7 7h-3zM5 18v-2h14v2H5z"/>
 				</svg>
@@ -92,10 +92,10 @@ class WPrintExportToolBar extends HTMLElement {
 			await this.SendToApi(body, pagetype);
 			return;
 		}
-		
+
 		const options = {
 			margin: 0,
-			filename: fileName+`.pdf`,
+			filename: fileName + `.pdf`,
 			image: { type: 'jpeg', quality: 2.0 },
 			html2canvas: {
 				scrollX: 0,
@@ -143,7 +143,7 @@ class WPrintExportToolBar extends HTMLElement {
 
 	}
 	async ExportPdfFromApi(rows,
-		header,      
+		header,
 		model,
 		apiUrl,
 		style,
@@ -268,15 +268,15 @@ class WPrintExportToolBar extends HTMLElement {
 	/**
 	 * @param {Array<Array<{value:string|number, style:string}>|Object>} rows
 	 * @param {HTMLElement} header      
-	 * @param {string} filename example: 
-	 * @param {Function} action example: 
+	 * @param {string} [filename] example: 
+	 * @param {Function} [action] example: 
 		const data = [
 			[{value: "Nombre", style: "color:red"}, {value: "Edad"},{value: "Nac."}],
 			[{value: "Juan"}, {value: 12}, {value: "Nic"}],
 			[{value: "Ana"}, {value: 10}, {value: "Es"}]
 		];
 		WPrintExportToolBarInstance.exportToCsv("filename", data);
-	 
+	 * @param {Object} [model] example: 
 	 */
 	async exportToXls(rows, header, filename, action, model) {
 		const table = await this.BuildTableFromRows(header, rows, model);
@@ -313,22 +313,24 @@ class WPrintExportToolBar extends HTMLElement {
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
+		console.log(table);
+
 	}
 
 
 	async BuildTableFromRows(header, rows, model, withImage = false) {
 		const table = html`<table style="border-collapse: collapse; width: 100%;">`; // Añade estilo inicial
-		const thead = WRender.Create({tagName: "thead"});
-		const tableBody = WRender.Create({tagName: "tbody"});
+		const thead = WRender.Create({ tagName: "thead" });
+		const tableBody = WRender.Create({ tagName: "tbody" });
 		table.append(thead, tableBody);
 		// Crear el encabezado principal con colspan
 		if (header) {
 			let processedHeader
 			if (withImage) {
-				processedHeader  = await WRender.convertImagesToCanvasInHtml(header);           
+				processedHeader = await WRender.convertImagesToCanvasInHtml(header);
 			} else {
-				 processedHeader = await WRender.RemoveImagesToCanvasInHtml(header);
-			}           
+				processedHeader = await WRender.RemoveImagesToCanvasInHtml(header);
+			}
 			const headerCell = WRender.Create({
 				tagName: "td",
 				children: [processedHeader],
@@ -345,15 +347,14 @@ class WPrintExportToolBar extends HTMLElement {
 		rows.forEach((row, index) => {
 			const trheader = WRender.Create({ tagName: "tr" });
 			const tr = WRender.Create({ tagName: "tr" });
-
-			if (row.__proto__ === Object.prototype) {
+			if (row.__proto__ == Object.prototype || (row.__proto__.__proto__).toString() == "[object Object]") {
 				for (const key in row) {
 					if (this.isNotDrawable(key, model, row)) {
 						continue;
 					}
 					if (index === 0) {
 						// Encabezados de columna con fondo gris tenue
-						const datoHeader = { value: WOrtograficValidation.es(key) };
+						const datoHeader = { value: model[key] && model[key].label ? model[key].label : WOrtograficValidation.es(key) };
 						trheader.append(WRender.Create({
 							tagName: "td",
 							style: "border: 1px solid #D2D2D2; background-color: #D2D2D2; color: #000000; font-weight: bold; text-align: center; padding: 5px; max-width:200px",

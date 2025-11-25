@@ -23,7 +23,7 @@ import { WAlertMessage } from "./WAlertMessage.js";
 	* @property {Object} [ParentEntity] objeto que contiene al objeto padre del que se esta editando
 	* @property {Array<{ name:string, action: (EditingObject:Object)=> {}}>} [UserActions] acciones personalizadas que se pueden agregar al formulario, estas se representan como botones adicionales
 	* @property {Object} [ModelObject] objeto que contiene las propiedades del modelo que se va a editar
-	* @property {Object} [EntityModel] objeto que contiene el modelo de la entidad que se esta editando
+	* @property {EntityClass} [EntityModel] objeto que contiene el modelo de la entidad que se esta editando
 	* @property {Boolean} [AutoSave] indica si el formulario se guarda automaticamente y debe hacer una peticion ajax a los metodos entity del modelo ejemplo Save o Update
 	* @property {Boolean} [WSelectAddObject] indica si el formulario permitira que un control wselect podra agregar un objeto nuevo
 	* @property {Boolean} [DataRequire]  indica si los datos son requeridos   
@@ -364,6 +364,7 @@ class WForm extends HTMLElement {
 		}
 	}
 
+	//TODO VERIFICAR POSTERIORMNENTE LA ASYNCRONIA
 	/**
 	 * @param {ModelProperty} modelProperty
 	 * @param {any} target
@@ -452,8 +453,7 @@ class WForm extends HTMLElement {
 		let addLabel = true;
 
 		const onchangeListener = async (/** @type {any} */ ev) => {
-			// @ts-ignore
-			if (!ModelProperty.disabled) {
+			if (ModelProperty.disabled != true) {
 				if (ev) {
 					await onChangeEvent(ev)
 				}
@@ -610,7 +610,7 @@ class WForm extends HTMLElement {
 			if (this.Config.ObjectOptions?.Url != undefined || this.Config.SaveFunction == undefined) {
 				const ModalCheck = await this.ModalCheck(ObjectF, this.Config.SaveFunction == undefined);
 				this.shadowRoot?.append(ModalCheck)
-			} else if (this.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
+			} else if ((this.Config?.EntityModel?.SaveWithModel != undefined || this.ModelObject?.SaveWithModel != undefined) && this.Config.AutoSave == true) {
 				const ModalCheck = await this.ModalCheck(ObjectF, true);
 				this.shadowRoot?.append(ModalCheck)
 			} else {
@@ -766,8 +766,10 @@ class WForm extends HTMLElement {
 		const modalCheckFunction = async ( /** @type {import("./LoadinModal.js").LoadinModal} */ loadinModal) => {
 			try {
 				this.shadowRoot?.appendChild(loadinModal);
+				
 				if (withModel) {
-					const response = await this.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
+					const saveF = this.Config?.EntityModel?.SaveWithModel ?? this.ModelObject?.SaveWithModel
+					const response = await saveF(ObjectF, this.Config.EditObject != undefined);
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();

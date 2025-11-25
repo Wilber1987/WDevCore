@@ -10,9 +10,7 @@ class PostConfig {
     * @param {Partial<PostConfig>} [props] 
     */
     constructor(props) {
-        for (const prop in props) {
-            this[prop] = props[prop];
-        }
+        Object.assign(this, props);
     }
     /**  @type {String | undefined} */ RequestType = "POST";
     /**  @type {String | undefined} */ HeaderType = "json";

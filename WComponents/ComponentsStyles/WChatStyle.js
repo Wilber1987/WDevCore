@@ -53,8 +53,8 @@ export const WChatStyle = css`
 
  /* Chats container styling */
  .chat-container {
-	 overflow-y: auto;
-	 max-height: calc(100vh - 180px);
+	overflow-y: auto;
+	max-height: calc(100vh - 230px);
 	margin-bottom: 130px !important;
  }
 
@@ -234,10 +234,10 @@ export const WChatStyle = css`
  /* Typing container styling */
  .typing-container {
 	 position: fixed;
-	 bottom: 0;
+	 bottom: 60px;
 	 width: 100%;
 	 display: flex;
-	 padding: 20px 10px;
+	 padding: 20px 10px 10px;
 	 justify-content: center;
 	 background: var(--outgoing-chat-bg);
 	 border-top: 1px solid var(--incoming-chat-border);
@@ -248,6 +248,14 @@ export const WChatStyle = css`
 	 max-width: 950px;
 	 width: 100%;
 	 align-items: flex-end;
+ }
+ .AddInputFileSection {
+	position: fixed;
+	bottom: 0;
+	display: grid !important;
+	grid-template-columns: auto 80px 50px;
+	align-items: center;
+	width: 100%;
  }
 
  .typing-container .typing-textarea {
@@ -320,7 +328,34 @@ export const WChatStyle = css`
 	overflow: hidden;
  }
 
+ .attachs {
+            overflow: hidden;   
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;       
+        }
+        .attachs img {
+            width: 500px;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+        .attachs a {
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0px;
+            display: block;
+            font-weight: bold;
+            text-decoration: underline;
+            color: #020c1f;
+        }
+.chat.outgoing .pElement {
+	text-align: end;
+}
  /* Reponsive Media Query */
+
+
  @media screen and (max-width: 800px) {
 	 :where(.default-text .pElement, textarea, .chat .pElement) {
 		 font-size: 0.95rem !important;
@@ -337,7 +372,7 @@ export const WChatStyle = css`
 
 	 .chat-container .chat .pElement {
 		 padding: 0 20px;
-	 }
+	 }	
 
 	 .chat .chat-content:not(:has(.typing-animation), :has(.error)) span {
 		 visibility: visible;
@@ -366,4 +401,5 @@ export const WChatStyle = css`
 		padding: 0 10px 0 10px;
 	 }
  }
+
 `

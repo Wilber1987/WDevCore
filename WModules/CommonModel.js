@@ -308,7 +308,7 @@ class ElementStyle { }
 	 * @property {String} [innerHTML]
 	 * @property {String} [placeholder]
 	 * @property {String} [pattern]
-	 * @property {Array<HTMLElement | String | WNode | Object>} [children]
+	 * @property {Array<HTMLElement | String |Partial<WNode>| Object<string, any> | undefined>} [children]
 	 * @property {Function} [onclick] 
 	 * @property {Function} [ondragover]
 	 * @property {Boolean} [draggable]
@@ -329,9 +329,7 @@ class WNode {
 	 * @param {*} props 
 	 */
 	constructor(props = {}) {
-		for (const prop in props) {
-			this[prop] = props[prop]
-		}
+		Object.assign(this, props);
 	}
 }
 /**
@@ -380,7 +378,7 @@ class WNode {
  *  * @property {Array} [Dataset]
 	* @property {Array} [selectedItems]
 	* @property {Object.<string, any>} [ModelObject]  
-	* @property {Object.<string, any>} [UseEntityMethods]  
+	* @property {Boolean} [UseEntityMethods]  
 	* @property {Object.<string, any>} [FilterModelObject]
 	* @property {Object.<string, any>} [EntityModel] 
 	* @property {Object.<string, any>} [ParentModel]  
@@ -444,9 +442,7 @@ class FilterData {
 	 * @param {Partial<FilterData>} [props] 
 	 */
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	/**@type {String}*/ PropName;
 	/**@type {String} */ FilterType;
@@ -551,9 +547,7 @@ class OrderData {
 	* @param {Partial<OrdeData>} [props] 
 	*/
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	PropName;
 	OrderType;

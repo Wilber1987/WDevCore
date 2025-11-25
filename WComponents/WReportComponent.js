@@ -1,5 +1,6 @@
 //@ts-check
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { ModelProperty } from "../WModules/CommonModel.js";
 import { Money } from "../WModules/Types/Money.js";
 import { ComponentsManager, ConvertToMoneyString, html, WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -7,12 +8,13 @@ import { css } from "../WModules/WStyledRender.js";
 import { WDocumentViewer } from "./WDocumentViewer.js";
 
 /**
- * @typedef {Object.<string, any>} ReportConfig
+ * @typedef {Object} ReportConfig
  * @property {Array} [Dataset]
  * @property {Object.<string, any>} [ModelObject]
  * @property {HTMLElement} [Header]
  * @property {HTMLStyleElement} [CustomStyle]
  * @property {String} [PageType]
+ * @property {String} [title]
  * @property {Function} [exportXlsAction]
  * @property {boolean} [DocumentViewFirst]
  * @property {boolean} [exportPdf]
@@ -71,7 +73,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 	SetOptions() {
 		this.OptionContainer.appendChild(html`<button class="Btn-Mini" onclick="${() => {
 			this.Manager.NavigateFunction("report", this.ReportContainer);
-		}}">Reporte</button>`);
+		}}">${ this.Config.title ? this.Config.title : "Reporte"}</button>`);
 
 		this.OptionContainer.appendChild(html`<button class="Btn-Mini" onclick="${() => {
 			this.GoToDocumentView();
@@ -80,6 +82,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 	GoToDocumentView() {
 		const documentViewer = this.ViewDocument();
+		this.Manager.Remove("documentViewer")
 		this.Manager.NavigateFunction("documentViewer", documentViewer);
 	}
 
@@ -102,8 +105,11 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		const { GroupParams, EvalParams } = this.Config;
 		if (!GroupParams || GroupParams.length === 0) {
 			// @ts-ignore
-			this.MetricLevels["Reporte"] = this.calculateSummary(data);
-			return { "Reporte": data };
+			this.MetricLevels[ this.Config.title ?? "Reporte"] = this.calculateSummary(data);
+			const metric = {};
+			// @ts-ignore
+			metric[this.Config.title ?? "Reporte"] = data
+			return metric;
 		}
 		const grouped = {};
 		data.forEach(item => {
@@ -276,6 +282,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 	CreateTable(data, parent, summary, level) {
 		const table = WRender.Create({ tagName: "table", className: "report-table" });
 		data.forEach((item, index) => {
+			
 			this.TableHeader(index, item, table);
 			const row = WRender.Create({
 				tagName: "tr", className: "table-row"
@@ -283,7 +290,8 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 			// Usamos el método para obtener todas las propiedades incluidas getters
 			this.allProps?.forEach(prop => {
-				if (this.IsDrawableRow(item, prop)) {
+				const modelProperty = this.Config.ModelObject[prop];
+				if (this.IsDrawableRow(item, prop, modelProperty)) {
 					let value;
 					// Intentamos leer el valor de la propiedad, puede ser getter
 					try {
@@ -304,6 +312,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 	TableHeader(index, item, table) {
 		if (index == 0) {
+			
 			const row = WRender.Create({
 				tagName: "tr", className: "table-row"
 			});
@@ -311,10 +320,12 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 				return this.IsDrawableRow(item, prop);
 			});
 			this.allProps.forEach(prop => {
+				/**@type {ModelProperty} */
+				const modelProperty = this.Config.ModelObject[prop];
 				row.appendChild(WRender.Create({
 					tagName: "th",
 					className: "table-cell",
-					children: [WOrtograficValidation.es(prop)]
+					children: [ modelProperty?.label ? modelProperty.label : WOrtograficValidation.es(prop)]
 				}));
 			})
 			table.appendChild(row);
@@ -361,22 +372,31 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 		return WRender.Create({ tagName: "td", className: "table-cell " + classType, children: [processValue?.toString()] });
 	}
-	IsDrawableRow(element, prop) {
-		const model = this.Config.ModelObject;
+	/**
+	  * @param {{ [x: string]: any; }} element
+	  * @param {string | number} prop
+	  * @param {ModelProperty} [modelProperty]
+	  */
+	IsDrawableRow(element, prop, modelProperty) {
+		const model = this.Config.ModelObject;	
 
 		// Si no hay modelo, mostrar solo propiedades primitivas
 		if (!model) {
 			const value = element[prop];
 			return ["number", "string", "boolean", "bigint"].includes(typeof value);
 		}
+		if (modelProperty) {
+			//return modelProperty.hidden == false;
+		}
 
 		const modelProp = model[prop];
-		if (!modelProp) return false;
+		if (modelProp == undefined) return false;
 		// Si el modelo dice que se oculta, o es tipo que no se debe mostrar
 		const hidden = typeof modelProp.hidden === "function" ? modelProp.hidden(element) : modelProp.hidden;
 		const type = modelProp.type?.toUpperCase();
 
 		if (
+			modelProp?.type == undefined ||
 			hidden ||
 			modelProp.primary ||
 			modelProp.hiddenInTable ||
@@ -477,7 +497,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		}
 
 		.group-title.group-0 {
-			text-transform: uppercase;
+			text-transform: capitalize;
 			font-size: 20px;
 			border-left: unset;
 			border-bottom: 5px solid #3498db;
@@ -606,6 +626,12 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			color: #222;
 		}
 
+		.document-container .table-cell {
+			padding: 5px;
+			font-size: 12px;
+			border: solid 1px #eee;
+			text-transform: capitalize;
+		}
 
 		/* Modo impresión */
 		@media print {

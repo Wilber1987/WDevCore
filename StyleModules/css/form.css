@@ -60,20 +60,7 @@
 	background-color: #861c1c;
 }
 
-.BtnReturn {
-	appearance: none;
-	display: flex;
-}
 
-.BtnReturn::before {
-	content: "";
-	margin-right: 8px;
-	height: 15px;
-	width: 15px;
-	display: block;
-	background-color: #fdfcfc;
-	clip-path: polygon(50% 0%, 100% 0%, 50% 50%, 100% 100%, 50% 100%, 0% 50%);
-}
 
 .BtnAlert,
 .BtnPrimary,
@@ -363,6 +350,22 @@ textarea:focus {
 .btn-go:hover::after {
 	right: 10px;
 	/* Desplaza la flecha 5px hacia la derecha en el hover */
+}
+
+.BtnReturn {
+	appearance: none;
+	display: flex;
+	align-items: center;
+}
+
+.BtnReturn::before {
+	content: "";
+	margin-right: 8px;
+	height: 15px;
+	width: 15px;
+	display: block;
+	background-color: #fdfcfc;
+	clip-path: polygon(50% 0%, 100% 0%, 50% 50%, 100% 100%, 50% 100%, 0% 50%);
 }
 
 .vertical-acordeon-btn {

@@ -484,7 +484,7 @@ export class ModelPropertyFormBuilder {
 			Add: ModelProperty.Options?.Add ?? true,
 			Edit: ModelProperty.Options?.Edit ?? true,
 			Delete: ModelProperty.Options?.Delete ?? true,
-			Search: ModelProperty.Options?.Search ?? true,
+			//Search: ModelProperty.Options?.Search ?? true,
 			AddAction: tableAction,
 			EditAction: tableAction,
 			DeleteAction: tableAction,

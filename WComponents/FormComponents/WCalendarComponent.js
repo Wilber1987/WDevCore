@@ -5,9 +5,7 @@ import { css } from "../../WModules/WStyledRender.js";
 
 class Agenda {
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	/**@type {Number}*/ IdAgenda;
 	/**@type {String}*/ Dia;
@@ -18,9 +16,7 @@ class Agenda {
 
 class Tbl_Calendario {
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	/**@type {Number}*/ IdCalendario;
 	/**@type {String}*/ Estado;

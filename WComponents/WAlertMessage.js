@@ -56,10 +56,39 @@ export class WAlertMessage extends HTMLElement {
         this.shadowRoot?.append(template);
     }
     /**
-        * conecta un nuevo alert en el document body
-        * @param {{ Message: String, CloseOption?:  Boolean, Direction?: String , Temporal?: Boolean, Type?: String }} Config 
-        */
-    static Connect(Config) {
+    * conecta un nuevo alert en el document body
+    * @param {{ Message: String, CloseOption?:  Boolean, Direction?: String , Temporal?: Boolean, Type?: String }} Config 
+    */
+    static Connect(Config) {        
+        const alert = new WAlertMessage(Config);
+        document.body.appendChild(alert);
+    }
+    /**
+    * conecta un nuevo alert en el document body
+    * @param { import("../WModules/CommonModel.js").ResponseServices? } Response 
+    */
+    static ResponseMessage(Response) {
+        /**@type {{ Message: String, CloseOption?:  Boolean, Direction?: String , Temporal?: Boolean, Type?: String }} */
+        const Config = {
+            Type : "info",
+            CloseOption: true,
+            Direction: "top",
+            Temporal: true,
+            Message: Response?.message ?? "..."
+        }
+        if (Response?.status) {
+            switch (Response.status.toString()) {
+                case "200":
+                    Config.Type = "success"
+                    break;
+                case "500":
+                    Config.Type = "danger"
+                    break;
+                default:
+                    Config.Type = "warning"
+                    break;
+            }
+        }
         const alert = new WAlertMessage(Config);
         document.body.appendChild(alert);
     }

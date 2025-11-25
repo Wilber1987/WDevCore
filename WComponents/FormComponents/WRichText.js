@@ -1,6 +1,9 @@
 //@ts-check
 import { html, WRender } from "../../WModules/WComponentsTools.js"
 import { css } from "../../WModules/WStyledRender.js"
+import { WModalForm } from "../WModalForm.js";
+import { BtnVideoComponent } from "./BtnVideoComponent.js";
+import { WImageCapture } from "./WImageCapture.js";
 class ModelFiles {
     /**
      * @param {string} name
@@ -247,9 +250,14 @@ class WRichText extends HTMLElement {
             tagName: "section", class: "InputFileSection", children: []
         })
         this.AddInputFileSection = WRender.Create({
-            tagName: "section", class: "AddInputFileSection", children: [
+            tagName: "section", class: "AddInputFileSection", children: [               
                 InputFileStyle.cloneNode(true),
                 this.AttachedSection,
+                 //new WImageCapture(),
+                 new BtnVideoComponent({
+                action: async (/** @type {any} */ imageB64) => {
+                    this.CreateFileObject("capture" + Date.now().toString(), imageB64, "data:image/png;base64,");
+                }}),
                 WRender.Create({
                     tagName: "label", htmlFor: "attachInput", class: "button", innerHTML: ""
                 }),
@@ -278,20 +286,7 @@ class WRichText extends HTMLElement {
                 reader.onloadend = (e) => {
                     //@ts-ignore
                     fileB64 = e.target?.result?.split("base64,")[1];
-                    const fileClass = new ModelFiles(file.name, fileB64, base64Type);
-                    this.Files.push(fileClass);
-                    //@ts-ignore
-                    this.AttachedSection.innerHTML = "";
-                    this.Files.forEach(file => {
-                        const AttachBtn = WRender.Create({
-                            className: "AttachBtn", innerHTML: "X", onclick: () => {
-                                this.Files.splice(this.Files.indexOf(file), 1);
-                                AttachBtn.parentNode?.parentNode?.removeChild(AttachBtn.parentNode);
-                            }
-                        })
-                        //@ts-ignore
-                        this.AttachedSection.append(WRender.Create({ class: "AttachItem", children: [file.Name, AttachBtn] }))
-                    });
+                    this.CreateFileObject(file.name, fileB64, base64Type);
 
                 };
                 reader.readAsDataURL(file);
@@ -307,6 +302,28 @@ class WRichText extends HTMLElement {
             },
         }))
         this.append(this.AddInputFileSection);
+    }
+
+    /**
+     * @param {string} fileName
+     * @param {string} fileB64
+     * @param {string} base64Type
+     */
+    CreateFileObject(fileName, fileB64, base64Type) {
+        const fileClass = new ModelFiles(fileName, fileB64, base64Type);
+        this.Files.push(fileClass);
+        //@ts-ignore
+        this.AttachedSection.innerHTML = "";
+        this.Files.forEach(file => {
+            const AttachBtn = WRender.Create({
+                className: "AttachBtn", innerHTML: "X", onclick: () => {
+                    this.Files.splice(this.Files.indexOf(file), 1);
+                    AttachBtn.parentNode?.parentNode?.removeChild(AttachBtn.parentNode);
+                }
+            });
+            //@ts-ignore
+            this.AttachedSection.append(WRender.Create({ class: "AttachItem", children: [file.Name, AttachBtn] }));
+        });
     }
 
     FunctionClear() {
@@ -621,17 +638,6 @@ const WRichTextStyle = css`
         box-shadow: 0 0 2px 0 #999;
     }
 
-    /*.tooltiptext::after {
-        content: "";
-        position: absolute;
-        bottom: -100;
-        left: 50%;
-        margin-left: -5px;
-        border-width: 5px;
-        border-style: solid;
-        border-color: black transparent transparent transparent;
-    }*/
-
     .tooltip:hover .tooltiptext {
         visibility: visible;
     } 
@@ -754,7 +760,7 @@ const InputFileStyle = css`
         display: grid;
         grid-template-columns: auto auto auto;
         justify-content: left;
-        min-width: calc(100% - 50px);
+        min-width: calc(100% - 150px);
     }
 
     .AddInputFileSection {
@@ -772,8 +778,7 @@ const InputFileStyle = css`
         min-width: 35px;
         min-height: 35px;
         max-height: 35px;
-        margin: 5px;
-        padding: 5px;
+        padding: 10px 0px;
         border-radius: 5px;
         transition: transform .2s ease-out;
         background-color: unset;
