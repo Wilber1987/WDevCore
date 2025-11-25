@@ -154,20 +154,7 @@ const StylesControlsV2 = css`.green {
 	background-color: #861c1c;
 }
 
-.BtnReturn {
-	appearance: none;
-	display: flex;
-}
 
-.BtnReturn::before {
-	content: "";
-	margin-right: 8px;
-	height: 15px;
-	width: 15px;
-	display: block;
-	background-color: #fdfcfc;
-	clip-path: polygon(50% 0%, 100% 0%, 50% 50%, 100% 100%, 50% 100%, 0% 50%);
-}
 
 .BtnAlert,
 .BtnPrimary,
@@ -408,6 +395,8 @@ textarea:focus {
 	right: 15px;
 }
 
+
+
 /*BOTON ACORDEON HOTIZONTAL*/
 .accordion-button::after {
 	width: 14px;
@@ -459,11 +448,26 @@ textarea:focus {
 	/* Desplaza la flecha 5px hacia la derecha en el hover */
 }
 
+.BtnReturn {
+	appearance: none;
+	display: flex;
+	align-items: center;
+}
+
+.BtnReturn::before {
+	content: "";
+	margin-right: 8px;
+	height: 15px;
+	width: 15px;
+	display: block;
+	background-color: #fdfcfc;
+	clip-path: polygon(50% 0%, 100% 0%, 50% 50%, 100% 100%, 50% 100%, 0% 50%);
+}
+
 .vertical-acordeon-btn {
 	display: flex;
 	gap: 10px;
 	font-size: 12px;
-	;
 	align-items: center;
 	border: none;
 	background-color: unset;
