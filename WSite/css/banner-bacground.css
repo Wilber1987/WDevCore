@@ -42,7 +42,7 @@
     opacity: 1;
 }
 
-.container {
+.banner-container {
     position: relative;
     display: grid;
     grid-template-rows: repeat(20, 5vh); 

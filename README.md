@@ -1,10 +1,10 @@
 # WDevCoreJs
 
-![WDevCoreJs Logo](https://raw.githubusercontent.com/Wilber1987/SSMP/main/UI/wwwroot/WDevCoreJs/WSite/Media/logos/WDevCoreJs.svg)
+![WDevCoreJs Logo](../Media/logos/devexpBanner.png)
 
 ## ¡Bienvenido a WDevCoreJs!
 
-WDevCoreJs es una librería de JavaScript de código abierto, ligera y potente, diseñada para la construcción de interfaces de usuario dinámicas. Inspirada en la simplicidad y eficiencia de Lit y la expresividad de JSX, WDevCoreJs te permite crear componentes web reutilizables y de alto rendimiento utilizando Vanilla JavaScript puro.
+WDevCoreJs es una librería de JavaScript de código abierto, ligera, diseñada para la construcción de interfaces de usuario dinámicas. Inspirada en la simplicidad y eficiencia de Lit y la expresividad de JSX, WDevCoreJs te permite crear componentes web reutilizables y de alto rendimiento utilizando Vanilla JavaScript puro.
 
 Nuestro objetivo es proporcionar a los desarrolladores una herramienta flexible y fácil de usar para construir aplicaciones web modernas, sin la complejidad de frameworks más grandes, pero con la capacidad de manejar estados y renderizado de manera eficiente.
 

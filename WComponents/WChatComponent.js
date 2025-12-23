@@ -225,15 +225,16 @@ class WChatComponent extends HTMLElement {
 				// 3️⃣ Escribe el contenido resultante en el párrafo
 				pElement.innerHTML = processed;
 				if (this.WithAgent != true) {
-					// Remove the typing animation, append the paragraph element and save the chats to local storage                   
-					incomingChatDiv.querySelector(".chat-details")?.appendChild(pElement);
+					// Remove the typing animation, append the paragraph element and save the chats to local storage                 
+					
 					if (attachs.children.length > 0) {
 						pElement.append(attachs)
 					}
 				} else {
-					incomingChatDiv.remove();
-					localStorage.removeItem("all-chats");
+					//incomingChatDiv.remove();
+					//localStorage.removeItem("all-chats");
 				}
+				incomingChatDiv.querySelector(".chat-details")?.appendChild(pElement);
 				const oldWithAgent = this.WithAgent;
 				const condition = oldWithAgent != response.WithAgentResponse;
 				this.WithAgent = response.WithAgentResponse ?? false;
@@ -243,7 +244,7 @@ class WChatComponent extends HTMLElement {
 				// @ts-ignore
 				sessionStorage.setItem("Id_Case", this.Id_Case?.toString());
 				if (condition) {
-					this.chatContainer.innerHTML = "";
+					//this.chatContainer.innerHTML = "";
 					this.update();
 				}
 				this.ActiveInterval();

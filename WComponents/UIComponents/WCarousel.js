@@ -43,6 +43,7 @@ class WCarousel extends HTMLElement {
                 <button class="nav-btn next" onclick="${this.next}">></button>
             </div>`;
 
+        // @ts-ignore
         this.append(content);
 
         // Posicionamos en el primer ítem real (índice 1 del track)
