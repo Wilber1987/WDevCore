@@ -79,7 +79,7 @@ class WTableComponent extends HTMLElement {
             Dataset: this.Dataset,
             AutoSetDate: Config.Options?.AutoSetDate ?? true,
             Sorts: this.Sorts,
-            ModelObject: Config.FilterModelObject ?? Config.ModelObject,
+            ModelObject: Config.FilterModelObject ?? Config.ModelObject ?? {},
             EntityModel: Config.EntityModel,
             Display: Config.Options?.FilterDisplay ?? false,
             UseEntityMethods: this.Config.UseEntityMethods ?? this.Config.AddItemsFromApi ?? true, //TODO
@@ -211,7 +211,7 @@ class WTableComponent extends HTMLElement {
         loadinModal.close();
 
         if (!chargeWithFilter) {
-            this.Table.append(WRender.createElement(this.DrawTHead(Dataset.length > 0 ? Dataset[0] : this.ModelObject)));
+            this.Table.append(WRender.createElement(this.DrawTHead(Dataset?.length > 0 ? Dataset[0] : this.ModelObject)));
             await this.DrawTBody(Dataset);
             if (this.paginate == true) {
                 this.Tfooter.innerHTML = "";

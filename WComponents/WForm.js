@@ -261,7 +261,7 @@ class WForm extends HTMLElement {
 						if (["NUMBER", "MONEY"].includes(modelProperty.type.toUpperCase()) && this.Controls[prop].value.trim() == "") {
 							target[prop] = this.IsNumber(target[prop]) ? target[prop] : undefined;
 							// @ts-ignore
-							this.Controls[prop].value = target[prop]?.toFixed(3);
+							this.Controls[prop].value = parseFloat(target[prop])?.toFixed(3);
 						}
 						if (['MODEL'].includes(Model[prop].type?.toUpperCase())) {
 							// @ts-ignore
