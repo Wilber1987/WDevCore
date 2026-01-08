@@ -133,7 +133,7 @@ class WForm extends HTMLElement {
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
 				// @ts-ignore
-				if (m.tool && !m.tool.className.includes("SELECT_BOX")) {
+				if (m.tool && !m.tool.className.includes("SELECT_BOX") && !m.tool.className.includes("toolInactive") ) {
 					// @ts-ignore
 					m.tool.className += " toolInactive";
 				}

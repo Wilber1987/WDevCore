@@ -15,7 +15,6 @@ import { DateTime } from "../WModules/Types/DateTime.js";
 import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
 import { ModelPropertyFormBuilder } from "../ComponentsBuilders/ModelPropertyFormBuilder.js";
 import { WCard } from "./WCard.js";
-import { WDetailView } from "./WDetailView.js";
 
 
 class WTableComponent extends HTMLElement {
@@ -28,13 +27,15 @@ class WTableComponent extends HTMLElement {
         this.attachShadow({ mode: "open" });
         this.Config = Config
         // @ts-ignore
-        for (const p in Config) {this[p] = Config[p];}
+        for (const p in Config) { this[p] = Config[p]; }
         this.TableClass = "WTable WScroll";
         /**
          * @type {any[]}
          */
         this.selectedItems = [];
         this.isSelectAll = false;
+        /**@type {Object.<string, ModelProperty>} */
+        this.EntityModel = {};
         /**@type {Object.<string, ModelProperty>} */
         this.ModelObject = {};
         this.ThOptions = WRender.Create({ class: "thOptions" });
@@ -159,6 +160,7 @@ class WTableComponent extends HTMLElement {
                 Show: true,
             };
         }
+        this.EntityModel = this.Config.EntityModel;
         this.ModelObject = this.Config.ModelObject ?? this.Dataset[0];
         this.DrawTable();
         return;
@@ -193,7 +195,7 @@ class WTableComponent extends HTMLElement {
         const isWithtModel = this.Config.ModelObject?.Get != undefined
         this.AddItemsFromApi = this.Config.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         let chargeWithFilter = false;
-        if (( Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
+        if ((Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
             if (isWithtUrl) {
                 // @ts-ignore
                 Dataset = await WAjaxTools.PostRequest(this.Config?.Options?.UrlSearch);
@@ -229,7 +231,7 @@ class WTableComponent extends HTMLElement {
             if (this.Options.Search == true) {
                 this.ThOptions.append(WRender.Create({
                     tagName: "input", class: "txtControl", type: "text",
-                    placeholder: "Buscar...", 
+                    placeholder: "Buscar...",
                     onchange: async (/** @type {any} */ ev) => {
                         this.SearchFunction(ev);
                     }
@@ -402,7 +404,7 @@ class WTableComponent extends HTMLElement {
             tagName: 'input', type: 'button',
             className: 'sort-down ' + (this.Sorts.find(s => s.PropName == prop && s.OrderType == "DESC") ? "sort-active" : ""),
             onclick: async (/** @type {any} */ ev) => {
-
+                await this.ExecuteSort(ev, prop, up, down, "DESC");
             }
         });
         return { up, down };
@@ -852,7 +854,7 @@ class WTableComponent extends HTMLElement {
                 );
                 this.DrawTable(Dataset.data);
             }
-        } else if (this.ModelObject?.Get != undefined) {
+        } else if (this.EntityModel?.Get != undefined || this.ModelObject?.Get != undefined) {
             /**
             * @type {Array<FilterData>}
             */
@@ -868,10 +870,16 @@ class WTableComponent extends HTMLElement {
                     filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })
                 }
             }
-            // @ts-ignore
-            const responseDataset = await new this.ModelObject.constructor({ FilterData: [{ FilterType: "or", Filters: filterData }] }).Get();
-            //this.Dataset = [...this.Dataset, ...responseDataset]
-            this.DrawTable(responseDataset);
+            if (this.EntityModel?.Get != undefined) {
+                // @ts-ignore
+                const responseDataset = await new this.EntityModel.constructor({ FilterData: [{ FilterType: "or", Filters: filterData }] }).Get();
+                this.DrawTable(responseDataset);
+            } else {
+                // @ts-ignore
+                const responseDataset = await new this.ModelObject.constructor({ FilterData: [{ FilterType: "or", Filters: filterData }] }).Get();
+                this.DrawTable(responseDataset);
+            }
+
 
         } else {
             const Dataset = await WArrayF.FilterInArrayByValue(this.Dataset, ev.target.value)

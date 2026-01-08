@@ -185,7 +185,9 @@ class WAppNavigator extends HTMLElement {
 	CreateTabControllers = () => {
 		this.TabContainer = this.TabContainer ?? WRender.Create({ className: "TabContainer", id: "content-container" });
 		this.Manager = new ComponentsManager({ MainContainer: this.TabContainer, SPAManage: false });
-		this.append(this.TabContainer);
+		if (!this.Config.TabContainer) {
+			this.append(this.TabContainer);
+		}		
 	}
 	/**
 	 * @param {HTMLElement | HTMLInputElement | HTMLSelectElement} objectWrapper

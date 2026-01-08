@@ -5,12 +5,17 @@
 	* @property {String} [Url]
 	* @property {Function} [SaveFunction]
 **/
-/**
- * @typedef {Object} ResponseServices 
- *  * @property {int} [status]
-	* @property {String} [message]
-**/
-class ResponseServices { }
+
+export class ResponseServices {
+	/**
+	* @param {Partial<ResponseServices>} [props] 
+	*/
+	constructor(props) {
+		Object.assign(this, props);
+	}
+	/**@type {Number} */ status
+	/**@type {String} */ message
+}
 
 /**
 * @param {Object.<string, any>} [EditingObject] este objeto es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante
@@ -51,7 +56,7 @@ function ModelFunction(EditingObject) {
 	* @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
 	* @property {() => { Agenda: Agenda[]; Calendario: Tbl_Calendario[]; }} [CalendarFunction] (obj) => {  }
 	* @property {String} [SelfChargeDataset] Si es un WSELECT con el valor de esta propiedad puede usar datos para llenar el desplegable a partir de la entidad padre, es funcional para relaciones recursivas dentro de un master detail
-   	* @property {Boolean} [IsGridDisplay] Se  usa para el formulario con propiedades MULTISELECT o WSELECT y despliega una tabla en lugar de un combo
+		  * @property {Boolean} [IsGridDisplay] Se  usa para el formulario con propiedades MULTISELECT o WSELECT y despliega una tabla en lugar de un combo
 	SE AGREGARA SECCION UTIL PARA CONFIGURAR PROPIEDADES EDITABLES EN COMPONENTES TABLAS
 	* @property {Boolean} [IsEditableInGrid]
 **/
@@ -529,7 +534,7 @@ class FilterData {
 	}
 
 	//json filters
-	static JsonPropEqual(propName, jsonPropName , value, type) {
+	static JsonPropEqual(propName, jsonPropName, value, type) {
 		if (value === null || value === undefined) {
 			throw new Error(`The value cannot be null or undefined for ${propName}`);
 		}
