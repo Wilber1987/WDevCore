@@ -51,6 +51,9 @@ class WModalForm extends HTMLElement {
         } else {
             this.append(WRender.createElement(this.FormStyle()));
         }
+        if (this.Config.CustomStyle) {
+			this.shadowRoot?.append(this.Config.CustomStyle);
+		}
         //NO MODAL
         this.append(StyleScrolls.cloneNode(true));
         this.append(WRender.createElement({

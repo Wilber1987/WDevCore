@@ -1,16 +1,34 @@
 
 /**
+<<<<<<< HEAD
  * @typedef {Object. ObjectOptions 
+=======
+ * @typedef {Object} ObjectOptions 
+>>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  *  * @property {Boolean} [AddObject]
 	* @property {String} [Url]
 	* @property {Function} [SaveFunction]
 **/
+<<<<<<< HEAD
 /**
  * @typedef {Object.<stsponseServices 
  *  * @property {int} [status]
 	* @property {String} [message]
 **/
 class ResponseServices { }
+=======
+
+export class ResponseServices {
+	/**
+	* @param {Partial<ResponseServices>} [props] 
+	*/
+	constructor(props) {
+		Object.assign(this, props);
+	}
+	/**@type {Number} */ status
+	/**@type {String} */ message
+}
+>>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
 
 /**
 * @param {Object.<string, any>} [EditingObject] este objeto es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante
@@ -51,7 +69,7 @@ function ModelFunction(EditingObject) {
 	* @property {Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado
 	* @property {() => { Agenda: Agenda[]; Calendario: Tbl_Calendario[]; }} [CalendarFunction] (obj) => {  }
 	* @property {String} [SelfChargeDataset] Si es un WSELECT con el valor de esta propiedad puede usar datos para llenar el desplegable a partir de la entidad padre, es funcional para relaciones recursivas dentro de un master detail
-   	* @property {Boolean} [IsGridDisplay] Se  usa para el formulario con propiedades MULTISELECT o WSELECT y despliega una tabla en lugar de un combo
+		  * @property {Boolean} [IsGridDisplay] Se  usa para el formulario con propiedades MULTISELECT o WSELECT y despliega una tabla en lugar de un combo
 	SE AGREGARA SECCION UTIL PARA CONFIGURAR PROPIEDADES EDITABLES EN COMPONENTES TABLAS
 	* @property {Boolean} [IsEditableInGrid]
 **/
@@ -61,7 +79,11 @@ class ModelProperty {
 	}
 }
 /**
+<<<<<<< HEAD
  * @typedef {Objey>} FormConfig 
+=======
+ * @typedef {Object} FormConfig 
+>>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  *  * @property {Object.<string, any>} [ObjectDetail]
 	* @property {Object.<string, any>} [EditObject]
 	* @property {Object.<string, any>} [ParentModel]
@@ -285,7 +307,11 @@ class FormConfig { };
 	 */
 class ElementStyle { }
 /**
+<<<<<<< HEAD
  * @typedef g, any>} WNode
+=======
+ * @typedef {Object} WNode
+>>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
 	 * @property {String} [tagName]
 	 * @property {String} [id]
 	 * @property {String} [type]
@@ -309,7 +335,7 @@ class ElementStyle { }
 	 * @property {String} [innerHTML]
 	 * @property {String} [placeholder]
 	 * @property {String} [pattern]
-	 * @property {Array<HTMLElement | String | WNode | Object>} [children]
+	 * @property {Array<HTMLElement | String |Partial<WNode>| Object<string, any> | undefined>} [children]
 	 * @property {Function} [onclick] 
 	 * @property {Function} [ondragover]
 	 * @property {Boolean} [draggable]
@@ -330,13 +356,15 @@ class WNode {
 	 * @param {*} props 
 	 */
 	constructor(props = {}) {
-		for (const prop in props) {
-			this[prop] = props[prop]
-		}
+		Object.assign(this, props);
 	}
 }
 /**
+<<<<<<< HEAD
  * @typedef {O any>} Actions 
+=======
+ * @typedef {Object} Actions 
+>>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  * @property {String} name
  * @property {Function} action
  * @property {Function|Boolean} [rendered] funcion que debe retornar true o false
@@ -372,16 +400,24 @@ class WNode {
 **/
 
 /**
+<<<<<<< HEAD
  * @typedef {Object.<strichItemsFromApi 
+=======
+ * @typedef {Object} SearchItemsFromApi 
+>>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  * @property {String} [ApiUrl]
  * @property {Function} [action]
  * **/
 /**
+<<<<<<< HEAD
  * @typedef {Objec>} TableConfig 
+=======
+ * @typedef {Object} TableConfig 
+>>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  *  * @property {Array} [Dataset]
 	* @property {Array} [selectedItems]
 	* @property {Object.<string, any>} [ModelObject]  
-	* @property {Object.<string, any>} [UseEntityMethods]  
+	* @property {Boolean} [UseEntityMethods]  
 	* @property {Object.<string, any>} [FilterModelObject]
 	* @property {Object.<string, any>} [EntityModel] 
 	* @property {Object.<string, any>} [ParentModel]  
@@ -406,7 +442,11 @@ class WNode {
  **/
 class TableConfig { };
 /**
+<<<<<<< HEAD
  * @typedef {Objec>} ModalConfig 
+=======
+ * @typedef {Object} ModalConfig 
+>>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  *  * @property {Boolean} [ShadowRoot]
 	* @property {String} [icon]
 	* @property {String} [title]  
@@ -445,9 +485,7 @@ class FilterData {
 	 * @param {Partial<FilterData>} [props] 
 	 */
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	/**@type {String}*/ PropName;
 	/**@type {String} */ FilterType;
@@ -534,7 +572,7 @@ class FilterData {
 	}
 
 	//json filters
-	static JsonPropEqual(propName, jsonPropName , value, type) {
+	static JsonPropEqual(propName, jsonPropName, value, type) {
 		if (value === null || value === undefined) {
 			throw new Error(`The value cannot be null or undefined for ${propName}`);
 		}
@@ -552,9 +590,7 @@ class OrderData {
 	* @param {Partial<OrdeData>} [props] 
 	*/
 	constructor(props) {
-		for (const prop in props) {
-			this[prop] = props[prop];
-		}
+		Object.assign(this, props);
 	}
 	PropName;
 	OrderType;

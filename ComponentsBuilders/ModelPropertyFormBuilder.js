@@ -294,6 +294,7 @@ export class ModelPropertyFormBuilder {
 	* @returns {Promise<HTMLElement>}
 	*/
 	static async CreateWSelect(ModelProperty, EditingObject, prop, onChangeListener) {
+		//console.log(prop);		
 		const { MultiSelect } = await import("../WComponents/WMultiSelect.js");
 		//const { EntityClass } = await import("../WModules/EntityClass.js");
 		const { require, disabled } = await this.DefineRequireAndDisable(ModelProperty, EditingObject);
@@ -341,7 +342,8 @@ export class ModelPropertyFormBuilder {
 	 * @param {boolean} multiple
 	 */
 	static async GetDatasetsAndSelectsItems(ModelProperty, EditingObject, prop, require, multiple) {
-		const isWTableControl = (ModelProperty.type?.toUpperCase() != "WSELECT"
+		const isWTableControl = (ModelProperty.type?.toUpperCase() != "WSELECT" 
+			&& ModelProperty.type?.toUpperCase() != "WRADIO"
 			&& ModelProperty.type?.toUpperCase() != "MULTISELECT") || ModelProperty.IsGridDisplay == true
 
 		const entity = ModelProperty.EntityModel ?? ModelProperty.ModelObject;
@@ -370,7 +372,8 @@ export class ModelPropertyFormBuilder {
 			selectedItems.push(...EditingObject[prop]);
 		}
 		if (ModelProperty.type?.toUpperCase() == "WSELECT"
-			&& ModelProperty.type?.toUpperCase() == "MULTISELECT") {
+			|| ModelProperty.type?.toUpperCase() == "WRADIO"
+			|| ModelProperty.type?.toUpperCase() == "MULTISELECT") {
 			Dataset = this.CreateDatasetForMultiSelect(ModelProperty, EditingObject[prop]);
 		}
 		return { Dataset, selectedItems };
@@ -481,7 +484,7 @@ export class ModelPropertyFormBuilder {
 			Add: ModelProperty.Options?.Add ?? true,
 			Edit: ModelProperty.Options?.Edit ?? true,
 			Delete: ModelProperty.Options?.Delete ?? true,
-			Search: ModelProperty.Options?.Search ?? true,
+			//Search: ModelProperty.Options?.Search ?? true,
 			AddAction: tableAction,
 			EditAction: tableAction,
 			DeleteAction: tableAction,
@@ -731,7 +734,6 @@ export class ModelPropertyFormBuilder {
 		let multiple = ["WRADIO", "WSELECT"].includes(ModelProperty.type?.toUpperCase()) ? false : true;
 		let modType = ["WRADIO", "WCHECKBOX"].includes(ModelProperty.type?.toUpperCase()) ? "SELECT_BOX" : "SELECT";
 		//console.log(multiple, modType);
-
 		return { multiple, modType }
 	}
 	/**

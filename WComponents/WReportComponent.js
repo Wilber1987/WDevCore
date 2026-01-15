@@ -1,5 +1,6 @@
 //@ts-check
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+import { ModelProperty } from "../WModules/CommonModel.js";
 import { Money } from "../WModules/Types/Money.js";
 import { ComponentsManager, ConvertToMoneyString, html, WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
@@ -7,12 +8,13 @@ import { css } from "../WModules/WStyledRender.js";
 import { WDocumentViewer } from "./WDocumentViewer.js";
 
 /**
- * @typedef {Object.<string, any>} ReportConfig
+ * @typedef {Object} ReportConfig
  * @property {Array} [Dataset]
  * @property {Object.<string, any>} [ModelObject]
  * @property {HTMLElement} [Header]
  * @property {HTMLStyleElement} [CustomStyle]
  * @property {String} [PageType]
+ * @property {String} [title]
  * @property {Function} [exportXlsAction]
  * @property {boolean} [DocumentViewFirst]
  * @property {boolean} [exportPdf]
@@ -35,6 +37,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		this.appendChild(this.OptionContainer);
 		this.appendChild(this.MainContainer);
 		this.appendChild(this.CustomStyle);
+		this.columnWidth = 100
 		if (Config.CustomStyle) {
 			this.appendChild(Config.CustomStyle);
 		}
@@ -60,6 +63,9 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			children: [this.RenderMetrics(this.MetricLevels["General Summary"], 0, "Total")]
 		}));
 		this.SetOptions();
+		if (this.Config.Dataset.length == 0) {
+			this.ReportContainer.innerHTML = "<h1 class='no-data'>No hay datos que mostrar!</h1>"
+		}
 		if (this.Config.DocumentViewFirst == true) {
 			this.GoToDocumentView();
 		} else {
@@ -71,7 +77,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 	SetOptions() {
 		this.OptionContainer.appendChild(html`<button class="Btn-Mini" onclick="${() => {
 			this.Manager.NavigateFunction("report", this.ReportContainer);
-		}}">Reporte</button>`);
+		}}">${this.Config.title ? this.Config.title : "Reporte"}</button>`);
 
 		this.OptionContainer.appendChild(html`<button class="Btn-Mini" onclick="${() => {
 			this.GoToDocumentView();
@@ -80,6 +86,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 	GoToDocumentView() {
 		const documentViewer = this.ViewDocument();
+		this.Manager.Remove("documentViewer")
 		this.Manager.NavigateFunction("documentViewer", documentViewer);
 	}
 
@@ -102,8 +109,11 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		const { GroupParams, EvalParams } = this.Config;
 		if (!GroupParams || GroupParams.length === 0) {
 			// @ts-ignore
-			this.MetricLevels["Reporte"] = this.calculateSummary(data);
-			return { "Reporte": data };
+			this.MetricLevels[this.Config.title ?? "Reporte"] = this.calculateSummary(data);
+			const metric = {};
+			// @ts-ignore
+			metric[this.Config.title ?? "Reporte"] = data
+			return metric;
 		}
 		const grouped = {};
 		data.forEach(item => {
@@ -218,22 +228,31 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		if (Object.keys(summary ?? {}).length === 0) {
 			return html`<span></span>`;
 		}
-		return WRender.Create({
+		const metricRow = WRender.Create({
 			tagName: "tr",
 			className: "metrics-container summary level" + level,
-			children: [WRender.Create({
+			children: this.allProps?.map(prop => WRender.Create({
+				tagName: "td",
+				style: { width: `${this.columnWidth}%` },
+				className: prop + " metric"
+				//colSpan: (this.allProps?.length ?? 1) - (this.Config.EvalParams?.length ?? 0),
+				//children: [summaryName]
+			}))
+		});
+		/*WRender.Create({
 				tagName: "td",
 				colSpan: (this.allProps?.length ?? 1) - (this.Config.EvalParams?.length ?? 0),
 				children: [summaryName]
-			}),
-			...Object.keys(summary ?? {}).map(metric =>
-				WRender.Create({
+			}),WRender.Create({
 					tagName: "td",
 					className: "metric",
 					children: [this.RenderProcessMetricValue(metric, summary)]
-				})
-			)]
-		});
+				})*/
+		Object.keys(summary ?? {}).forEach(metric => {
+			const metricData = this.RenderProcessMetricValue(metric, summary);
+			metricRow.querySelector(`.${metric}`)?.append(metricData)
+		})
+		return metricRow;
 	}
 
 	RenderProcessMetricValue(metric, summary) {
@@ -276,6 +295,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 	CreateTable(data, parent, summary, level) {
 		const table = WRender.Create({ tagName: "table", className: "report-table" });
 		data.forEach((item, index) => {
+
 			this.TableHeader(index, item, table);
 			const row = WRender.Create({
 				tagName: "tr", className: "table-row"
@@ -283,7 +303,8 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 			// Usamos el método para obtener todas las propiedades incluidas getters
 			this.allProps?.forEach(prop => {
-				if (this.IsDrawableRow(item, prop)) {
+				const modelProperty = this.Config.ModelObject[prop];
+				if (this.IsDrawableRow(item, prop, modelProperty)) {
 					let value;
 					// Intentamos leer el valor de la propiedad, puede ser getter
 					try {
@@ -304,17 +325,24 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 	TableHeader(index, item, table) {
 		if (index == 0) {
+
 			const row = WRender.Create({
 				tagName: "tr", className: "table-row"
 			});
 			this.allProps = this.GetAllPropertyNames(item).filter(prop => {
 				return this.IsDrawableRow(item, prop);
 			});
+
+			this.columnWidth = 100 / this.allProps.length;
+
 			this.allProps.forEach(prop => {
+				/**@type {ModelProperty} */
+				const modelProperty = this.Config.ModelObject[prop];
 				row.appendChild(WRender.Create({
 					tagName: "th",
 					className: "table-cell",
-					children: [WOrtograficValidation.es(prop)]
+					style: { width: `${this.columnWidth}%` },
+					children: [modelProperty?.label ? modelProperty.label : WOrtograficValidation.es(prop)]
 				}));
 			})
 			table.appendChild(row);
@@ -343,7 +371,9 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 				case "MONEY":
 					classType += "row-money";
 					return WRender.Create({
-						tagName: "td", className: "table-cell " + classType, children: [
+						tagName: "td", className: "table-cell " + classType,
+						style: { width: `${this.columnWidth}%` },
+						children: [
 							html`<label>
 								<span>${new Money(value, this.Config.ModelObject[prop].Currency).toString()}</span>
 							</label>`
@@ -359,9 +389,18 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			}
 		}
 
-		return WRender.Create({ tagName: "td", className: "table-cell " + classType, children: [processValue?.toString()] });
+		return WRender.Create({
+			tagName: "td", className: "table-cell " + classType,
+			style: { width: `${this.columnWidth}%` },
+			children: [processValue?.toString()]
+		});
 	}
-	IsDrawableRow(element, prop) {
+	/**
+	  * @param {{ [x: string]: any; }} element
+	  * @param {string | number} prop
+	  * @param {ModelProperty} [modelProperty]
+	  */
+	IsDrawableRow(element, prop, modelProperty) {
 		const model = this.Config.ModelObject;
 
 		// Si no hay modelo, mostrar solo propiedades primitivas
@@ -369,14 +408,18 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			const value = element[prop];
 			return ["number", "string", "boolean", "bigint"].includes(typeof value);
 		}
+		if (modelProperty) {
+			//return modelProperty.hidden == false;
+		}
 
 		const modelProp = model[prop];
-		if (!modelProp) return false;
+		if (modelProp == undefined) return false;
 		// Si el modelo dice que se oculta, o es tipo que no se debe mostrar
 		const hidden = typeof modelProp.hidden === "function" ? modelProp.hidden(element) : modelProp.hidden;
 		const type = modelProp.type?.toUpperCase();
 
 		if (
+			modelProp?.type == undefined ||
 			hidden ||
 			modelProp.primary ||
 			modelProp.hiddenInTable ||
@@ -413,6 +456,10 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			display: block;
 			padding: 20px;
 			background-color: #ffffff;
+			padding: 20px;
+			margin: 0px;
+			border-radius: 5px;
+			border: 1px solid #eee;
 		}
 		.group-level {
 			height: auto;
@@ -477,7 +524,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		}
 
 		.group-title.group-0 {
-			text-transform: uppercase;
+			text-transform: capitalize;
 			font-size: 20px;
 			border-left: unset;
 			border-bottom: 5px solid #3498db;
@@ -582,6 +629,10 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			padding: 0 !important;
 		}
 
+		.report-table.group-summary .metric, .report-table.summary .metric {
+			width: 300px;
+		}
+
 		.metric-label {
 			font-weight: bold;
 			padding: 0px 5px;
@@ -606,6 +657,19 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			color: #222;
 		}
 
+		.document-container .table-cell {
+			padding: 5px;
+			font-size: 12px;
+			border: solid 1px #eee;
+			text-transform: capitalize;
+		}
+
+		.no-data {
+			padding: 20px;
+			margin: 0px;
+			border-radius: 5px;
+			border: 1px solid #eee;
+		}
 
 		/* Modo impresión */
 		@media print {

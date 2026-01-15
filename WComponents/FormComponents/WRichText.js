@@ -1,7 +1,15 @@
 //@ts-check
 import { html, WRender } from "../../WModules/WComponentsTools.js"
 import { css } from "../../WModules/WStyledRender.js"
+import { WModalForm } from "../WModalForm.js";
+import { BtnVideoComponent } from "./BtnVideoComponent.js";
+import { WImageCapture } from "./WImageCapture.js";
 class ModelFiles {
+    /**
+     * @param {string} name
+     * @param {string} value
+     * @param {string} type
+     */
     constructor(name, value, type) {
         this.Name = name;
         this.Type = type;
@@ -22,7 +30,7 @@ class WRichText extends HTMLElement {
     /**
     * @param {Config} [Config] 
     */
-    constructor(Config = { value: "", action: (value) => { } }) {
+    constructor(Config = { value: "", action: (/** @type {any} */ value) => { } }) {
         super();
         this.value = Config?.value ?? "";
         /**
@@ -64,6 +72,9 @@ class WRichText extends HTMLElement {
         this.DrawAttached();
         this.DrawHtmlEditor();
     }
+    /**
+     * @param {string} contenido
+     */
     clearInnerHtml(contenido) {
         // @ts-ignore
         //let contenido = this.querySelector(".WREditor")?.innerText;
@@ -100,6 +111,7 @@ class WRichText extends HTMLElement {
             } else if (command.class == "right") {
                 CommandBtn.appendChild(html`<svg viewBox="0 -5 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 1H5V3H15V1Z" fill="#000000"></path> <path d="M1 5H15V7H1V5Z" fill="#000000"></path> <path d="M15 9H5V11H15V9Z" fill="#000000"></path> <path d="M15 13H1V15H15V13Z" fill="#000000"></path> </g></svg>`)
             }
+            // @ts-ignore
             CommandBtn[command.event] = () => {
                 const ROption = this.querySelector("#ROption" + command.commandName);
                 //console.log( ROption.value );   
@@ -117,6 +129,108 @@ class WRichText extends HTMLElement {
         OptionsSection.append(html`<button onclick="${() => this.ToggleHtmlEditor()}" class="htmlBtn ROption tooltip tooltipBtn">
             <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <rect x="0" fill="none" width="20" height="20"></rect> <g> <path d="M4 16v-2H2v2H1v-5h1v2h2v-2h1v5H4zM7 16v-4H5.6v-1h3.7v1H8v4H7zM10 16v-5h1l1.4 3.4h.1L14 11h1v5h-1v-3.1h-.1l-1.1 2.5h-.6l-1.1-2.5H11V16h-1zM19 16h-3v-5h1v4h2v1zM9.4 4.2L7.1 6.5l2.3 2.3-.6 1.2-3.5-3.5L8.8 3l.6 1.2zm1.2 4.6l2.3-2.3-2.3-2.3.6-1.2 3.5 3.5-3.5 3.5-.6-1.2z"></path> </g> </g></svg>
         </button>`);
+
+        // --- NUEVAS OPCIONES: TAMAÑO DE FUENTE ---
+        //{ 1: "8px", 2: "10px", 3: "12px", 4: "14px", 5: "18px", 6: "24px", 7: "32px" };
+        OptionsSection.append(WRender.Create({
+            class: "tooltip",
+            children: [
+                WRender.Create({
+                    tagName: "select",
+                    className: "ROption font-select",
+                    onchange: (/** @type {{ target: { value: number; }; }} */ ev) => this.changeFontSize(ev.target.value),
+                    children: [
+                        { tagName: "option", value: 3, innerText: "A" },
+                        { tagName: "option", value: 1, innerText: "8 px" },
+                        { tagName: "option", value: 2, innerText: "10 px" },
+                        { tagName: "option", value: 3, innerText: "12 px" },
+                        { tagName: "option", value: 4, innerText: "14 px" },
+                        { tagName: "option", value: 5, innerText: "18 px" },
+                        { tagName: "option", value: 6, innerText: "24 px" },
+                        { tagName: "option", value: 7, innerText: "32 px" },
+                    ]
+                })
+            ]
+        }));
+
+        OptionsSection.append(WRender.Create({
+            class: "tooltip",
+            children: [
+                WRender.Create({
+                    tagName: "input",
+                    className: "ROption font-select",
+                    type: "color",
+                    onchange: (/** @type {{ target: { value: String; }; }} */ ev) => this.changeFontColor(ev.target.value),
+                })
+            ]
+        }));
+
+        // --- NUEVA OPCIÓN: INSERTAR IMAGEN (URL) ---
+        const ImageContainer = html`<div class="ToolWithInputContainer tooltip">            
+                <button class="ROption tooltipBtn insert-image-btn" title="Insertar Imagen (URL)" 
+                    onclick="${(/** @type {{ preventDefault: () => void; }} */ e) => {
+                e.preventDefault();
+                const input = this.querySelector(".image-url-input");
+                // @ts-ignore
+                const isHidden = input.style.display !== "inline-block";
+                // @ts-ignore
+                input.style.display = !isHidden ? "none" : "inline-block";
+                if (isHidden) {
+                    // @ts-ignore
+                    input.focus();
+                }
+            }}"> 
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M1 1H15V15H1V1ZM6 9L8 11L13 6V13H3V12L6 9ZM6.5 7C7.32843 7 8 6.32843 8 5.5C8 4.67157 7.32843 4 6.5 4C5.67157 4 5 4.67157 5 5.5C5 6.32843 5.67157 7 6.5 7Z" fill="#000000"></path> </g></svg>          
+            </button>
+            <input type= "url" placeholder= "Image URL" class="ROption tool-input image-url-input"  onkeypress="${(/** @type {{ key: string; preventDefault: () => void; target: { value: string; style: { display: string; }; }; }} */ e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // @ts-ignore
+                    this.insertImage(e.target.value);
+                    // @ts-ignore
+                    e.target.value = "";
+                    // @ts-ignore
+                    e.target.style.display = "none";
+                }
+            }}">
+        </div>`
+
+        const ParamContainer = html`<div class="ToolWithInputContainer tooltip">
+                <button class="ROption  tooltipBtn bold" title="Insertar el nombre del parámetro" onclick="${(/** @type {{ preventDefault: () => void; }} */ e) => {
+                e.preventDefault();
+                const input = this.querySelector(".param-input");
+                // @ts-ignore
+                const isHidden = input.style.display !== "inline-block";
+                // @ts-ignore
+                input.style.display = !isHidden ? "none" : "inline-block";
+                if (isHidden) {
+                    // @ts-ignore
+                    input.focus();
+                }
+            }}">P</button>
+            <input type= "text" placeholder= "Nombre del parámetro" class="ROption tool-input param-input" onkeypress="${(/** @type {{ key: string; preventDefault: () => void; target: { value: string; style: { display: string; }; }; }} */ e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const paramValue = e.target.value.trim();
+                    // 1. Ocultar y limpiar el input
+                    e.target.value = "";
+                    e.target.style.display = "none";
+                    if (paramValue) {
+                        // 3. Devolver el foco al editor (necesario para execCommand)
+                        this.Divinput.focus();
+                        // 4. Insertar el texto en la posición restaurada
+                        const formattedText = `{{ ${paramValue} }}`;
+                        document.execCommand("insertText", false, formattedText);
+                        this.Divinput.dispatchEvent(new Event('input'));
+                    } else {
+                        // Si no hay valor, solo asegura el foco
+                        this.Divinput.focus();
+                    }
+                }
+            }}">
+        </div>`
+
+        OptionsSection.append(ImageContainer, ParamContainer);
         this.append(OptionsSection);
 
     }
@@ -136,9 +250,14 @@ class WRichText extends HTMLElement {
             tagName: "section", class: "InputFileSection", children: []
         })
         this.AddInputFileSection = WRender.Create({
-            tagName: "section", class: "AddInputFileSection", children: [
+            tagName: "section", class: "AddInputFileSection", children: [               
                 InputFileStyle.cloneNode(true),
                 this.AttachedSection,
+                 //new WImageCapture(),
+                 new BtnVideoComponent({
+                action: async (/** @type {any} */ imageB64) => {
+                    this.CreateFileObject("capture" + Date.now().toString(), imageB64, "data:image/png;base64,");
+                }}),
                 WRender.Create({
                     tagName: "label", htmlFor: "attachInput", class: "button", innerHTML: ""
                 }),
@@ -146,7 +265,7 @@ class WRichText extends HTMLElement {
         })
         this.AddInputFileSection.append(WRender.Create({
             tagName: "input", id: "attachInput", type: "file", class: "inputfile",
-            onchange: (ev) => {
+            onchange: (/** @type {{ target: any; }} */ ev) => {
                 const targetControl = ev.target
                 let base64Type = "";
                 let fileB64;
@@ -167,24 +286,11 @@ class WRichText extends HTMLElement {
                 reader.onloadend = (e) => {
                     //@ts-ignore
                     fileB64 = e.target?.result?.split("base64,")[1];
-                    const fileClass = new ModelFiles(file.name, fileB64, base64Type);
-                    this.Files.push(fileClass);
-                    //@ts-ignore
-                    this.AttachedSection.innerHTML = "";
-                    this.Files.forEach(file => {
-                        const AttachBtn = WRender.Create({
-                            className: "AttachBtn", innerHTML: "X", onclick: () => {
-                                this.Files.splice(this.Files.indexOf(file), 1);
-                                AttachBtn.parentNode?.parentNode?.removeChild(AttachBtn.parentNode);
-                            }
-                        })
-                        //@ts-ignore
-                        this.AttachedSection.append(WRender.Create({ class: "AttachItem", children: [file.Name, AttachBtn] }))
-                    });
+                    this.CreateFileObject(file.name, fileB64, base64Type);
 
                 };
                 reader.readAsDataURL(file);
-            }, onclick: (ev) => {
+            }, onclick: (/** @type {{ target: { value: string; }; }} */ ev) => {
                 let file = '';
                 if (ev.target?.value) {
                     file = ev.target?.value;
@@ -198,6 +304,28 @@ class WRichText extends HTMLElement {
         this.append(this.AddInputFileSection);
     }
 
+    /**
+     * @param {string} fileName
+     * @param {string} fileB64
+     * @param {string} base64Type
+     */
+    CreateFileObject(fileName, fileB64, base64Type) {
+        const fileClass = new ModelFiles(fileName, fileB64, base64Type);
+        this.Files.push(fileClass);
+        //@ts-ignore
+        this.AttachedSection.innerHTML = "";
+        this.Files.forEach(file => {
+            const AttachBtn = WRender.Create({
+                className: "AttachBtn", innerHTML: "X", onclick: () => {
+                    this.Files.splice(this.Files.indexOf(file), 1);
+                    AttachBtn.parentNode?.parentNode?.removeChild(AttachBtn.parentNode);
+                }
+            });
+            //@ts-ignore
+            this.AttachedSection.append(WRender.Create({ class: "AttachItem", children: [file.Name, AttachBtn] }));
+        });
+    }
+
     FunctionClear() {
         // @ts-ignore
         this.value = this.Divinput.innerHTML = "";
@@ -207,44 +335,6 @@ class WRichText extends HTMLElement {
         }
         this.Files = [];
     }
-    Commands = [
-        //{ commandName: "backColor", icon: "", type: "color", commandOptions: null, state: 1, event: "onchange" },
-        { commandName: "bold", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "bold", label: "B" },
-        { commandName: "italic", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "italic", label: "I" },
-        { commandName: "underline", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "underline", label: "U" },
-        { commandName: "insertUnorderedList", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "list", label: "" },
-        //{ commandName: "createLink", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "link", label: "" },
-        //{ commandName: "uppercase", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "bold", label: "A" },
-        //{ commandName: "insertOrderedList", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "list", label: "" },
-        //{ commandName: "copy", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "cut", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "defaultParagraphSeparator", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "delete", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "fontName", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "foreColor", icon: "", type: "color", commandOptions: null, state: 1, event: "onchange" },
-        //{ commandName: "formatBlock", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "forwardDelete", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "insertHorizontalRule", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "insertHTML", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "insertImage", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "insertLineBreak", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "insertParagraph", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "insertText", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        { commandName: "justifyLeft", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "left", label: "" },
-        { commandName: "justifyCenter", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "center", label: "" },
-        { commandName: "justifyRight", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "right", label: "" },
-        //{ commandName: "justifyFull", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "outdent", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "paste", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "redo", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "selectAll", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "strikethrough", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "styleWithCss", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "subscript", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "superscript", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "undo", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-        //{ commandName: "unlink", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
-    ];
     tableBuilder = html`<div class="tableBuilder" tabindex="-1">
         <div class="ck">
             <div class="btn-container">
@@ -291,10 +381,16 @@ class WRichText extends HTMLElement {
             }
         </style>
     </div>`
+    /**
+     * @param {any} ev
+     */
     CreateTable(ev) {
         this.Divinput.append(this.CreateHtmlTable(ev));
         this.value = this.Divinput.innerHTML;
     }
+    /**
+     * @param {{ target: any; }} event
+     */
     CreateHtmlTable(event) {
         const button = event.target;
         const sizeString = button.querySelector('span').textContent;
@@ -339,11 +435,14 @@ class WRichText extends HTMLElement {
         }
         return table;
     }
+    /**
+     * @param {number} num
+     */
     BuildBtnTableMap(num) {
         const BtnArray = [];
         for (let indexCol = 1; indexCol <= num; indexCol++) {
             for (let indexRow = 1; indexRow <= num; indexRow++) {
-                BtnArray.push(html`<button onclick="${(ev) => { this.CreateTable(ev) }}"><span>${indexCol} × ${indexRow}</span></button>`);
+                BtnArray.push(html`<button onclick="${(/** @type {any} */ ev) => { this.CreateTable(ev) }}"><span>${indexCol} × ${indexRow}</span></button>`);
             }
         }
         return BtnArray
@@ -373,6 +472,76 @@ class WRichText extends HTMLElement {
         });
         this.append(this.htmlEditor);
     }
+    /**
+     * Inserta una imagen en el editor en la posición actual del cursor/selección.
+     * @param {string} url - La URL de la imagen a insertar.
+     */
+    insertImage = (url) => {
+        if (url && url.trim() !== "") {
+            this.Divinput.append(html`<img class="content-image" src="${url.trim()}">`);
+        }
+        this.Divinput.focus();
+    }
+    /**
+     * @param {number} step
+     */
+    changeFontSize(step) {
+        // 1–7 son los tamaños válidos en execCommand
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return;
+        /**@type {number} */
+        const newSize = Math.min(7, Math.max(1, step));
+        document.execCommand("fontSize", false, newSize.toString());
+    }
+
+    /**
+     * @param {string} color
+     */
+    changeFontColor(color) {
+        // 1–7 son los tamaños válidos en execCommand
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return;
+        document.execCommand("foreColor", false, color);
+    }
+
+    Commands = [
+        //{ commandName: "backColor", icon: "", type: "color", commandOptions: null, state: 1, event: "onchange" },
+        { commandName: "bold", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "bold", label: "B" },
+        { commandName: "italic", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "italic", label: "I" },
+        { commandName: "underline", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "underline", label: "U" },
+        { commandName: "insertUnorderedList", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "list", label: "" },
+        //{ commandName: "createLink", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "link", label: "" },
+        //{ commandName: "uppercase", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "bold", label: "A" },
+        //{ commandName: "insertOrderedList", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "list", label: "" },
+        //{ commandName: "copy", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "cut", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "defaultParagraphSeparator", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "delete", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "fontName", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "foreColor", icon: "", type: "color", commandOptions: null, state: 1, event: "onchange" },
+        //{ commandName: "formatBlock", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "forwardDelete", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "insertHorizontalRule", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "insertHTML", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "insertImage", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "insertLineBreak", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "insertParagraph", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "insertText", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        { commandName: "justifyLeft", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "left", label: "" },
+        { commandName: "justifyCenter", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "center", label: "" },
+        { commandName: "justifyRight", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick", class: "right", label: "" },
+        //{ commandName: "justifyFull", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "outdent", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "paste", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "redo", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "selectAll", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "strikethrough", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "styleWithCss", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "subscript", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "superscript", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "undo", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+        //{ commandName: "unlink", icon: "", type: "button", commandOptions: null, state: 1, event: "onclick" },
+    ];
 }
 
 
@@ -400,11 +569,7 @@ const WRichTextStyle = css`
         background-color: var(--fifty-color);
         position: relative;
         gap: 10px;
-    }
-
-    
-    
-
+    }  
     w-rich-text .SendSection {
         border: none;
         margin: 10px;    
@@ -419,12 +584,20 @@ const WRichTextStyle = css`
         padding: 3px;
         margin: 0px;
         display: grid;
-        place-items: center;
         background-color: transparent;
         color: var(--font-primary-color);
         cursor  : pointer;
         transition: all 0.3s;
     }
+    .ROption.font-select {
+        width: 65px;
+        border: 1px solid #999;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    .content-image {
+        max-width: 100%;
+    }    
     w-rich-text .ROption:hover {
         color: var(--font-secundary-color);
     }
@@ -464,17 +637,6 @@ const WRichTextStyle = css`
         margin-left: -60px;
         box-shadow: 0 0 2px 0 #999;
     }
-
-    /*.tooltiptext::after {
-        content: "";
-        position: absolute;
-        bottom: -100;
-        left: 50%;
-        margin-left: -5px;
-        border-width: 5px;
-        border-style: solid;
-        border-color: black transparent transparent transparent;
-    }*/
 
     .tooltip:hover .tooltiptext {
         visibility: visible;
@@ -578,7 +740,15 @@ const WRichTextStyle = css`
         background-size: 18px;
         background-image: url("/WDevCore/Icons/code.png");
     }
-    `
+    .ToolWithInputContainer {
+        display: flex;
+        align-items: center;
+        text-align: left;
+    }
+    w-rich-text .tool-input {
+        width: 150px; padding: 5px; margin-left: 5px; display: none; border-radius: 5px; border: 1px solid var(--fifty-color);
+    }
+`
 
 
 const InputFileStyle = css`
@@ -590,7 +760,7 @@ const InputFileStyle = css`
         display: grid;
         grid-template-columns: auto auto auto;
         justify-content: left;
-        min-width: calc(100% - 50px);
+        min-width: calc(100% - 150px);
     }
 
     .AddInputFileSection {
@@ -608,8 +778,7 @@ const InputFileStyle = css`
         min-width: 35px;
         min-height: 35px;
         max-height: 35px;
-        margin: 5px;
-        padding: 5px;
+        padding: 10px 0px;
         border-radius: 5px;
         transition: transform .2s ease-out;
         background-color: unset;

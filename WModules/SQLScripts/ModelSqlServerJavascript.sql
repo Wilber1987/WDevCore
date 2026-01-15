@@ -23,7 +23,7 @@ BEGIN
 
 PRINT 'class ' + @tableName + ' {'
 PRINT '	constructor(props) {'
-PRINT '		for (const prop in props) {'
+PRINT '		Object.assign(this, props);'
 PRINT '			this[prop] = props[prop];'
 PRINT '		}'
 PRINT '	}'

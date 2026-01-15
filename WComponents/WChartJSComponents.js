@@ -67,6 +67,8 @@ class ColumChart extends HTMLElement {
     }
     connectedCallback() {
         //console.log("conected");
+        console.trace()
+        console.log(this.ChartInstance.Dataset)
         if (this.ChartInstance.Dataset == null || this.ChartInstance.Dataset == undefined || this.ChartInstance.Dataset.length == 0) {
             this.shadowRoot.innerHTML = "No hay datos que mostar";
             return;
@@ -194,7 +196,7 @@ class ColumChart extends HTMLElement {
             let trGroup = { type: "GroupSection", props: { class: "GroupSection" }, children: [WArrayF.Capitalize(Group[Groups.groupParam])] };
             let groupBar = {
                 type: "containerbar", props: {
-                    style: `padding: 10px; width: ${100 / (Groups.children?.length ?? 1)}%`, class: "ContainerBars"
+                    style: `width: ${100 / (Groups.children?.length ?? 1)}%`, class: "ContainerBars"
                 }, children: []
             };
            // let groupBar = html`<div class="groupBar"></div>`
@@ -726,6 +728,7 @@ const WChartStyle = (ChartInstance) => {
             max-height: 450px;
             position: relative;
             font-family: Verdana, Geneva, Tahoma, sans-serif;
+            box-sizing: border-box;
         }
         .WChartContainerRadial {
             display: grid;

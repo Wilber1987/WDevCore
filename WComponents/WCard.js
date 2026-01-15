@@ -5,7 +5,7 @@ import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css } from "../WModules/WStyledRender.js";
 
 class WCard extends HTMLElement {
-    constructor(Element, Model, Config) {
+    constructor(Element, Model, Config = {}) {
         super();
         if (Model?.__proto__ == Function.prototype) {
             Model = Model();

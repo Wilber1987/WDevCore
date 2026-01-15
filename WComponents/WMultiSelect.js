@@ -69,7 +69,8 @@ class MultiSelect extends HTMLElement {
 				position: "relative",
 				padding: "0px",
 				border: "none",
-				height: "initial"
+				height: "initial",
+				backgroundColor: "unset"
 			});
 		}
 
@@ -165,6 +166,8 @@ class MultiSelect extends HTMLElement {
 		//this.shadowRoot?.append(
 		this.SetOptions();
 		if (Config.Mode == "SELECT_BOX") {
+			// @ts-ignore
+			this.tool.className += "SELECT_BOX"
 			this.shadowRoot?.append(selectBoxStyle.cloneNode(true));
 			this.DisplayOptions();
 		}
@@ -518,7 +521,7 @@ class MultiSelect extends HTMLElement {
 	}
 	undisplayMultiSelects = (e) => {
 		// @ts-ignore
-		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
+		if (!e.target?.tagName?.includes("W-MULTI-SELECT")) {
 			// @ts-ignore
 			document.querySelectorAll("w-multi-select").forEach((/**@type {MultiSelect} */ m) => {
 				if (this.Config.Mode != "SELECT_BOX") {
@@ -668,6 +671,8 @@ const MainMenu = css`
 		padding: 10px 10px;
 		font-size: 12px;
 		text-align: justify;
+		min-width: 100%;
+    	box-sizing: border-box;
 	}
 	.SubMenu {
 		max-height: 0px;
@@ -745,6 +750,30 @@ const MainMenu = css`
 		font-size: 12px;
 		font-weight: 500;
 		top: 32px !important;
+	}
+	.SELECT_BOX {
+		border: none;
+		z-index: unset;
+		.OptionsContainer  {
+			flex-direction: column;
+			background-color: unset;
+			.OContainer::first-letter, .OContainerActive::first-letter, .OptionLabel::first-letter {
+				text-transform: capitalize;
+			}
+			.OContainer, .OContainer:hover, .OContainerActive, .OptionLabel {
+				background-color: unset;
+				font-size: 14px !important;
+				display: flex;
+				flex-direction: row;
+				position: relative;
+				padding-left: 30px;
+				align-items: center;
+				input[type=radio] {
+					position: absolute;
+					left: 0;
+				}
+			} 
+		}
 	}
 	input[type=radio] {
 		cursor: pointer;

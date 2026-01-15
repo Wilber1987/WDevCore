@@ -2,7 +2,7 @@ import { css } from "../../WModules/WStyledRender.js";
 export const WModalStyle = css`
   .ContainerFormWModal {
        display: grid;
-       grid-template-rows: 70px calc(100% - 70px);
+       grid-template-rows: 50px calc(100% - 50px);
        margin: auto;
        margin-top: 20px;
        background-color: var(--primary-color);
@@ -29,7 +29,7 @@ export const WModalStyle = css`
 
   .ModalContent {
        display: block;
-       padding: 30px;
+       padding: 20px;
   }
 
   .ModalHeader {
@@ -39,8 +39,7 @@ export const WModalStyle = css`
        display: flex;
        justify-content: center;
        align-items: center;
-       padding: 40px 30px 20px 30px;
-       margin-bottom: 20px;
+       padding: 30px;
        text-transform: uppercase;
        position: relative;
   }
@@ -91,7 +90,7 @@ export const WModalStyle = css`
 
   @media (max-width: 1200px) {
        .ContainerFormWModal {
-            width: 90%;
+            width: 90% !important;
        }
   }
 

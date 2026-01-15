@@ -23,7 +23,7 @@ import { WAlertMessage } from "./WAlertMessage.js";
 	* @property {Object} [ParentEntity] objeto que contiene al objeto padre del que se esta editando
 	* @property {Array<{ name:string, action: (EditingObject:Object)=> {}}>} [UserActions] acciones personalizadas que se pueden agregar al formulario, estas se representan como botones adicionales
 	* @property {Object} [ModelObject] objeto que contiene las propiedades del modelo que se va a editar
-	* @property {Object} [EntityModel] objeto que contiene el modelo de la entidad que se esta editando
+	* @property {EntityClass} [EntityModel] objeto que contiene el modelo de la entidad que se esta editando
 	* @property {Boolean} [AutoSave] indica si el formulario se guarda automaticamente y debe hacer una peticion ajax a los metodos entity del modelo ejemplo Save o Update
 	* @property {Boolean} [WSelectAddObject] indica si el formulario permitira que un control wselect podra agregar un objeto nuevo
 	* @property {Boolean} [DataRequire]  indica si los datos son requeridos   
@@ -123,7 +123,7 @@ class WForm extends HTMLElement {
 		}
 	}
 
-	connectedCallback() {		
+	connectedCallback() {
 		this.CreateOriginalObject();
 		this.DivForm.addEventListener("click", (e) => this.undisplayMultiSelects(e));
 		this.DivForm.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
@@ -133,9 +133,9 @@ class WForm extends HTMLElement {
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
 				// @ts-ignore
-				if (m.tool) {
+				if (m.tool && !m.tool.className.includes("SELECT_BOX") && !m.tool.className.includes("toolInactive") ) {
 					// @ts-ignore
-					m.tool.className = "toolInactive";
+					m.tool.className += " toolInactive";
 				}
 			})
 		}
@@ -143,7 +143,7 @@ class WForm extends HTMLElement {
 	/**@type {Object.<string,any>} */
 	#OriginalObject = {};
 	DrawComponent = async () => {
-		/**@type {Object.<string,any>} */		
+		/**@type {Object.<string,any>} */
 		const Model = this.ModelObject;
 		const ObjectProxy = this.CreateProxy(Model);
 		this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
@@ -259,7 +259,9 @@ class WForm extends HTMLElement {
 						}
 						// @ts-ignore
 						if (["NUMBER", "MONEY"].includes(modelProperty.type.toUpperCase()) && this.Controls[prop].value.trim() == "") {
-							target[prop] = undefined;
+							target[prop] = this.IsNumber(target[prop]) ? target[prop] : undefined;
+							// @ts-ignore
+							this.Controls[prop].value = this.IsNumber(target[prop]) ? parseFloat(target[prop])?.toFixed(3) : "";
 						}
 						if (['MODEL'].includes(Model[prop].type?.toUpperCase())) {
 							// @ts-ignore
@@ -281,6 +283,12 @@ class WForm extends HTMLElement {
 			}
 		}
 		return OriginalObject;
+	}
+	/**
+	 * @param {any} value
+	 */
+	IsNumber(value) {
+		return !isNaN(value) && value !== null && value !== '' && value !== true && value !== false;
 	}
 	/**
 	* 
@@ -356,6 +364,7 @@ class WForm extends HTMLElement {
 		}
 	}
 
+	//TODO VERIFICAR POSTERIORMNENTE LA ASYNCRONIA
 	/**
 	 * @param {ModelProperty} modelProperty
 	 * @param {any} target
@@ -444,8 +453,7 @@ class WForm extends HTMLElement {
 		let addLabel = true;
 
 		const onchangeListener = async (/** @type {any} */ ev) => {
-			// @ts-ignore
-			if (!ModelProperty.disabled) {
+			if (ModelProperty.disabled != true) {
 				if (ev) {
 					await onChangeEvent(ev)
 				}
@@ -473,7 +481,7 @@ class WForm extends HTMLElement {
 				this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
 					ObjectF, prop, this.Config?.ImageUrlPath ?? "", onchangeListener);
 				break;
-			case "MULTISELECT": case "WCHECKBOX": case "WSELECT":
+			case "MULTISELECT": case "WCHECKBOX": case "WSELECT": case "WRADIO":
 				if (ModelProperty.IsGridDisplay) {
 					// @ts-ignore
 					this.Controls[prop] = await ModelPropertyFormBuilder.CreateTable(ModelProperty,
@@ -602,7 +610,7 @@ class WForm extends HTMLElement {
 			if (this.Config.ObjectOptions?.Url != undefined || this.Config.SaveFunction == undefined) {
 				const ModalCheck = await this.ModalCheck(ObjectF, this.Config.SaveFunction == undefined);
 				this.shadowRoot?.append(ModalCheck)
-			} else if (this.ModelObject?.SaveWithModel != undefined && this.Config.AutoSave == true) {
+			} else if ((this.Config?.EntityModel?.SaveWithModel != undefined || this.ModelObject?.SaveWithModel != undefined) && this.Config.AutoSave == true) {
 				const ModalCheck = await this.ModalCheck(ObjectF, true);
 				this.shadowRoot?.append(ModalCheck)
 			} else {
@@ -758,8 +766,10 @@ class WForm extends HTMLElement {
 		const modalCheckFunction = async ( /** @type {import("./LoadinModal.js").LoadinModal} */ loadinModal) => {
 			try {
 				this.shadowRoot?.appendChild(loadinModal);
+				
 				if (withModel) {
-					const response = await this.ModelObject?.SaveWithModel(ObjectF, this.Config.EditObject != undefined);
+					const saveF = this.Config?.EntityModel?.SaveWithModel ?? this.ModelObject?.SaveWithModel
+					const response = await saveF(ObjectF, this.Config.EditObject != undefined);
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
@@ -825,10 +835,14 @@ class WForm extends HTMLElement {
 			.MASTERDETAIL,
 			.GRID_DISPLAY,
 			.RICHTEXT,
+			.WRADIO,
 			.DRAW,
 			.CALENDAR {
 				grid-column: span  ${this.limit};
 				padding-bottom: 10px;
+				@media (max-width: 600px) {
+					grid-column: span 1;
+				}
 			}
 			.TEXTAREA, .PASSWORD, .MODEL {
 				grid-column: span  ${(this.limit ?? 1) > 1 ? this.limit : 1};

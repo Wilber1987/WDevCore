@@ -5,17 +5,17 @@ import { css } from "../WModules/WStyledRender.js";
 
 
 /**
- * @typedef {Object.<string, any>} NavConfig 
+ * @typedef {Object} NavConfig 
  *  * @property {Boolean} [Inicialize] 
 	* @property {String} [NavTitle] flex-end
 	* @property {String} [alignItems] flex-end
 	* @property {String} [DisplayMode] right
-	* @property {Array} [Elements]
+	* @property {Array<Object<string, any>>} [Elements]
 	* @property {Boolean} [DarkMode]
 	* @property {Boolean} [isMediaQuery]
 	* @property {String} [Direction] row | column
 	* @property {String} [NavStyle] nav | tab
-	* @property {HTMLStyleElement} [CustomStyle]
+	* @property {HTMLStyleElement|Node} [CustomStyle]
 	* @property {HTMLElement} [TabContainer]
 **/
 class WAppNavigator extends HTMLElement {
@@ -40,6 +40,9 @@ class WAppNavigator extends HTMLElement {
 				display: "block"
 			})
 		}
+		/**
+		 * @type {any[]}
+		 */
 		this.ElementNavControls = [];
 		this.DrawAppNavigator();
 		this.Elements = this.Elements ?? [];
@@ -57,7 +60,7 @@ class WAppNavigator extends HTMLElement {
 			this.InitialNav();
 		}
 	}
-	ActiveMenu = (ev) => {
+	ActiveMenu = (/** @type {{ className: string; }} */ ev) => {
 		var navs = this.parentNode?.querySelectorAll("w-app-navigator");
 		navs?.forEach(nav => {
 			nav.querySelectorAll(".elementNavActive").forEach(elementNavActive => {
@@ -106,7 +109,7 @@ class WAppNavigator extends HTMLElement {
 		} else {
 			this.CreateTabControllers();
 		}
-
+		let activeIndex = 0
 		this.Elements.forEach((element, Index) => {
 			if (element.Disabled == false || element.rendered == false) {
 				return;
@@ -171,17 +174,20 @@ class WAppNavigator extends HTMLElement {
 				this.ElementNavControls.push(elementNav);
 
 			}
-			if (Index == 0 && element.SubNav == undefined) {
+			if (activeIndex == 0 && element.SubNav == undefined) {
 				this.InitialNav = () => {
 					elementNav.onclick();
 				}
 			}
+			activeIndex ++;
 		});
 	}
 	CreateTabControllers = () => {
 		this.TabContainer = this.TabContainer ?? WRender.Create({ className: "TabContainer", id: "content-container" });
 		this.Manager = new ComponentsManager({ MainContainer: this.TabContainer, SPAManage: false });
-		this.append(this.TabContainer);
+		if (!this.Config.TabContainer) {
+			this.append(this.TabContainer);
+		}		
 	}
 	/**
 	 * @param {HTMLElement | HTMLInputElement | HTMLSelectElement} objectWrapper
