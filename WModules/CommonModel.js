@@ -1,22 +1,10 @@
 
 /**
-<<<<<<< HEAD
- * @typedef {Object. ObjectOptions 
-=======
  * @typedef {Object} ObjectOptions 
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  *  * @property {Boolean} [AddObject]
 	* @property {String} [Url]
 	* @property {Function} [SaveFunction]
 **/
-<<<<<<< HEAD
-/**
- * @typedef {Object.<stsponseServices 
- *  * @property {int} [status]
-	* @property {String} [message]
-**/
-class ResponseServices { }
-=======
 
 export class ResponseServices {
 	/**
@@ -28,7 +16,6 @@ export class ResponseServices {
 	/**@type {Number} */ status
 	/**@type {String} */ message
 }
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
 
 /**
 * @param {Object.<string, any>} [EditingObject] este objeto es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante
@@ -79,11 +66,7 @@ class ModelProperty {
 	}
 }
 /**
-<<<<<<< HEAD
- * @typedef {Objey>} FormConfig 
-=======
  * @typedef {Object} FormConfig 
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  *  * @property {Object.<string, any>} [ObjectDetail]
 	* @property {Object.<string, any>} [EditObject]
 	* @property {Object.<string, any>} [ParentModel]
@@ -307,11 +290,7 @@ class FormConfig { };
 	 */
 class ElementStyle { }
 /**
-<<<<<<< HEAD
- * @typedef g, any>} WNode
-=======
  * @typedef {Object} WNode
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
 	 * @property {String} [tagName]
 	 * @property {String} [id]
 	 * @property {String} [type]
@@ -360,11 +339,7 @@ class WNode {
 	}
 }
 /**
-<<<<<<< HEAD
- * @typedef {O any>} Actions 
-=======
  * @typedef {Object} Actions 
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  * @property {String} name
  * @property {Function} action
  * @property {Function|Boolean} [rendered] funcion que debe retornar true o false
@@ -400,20 +375,12 @@ class WNode {
 **/
 
 /**
-<<<<<<< HEAD
- * @typedef {Object.<strichItemsFromApi 
-=======
  * @typedef {Object} SearchItemsFromApi 
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  * @property {String} [ApiUrl]
  * @property {Function} [action]
  * **/
 /**
-<<<<<<< HEAD
- * @typedef {Objec>} TableConfig 
-=======
  * @typedef {Object} TableConfig 
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  *  * @property {Array} [Dataset]
 	* @property {Array} [selectedItems]
 	* @property {Object.<string, any>} [ModelObject]  
@@ -442,11 +409,7 @@ class WNode {
  **/
 class TableConfig { };
 /**
-<<<<<<< HEAD
- * @typedef {Objec>} ModalConfig 
-=======
  * @typedef {Object} ModalConfig 
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
  *  * @property {Boolean} [ShadowRoot]
 	* @property {String} [icon]
 	* @property {String} [title]  

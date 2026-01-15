@@ -15,11 +15,8 @@ export class WAlertMessage extends HTMLElement {
         this.Direction = Config.Direction ?? 'top';
         this.Temporal = Config.Temporal ?? false;
         this.Type = Config.Type ?? 'info';
-<<<<<<< HEAD
-=======
         this.style.zIndex = "20001";
         this.style.transition = "all .5s";
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
     }
 
     connectedCallback() {
@@ -34,15 +31,9 @@ export class WAlertMessage extends HTMLElement {
         this.style.opacity = "0";
         this.style.transform = "scale(0.9)";
         setTimeout(() => {
-<<<<<<< HEAD
-            this.remove();
-            // Opcional: remover el contenedor si queda vacío
-        }, 600);
-=======
            this.remove();
         }, 700);
         
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
     }
 
     Draw() {
@@ -66,7 +57,6 @@ export class WAlertMessage extends HTMLElement {
     }
 
     /**
-<<<<<<< HEAD
      * @param {{ Message: String, CloseOption?: Boolean, Direction?: String , Temporal?: Boolean, Type?: String }} Config 
      */
     static Connect(Config) {
@@ -103,14 +93,8 @@ export class WAlertMessage extends HTMLElement {
 
         if (Config.Temporal == true) {
             setTimeout(() => alert.Close(), 3000);
-=======
-    * conecta un nuevo alert en el document body
-    * @param {{ Message: String, CloseOption?:  Boolean, Direction?: String , Temporal?: Boolean, Type?: String }} Config 
-    */
-    static Connect(Config) {        
-        const alert = new WAlertMessage(Config);
-        document.body.appendChild(alert);
-    }
+        }
+    }   
     /**
     * conecta un nuevo alert en el document body
     * @param { import("../WModules/CommonModel.js").ResponseServices? } Response 
@@ -123,7 +107,6 @@ export class WAlertMessage extends HTMLElement {
             Direction: "top",
             Temporal: true,
             Message: Response?.message ?? "..."
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
         }
         if (Response?.status) {
             switch (Response.status.toString()) {
@@ -183,12 +166,9 @@ export class WAlertMessage extends HTMLElement {
         align-items: center;
         animation: fadeIn 0.3s ease-out;
         font-family: sans-serif;
-<<<<<<< HEAD
         position: relative;
         box-sizing: border-box;
-=======
         transition: all 0.6s;
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
         & svg {
             position: absolute;
             height: 25px;
@@ -200,8 +180,6 @@ export class WAlertMessage extends HTMLElement {
             fill: none;
             stroke: #f8eaea;
         }
-<<<<<<< HEAD
-=======
     }   
 
     .top {
@@ -210,7 +188,6 @@ export class WAlertMessage extends HTMLElement {
 
     .bottom {
         bottom: 1rem;
->>>>>>> 5fb313f473daa246528aac9500a349e5105f830c
     }
 
     .alerta.danger {
