@@ -549,7 +549,7 @@ class ComponentsManager {
         this.NavigationLog.pop();
         this.NavigateFunction(IdComponent, undefined, undefined, true);
     }
-    static modalFunction(ventanaM) {
+    static modalFunction(ventanaM, transition = 0.3) {
         if (ventanaM.style.opacity == 0) {
             // WRender.SetStyle(ventanaM, {
             //     //transform: "translateY(-100%)",
@@ -562,14 +562,14 @@ class ComponentsManager {
             //         opacity: 1
             //     });
             // }, 100);
-            ventanaM.style.transition = "all ease 0.3s";
+            ventanaM.style.transition = `all ease ${transition}s`;
             ventanaM.style.pointerEvents = "all";
             ventanaM.style.display = "block";
             setTimeout(() => {
                 ventanaM.style.opacity = 1;
             }, 333);
         } else {
-            ventanaM.style.transition = "all ease 0.3s";
+            ventanaM.style.transition = `all ease ${transition}s`;
             ventanaM.style.opacity = 0;
             ventanaM.style.pointerEvents = "none";
             setTimeout(() => {
