@@ -773,10 +773,10 @@ class WForm extends HTMLElement {
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
-						WAlertMessage.Danger(response.message)
+						WAlertMessage.Danger(response.message,true)
 						return;
 					} if (response.status == 200 && response.message) {
-						WAlertMessage.Success(response.message)
+						WAlertMessage.Success(response.message,true)
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				} else if (this.Config.ObjectOptions?.Url != undefined) {
