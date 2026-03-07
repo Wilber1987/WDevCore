@@ -58,7 +58,7 @@ class WSecurity {
             //document.body.append(ModalMessage(result?.message));
         } else {
             //alert("ERROR")
-            WAlertMessage.Danger("ERROR")
+           WAlertMessage.Danger("ERROR")
            //document.body.append(ModalMessage("ERROR"));
         }
     }

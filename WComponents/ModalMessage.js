@@ -15,6 +15,7 @@ export const ModalMessage = (message, detail = "", reload = false) => {
 		localStorage.setItem("reloadWAlertMessage", message);
 		window.location.reload();
 	}
+	WAlertMessage.Info(message, true);
 	return new WAlertMessage({ Message: message, Temporal: true });
 	/*const ModalCheck = new WSimpleModal({
 		title: message,
