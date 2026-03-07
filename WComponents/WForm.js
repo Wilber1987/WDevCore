@@ -773,14 +773,14 @@ class WForm extends HTMLElement {
 					await this.ExecuteSaveFunction(ObjectF, response);
 				} else if (this.Config.ObjectOptions?.Url != undefined) {
 					const response = await WAjaxTools.PostRequest(this.Config.ObjectOptions?.Url, ObjectF);
-					if (response.status == 500 && response.message) {
+					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
-						this.shadowRoot?.append(ModalMessage(response.message))
+						WAlertMessage.Danger(response.message)
 						return;
 					}
 					if (response.status == 200 && response.message) {
-						this.shadowRoot?.append(ModalMessage(response.message))
+						WAlertMessage.Success(response.message)						
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				}

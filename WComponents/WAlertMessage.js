@@ -130,6 +130,9 @@ export class WAlertMessage extends HTMLElement {
     }
 
     CustomStyles = css`
+     :host{
+        position:absolute;
+     }
      .alerta {
         position: fixed;
         left: 50%;

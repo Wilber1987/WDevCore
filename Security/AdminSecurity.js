@@ -94,8 +94,7 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
 		}
 	};
 }
-const ChangeDatos = async (/**@type {Security_Users} */ object, /**@type {WTableComponent} */ table) => {
-	const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});
+const ChangeDatos = async (/**@type {Security_Users} */ object, /**@type {WTableComponent} */ table) => {	
 	return new WModalForm({
 		title: "EDITAR",
 		EditObject: object,
