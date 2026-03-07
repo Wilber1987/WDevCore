@@ -79,11 +79,11 @@ class DateTime extends Date {
         const minutes = pad(d.getMinutes());
         return `${day}-${month}-${year} ${hours}:${minutes}`;
     }
-/**
-     * Formatea una fecha a formato YYYY/MM/DD HH:mm
-     * @param {String|Date} date 
-     * @returns {String}
-     */
+    /**
+         * Formatea una fecha a formato YYYY/MM/DD HH:mm
+         * @param {String|Date} date 
+         * @returns {String}
+         */
     formatDateTimeToYYYYMMDDHHMM(date = this) {
         const d = new Date(date);
         const day = pad(d.getDate());
@@ -98,6 +98,31 @@ class DateTime extends Date {
      */
     toDateFormatEs() {
         return this.Date.toString().toDateFormatEs();
+    }
+
+    /**
+     * @returns {String} Formatted date string: fechaInicioSemana al fechaFinSemana
+     */
+    getDateWeakRange() {
+        // 1. Crear una copia para no mutar la fecha original
+        const date = new Date(this.Date);
+
+        // 2. Obtener el día de la semana (0 es domingo, 1 es lunes, ..., 6 es sábado)
+        const day = date.getDay();
+
+        // 3. Ajustar para que el Lunes sea el día 0 y el Domingo el día 6
+        // (Si es domingo (0), lo tratamos como el séptimo día para retroceder al lunes previo)
+        const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
+
+        const monday = new Date(date.setDate(diffToMonday));
+        const sunday = new Date(date.setDate(monday.getDate() + 6));
+
+        // 4. Formatear a String (puedes usar toLocaleDateString o ISO)
+        const opciones = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        const inicio = monday.toLocaleDateString('es-ES', opciones);
+        const fin = sunday.toLocaleDateString('es-ES', opciones);
+
+        return `${inicio} al ${fin}`;
     }
 
     /**

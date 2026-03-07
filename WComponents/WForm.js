@@ -123,7 +123,7 @@ class WForm extends HTMLElement {
 		}
 	}
 
-	connectedCallback() {		
+	connectedCallback() {
 		this.CreateOriginalObject();
 		this.DivForm.addEventListener("click", (e) => this.undisplayMultiSelects(e));
 		this.DivForm.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
@@ -133,7 +133,7 @@ class WForm extends HTMLElement {
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
 				// @ts-ignore
-				if (m.tool && !m.tool.className.includes("SELECT_BOX")) {
+				if (m.tool && !m.tool.className.includes("SELECT_BOX") && !m.tool.className.includes("toolInactive") ) {
 					// @ts-ignore
 					m.tool.className += " toolInactive";
 				}
@@ -143,7 +143,7 @@ class WForm extends HTMLElement {
 	/**@type {Object.<string,any>} */
 	#OriginalObject = {};
 	DrawComponent = async () => {
-		/**@type {Object.<string,any>} */		
+		/**@type {Object.<string,any>} */
 		const Model = this.ModelObject;
 		const ObjectProxy = this.CreateProxy(Model);
 		this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
@@ -259,7 +259,9 @@ class WForm extends HTMLElement {
 						}
 						// @ts-ignore
 						if (["NUMBER", "MONEY"].includes(modelProperty.type.toUpperCase()) && this.Controls[prop].value.trim() == "") {
-							target[prop] = undefined;
+							target[prop] = this.IsNumber(target[prop]) ? target[prop] : undefined;
+							// @ts-ignore
+							this.Controls[prop].value = this.IsNumber(target[prop]) ? parseFloat(target[prop])?.toFixed(3) : "";
 						}
 						if (['MODEL'].includes(Model[prop].type?.toUpperCase())) {
 							// @ts-ignore
@@ -281,6 +283,12 @@ class WForm extends HTMLElement {
 			}
 		}
 		return OriginalObject;
+	}
+	/**
+	 * @param {any} value
+	 */
+	IsNumber(value) {
+		return !isNaN(value) && value !== null && value !== '' && value !== true && value !== false;
 	}
 	/**
 	* 

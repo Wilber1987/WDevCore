@@ -6,13 +6,16 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
 	<link rel="stylesheet" href="../../css/docstyle.css">
+	<link rel="stylesheet" href="../../css/site.css">
+    <script type="module" src="../../Template/Layout.js"> </script>
 </head>
 
 <body>
-	<main></main>
+	<w-layout id="layout">
 	<div id="header">
 		<h1>Reporte</h1>
 	</div>
+	</w-layout>
 	<script type="module">
 		import { WReportComponent, PageType } from "../../../WComponents/WReportComponent.js";
 		import { data, ModelObject } from "./ExampleData.js";
@@ -102,7 +105,7 @@
 				]
 			}
 		]
-		document.querySelector("main").append(
+		layout.content.append(
 			new WReportComponent({
 				Dataset: data,
 				GroupParams: ["Sucursal", "Producto"],

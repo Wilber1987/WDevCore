@@ -313,7 +313,9 @@ input[type=radio]:checked::before {
 .titleContainer {
 	height: 30px;
 }
-
+.ELEMENT_DYSPLAY {
+	display: block;
+}
 @media (max-width: 800px) {
 	.divForm {
 		display: grid;

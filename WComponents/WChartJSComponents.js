@@ -67,6 +67,8 @@ class ColumChart extends HTMLElement {
     }
     connectedCallback() {
         //console.log("conected");
+        console.trace()
+        console.log(this.ChartInstance.Dataset)
         if (this.ChartInstance.Dataset == null || this.ChartInstance.Dataset == undefined || this.ChartInstance.Dataset.length == 0) {
             this.shadowRoot.innerHTML = "No hay datos que mostar";
             return;

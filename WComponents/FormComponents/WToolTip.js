@@ -23,9 +23,9 @@ export class WToolTip extends HTMLElement {
 				left: 0;      
 				top: 0;       
 			}
-			w-tooltip.active {
+			w-tooltip.tool-active {
 				max-height: 400px;
-				overflow: auto;            
+				overflow: auto;
 			}
 			.tool-container {
 				position: relative;
@@ -47,14 +47,14 @@ export class WToolTip extends HTMLElement {
 		this.Display()
 	}
 	disconnectedCallback() {
-		this.className = this.className.replace("active", "");
+		this.className = this.className.replace("tool-active", "");
 	}
 	Display = async () => {
 		setTimeout(() => {
-			if (this.className.includes("active")) {
-				this.className = this.className.replace("active", "");
+			if (this.className.includes("tool-active")) {
+				this.className = this.className.replace("tool-active", "");
 			} else {
-				this.className += " active"
+				this.className += " tool-active"
 			}
 		}, 100);
 	}
