@@ -152,10 +152,16 @@ export class WAlertMessage extends HTMLElement {
     static Danger(Message, Temporal, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'danger' }); }
 
     CustomStyles = css`
-    :host {
-        display: block;
+     :host{
+        position:absolute;
+         display: block;
         margin-bottom: 10px;
-    }
+     }
+     .alerta {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+     }
     .alerta {
         padding: 10px 10px 10px 20px;
         border-radius: 10px;

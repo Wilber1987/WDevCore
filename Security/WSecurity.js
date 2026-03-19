@@ -2,6 +2,7 @@ import { ComponentsManager, WRender } from "../WModules/WComponentsTools.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { ModalMessage } from "../WComponents/ModalMessage.js";
+import { WAlertMessage } from "../WComponents/WAlertMessage.js";
 //import { WModalForm } from "../WComponents/WModalForm.js";
 // import "../WComponents/WLoginTemplate.js";
 
@@ -53,10 +54,12 @@ class WSecurity {
             window.location = url ?? WSecurity.urlHomeView;
         } else if (result != false || result.success == false) {
             //alert(result?.message)
-            document.body.append(ModalMessage(result?.message));
+            WAlertMessage.Danger(result?.message,true)
+            //document.body.append(ModalMessage(result?.message));
         } else {
             //alert("ERROR")
-           document.body.append(ModalMessage("ERROR"));
+           WAlertMessage.Danger("ERROR")
+           //document.body.append(ModalMessage("ERROR"));
         }
     }
     static RecoveryPassword = async (UserData, url) => {
