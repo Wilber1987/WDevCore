@@ -16,7 +16,7 @@ function html(strings, ...values) {
             if (value == undefined) {
                 value = "";
             }
-            if (value instanceof HTMLElement || value.__proto__.__proto__ == HTMLElement.prototype) {
+            if (value instanceof Node) {
                 // Si el valor es un nodo HTML, lo añadimos al wrapper
                 const placeholder = document.createElement('div');
                 placeholder.setAttribute('data-placeholder', index); // Marcador de posición
@@ -28,11 +28,18 @@ function html(strings, ...values) {
                     placeholder.setAttribute('data-placeholder', `${index}-${i}`);
                     accumulator += placeholder.outerHTML;
                 });
+            } else if (Array.isArray(value) && value.every(item => item.tagName?.toUpperCase()?.includes("SVG"))) {
+                // Si el valor es un array de nodos HTML, creamos un marcador para cada uno
+                value.forEach((_, i) => {
+                    const placeholder = document.createElement('div');
+                    placeholder.setAttribute('data-placeholder', `${index}-${i}`);
+                    accumulator += placeholder.outerHTML;
+                });
             } else if (typeof value === 'function') {
                 // Insertamos un marcador de posición para la función
                 let placeholder = ``;
                 // Expresión regular para detectar las combinaciones al final del string
-                const patron = /(onclick=['"]|ondragstart=['"]|ondragleave=['"]|ondragend=['"]|ondragover=['"]|ondragover=['"]|ondrop=['"]|ontransitionend=['"]|onload=['"]|onchange=['"]|onkeypress=['"]|onkeydown=['"])$/;
+                const patron = /(onclick=['"]|ondragstart=['"]|ondragleave=['"]|ondragend=['"]|ondragover=['"]|ondragover=['"]|ondrop=['"]|ontransitionend=['"]|onload=['"]|onchange=['"]|onkeypress=['"]|onkeydown=['"]|onmouseenter=['"]|onmouseleave=['"])$/;
                 // Buscar la coincidencia al final del string
                 const coincidencia = accumulator.match(patron);
                 //console.log(accumulator);
@@ -40,7 +47,7 @@ function html(strings, ...values) {
                 if (coincidencia) {
                     // Almacenar el fragmento que se va a reemplazar en una constante
                     const fragmentoAReemplazar = coincidencia[0];
-                    const patronEvent = /(onclick|ondragstart|ondragleave|ondragend|ondragover|ondragover|ondrop|onload|ontransitionend|onchange|onkeypress|onkeydown)=['"]$/;
+                    const patronEvent = /(onclick|ondragstart|ondragleave|ondragend|ondragover|ondragover|ondrop|onload|ontransitionend|onchange|onkeypress|onkeydown|onmouseenter|onmouseleave)=['"]$/;
                     const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
                     // Almacenar solo la palabra (onclick, onload, onchange) en una constante
                     const event = coincidenciaEvent[1];
@@ -61,8 +68,23 @@ function html(strings, ...values) {
         return accumulator;
     }, '');
 
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = result;
+    const isSVG = result.trim().startsWith("<svg") 
+        || result.includes("<g") 
+        || result.includes("<text") 
+        || result.includes("<line")
+        || result.includes("<path") 
+        || result.includes("<circle") 
+        || result.includes("<polyline");
+
+    let wrapper;
+
+    if (isSVG) {
+        wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        wrapper.innerHTML = result;
+    } else {
+        wrapper = document.createElement("div");
+        wrapper.innerHTML = result;
+    }
 
     // Reemplazar los marcadores de posición con los nodos HTML reales o asociar funciones a eventos
     values.forEach((value, index) => {
@@ -109,7 +131,7 @@ export { html }
 export async function loadExternalResources(resources) {
     // Función para cargar un recurso individual
     const loadResource = (res) => {
-        return new Promise((resolve, reject) => {            
+        return new Promise((resolve, reject) => {
             let element;
 
             if (res.type === 'script' && res.src) {
@@ -156,6 +178,11 @@ class WRender {
         let node = document.createRange().createContextualFragment(string);
         return node.childNodes[0];
     }
+    /**
+     * 
+     * @param {WNode} Node 
+     * @returns {HTMLElement}
+     */
     static createElement = (Node) => {
         try {
             if (typeof Node === "undefined" || Node == null) {
@@ -196,6 +223,11 @@ class WRender {
             return document.createTextNode("Problemas en la construcción del nodo.");
         }
     }
+    /**
+     * 
+     * @param {WNode} Node 
+     * @returns {HTMLElement}
+     */
     static createElementNS = (node, uri = "svg") => {
         try {
             let URI = null;
@@ -517,7 +549,7 @@ class ComponentsManager {
             && this.DomComponents.find(node => node.id == IdComponent) != null;
     }
     Remove = (IdComponent) => {
-        if(this.Exists(IdComponent)) {
+        if (this.Exists(IdComponent)) {
             const component = this.DomComponents.find(node => node.id == IdComponent);
             this.DomComponents.splice(this.DomComponents.indexOf(component), 1);
         }

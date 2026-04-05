@@ -294,6 +294,7 @@ class ElementStyle { }
 	 * @property {String} [tagName]
 	 * @property {String} [id]
 	 * @property {String} [type]
+	 * @property {String} [title] 
 	 * @property {Partial<CSSStyleDeclaration> | String} [style]
 	 * @property {String} [className]
 	 * @property {Boolean} [hidden]
@@ -326,6 +327,8 @@ class ElementStyle { }
 	 * @property {Function} [onkeypress]
 	 * @property {Function} [onload]
 	 * @property {Function} [oninput]
+	 * @property {Function} [onmouseenter]
+	 * @property {Function} [onmouseleave]
 	 * @property {Object.<string, any>} [object]
 	 * @property {String} [autocomplete]
  **/

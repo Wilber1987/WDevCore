@@ -598,6 +598,133 @@ class WArrayF {
         }
         return clone;
     }
+
+    //NUEVA AGRUPACION
+
+    /**
+      * @param {any[]} data
+      * @param {string | undefined} title
+      * @param {any[] | undefined} GroupParams
+      * @param {string[] | undefined} EvalParams
+      * @param {Object.<string, ModelProperty>} [ModelObject]
+      */
+    static GroupData(data, GroupParams, EvalParams, ModelObject, title, isFinalGroupedData = false) {
+        const metricLevels = {}
+
+        if (!GroupParams || GroupParams.length === 0) {
+            // @ts-ignore
+            metricLevels[title ?? "Reporte"] = this.CalculateSummary(data, undefined, EvalParams, ModelObject, isFinalGroupedData);
+            const metric = {};
+            // @ts-ignore
+            metric[title ?? "Reporte"] = data
+            return metric;
+        }
+        const groupedData = {};
+        let metricKey;
+        data.forEach(itemData => {
+            const item = Object.assign({}, itemData)
+
+            /**@type {Object.<string, any>} */
+            let currentLevel = groupedData;
+            let path = []; // Almacena el nivel de agrupación
+            GroupParams.forEach((param, index) => {
+                const key = item[param] ?? "Undefined";
+                path.push(key);
+                if (!currentLevel[key]) {
+                    currentLevel[key] = index === GroupParams.length - 1 ? [] : {};
+                    metricKey = param
+                }
+                currentLevel = currentLevel[key];
+            });
+
+            if (isFinalGroupedData && Array.isArray(currentLevel)) {
+                const itemIncluded = currentLevel.find(it => it[metricKey] == item[metricKey])
+                if (itemIncluded == null) {
+                    item.count = 1;
+                    currentLevel.push(item);
+                } else {
+                    itemIncluded.count++;
+                    EvalParams.forEach(param => {
+                        itemIncluded[param] += item[param]
+                    })
+                }
+            } else {
+                currentLevel.push(item);
+            }
+        });
+        // Función recursiva para calcular los resúmenes de cada grupo
+        const processGroup = (group, path = []) => {
+            /**
+             * @type {any[]}
+             */
+            let allItems = [];
+            Object.keys(group).forEach(key => {
+                const currentPath = [...path, key];
+                if (Array.isArray(group[key])) {
+                    // Si es un array, calcular resumen y almacenarlo en MetricLevels
+                    // @ts-ignore
+                    metricLevels[currentPath.join(" > ")] = this.CalculateSummary(group[key], data, EvalParams, ModelObject, isFinalGroupedData);
+                    allItems = allItems.concat(group[key]);
+                } else {
+                    // Si es un objeto anidado, procesarlo recursivamente
+                    const subItems = processGroup(group[key], currentPath);
+                    allItems = allItems.concat(subItems);
+                }
+            });
+            // Resumen del nivel actual
+            if (allItems.length > 0) {
+                // @ts-ignore
+                metricLevels[path.join(" > ")] = this.CalculateSummary(allItems, data, EvalParams, ModelObject, isFinalGroupedData);
+            }
+            return allItems;
+        };
+        processGroup(groupedData);
+        // Consolidado general
+        metricLevels["General Summary"] = this.CalculateSummary(data, undefined, EvalParams, ModelObject, isFinalGroupedData);
+        
+        if (isFinalGroupedData) {
+            const uniqueMetricsLevels = {};
+            Object.keys(metricLevels).forEach(key => {
+                /*const uniqueMetricsLevel = uniqueMetricsLevels[key];      
+                if (!uniqueMetricsLevel) {
+                    const newObject = Object.assign({}, metricLevels[key])
+                    uniqueMetricsLevels[key] = newObject;
+                } else {
+
+                }*/
+            })
+        }
+        console.log(groupedData, metricLevels);
+        return { groupedData, metricLevels };
+    }
+
+    // Método auxiliar para calcular el resumen de un conjunto de datos
+    static CalculateSummary(data, parentData, EvalParams, ModelObject, isFinalGroupedData) {
+        const summary = {};
+
+        EvalParams?.forEach(param => {
+            const isWithModel = ModelObject != null && ModelObject != undefined;
+            const isMoney = isWithModel && ModelObject[param]?.type?.toUpperCase() === "MONEY";
+            const isNumber = isWithModel && ModelObject[param]?.type?.toUpperCase() === "NUMBER";
+
+            // Solo sumar valores numéricos si el tipo es MONEY o NUMBER
+            const totalSum = (isMoney || isNumber)
+                ? data.reduce((acc, item) => acc + (typeof item[param] === 'number' ? item[param] : 0), 0)
+                : undefined;
+
+            const totalElements = parentData?.length ?? data.length; // Total de elementos en data
+            const validCount = isFinalGroupedData ? data[0].count : data.filter(item => item[param] !== undefined && item[param] !== null).length; // Cuenta los elementos válidos
+
+            const avg = totalElements > 0 ? (validCount / totalElements) * 100 : 0; // % de elementos válidos
+
+            summary[param] = {
+                ...(totalSum !== undefined ? { sum: totalSum } : {}), // Solo incluir 'sum' si se calculó
+                count: validCount, // Número de elementos válidos
+                avg // % de elementos válidos sobre el total
+            };
+        });
+        return summary;
+    }
 }
 
 export { WArrayF };
