@@ -3,19 +3,20 @@
  * Helper estático para procesamiento de datos de gráficos
  */
 export class ChartDataHelper {
-    static EVAL_METRICS = ["sum", "avg", "count"];
+    static EVAL_METRICS = ["count","sum", "avg",  "pct"];
 
     /**
      * @param {any} groupedData
      * @param {any} metricLevels
      * @param {string} selectedMetric
+     * @param {string[] | undefined} colors
      * @param {string} evalMetric
      * @param {number} [maxLevels]
      * @returns {{mainGroups: any[], colorMap: Map<string, string>}}
      */
-    static processTreeData(groupedData, metricLevels, selectedMetric, evalMetric, maxLevels = Infinity) {
+    static processTreeData(groupedData, metricLevels, selectedMetric, evalMetric, colors,  maxLevels = Infinity) {
         const colorMap = new Map();
-        const palette = this.getColorPalette();
+        const palette = colors ?? this.getColorPalette();
         let colorIndex = 0;
 
         const getColor = (/** @type {string} */ key) => {
