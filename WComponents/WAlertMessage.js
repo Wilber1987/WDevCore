@@ -128,7 +128,7 @@ export class WAlertMessage extends HTMLElement {
     // ... Métodos Static Warning, Info, Success, Danger se mantienen igual ...
     /**
      * @param {string} Message
-     * @param {boolean} Temporal
+     * @param {boolean} [Temporal]
      * @param {string} [Direction]
      */
     static Warning(Message, Temporal, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'warning' }); }

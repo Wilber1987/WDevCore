@@ -1,5 +1,6 @@
 import { ModelProperty } from "./CommonModel.js";
 import { EntityClass } from "./EntityClass.js";
+import { Money } from "./Types/Money.js";
 
 class WArrayF {
     static isArray(array) {
@@ -318,6 +319,19 @@ class WArrayF {
             }
         }
         return Maxvalue;
+    }
+
+    /**
+     *
+     * @param {Array<Object<String, any>>} DataArry
+     * @param {string} EvalValue
+     * @param {string} [currency]
+     * @returns {Money}
+     */
+    static sumMoney(DataArry, EvalValue, currency = 'USD') {
+        return DataArry.reduce((acc, item) => {
+            return acc.add(new Money(item[EvalValue] ?? 0, currency));
+        }, new Money(0, currency));
     }
 
     /**
@@ -681,7 +695,7 @@ class WArrayF {
         processGroup(groupedData);
         // Consolidado general
         metricLevels["General Summary"] = this.CalculateSummary(data, undefined, EvalParams, ModelObject, isFinalGroupedData);
-        
+
         if (isFinalGroupedData) {
             const uniqueMetricsLevels = {};
             Object.keys(metricLevels).forEach(key => {
