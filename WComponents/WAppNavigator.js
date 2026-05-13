@@ -85,7 +85,7 @@ class WAppNavigator extends HTMLElement {
 
 		this.DarkMode = this.DarkMode ?? false;
 		this.DisplayMode = this.DisplayMode ?? "left";
-		this.append(WRender.createElement(this.Style()));
+		this.append(this.Style());
 		if (this.NavStyle == undefined) {
 			this.NavStyle = "nav";
 		}
@@ -114,21 +114,18 @@ class WAppNavigator extends HTMLElement {
 			if (element.Disabled == false || element.rendered == false) {
 				return;
 			}
-			const elementNav = WRender.createElement({
+			/**@type {HTMLLinkElement} */// @ts-ignore
+			const elementNav = WRender.Create({
 				type: "a",
-				props: {
-					id: "element" + (element.id ?? element.name.toString().replace(" ", "")),
-					class: "elementNav",
-					innerHTML: element.name.toString()
-				}
+				id: "element" + (element.id ?? element.name.toString().replace(" ", "")),
+				class: "elementNav",
+				innerHTML: element.name.toString()
 			});
 
 			//elementNav.append(element.name)
 			if (element.icon) {
-				elementNav.append(WRender.createElement({
-					type: 'img', props: {
-						src: element.icon, class: 'IconNav'
-					}
+				elementNav.append(WRender.Create({
+					type: 'img', src: element.icon, class: 'IconNav'
 				}));
 			}
 			if (element.url != undefined && element.url != "#") {
@@ -152,8 +149,7 @@ class WAppNavigator extends HTMLElement {
 						const objectWrapper = html`<div class="ObjectWrapper">
 							<div class="header">
 								<!-- <h4 class="title">${element.name}</h4> -->
-								<button class="zoomBtn"
-								 onclick="${() => { this.ZoomInOrOut(objectWrapper); }}">
+								<button class="zoomBtn" onclick="${() => { this.ZoomInOrOut(objectWrapper); }}">
 									<svg class="btnZoomIn" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" fill="#074cbb" stroke="#074cbb" stroke-width="0.8879999999999999"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.144"></g><g id="SVGRepo_iconCarrier"><path d="M9.354 15.354L3.7 21H8v1H2v-6h1v4.285l5.646-5.639zM22 2h-6v1h4.3l-5.654 5.646.707.708L21 3.715V8h1zm-6 20h6v-6h-1v4.285l-5.646-5.639-.707.708L20.3 21H16zM8 2H2v6h1V3.715l5.646 5.639.707-.708L3.7 3H8z"></path><path fill="none" d="M0 0h24v24H0z"></path></g></svg>
 									<svg class="btnZoomOut" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#165ebb" stroke="#165ebb" stroke-width="1.104"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M22.154 2.554L16.707 8H21v1h-6V3h1v4.293l5.446-5.447zm-19.6 19.6L8 16.707V21h1v-6H3v1h4.293l-5.447 5.446zm19.6-.707L16.707 16H21v-1h-6v6h1v-4.293l5.446 5.446zM1.846 2.554L7.293 8H3v1h6V3H8v4.293L2.554 1.846z"></path><path fill="none" d="M0 0h24v24H0z"></path></g></svg>
 								</button>
@@ -176,6 +172,7 @@ class WAppNavigator extends HTMLElement {
 			}
 			if (activeIndex == 0 && element.SubNav == undefined) {
 				this.InitialNav = () => {
+					// @ts-ignore
 					elementNav.onclick();
 				}
 			}
@@ -264,18 +261,32 @@ class WAppNavigator extends HTMLElement {
 			}
 		
 			.tab {
-				display: flex;
+				display: grid;
+				grid-template-columns: repeat(6, 1fr);
 				flex-direction: ${navDirection};
 				transition: all ease 1s;
 				justify-content: flex-start;
-				gap: 5px;
+				gap: 10px;
+				padding-bottom: 10px;
+				border-bottom: 1px solid #d2d2d3;
+				@media (max-width: 1000px) {
+					grid-template-columns: repeat(4, 1fr);
+				}
+				@media (max-width: 600px) {
+					grid-template-columns: repeat(2, 1fr);
+				}
+				@media (max-width: 400px) {
+					grid-template-columns: repeat(1, 1fr);
+				}
+
+
 			}
 		
 			.tab .elementNavActive {
 				border-top: solid 1px rgba(0, 0, 0, 0);
 				border-left: solid 1px rgba(0, 0, 0, 0);
 				border-right: solid 1px rgba(0, 0, 0, 0);
-				border-radius: 0.3cm;
+				border-radius: 0.2cm;
 				color: ${this.DarkMode ? "#4da6ff" : "#ffffff"};
 				background-color: #1f58c7;
 			}
@@ -284,38 +295,39 @@ class WAppNavigator extends HTMLElement {
 				text-decoration: none;
 				cursor: pointer;
 			}
-		
-			.elementNav {
+
+			.elementNav, .elementNavActive {
 				text-decoration: none;
 				color: var(--font-primary-color);
-				padding: 8px;
-				border: solid 1px rgb(0, 0, 0, 0);
+				padding: 10px;
 				transition: all 0.1s;
 				display: flex;
 				align-items: center;
+				justify-content: center;
 				cursor: pointer;
 				font-size: 0.925rem;
 				font-family: "IBM Plex Sans", sans-serif;
 				position: relative;
-				border-radius: 0.3cm;
+				border-radius: 0.2cm;
+				text-transform: capitalize;
+				text-align: center;
+			}
+		
+		
+			.elementNav {
+				color: var(--font-primary-color);
+				border: solid 1px rgb(0, 0, 0, 0.2);
 			}
 		
 			.elementNavActive {
-				text-decoration: none;
-				color: var(--font-primary-color);
-				padding: 8px;
-				font-size: 0.925rem;
-				font-family: "IBM Plex Sans", sans-serif;
+				text-decoration: none;				
 				border: solid 1px rgb(0, 0, 0, 0);
-				transition: all 0.6s;
-				display: flex;
-				align-items: center;
 			}
 			.nav .elementNavActive {
 				border-top: solid 1px rgba(0, 0, 0, 0);
 				border-left: solid 1px rgba(0, 0, 0, 0);
 				border-right: solid 1px rgba(0, 0, 0, 0);
-				border-radius: 0.3cm;
+				border-radius: 0.2cm;
 				color: ${this.DarkMode ? "#4da6ff" : "#ffffff"};
 				background-color: #1f58c7;
 			}
@@ -324,7 +336,7 @@ class WAppNavigator extends HTMLElement {
 				display: none;
 			}
 			.TabContainer {
-				padding: 20px 0px 10px 0px;
+				padding: 0px 0px 0px 0px;
 				margin-top: 10px;
 				height: calc(100% - 100px);
 			}
@@ -447,7 +459,7 @@ class WAppNavigator extends HTMLElement {
 						position: absolute;
 						right: 10px;
 						top: 5px;
-						transform: translateY(-100%);
+						transform: translateY(-10%);
 					} 
 					& .zoomBtn .btnZoomOut{
 						display: none;

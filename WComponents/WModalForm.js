@@ -2,7 +2,7 @@ import { WRender, ComponentsManager, html } from "../WModules/WComponentsTools.j
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { ModalConfig } from "../WModules/CommonModel.js";
-import { WModalStyle } from "./ComponentsStyles/WModalStyle.mjs";
+import { WModalStyle } from "./ComponentsStyles/WModalStyle.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 
 

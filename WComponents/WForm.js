@@ -9,7 +9,7 @@ import { ModelPropertyFormBuilder } from '../ComponentsBuilders/ModelPropertyFor
 import { ModelProperty, TableConfig } from '../WModules/CommonModel.js';
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { WArrayF } from "../WModules/WArrayF.js";
-import { WFormStyle } from './ComponentsStyles/WFormStyle.mjs';
+import { WFormStyle } from './ComponentsStyles/WFormStyle.js';
 import { GroupComponent } from './FormComponents/GroupComponent.js';
 import { ModalMessage } from './ModalMessage.js';
 import { ModalVericateAction } from './ModalVericateAction.js';

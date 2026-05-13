@@ -9,7 +9,7 @@ import { WFilterOptions } from "./WFilterControls.js";
 import { LoadinModal } from "./LoadinModal.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
-import { WTableStyle } from "./ComponentsStyles/WTableStyle.mjs";
+import { WTableStyle } from "./ComponentsStyles/WTableStyle.js";
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { DateTime } from "../WModules/Types/DateTime.js";
 import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
@@ -333,7 +333,7 @@ class WTableComponent extends HTMLElement {
                 innerText: "No hay elementos que mostrar"
             }));
         }
-        this.shadowRoot?.append(WRender.createElement(this.MediaStyleResponsive()));
+        this.shadowRoot?.append(...this.MediaStyleResponsive());
         this.Table.append(tbody)
         return tbody;
     }
@@ -1013,32 +1013,43 @@ class WTableComponent extends HTMLElement {
     }
     //#endregion fin tabla basica
     //#region ESTILOS-------------------------------------------------------------------------------------------
+    /** @returns {HTMLStyleElement[]} */
+    
     MediaStyleResponsive() {
         const ClassList = [];
         let index = 1;
         for (const prop in this.ModelObject) {
-            const flag = WArrayF.checkDisplay([], prop);
-            if (flag) {
-                if (!prop.includes("Photo") &&
-                    !prop.includes("img") &&
-                    !prop.includes("image") &&
-                    !prop.includes("Image") &&
-                    !prop.includes("Pict") &&
-                    !prop.includes("_hidden")) {
-                    ClassList.push(new WCssClass(`td:nth-of-type(${index}):before`, {
-                        content: `"${prop}:"`,
-                        "margin-right": "10px"
-                    }))
-                }
-                index++;
+            const modelProperty = this.ModelObject[prop]
+            if (modelProperty != undefined &&
+                // @ts-ignore
+                modelProperty.__proto__ == Object.prototype &&
+                modelProperty.hidden != true &&
+                modelProperty.hiddenInTable != true &&
+                !prop.includes("img") &&
+                !prop.includes("image") &&
+                !prop.includes("Image") &&
+                !prop.includes("Pict") &&
+                !prop.includes("_hidden")) {
+                ClassList.push(css`
+                    @container (width <= 1000px) {
+                        .td_${prop} {
+                            display: flex;
+                            flex-direction: column;
+                            font-size: 0.8rem;
+                        }
+                        .td_${prop}::before {
+                            content: '${WOrtograficValidation.es(prop)}';
+                            font-weight: bold;
+                            text-transform: capitalize;
+                            font-size: 0.65rem;
+                            margin-right: 10px;
+                        }
+                    }    
+                ` )
             }
+            index++;
         }
-        return new WStyledRender({
-            MediaQuery: [{
-                condicion: "(max-width: 600px)",
-                ClassList: ClassList
-            }]
-        })
+        return ClassList
     }
     DrawLabel = () => {
         // @ts-ignore

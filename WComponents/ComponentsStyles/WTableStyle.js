@@ -362,7 +362,62 @@ input[type=radio]:checked::before {
 	padding: 0px 5px;
 }
 
-@container (width < 600px) {
+@container (width <= 1000px) {
+	divForm div {
+		width: calc(100% - 10px);
+		margin: 5px;
+	}
+
+	.WTable {
+		display: block;
+	}
+
+	.WTable tbody {
+		display: block;
+	}
+
+	.WTable thead {
+		display: none;
+	}
+
+	.WTable tr {
+		display: grid;		
+		margin: 10px;
+		border-radius: 0.3cm;
+		grid-template-columns: repeat(5, 1fr);
+		overflow: hidden;
+		box-shadow: 0 0 3px 0 var(--fifty-color);
+	}
+
+	.WTable td {
+		display: flex;
+		border-bottom: 1px var(--fifty-color) solid;
+		padding: 10px;
+	}
+
+	.WTable .tdAction {
+		display: block;
+		gap: 20px;
+		text-align: end;
+		width: auto;
+		padding: 10px;
+		grid-column: 5 span;
+		border-top: 2px solid #dadada;
+	}
+	.BtnTable, .BtnTableA, .BtnTableS, .BtnTableSR {		
+		width: 150px !important;
+	}
+
+	input[type=text],
+	input[type=string],
+	input[type=number],
+	input[type=date] {
+		padding: 5px 10px;
+		width: calc(100% - 20px);
+	}
+}
+
+@container (width <= 600px) {
 	divForm div {
 		width: calc(100% - 10px);
 		margin: 5px;

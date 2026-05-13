@@ -20,6 +20,9 @@ class WCard extends HTMLElement {
     }
     connectedCallback() { }
     DrawWCard = async () => {
+        if (!this.Element) {
+            return;
+        }
         this.CardTableContainer.append(WRender.Create({
             tagName: "h3",
             innerHTML: WOrtograficValidation.es(!this.Element[this.HeaderProp]  ? "" : this.Element[this.HeaderProp])
@@ -93,6 +96,7 @@ class WCard extends HTMLElement {
             grid-column: 2/3;
             padding: 0 !important;
             margin: 0 !important;
+            font-size: 0.8rem;
         }
 
         .CardTableContainer label::first-letter, .CardTableContainer h3::first-letter {
