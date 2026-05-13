@@ -294,8 +294,7 @@ export class ModelPropertyFormBuilder {
 	* @returns {Promise<HTMLElement>}
 	*/
 	static async CreateWSelect(ModelProperty, EditingObject, prop, onChangeListener) {
-		console.log(prop);
-		
+		//console.log(prop);		
 		const { MultiSelect } = await import("../WComponents/WMultiSelect.js");
 		//const { EntityClass } = await import("../WModules/EntityClass.js");
 		const { require, disabled } = await this.DefineRequireAndDisable(ModelProperty, EditingObject);
@@ -735,7 +734,6 @@ export class ModelPropertyFormBuilder {
 		let multiple = ["WRADIO", "WSELECT"].includes(ModelProperty.type?.toUpperCase()) ? false : true;
 		let modType = ["WRADIO", "WCHECKBOX"].includes(ModelProperty.type?.toUpperCase()) ? "SELECT_BOX" : "SELECT";
 		//console.log(multiple, modType);
-
 		return { multiple, modType }
 	}
 	/**

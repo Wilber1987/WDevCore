@@ -133,7 +133,7 @@ class WForm extends HTMLElement {
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
 				// @ts-ignore
-				if (m.tool && !m.tool.className.includes("SELECT_BOX")) {
+				if (m.tool && !m.tool.className.includes("SELECT_BOX") && !m.tool.className.includes("toolInactive") ) {
 					// @ts-ignore
 					m.tool.className += " toolInactive";
 				}
@@ -259,7 +259,9 @@ class WForm extends HTMLElement {
 						}
 						// @ts-ignore
 						if (["NUMBER", "MONEY"].includes(modelProperty.type.toUpperCase()) && this.Controls[prop].value.trim() == "") {
-							target[prop] = undefined;
+							target[prop] = this.IsNumber(target[prop]) ? target[prop] : undefined;
+							// @ts-ignore
+							this.Controls[prop].value = this.IsNumber(target[prop]) ? parseFloat(target[prop])?.toFixed(3) : "";
 						}
 						if (['MODEL'].includes(Model[prop].type?.toUpperCase())) {
 							// @ts-ignore
@@ -281,6 +283,12 @@ class WForm extends HTMLElement {
 			}
 		}
 		return OriginalObject;
+	}
+	/**
+	 * @param {any} value
+	 */
+	IsNumber(value) {
+		return !isNaN(value) && value !== null && value !== '' && value !== true && value !== false;
 	}
 	/**
 	* 
@@ -765,12 +773,17 @@ class WForm extends HTMLElement {
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
-						WAlertMessage.Danger(response.message)
+						WAlertMessage.Danger(response.message,true)
 						return;
+<<<<<<< HEAD
 					} else if (response.status == 200 && response.message) {
 						WAlertMessage.Success(response.message, true)
 					} else {
 						WAlertMessage.Success("Datos guardados correctamente", true)
+=======
+					} if (response.status == 200 && response.message) {
+						WAlertMessage.Success(response.message,true)
+>>>>>>> 7c2ee9cfab17bd950138516cb9590cbe3d931df0
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				} else if (this.Config.ObjectOptions?.Url != undefined) {
@@ -778,12 +791,18 @@ class WForm extends HTMLElement {
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
-						this.shadowRoot?.append(ModalMessage(response.message))
+						WAlertMessage.Danger(response.message)
 						return;
+<<<<<<< HEAD
 					} else if (response.status == 200 && response.message) {
 						this.shadowRoot?.append(ModalMessage(response.message))
 					} else {
 						WAlertMessage.Success("Datos guardados correctamente", true)
+=======
+					}
+					if (response.status == 200 && response.message) {
+						WAlertMessage.Success(response.message)						
+>>>>>>> 7c2ee9cfab17bd950138516cb9590cbe3d931df0
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				}

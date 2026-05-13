@@ -90,7 +90,7 @@ export const WModalStyle = css`
 
   @media (max-width: 1200px) {
        .ContainerFormWModal {
-            width: 90%;
+            width: 90% !important;
        }
   }
 
