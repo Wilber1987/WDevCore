@@ -786,18 +786,12 @@ class WForm extends HTMLElement {
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
-						WAlertMessage.Danger(response.message)
+						WAlertMessage.Danger(response.message, true)
 						return;
-<<<<<<< HEAD
 					} else if (response.status == 200 && response.message) {
 						this.shadowRoot?.append(ModalMessage(response.message))
 					} else {
 						WAlertMessage.Success("Datos guardados correctamente", true)
-=======
-					}
-					if (response.status == 200 && response.message) {
-						WAlertMessage.Success(response.message)						
->>>>>>> 7c2ee9cfab17bd950138516cb9590cbe3d931df0
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				}
@@ -807,6 +801,7 @@ class WForm extends HTMLElement {
 				loadinModal.close();
 				ModalCheck.close();
 				console.log(error);
+				// @ts-ignore
 				this.shadowRoot?.append(ModalMessage(error));
 			}
 		}
