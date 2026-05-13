@@ -766,7 +766,7 @@ class WForm extends HTMLElement {
 		const modalCheckFunction = async ( /** @type {import("./LoadinModal.js").LoadinModal} */ loadinModal) => {
 			try {
 				this.shadowRoot?.appendChild(loadinModal);
-				
+
 				if (withModel) {
 					const saveF = this.Config?.EntityModel?.SaveWithModel ?? this.ModelObject?.SaveWithModel
 					const response = await saveF(ObjectF, this.Config.EditObject != undefined);
@@ -775,8 +775,15 @@ class WForm extends HTMLElement {
 						ModalCheck.close();
 						WAlertMessage.Danger(response.message,true)
 						return;
+<<<<<<< HEAD
+					} else if (response.status == 200 && response.message) {
+						WAlertMessage.Success(response.message, true)
+					} else {
+						WAlertMessage.Success("Datos guardados correctamente", true)
+=======
 					} if (response.status == 200 && response.message) {
 						WAlertMessage.Success(response.message,true)
+>>>>>>> 7c2ee9cfab17bd950138516cb9590cbe3d931df0
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				} else if (this.Config.ObjectOptions?.Url != undefined) {
@@ -786,9 +793,16 @@ class WForm extends HTMLElement {
 						ModalCheck.close();
 						WAlertMessage.Danger(response.message)
 						return;
+<<<<<<< HEAD
+					} else if (response.status == 200 && response.message) {
+						this.shadowRoot?.append(ModalMessage(response.message))
+					} else {
+						WAlertMessage.Success("Datos guardados correctamente", true)
+=======
 					}
 					if (response.status == 200 && response.message) {
 						WAlertMessage.Success(response.message)						
+>>>>>>> 7c2ee9cfab17bd950138516cb9590cbe3d931df0
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				}
