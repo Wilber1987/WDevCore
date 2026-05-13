@@ -123,7 +123,7 @@ class WForm extends HTMLElement {
 		}
 	}
 
-	connectedCallback() {		
+	connectedCallback() {
 		this.CreateOriginalObject();
 		this.DivForm.addEventListener("click", (e) => this.undisplayMultiSelects(e));
 		this.DivForm.addEventListener("scroll", (e) => this.undisplayMultiSelects(e));//TODO VER SCROLL
@@ -143,7 +143,7 @@ class WForm extends HTMLElement {
 	/**@type {Object.<string,any>} */
 	#OriginalObject = {};
 	DrawComponent = async () => {
-		/**@type {Object.<string,any>} */		
+		/**@type {Object.<string,any>} */
 		const Model = this.ModelObject;
 		const ObjectProxy = this.CreateProxy(Model);
 		this.DivForm.innerHTML = ""; //AGREGA FORMULARIO CRUD A LA VISTA
@@ -758,7 +758,7 @@ class WForm extends HTMLElement {
 		const modalCheckFunction = async ( /** @type {import("./LoadinModal.js").LoadinModal} */ loadinModal) => {
 			try {
 				this.shadowRoot?.appendChild(loadinModal);
-				
+
 				if (withModel) {
 					const saveF = this.Config?.EntityModel?.SaveWithModel ?? this.ModelObject?.SaveWithModel
 					const response = await saveF(ObjectF, this.Config.EditObject != undefined);
@@ -767,20 +767,23 @@ class WForm extends HTMLElement {
 						ModalCheck.close();
 						WAlertMessage.Danger(response.message)
 						return;
-					} if (response.status == 200 && response.message) {
-						WAlertMessage.Success(response.message)
+					} else if (response.status == 200 && response.message) {
+						WAlertMessage.Success(response.message, true)
+					} else {
+						WAlertMessage.Success("Datos guardados correctamente", true)
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				} else if (this.Config.ObjectOptions?.Url != undefined) {
 					const response = await WAjaxTools.PostRequest(this.Config.ObjectOptions?.Url, ObjectF);
-					if (response.status == 500 && response.message) {
+					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
 						this.shadowRoot?.append(ModalMessage(response.message))
 						return;
-					}
-					if (response.status == 200 && response.message) {
+					} else if (response.status == 200 && response.message) {
 						this.shadowRoot?.append(ModalMessage(response.message))
+					} else {
+						WAlertMessage.Success("Datos guardados correctamente", true)
 					}
 					await this.ExecuteSaveFunction(ObjectF, response);
 				}
