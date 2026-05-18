@@ -133,7 +133,7 @@ class WForm extends HTMLElement {
 		if (!e.target.tagName.includes("W-MULTI-SELECT")) {
 			this.shadowRoot?.querySelectorAll("w-multi-select").forEach(m => {
 				// @ts-ignore
-				if (m.tool && !m.tool.className.includes("SELECT_BOX") && !m.tool.className.includes("toolInactive") ) {
+				if (m.tool && !m.tool.className.includes("SELECT_BOX") && !m.tool.className.includes("toolInactive")) {
 					// @ts-ignore
 					m.tool.className += " toolInactive";
 				}
@@ -162,6 +162,28 @@ class WForm extends HTMLElement {
 			get: (/** @type {{ [x: string]: any; }} */ target, /** @type {string | number} */ property) => {
 				return target[property];
 			}, set: (/** @type {{ [x: string]: any; }} */ target, /** @type {string} */ property, /** @type {any} */ value, /** @type {any} */ receiver) => {
+				// Buscar descriptor de propiedad
+				const descriptor = Object.getOwnPropertyDescriptor(
+					Object.getPrototypeOf(target),
+					property
+				) || Object.getOwnPropertyDescriptor(target, property);
+
+				// Si es getter sin setter => ignorar
+				if (descriptor?.get && !descriptor?.set) {
+					console.warn(
+						`La propiedad '${String(property)}' es de solo lectura`
+					);
+					return true;
+				}
+
+				// Si no es writable => ignorar
+				if (descriptor && descriptor.writable === false) {
+					console.warn(
+						`La propiedad '${String(property)}' no es modificable`
+					);
+					return true;
+				}
+
 				this.ExistChange = true;
 				target[property] = value;
 				if (!["IMG", "FILE", "DATE", "DATETIME"].includes(Model[property]?.type?.toUpperCase())) {
@@ -194,27 +216,60 @@ class WForm extends HTMLElement {
 	 */
 	CreateModelProxy(Model, FormObject = this.FormObject) {
 		if (Model == undefined) {
-			/**@type {Object.<string, ModelProperty>} */
-			const Model = {}
+			/** @type {Object.<string, ModelProperty>} */
+			const Model = {};
+
 			Object.keys(this.FormObject).forEach(prop => {
-				/**@type {ModelProperty} */
-				const modelProp = { type: this.CalculeType(this.FormObject[prop]) }
-				Model[prop] = modelProp
-			})
+				/** @type {ModelProperty} */
+				const modelProp = {
+					type: this.CalculeType(this.FormObject[prop])
+				};
+
+				Model[prop] = modelProp;
+			});
+
 			return Model;
 		}
-		/**@type {Object.<string,any>} */
+
+		/** @type {Object.<string, any>} */
 		const ObjHandler = {
-			get: (/** @type {{ [x: string]: any; }} */ target, /** @type {string | number} */ property) => {
+			get: (target, property) => {
 				return target[property];
-			}, set: (/** @type {{ [x: string]: any; }} */ target, /** @type {string | number} */ property, /** @type {any} */ value) => {
+			},
+
+			set: (target, property, value) => {
+
+				// Buscar descriptor de propiedad
+				const descriptor = Object.getOwnPropertyDescriptor(
+					Object.getPrototypeOf(target),
+					property
+				) || Object.getOwnPropertyDescriptor(target, property);
+
+				// Si es getter sin setter => ignorar
+				if (descriptor?.get && !descriptor?.set) {
+					console.warn(
+						`La propiedad '${String(property)}' es de solo lectura`
+					);
+					return true;
+				}
+
+				// Si no es writable => ignorar
+				if (descriptor && descriptor.writable === false) {
+					console.warn(
+						`La propiedad '${String(property)}' no es modificable`
+					);
+					return true;
+				}
+
 				target[property] = value;
-				this.SetOperationValues(Model, FormObject)
+
+				this.SetOperationValues(Model, FormObject);
+
 				return true;
 			}
 		};
-		const ObjectProxy = new Proxy(Model, ObjHandler);
-		return ObjectProxy;
+
+		return new Proxy(Model, ObjHandler);
 	}
 	/**
 	 * @param {any} value
@@ -237,6 +292,7 @@ class WForm extends HTMLElement {
 					//if (Model[prop].type?.toUpperCase() == "OPERATION") 					
 				}*/else {
 					if (this.Controls[prop] && this.Controls[prop] != null) {
+
 						// --- 1. Evaluar `require` (estático o dinámico)
 						let { isHidden, isDisabled } = this.EvalHiddenDisabled(modelProperty, target);
 
@@ -423,6 +479,7 @@ class WForm extends HTMLElement {
 			(//Model[prop]?.primary ||
 				//|| Model[prop]?.hidden ||
 				!Model[prop]?.type))
+			|| Model[prop]?.isReadOnly == true
 			|| Model[prop]?.__proto__ == Function.prototype
 			|| Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "FilterData" || prop == "OrderData";
 	}
@@ -773,7 +830,7 @@ class WForm extends HTMLElement {
 					if (response.status != 200 && response.message) {
 						loadinModal.close();
 						ModalCheck.close();
-						WAlertMessage.Danger(response.message,true)
+						WAlertMessage.Danger(response.message, true)
 						return;
 					} else if (response.status == 200 && response.message) {
 						WAlertMessage.Success(response.message, true)

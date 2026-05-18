@@ -72,7 +72,7 @@ class WTableComponent extends HTMLElement {
         this.Config = Config ?? {};
         this.Config.isActiveSorts = this.Config.isActiveSorts ?? true;
         this.Config.isActiveMultiSorts = this.Config.isActiveMultiSorts ?? false;
-        this.Dataset = this.Config.Dataset;
+        this.Dataset = Array.isArray(this.Dataset) && this.Dataset.length > 0 ? this.Dataset : this.Config.Dataset;
 
         /**@type {Array<OrderData>} */
         this.Sorts = [];
@@ -158,6 +158,7 @@ class WTableComponent extends HTMLElement {
                 Add: true,
                 Edit: true,
                 Show: true,
+                Delete: true
             };
         }
         this.EntityModel = this.Config.EntityModel;

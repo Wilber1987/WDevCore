@@ -252,6 +252,7 @@ class WAppNavigator extends HTMLElement {
 				justify-content: ${this.alignItems};
 				flex-wrap: wrap;
 				position: relative;
+				gap: 10px;
 			}
 			header svg {
 				height: 24px;
