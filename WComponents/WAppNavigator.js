@@ -135,8 +135,8 @@ class WAppNavigator extends HTMLElement {
 			if (element.SubNav != undefined) {
 				this.AddSubNav(Index, element, elementNav, this.Nav);
 			} else {
-				if (elementNav.url == undefined) {
-					elementNav.url = "#" + this.id;
+				if (element.url == undefined) {
+					element.url = "#" + this.id;
 				}
 				elementNav.onclick = async (ev) => {
 					this.ActiveMenu(elementNav);
@@ -197,6 +197,12 @@ class WAppNavigator extends HTMLElement {
 		}
 	}
 
+	/**
+	 * @param {string | number} Index
+	 * @param {{ [x: string]: any; url?: any; SubNav?: any; }} element
+	 * @param {HTMLLinkElement} elementNav
+	 * @param {HTMLElement | undefined} Nav
+	 */
 	AddSubNav(Index, element, elementNav, Nav) {
 		const SubMenuId = "SubMenu" + Index + this.id;
 		const SubNav = WRender.Create({
@@ -204,11 +210,11 @@ class WAppNavigator extends HTMLElement {
 			id: SubMenuId, href: element.url, className: "UnDisplayMenu"
 		});
 		if (element.SubNav.Elements != undefined) {
-			element.SubNav.Elements.forEach(SubElement => {
+			element.SubNav.Elements.forEach((/** @type {{ name: any; action: ((arg0: any) => void) | undefined; }} */ SubElement) => {
 				SubNav.append(WRender.Create({
 					tagName: "a",
 					innerText: SubElement.name,
-					onclick: async (ev) => {
+					onclick: async (/** @type {any} */ ev) => {
 						if (SubElement.action != undefined) {
 							SubElement.action(ev);
 						}
@@ -217,6 +223,7 @@ class WAppNavigator extends HTMLElement {
 				}));
 			});
 			elementNav.onclick = (ev) => {
+				// @ts-ignore
 				this.ActiveMenu(ev);
 				const MenuSelected = this.querySelector("#" + SubMenuId);
 				if (MenuSelected?.className.includes("UnDisplayMenu")) {
@@ -227,7 +234,7 @@ class WAppNavigator extends HTMLElement {
 					MenuSelected.className = this.Direction != "column" ? "UnDisplayMenu AbsoluteDisplay" : "UnDisplayMenu";
 				}
 			};
-			Nav.appendChild(SubNav);
+			Nav?.appendChild(SubNav);
 		}
 	}
 
@@ -252,6 +259,7 @@ class WAppNavigator extends HTMLElement {
 				justify-content: ${this.alignItems};
 				flex-wrap: wrap;
 				position: relative;
+				gap: 10px;
 			}
 			header svg {
 				height: 24px;
@@ -335,10 +343,14 @@ class WAppNavigator extends HTMLElement {
 			h4.elementNavActive {
 				display: none;
 			}
+			
 			.TabContainer {
 				padding: 0px 0px 0px 0px;
 				margin-top: 10px;
 				height: calc(100% - 100px);
+			}
+			#content-container {
+				padding: 15px;
 			}
 		
 			.elementNav:hover {
@@ -551,6 +563,9 @@ class WAppNavigator extends HTMLElement {
 				}
 		}`;
 	}
+	/**
+	 * @param {string} tabName
+	 */
 	ActiveTab(tabName) {
 		// @ts-ignore
 		this.Nav?.querySelector(`#element${tabName.replace(" ", "")}`)?.onclick();

@@ -15,8 +15,6 @@ import { DateTime } from "../WModules/Types/DateTime.js";
 import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
 import { ModelPropertyFormBuilder } from "../ComponentsBuilders/ModelPropertyFormBuilder.js";
 import { WCard } from "./WCard.js";
-
-
 class WTableComponent extends HTMLElement {
 
     /**
@@ -34,7 +32,7 @@ class WTableComponent extends HTMLElement {
          */
         this.selectedItems = [];
         this.isSelectAll = false;
-        /**@type {Object.<string, ModelProperty>} */
+        /**@type {Object.<string, any>|undefined} */
         this.EntityModel = {};
         /**@type {Object.<string, ModelProperty>} */
         this.ModelObject = {};
@@ -72,7 +70,8 @@ class WTableComponent extends HTMLElement {
         this.Config = Config ?? {};
         this.Config.isActiveSorts = this.Config.isActiveSorts ?? true;
         this.Config.isActiveMultiSorts = this.Config.isActiveMultiSorts ?? false;
-        this.Dataset = this.Config.Dataset;
+        // @ts-ignore
+        this.Dataset = Array.isArray(this.Dataset) && this.Dataset.length > 0 ? this.Dataset : this.Config.Dataset;
 
         /**@type {Array<OrderData>} */
         this.Sorts = [];
@@ -90,10 +89,10 @@ class WTableComponent extends HTMLElement {
                 this.FilterDataset = DFilt;
                 this.Dataset = [];
                 if (this.Dataset.length == 0) {
-                    this.Dataset = [...this.Dataset, ...DFilt];
+                    this.Dataset = [...this.Dataset, ...(DFilt ?? [])];
                 } else {
                     const objSet = new Set(this.Dataset.map(item => JSON.stringify(item)));
-                    DFilt.forEach((/** @type {any} */ itemf) => {
+                    DFilt?.forEach((/** @type {any} */ itemf) => {
                         const itemfStr = JSON.stringify(itemf);
                         if (!objSet.has(itemfStr)) {
                             this.Dataset.push(itemf);
@@ -158,6 +157,7 @@ class WTableComponent extends HTMLElement {
                 Add: true,
                 Edit: true,
                 Show: true,
+                Delete: true
             };
         }
         this.EntityModel = this.Config.EntityModel;
@@ -192,7 +192,7 @@ class WTableComponent extends HTMLElement {
         const loadinModal = new LoadinModal();
         this.shadowRoot?.append(loadinModal);
         const isWithtUrl = (this.Config?.Options?.UrlSearch != null || this.Config?.Options?.UrlSearch != undefined);
-        const isWithtModel = this.Config.ModelObject?.Get != undefined
+        const isWithtModel = this.Config.ModelObject?.Get != undefined ||  this.Config.EntityModel?.Get != undefined
         this.AddItemsFromApi = this.Config.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         let chargeWithFilter = false;
         if ((Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
@@ -213,7 +213,7 @@ class WTableComponent extends HTMLElement {
         loadinModal.close();
 
         if (!chargeWithFilter) {
-            this.Table.append(WRender.createElement(this.DrawTHead(Dataset?.length > 0 ? Dataset[0] : this.ModelObject)));
+            this.Table.append(this.DrawTHead(Dataset?.length > 0 ? Dataset[0] : this.ModelObject));
             await this.DrawTBody(Dataset);
             if (this.paginate == true) {
                 this.Tfooter.innerHTML = "";
@@ -337,7 +337,7 @@ class WTableComponent extends HTMLElement {
         this.Table.append(tbody)
         return tbody;
     }
-    DrawTRow = async (/** @type {HTMLElement} */ tr, /** @type {any} */ element, /** @type {string | number} */ index) => {
+    DrawTRow = async (/** @type {HTMLElement} */ tr, /** @type {any} */ element, /** @type {number} */ index) => {
         tr.innerHTML = "";
         for (const prop in this.ModelObject) {
             if (this.IsDrawableRow(element, prop)) {
@@ -370,7 +370,7 @@ class WTableComponent extends HTMLElement {
                     }))
                 });
             }
-            tr.append(WRender.createElement(Options));
+            tr.append(Options);
         }
     }
     SetOperationValues = (Model = this.Config.ModelObject, Dataset = this.Dataset) => {
@@ -501,11 +501,11 @@ class WTableComponent extends HTMLElement {
     }
 
     /**
-     * @param {{ [x: string]: { action: (arg0: any) => string | Node; }; } | undefined} Model
+     * @param {Object<string, any>} Model
      * @param {string} prop
      * @param {{ append: (arg0: HTMLElement) => void; }} tr
      * @param {{ [x: string]: any; }} element
-     * @param {string} index
+     * @param {number} index
      */
     async EvalModelPrototype(Model, prop, tr, element, index) {
         let value = element[prop] != null && element[prop] != undefined ? element[prop] : "";
@@ -656,19 +656,22 @@ class WTableComponent extends HTMLElement {
         /**
          * @type {HTMLInputElement}
          */
+        // @ts-ignore
         const targetControl = ev?.target
         /**
         * @type {HTMLInputElement}
         */
+        // @ts-ignore
         const currentTarget = ev?.currentTarget
 
         await ModelPropertyFormBuilder.OnChange(targetControl, currentTarget, ObjectF, prop, Model);
+        // @ts-ignore
         this.SaveAction(undefined, ObjectF)
     }
 
     DeleteBTN = async (/** @type {HTMLElement} */ Options, /** @type {{ [x: string]: any; } | undefined} */ element, /** @type {any} */ tr) => {
         if (this.Options?.Delete != undefined
-            && this.Options.Delete == true && element.isRemovable != false) {
+            && this.Options.Delete == true && element?.isRemovable != false) {
             Options.append(WRender.Create({
                 tagName: "button",
                 children: [{ tagName: 'img', class: "icon", src: WIcons["delete"] }],
@@ -687,8 +690,8 @@ class WTableComponent extends HTMLElement {
                             }
                             if (this.Options?.UrlDelete) {
                                 WAjaxTools.PostRequest(this.Options?.UrlDelete, element);
-                            } else if (element.Delete && this.Config.AutoSave) {
-                                element.Delete();
+                            } else if (element?.Delete && this.Config.AutoSave) {
+                                element?.Delete();
                             }
                             this.DrawTable();
                         } else { console.log("No Object"); }
@@ -702,6 +705,7 @@ class WTableComponent extends HTMLElement {
         if (!this.TypeMoney) {
             return "";
         }
+        // @ts-ignore
         return Money[this.TypeMoney];
     }
 
@@ -751,8 +755,8 @@ class WTableComponent extends HTMLElement {
     /**
      * @param {any} element
      * @param {HTMLElement} Options
-     * @param {string} index
-     * @param {{ querySelectorAll: (arg0: string) => any[]; }} tr
+     * @param {number} index
+     * @param {HTMLElement} tr
      */
     SelectBTN(element, Options, index, tr) {
         if ((this.Options?.Select != undefined && this.Options.Select == true)
@@ -799,7 +803,7 @@ class WTableComponent extends HTMLElement {
         }
     }
     /**
-     * @param {undefined} [element]
+     * @param {Object.<string, any>} [element]
      * @param {undefined} [tr]
      */
     async ModalCRUD(element, tr) {
@@ -824,7 +828,7 @@ class WTableComponent extends HTMLElement {
                 }
             }));
     }
-    SaveAction = async (/** @type {undefined} */ NewObject, /** @type {undefined} */ element) => {
+    SaveAction = async (/** @type { Object.<string, any>} */ NewObject, /** @type { Object.<string, any>|undefined} */ element) => {
         if (NewObject != undefined && element == undefined) {
             this.Dataset.push(NewObject);
             if (this.Options?.AddAction != undefined) {
@@ -861,10 +865,13 @@ class WTableComponent extends HTMLElement {
             const filterData = []
             for (const prop in this.ModelObject) {
                 if ((this.ModelObject[prop]?.type?.toUpperCase() == "TEXT")
+                    // @ts-ignore
                     && ev.target.value.replaceAll(" ", "") != "") {
                     // @ts-ignore
                     filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
+                // @ts-ignore
                 } else if ((this.ModelObject[prop]?.type?.toUpperCase() == "NUMBER" && !isNaN(ev.target.value))
+                    // @ts-ignore
                     && ev.target.value.replaceAll(" ", "") != "") {
                     // @ts-ignore
                     filterData.push({ PropName: prop, FilterType: "=", Values: [ev.target.value] })

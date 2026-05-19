@@ -46,6 +46,7 @@ function ModelFunction(EditingObject) {
 	* @property {any} [defaultValue]
 	* @property {String} [placeholder]
 	* @property {Boolean} [hiddenFilter]
+	* @property {Boolean} [isReadOnly]
 	* @property {Boolean} [fullDetail] - esto oculta el detalle del objeto en multiselect(por ahora)
 	* @property {String | Number} [min] para rangos de tipo number y date
 	* @property {String | Number} [max] para rangos de tipo number y date
@@ -331,6 +332,7 @@ class ElementStyle { }
 	 * @property {Function} [onmouseleave]
 	 * @property {Object.<string, any>} [object]
 	 * @property {String} [autocomplete]
+	 * @property {Object.<string, any>} [props]
  **/
 class WNode {
 	/**

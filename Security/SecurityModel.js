@@ -1,9 +1,13 @@
-import { ModelProperty } from "../WModules/CommonModel.js";
-import { EntityClass } from "../WModules/EntityClass.js";
-import { Tbl_Profile } from "./Tbl_Profile.js";
-
 //@ts-check
-class Security_Roles extends EntityClass {
+// @ts-ignore
+import { ModelProperty } from "../WModules/CommonModel.js";
+import { Tbl_Profile } from "../../Admin/Security/OrganizationModel/Tbl_Profile.js";
+import { EntityClass } from "../WModules/EntityClass.js";
+
+class Security_Roles extends EntityClass {	
+	/**
+	 * @param {Partial<Security_Roles>} [props]
+	 */
 	constructor(props) {
 		super(props, "EntitySECURITY");
 		Object.assign(this, props);
@@ -17,6 +21,9 @@ class Security_Roles extends EntityClass {
 }
 export { Security_Roles }
 class Security_Permissions {
+	/**
+	 * @param {Partial<Security_Roles>} [props]
+	 */
 	constructor(props) {
 		Object.assign(this, props);
 	}
@@ -28,6 +35,9 @@ class Security_Permissions {
 export { Security_Permissions }
 
 class Security_Permissions_Roles {
+	/**
+	 * @param {Partial<Security_Roles>} [props]
+	 */
 	constructor(props) {
 		Object.assign(this, props);
 	}
@@ -38,6 +48,9 @@ class Security_Permissions_Roles {
 export { Security_Permissions_Roles }
 
 class Security_Users_Roles {
+	/**
+	 * @param {Partial<Security_Roles>} [props]
+	 */
 	constructor(props) {
 		Object.assign(this, props);
 	}
@@ -49,12 +62,15 @@ export { Security_Users_Roles }
 
 
 class Security_Users  extends EntityClass{
+	/**
+	 * @param {Partial<Security_Roles>} [props]
+	 */
 	constructor(props) {
 		super(props, "EntitySECURITY");
 		Object.assign(this, props);
 	}
 	/**@type {ModelProperty} */
-	//Tbl_Profiles = { type: "masterdetail", ModelObject: new Tbl_Profile(), max: 1 };
+	Tbl_Profiles = { type: "masterdetail", ModelObject: new Tbl_Profile(), max: 1 };
 	Id_User = { type: "number", primary: true };
 	Nombres = { type: "text" };
 	Descripcion = { type: "text", require: false };
@@ -67,6 +83,9 @@ class Security_Users  extends EntityClass{
 }
 export { Security_Users }
 class ChangePasswordModel {
+	/**
+	 * @param {Partial<Security_Roles>} [props]
+	 */
 	constructor(props) {
 		Object.assign(this, props);
 	}
@@ -75,6 +94,9 @@ class ChangePasswordModel {
 }
 export { ChangePasswordModel }
 class ChangeStateModel {
+	/**
+	 * @param {Partial<Security_Roles>} [props]
+	 */
 	constructor(props) {
 		Object.assign(this, props);
 	}
@@ -83,6 +105,9 @@ class ChangeStateModel {
 }
 export { ChangeStateModel }
 class ChangeRolesModel {
+	/**
+	 * @param {Partial<Security_Roles>} [props]
+	 */
 	constructor(props) {
 		Object.assign(this, props);
 	}

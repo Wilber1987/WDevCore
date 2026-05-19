@@ -597,7 +597,7 @@ class ComponentsManager {
             this.MainContainer = document.querySelector("#" + this.ContainerName);
         }
         const ContainerNavigate = this.MainContainer;
-        let Nodes = ContainerNavigate.querySelectorAll(".DivContainer");
+        let Nodes = ContainerNavigate.querySelectorAll(":scope > .DivContainer");
         Nodes.forEach((node) => {
             if (node.id != IdComponent) {
                 let nodeF = this.DomComponents.find(n => n == node);

@@ -635,8 +635,8 @@ class WArrayF {
         }
         const groupedData = {};
         let metricKey;
-        data.forEach(itemData => {
-            const item = Object.assign({}, itemData)
+        data.forEach(item => {
+            //const item = Object.assign({}, itemData)//TODO REVISAR LA MUTABILIDAD
 
             /**@type {Object.<string, any>} */
             let currentLevel = groupedData;
