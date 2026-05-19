@@ -1,7 +1,9 @@
+//@ts-check
 import { WRender, ComponentsManager } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
-
+// @ts-ignore
+import { ModalConfig } from "../WModules/CommonModel.js";
 class WSimpleModal extends HTMLElement {
     /**
      *
@@ -11,11 +13,11 @@ class WSimpleModal extends HTMLElement {
         super();
         this.attachShadow({ mode: "open" });
         this.append(this.modalStyle);
-        this.shadowRoot.append(StyleScrolls.cloneNode(true));
-        this.shadowRoot.append(StylesControlsV2.cloneNode(true));
-        this.shadowRoot.append(this.FormStyle());
+        this.shadowRoot?.append(StyleScrolls.cloneNode(true));
+        this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
+        this.shadowRoot?.append(this.FormStyle());
         this.Modal = WRender.Create({ class: "ContainerFormWModal" });
-        this.shadowRoot.append(this.Modal);
+        this.shadowRoot?.append(this.Modal);
         for (const p in Config) {
             this[p] = Config[p];
         }
