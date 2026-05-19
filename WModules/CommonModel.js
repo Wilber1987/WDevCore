@@ -331,6 +331,7 @@ class ElementStyle { }
 	 * @property {Function} [onmouseleave]
 	 * @property {Object.<string, any>} [object]
 	 * @property {String} [autocomplete]
+	 * @property {Object.<string, any>} [props]
  **/
 class WNode {
 	/**
