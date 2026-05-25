@@ -306,6 +306,7 @@ class ElementStyle { }
 	 * @property {Boolean} [checked]
 	 * @property {Boolean} [multiple]
 	 * @property {Boolean} [disabled]
+	 * @property {Boolean} [contentEditable]
 	 * @property {number} [colSpan] 
 	 * @property {String} [src]
 	 * @property {String} [href]
@@ -435,6 +436,7 @@ class TableConfig { };
 	* @property {Object | WNode | Node} [ObjectModal] nodo o componente html que se dibujara dentro del modal
 	* @property {Boolean} [CloseOption]
 	* @property {Function} [ProxyAction]
+	* @property {HTMLStyleElement} [CustomStyle]
  **/
 
 class ModalConfig {

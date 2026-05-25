@@ -284,7 +284,7 @@
 			"",
 			"window.onload = ()=>{",
 			"    // @ts-ignore",
-			"    Main.append(new ComponentManager({}));",
+			"    MainContainer.append(new ComponentManager({}));",
 			"}"
 		],
 		"description": "crea un componente con caracteristicas crud"

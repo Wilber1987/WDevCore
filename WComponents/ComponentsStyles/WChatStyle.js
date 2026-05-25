@@ -7,7 +7,7 @@ export const WChatStyle = css`
 	 font-family: "Poppins", sans-serif;
  }
 
- :root {
+ :host {
 	 --text-color: #FFFFFF;
 	 --icon-color: #ACACBE;
 	 --icon-hover-bg: #5b5e71;
@@ -27,7 +27,20 @@ export const WChatStyle = css`
 	 --outgoing-chat-border: #FFFFFF;
 	 --incoming-chat-border: #D9D9E3;
  }
-
+ 
+ w-chat-component {
+	display: grid;
+	grid-template-rows: 100%;
+	gap: 10px;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+	border: 1px solid var(--incoming-chat-border);
+ } 
+.container-chat {
+    display: grid;
+    grid-template-rows: calc(100% - 100px) 100px;
+}
  .light-mode {
 	 --text-color: #343541;
 	 --icon-color: #a9a9bc;
@@ -54,8 +67,7 @@ export const WChatStyle = css`
  /* Chats container styling */
  .chat-container {
 	overflow-y: auto;
-	max-height: calc(100vh - 230px);
-	margin-bottom: 130px !important;
+	max-height: calc(100%);
  }
 
  :where(.chat-container, textarea)::-webkit-scrollbar {
@@ -90,26 +102,30 @@ export const WChatStyle = css`
  .default-text .pElement {
 	 margin-top: 10px;
 	 font-size: 1.1rem;
+	 text-align: justify;
  }
 
  .chat-container .chat {
-	 padding: 25px 20px;
+	 padding: 15px 8px;
 	 display: flex;
 	 justify-content: center;
 	 color: var(--text-color);
-	 max-width: 1200px;
-	 margin: auto;
+	 max-width: 95%;
+	 margin: 0;
 	 border-radius: 0.3cm;
 	 margin-bottom: 5px;
  }
 
  .chat-container .chat.outgoing {
 	 background: var(--outgoing-chat-bg);
-	 border: 1px solid var(--outgoing-chat-border);
+	 border: 1px solid var(--incoming-chat-border);
+	 margin-left: auto;
+	justify-content: flex-end;
 	 & .chat-content  {
 		justify-content: flex-end;
 		& .chat-details {
 			flex-direction: row-reverse;
+			max-width: 100%;
 		}
 		
 	 }
@@ -124,6 +140,8 @@ export const WChatStyle = css`
 .chat-container .chat.incoming {
 	background: var(--incoming-chat-bg);
 	border: 1px solid var(--incoming-chat-border);
+	margin-right: auto;
+	justify-content: flex-start
 }
 #ControlValueCorreo {
 	border: solid #eee 1px !important;
@@ -131,14 +149,12 @@ export const WChatStyle = css`
 
  .chat .chat-content {
 	 display: flex;
-	 max-width: 1200px;
 	 width: 100%;
 	 align-items: flex-start;
 	 justify-content: space-between;
  }
 
- span.material-symbols-rounded {
-	 user-select: none;
+ span.material-symbols-rounded {	 
 	 cursor: pointer;
  }
 
@@ -159,9 +175,8 @@ export const WChatStyle = css`
  }
 
  .chat .chat-details svg {
-	 width: 40px;
-	 height: 40px;
-	 min-width: 40px;
+	 width: 35px;
+	 height: 35px;
 	 align-self: flex-start;
 	 object-fit: cover;
 	 border-radius: 2px;
@@ -169,6 +184,7 @@ export const WChatStyle = css`
 
 #send-btn {
 	color: #1571db;
+	height: 100%;
 }
 #delete-btn {
 	color: #db6030;
@@ -179,9 +195,12 @@ export const WChatStyle = css`
  .chat .chat-details .pElement {
 	 white-space: pre-wrap;
 	 font-size: 12px !important;
-	 padding: 0 50px 0 25px;
+	 padding: 10px;
 	 color: var(--text-color);
 	 word-break: break-word;
+	 * {
+		max-width: 100%;
+	 }
  }
 
  .chat .chat-details .pElement.error {
@@ -198,6 +217,7 @@ export const WChatStyle = css`
  
  .bot {
 	align-self: baseline;
+	height: 30px;
  }
 
  .typing-animation .typing-dot {
@@ -233,11 +253,10 @@ export const WChatStyle = css`
 
  /* Typing container styling */
  .typing-container {
-	 position: fixed;
 	 bottom: 60px;
 	 width: 100%;
 	 display: flex;
-	 padding: 20px 10px 10px;
+	 padding: 10px;
 	 justify-content: center;
 	 background: var(--outgoing-chat-bg);
 	 border-top: 1px solid var(--incoming-chat-border);
@@ -245,15 +264,13 @@ export const WChatStyle = css`
 
  .typing-container .typing-content {
 	 display: flex;
-	 max-width: 950px;
 	 width: 100%;
 	 align-items: flex-end;
  }
  .AddInputFileSection {
-	position: fixed;
 	bottom: 0;
 	display: grid !important;
-	grid-template-columns: auto 80px 50px;
+	grid-template-columns: 60px 30px;
 	align-items: center;
 	width: 100%;
  }
@@ -262,13 +279,14 @@ export const WChatStyle = css`
 	 width: 100%;
 	 display: flex;
 	 position: relative;
+	 height:100%;
  }
 
  .typing-textarea textarea {
 	 resize: none;
 	 min-height: 45px;
 	 font-size: 14px !important;
-	 height: 45px;
+	 height: 100%;
 	 width: 100%;
 	 border: none;
 	 padding: 15px 45px 15px 20px;
@@ -308,6 +326,13 @@ export const WChatStyle = css`
 
  .typing-controls {
 	 display: flex;
+	 height: 100%;
+ }
+
+ .InputFileSection {
+	display: flex !important;
+    flex-direction: column !important;
+	grid-column: span 2;
  }
 
  .typing-controls span {
@@ -351,7 +376,9 @@ export const WChatStyle = css`
             color: #020c1f;
         }
 .chat.outgoing .pElement {
-	text-align: end;
+	text-align: justify;
+	max-width: 100%;
+	overflow: hidden;
 }
  /* Reponsive Media Query */
 

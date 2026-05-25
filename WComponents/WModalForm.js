@@ -119,6 +119,7 @@ class WModalForm extends HTMLElement {
         } else if (this.ObjectDetail || this.ModelObject || this.EditObject) { // MUESTRA EL DETALLE DE UN OBJETO EN UNA LISTA
             const { WForm } = await import("./WForm.js");
             const config = WArrayF.CloneObject(this.Config);
+            config.CustomStyle = this.Config.CustomStyle?.cloneNode(true)
             config.SaveFunction = (ObjectF, response) => {
                 if (this.ObjectOptions != undefined) {  /**TODO REVISAR */
                     if (this.ObjectOptions.SaveFunction != undefined) {

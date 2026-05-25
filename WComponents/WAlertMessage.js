@@ -140,10 +140,10 @@ export class WAlertMessage extends HTMLElement {
     static Info(Message, Temporal, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'info' }); }
     /**
      * @param {string} Message
-     * @param {boolean} Temporal
+     * @param {boolean} [Temporal]
      * @param {string} [Direction]
      */
-    static Success(Message, Temporal, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'success' }); }
+    static Success(Message, Temporal = true, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'success' }); }
     /**
      * @param {string} Message
      * @param {boolean} Temporal

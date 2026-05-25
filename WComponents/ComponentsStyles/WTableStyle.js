@@ -60,6 +60,7 @@ w-card-table {
 	color: var(--font-primary-color) !important;
 	padding: 0 5px;
 	max-width: 400px;
+	margin: 0px;
 }
 .WTable td label *, .WTable td p * {
 	color: var(--font-primary-color) !important;
