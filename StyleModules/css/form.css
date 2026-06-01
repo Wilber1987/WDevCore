@@ -73,7 +73,7 @@
 .Btn,
 .btn-go,
 .btn-danger2,
-.BtnAlert2 {
+.BtnAlert2, input[type="file"]::file-selector-button {
 	display: inline-block;
 	text-decoration: none;
 	padding: 10px;  
@@ -411,4 +411,7 @@ textarea:focus {
 	background-color: #fff;
 }
 
+input[type="file"]::file-selector-button:hover {
+    background: #005fa3;
+}
 

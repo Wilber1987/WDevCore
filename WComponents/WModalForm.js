@@ -21,7 +21,10 @@ class WModalForm extends HTMLElement {
             this[p] = Config[p];
         }
         this.DivColumns = this.Config.DivColumns;
-        this.StyleForm = this.Config.DivColumns == "FullScreen" ? this.WidthContainer = "90%" : this.WidthContainer = "60%"
+        this.WidthContainer = "60%";
+        this.HeightContainer =this.Config.FullScreen ? "95%": "auto"
+        this.StyleForm = this.Config.FullScreen  ? this.WidthContainer = "95%" : this.WidthContainer = "60%"
+        
         /*if (this.StyleForm == "columnX1") {
             this.WidthContainer = "40%";
             this.Config.DivColumns = "calc(100%)";
@@ -108,6 +111,7 @@ class WModalForm extends HTMLElement {
             style: {
                 gridTemplateColumns: this.DivColumns,
                 width: this.WidthContainer,
+                height: this.HeightContainer,
                 textAling: "center"
             },
             children: []
