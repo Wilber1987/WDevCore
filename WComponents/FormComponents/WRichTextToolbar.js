@@ -42,8 +42,11 @@ class WRichTextToolbar extends HTMLElement {
             //showLineHeight: true,
             ...config
         };
-        this.htmlEditor = config.htmlEditor
-        this.style.display = "block";
+        this.htmlEditor = config.htmlEditor;
+        WRender.SetStyle(this, {
+            flex:"1",
+            display: "block"
+        })
         this.DrawComponent();
     }
 
@@ -443,7 +446,7 @@ class WRichTextToolbar extends HTMLElement {
         const sel = window.getSelection();
         if (!sel || sel.rangeCount === 0) return;
         document.execCommand("fontName", false, fontFamily);
-    }   
+    }
     /**
     * @param {string} color
     */
@@ -500,6 +503,9 @@ class WRichTextToolbar extends HTMLElement {
 
 
 const WRichTextToolbarStyle = css` 
+    :host {
+        flex: 1;
+    }
     w-rich-text-toolbar .WOptionsSection {
         margin: 0px;
         border-radius: 4px;
@@ -508,9 +514,9 @@ const WRichTextToolbarStyle = css`
         align-items: center;
         justify-content: flex-start;
         flex-wrap: wrap;
-        background-color: var(--tertiary-color);
         position: relative;
         gap: 10px;
+        flex:1;
     }  
 
     w-rich-text-toolbar .ROption {

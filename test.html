@@ -1,78 +1,722 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-	<title>Catalogo de Productos</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			margin: 0 auto;
-			width: 800px;
-			background-color: #f9f9f9;
-		}
-		
-		#container {
-			max-width: 800px;
-			margin: 40px auto;
-			padding: 20px;
-			border: 1px solid #ddd;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		}
-		
-		.product-grid {
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			gap: 20px;
-		}
-		
-		.product-card {
-			background-color: #fff;
-			padding: 10px;
-			border: 1px solid #ddd;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		}
-		
-		.product-image {
-			width: 100%;
-			height: 150px;
-			object-fit: cover;
-			border-radius: 10px 10px 0 0;
-		}
-		
-		.product-info {
-			padding: 10px;
-			text-align: center;
-			font-size: 16px;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Moderna - Catálogo de Productos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           VARIABLES Y RESET
+           ============================================ */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-radius: 16px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           HEADER / NAVBAR
+           ============================================ */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .cart-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cart-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        .hero {
+            text-align: center;
+            padding: 4rem 1.5rem;
+            background: linear-gradient(180deg, var(--bg-color) 0%, #eef2ff 100%);
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* ============================================
+           FILTROS Y BÚSQUEDA
+           ============================================ */
+        .filters-section {
+            padding: 1.5rem 0;
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.625rem 1.25rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: var(--text-secondary);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           GRID DE PRODUCTOS
+           ============================================ */
+        .products-section {
+            padding: 3rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            color: var(--text-primary);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* ============================================
+           TARJETA DE PRODUCTO
+           ============================================ */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-image-container {
+            position: relative;
+            padding-top: 125%; /* Aspect ratio 4:3 */
+            overflow: hidden;
+        }
+
+        .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge.new {
+            background: var(--accent-color);
+        }
+
+        .badge.sale {
+            background: #ef4444;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .category {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .stars {
+            color: var(--accent-color);
+        }
+
+        .rating-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        footer {
+            background: #1e293b;
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            line-height: 1.8;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .social-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.25rem;
+            }
+
+            .filter-buttons {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .search-container {
+                margin: 0 auto 1.5rem;
+            }
+        }
+
+        /* ============================================
+           ANIMACIONES
+           ============================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.2s; }
+        .product-card:nth-child(3) { animation-delay: 0.3s; }
+        .product-card:nth-child(4) { animation-delay: 0.4s; }
+        .product-card:nth-child(5) { animation-delay: 0.5s; }
+        .product-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* ============================================
+           NOTIFICACIÓN DE AGREGADO AL CARRITO
+           ============================================ */
+        .toast-notification {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.5rem;
+        }
+    </style>
 </head>
 <body>
-	<div id="container">
-		<h1>Catalogo de Productos</h1>
-		<div class="product-grid">
-			<!-- Product Card 1 -->
-			<div class="product-card">
-				<img src="product-image-1.jpg" alt="Product Image 1" class="product-image" />
-				<h2>Producto 1</h2>
-				<p>$X.XX - Disponible</p>
-				<button>Ver Detalles</button>
-			</div>
-			
-			<!-- Product Card 2 -->
-			<div class="product-card">
-				<img src="product-image-2.jpg" alt="Product Image 2" class="product-image" />
-				<h2>Producto 2</h2>
-				<p>$X.XX - Disponible</p>
-				<button>Ver Detalles</button>
-			</div>
-			
-			<!-- Product Card 3 -->
-			<div class="product-card">
-				<img src="product-image-3.jpg" alt="Product Image 3" class="product-image" />
-				<h2>Producto 3</h2>
-				<p>$X.XX - Disponible</p>
-				<button>Ver Detalles</button>
-			</div>
-		</div>
-	</div>
-</body>
-</html>
+    <!-- Header / Navbar -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/>
+                        </svg>
+                    </div>
+                    TiendaPro
+                </a>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">Inicio</a>
+                    <a href="#productos" class="nav-link">Productos</a>
+                    <a href="#" class="nav-link">Ofertas</a>
+                    <button class="cart-btn">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V6a1 1 0 00-1-1h-4a1 1 0 00-1 1v5"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M21 12v9.99M3 12a9 9 0 0117.98-4l1.5-1.5A9 9 0 013 12z"/>
+                        </svg>
+                        <span id="cart-count">0</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Descubre lo mejor de nuestra tienda</h1>
+            <p>Encuentra los productos más exclusivos con las mejores precios. Calidad garantizada y envío rápido a todo el país.</p>
+        </div>
+    </section>
+
+    <!-- Filtros y Búsqueda -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="🔍 Buscar productos...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active">Todos</button>
+                <button class="filter-btn">Electrónica</button>
+                <button class="filter-btn">Ropa</button>
+                <button class="filter-btn">Hogar</button>
+                <button class="filter-btn">Deportes</button>
+                <button class="filter-btn">Ofertas</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lista de Productos -->
+    <section class="products-section" id="productos">
+        <div class="container">
+            <h2 class="section-title">📦 Nuestros Productos Destacados</h2>
+            
+            <div class="products-grid">
+                <!-- Producto 1 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <span class="badge new">Nuevo</span>
+                        <img src="https://images.unsplash.com/photo-1546813828-6209b70c9d9e?w=500&h=500&fit=crop" alt="Auriculares Premium" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Electrónica</span>
+                        <h3 class="product-title">Auriculares Bluetooth Pro Max</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating-text">(4.8)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$199.99</span>
+                            <span class="original-price">$249.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 2 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <span class="badge sale">-30%</span>
+                        <img src="https://images.unsplash.com/photo-1591793843956-b882c0d9a2e8?w=500&h=500&fit=crop" alt="Smartwatch Deportivo" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Electrónica</span>
+                        <h3 class="product-title">Smartwatch Fitness Tracker</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="rating-text">(4.5)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$89.99</span>
+                            <span class="original-price">$129.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 3 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <img src="https://images.unsplash.com/photo-1529374267416-a8329ad37703?w=500&h=500&fit=crop" alt="Camiseta Básica" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Ropa</span>
+                        <h3 class="product-title">Camiseta Algodón Premium</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating-text">(5.0)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$24.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 4 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <span class="badge new">Nuevo</span>
+                        <img src="https://images.unsplash.com/photo-1586023492195-27b2c44f75bb?w=500&h=500&fit=crop" alt="Cámara DSLR" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Electrónica</span>
+                        <h3 class="product-title">Cámara Profesional 4K</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="rating-text">(4.2)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$599.99</span>
+                            <span class="original-price">$799.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 5 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec0d8b403c?w=500&h=500&fit=crop" alt="Zapatillas Running" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Deportes</span>
+                        <h3 class="product-title">Zapatillas Running Pro</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating-text">(4.9)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$129.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 6 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <span class="badge sale">-25%</span>
+                        <img src="https://images.unsplash.com/photo-1594818379416-e8c5b2f0903e?w=500&h=500&fit=crop" alt="Lámpara de Escritorio" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Hogar</span>
+                        <h3 class="product-title">Lámpara LED Ajustable</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="rating-text">(4.3)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$45.99</span>
+                            <span class="original-price">$61.32</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>TiendaPro</h3>
+                    <p>📍 Av. Principal 123, Ciudad<br>📧 contacto@tiendapro.com<br>📞 +123 456 7890</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Enlaces Rápidos</h3>
+                    <a href="#">Sobre Nosotros</a><br>
+                    <a href="#">Términos y Condiciones</a><br>
+                    <a href="#">Política de Privacidad</a><br>
+                    <a href="#">Contacto</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Síguenos</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-icon" aria-label="Facebook">
+                            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="#" class="social-icon" aria-label="Instagram">
+                            <svg viewBox="0 0 24 24"><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/></svg>
+                        </a>
+                        <a href="#" class="social-icon" aria-label="Twitter">
+                            <svg viewBox="0 0 24 24"><path d="M23 3a10.93 10.93 0 0 1-3.14 1.5A7.94 7.94 0 0 1 18 3a7.92 7.92 0 0 1-5.64 2.37l1.5 1.5c-.9-.5-2-1-3-1A5.92 5.92 0 0 0 5 4a5.9 5.9 0 0 0 1.75 4.08l-.16.16a8.85 8.85 0 0 1-3.8-1.73A8.95 8.95 0 0 1 2 12c0 2.31.84 4.44 2.22 6.14l-.5.5a11.16 11.16 0 0 1-2.79-1.67A9.83 9.83 0 0 0 4 14c0-2.21.9-4.18 2.3-5.64l-.16-.16a8.85 8.85 0 0 1-1.78-2.6A8.85 8.85 0 0 1 4 4c2.31 0 4.44.84 6.14 2.22l1.5-1.5a9.83 9.83 0 0 1 4.08 1.75A8.85 8.85 0 0 1 20 8c0 2.31-.84 4.44-2.22 6.14l.5.5a11.16 11.16 0 0 1-1.67-2.79A9.83 9.83 0 0 0 14 14c0-2.21-.9-4.18-2.3-5.64l.16-.16a8.85 8.85 0 0 1 1.78-2.6A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l.5-.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a11.16 11.16 0 0 1-2.79-1.67A9.83 9.83 0 0 0 14 4c0-2.21-.9-4.18-2.3-5.64l.16-.16a8.85 8.85 0 0 1 1.78-2.6A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.2"
+                            ></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div></div></footer></body></html>
