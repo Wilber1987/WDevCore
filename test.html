@@ -1,78 +1,577 @@
+{@com.gi.car.domain.service.mail.CarMailData data}
+{@java.lang.String css}
+
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
-	<title>Catalogo de Productos</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			margin: 0 auto;
-			width: 800px;
-			background-color: #f9f9f9;
-		}
-		
-		#container {
-			max-width: 800px;
-			margin: 40px auto;
-			padding: 20px;
-			border: 1px solid #ddd;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		}
-		
-		.product-grid {
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			gap: 20px;
-		}
-		
-		.product-card {
-			background-color: #fff;
-			padding: 10px;
-			border: 1px solid #ddd;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		}
-		
-		.product-image {
-			width: 100%;
-			height: 150px;
-			object-fit: cover;
-			border-radius: 10px 10px 0 0;
-		}
-		
-		.product-info {
-			padding: 10px;
-			text-align: center;
-			font-size: 16px;
-		}
-	</style>
+    <meta charset="UTF-8"/>
+    <title></title>
+
+    <link href="https://public.grupoiris.net/libs/font-awesome/5.14.0/css/fontawesome.css"
+          rel="stylesheet"/>
+
+    <style type="text/css">
+        @font-face {
+    font-family: FontAwesome;
+    src: url(https://public.grupoiris.net/libs/font-awesome/5.14.0/webfonts/fa-solid-900.ttf);
+    -fs-pdf-font-embed: embed;
+    -fs-pdf-font-encoding: Identity-H;
+}
+
+@page {
+    @bottom-center {
+        content: element(footer);
+    }
+}
+
+/********** GENERAL **********/
+body {
+    font-family: Tahoma, Verdana, Helvetica, sans-serif;
+    font-size: 11px;
+}
+
+.fa {
+    font-family: Tahoma, Verdana, Helvetica, sans-serif;
+    display: table-cell;
+}
+
+.fa::before {
+    font: normal normal normal 14px/1 FontAwesome;
+    margin-right: 5px;
+    font-size: 1.2em;
+}
+
+.icon::before,
+.fa::before {
+    font: normal normal normal 14px/1 FontAwesome;
+    margin-right: 5px;
+    font-size: 1.2em;
+}
+
+.header {
+    display: block;
+    min-height: 115px;
+    width: 100%;
+}
+
+.header-div {
+    display: block;
+    padding: 20px 20px 0 20px !important;
+    width: 100%;
+    height: 100%;
+}
+
+.table-data {
+    font-size: 11px;
+    width: 100%;
+}
+
+.avoid-page-break {
+    page-break-inside: avoid;
+}
+
+.location-info {
+    color: #555555;
+}
+
+.client-logo {
+    justify-self: start;
+    width: 150px;
+    height: auto;
+    float: left;
+}
+
+.agency-logo {
+    width: 150px;
+    height: auto;
+    float: right;
+}
+
+.header img {
+    display: block;
+    height: 70px;
+    width: auto;
+    max-width: 220px;
+}
+
+.customer-booking-info {
+    float: left;
+    text-align: left;
+}
+
+.adress .customer-booking-info div {
+    text-align: left;
+}
+
+.customer-booking-info-right {
+    display: block;
+}
+
+.adress div {
+    text-align: right;
+}
+
+.provider-booking-container.img {
+    width: 100%;
+}
+
+.provider-booking-container,
+.provider-booking-info {
+    text-align: right;
+}
+
+.provider-booking-info h2 {
+    font-size: 0.813rem;
+}
+
+.provider-booking-container .provider-booking-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+}
+
+.section h1,
+.section h2,
+.section h3,
+.section h4 {
+    display: block;
+    width: 98%;
+    padding: 1%;
+    margin-top: 0;
+}
+
+.section-title-monto {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.625rem;
+    height: 1.25rem;
+    font-size: 1rem;
+    background-color: #ececec;
+    border-left: 0.625rem solid #1da3f0;
+}
+
+.section-amount-title {
+    width: 50%;
+    font-size: 16px !important;
+    text-align: left;
+    margin: 0;
+    float: left;
+}
+
+.section-amount-value {
+    width: 48%;
+    font-size: 0.875rem;
+    text-align: right;
+    margin-left: auto;
+    margin-right: 0.313rem;
+    float: left;
+}
+
+.section .section-title {
+    font-size: 16px;
+    padding: 10px;
+    background-color: #ececec;
+    border-left: 10px solid #1da3f0;
+}
+
+.div-img {
+    float: left;
+}
+
+.div-img,
+.div-img-right {
+    width: 40%;
+    height: 80%;
+}
+
+.div-img-right {
+    float: left !important;
+    margin-left: auto;
+}
+
+.passenger-info,
+.main-container {
+    display: block;
+}
+
+.passenger-info {
+    text-align: right;
+}
+
+.main-container {
+    text-align: right;
+    min-height: 130px;
+}
+
+.detalle {
+    display: block;
+    margin: 15px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.detalle .detail-title {
+    font-weight: bold;
+}
+
+.price-container {
+    display: block;
+    text-align: right;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.agency-logo {
+    display: inline-block;
+    width: 280px;
+    height: auto;
+    object-fit: contain;
+}
+
+.car-icono {
+    width: 40%;
+    float: left;
+    margin-right: 20px;
+}
+
+.car-icono img {
+    display: block;
+    margin: auto;
+    width: 150px;
+    height: auto;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.icon-pax {
+    width: 40%;
+    height: 50px;
+    float: left;
+    margin-right: 20px;
+}
+
+.detalle-container,
+.pax-detail {
+    text-align: left;
+    display: inline-block;
+    width: 50%;
+}
+
+.icon-pax .detalle::before {
+    font-size: 3em;
+    margin: 0 20px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.icon-pax .detalle {
+    position: relative;
+    padding-left: 50px;
+}
+
+.fa-car {
+    display: block;
+    width: 100%;
+}
+
+/********** FOOTER **********/
+.footer {
+    padding-top: 5px;
+    border-top: 1px solid #ececec;
+    page-break-inside: avoid;
+    display: block;
+    position: running(footer);
+    text-align: center;
+    font-size: 8px;
+}
+
+/********** GENERIC TEXT **********/
+.generictext {
+    padding-top: 5px;
+    page-break-inside: avoid;
+    display: block;
+    text-align: left;
+    font-size: 10px;
+}
+
+.segment-header {
+    display: block;
+    margin: 15px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.segment-title {
+    font-weight: bold;
+    margin: 0;
+    display: flex;
+}
+
+.segment-info p {
+    display: block;
+    margin: 15px;
+    font-size: 13px;
+}
+
+.segment {
+    display: inline-flex;
+    vertical-align: top;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+    </style>
 </head>
+
+
+    <footer class="footer">
+        <p>{data.footer}</p>
+    </footer>
+
+
 <body>
-	<div id="container">
-		<h1>Catalogo de Productos</h1>
-		<div class="product-grid">
-			<!-- Product Card 1 -->
-			<div class="product-card">
-				<img src="product-image-1.jpg" alt="Product Image 1" class="product-image" />
-				<h2>Producto 1</h2>
-				<p>$X.XX - Disponible</p>
-				<button>Ver Detalles</button>
-			</div>
-			
-			<!-- Product Card 2 -->
-			<div class="product-card">
-				<img src="product-image-2.jpg" alt="Product Image 2" class="product-image" />
-				<h2>Producto 2</h2>
-				<p>$X.XX - Disponible</p>
-				<button>Ver Detalles</button>
-			</div>
-			
-			<!-- Product Card 3 -->
-			<div class="product-card">
-				<img src="product-image-3.jpg" alt="Product Image 3" class="product-image" />
-				<h2>Producto 3</h2>
-				<p>$X.XX - Disponible</p>
-				<button>Ver Detalles</button>
-			</div>
-		</div>
-	</div>
+
+<div class="header">
+    <div class="header-div">
+
+        
+                <img src="{data.clientLogo}"
+                     class="client-logo"
+                     alt="Logo del cliente"/>
+        
+
+        
+            <img src="{data.agencyLogo}"
+                     class="agency-logo"
+                     alt="Logo de la agencia"/>
+        
+
+    </div>
+</div>
+
+<div class="adress">
+
+    
+        <div class="customer-booking-info">
+            <p style="margin: 0px">
+                {data.customer}
+            </p>
+        </div>
+    
+
+    <div class="customer-booking-info-right">
+
+        
+
+            <p>
+                {#for line in data.customerServiceData.split('\n')}
+                    {line}<br/>
+                {/for}
+            </p>
+
+        {#else}
+
+            <div>{data.agencyName}</div>
+
+            
+                <div>{data.addressAgency}</div>
+            
+
+            
+                <div>cp: {data.postalCodeAgency}</div>
+            
+
+            
+                <div>{data.branchOfficeEmail}</div>
+            
+
+            
+                <div>Teléfono: {data.phoneAgency}</div>
+            
+
+        
+
+    </div>
+</div>
+
+<br/><br/><br/>
+<br/><br/><br/>
+
+<main class="main">
+
+    <div class="provider-booking-container">
+
+        <h3>
+            Reserva de coche
+            <b>{data.locator}</b>
+            -
+            <b>{data.status}</b>
+        </h3>
+
+        
+            <h3>
+                Peticionario:
+                <b>{data.peticionario}</b>
+            </h3>
+        
+
+        
+            <h3>
+                Número de confirmación:
+                <b>{data.confirmationNumber}</b>
+            </h3>
+        {#else}
+            <h3>
+                Número de confirmación:
+                Sin confirmar
+            </h3>
+        
+
+        
+            <h3>
+                Número de bono emitido:
+                <b>{data.voucherNumber}</b>
+            </h3>
+        
+
+        <h3>
+            Fecha reserva: {data.bookingDate}
+        </h3>
+        
+        <h3>
+            Fecha cancelación: {data.cancellationDate}
+        </h3>
+        
+
+    </div>
+
+    <section class="section avoid-page-break">
+    <h2 class="section-title">
+        Datos pasajeros
+    </h2>
+
+    <div class="passenger-info">
+
+        <div class="icon-pax">
+            <div class="detalle fa fa-male">
+                {data.name}
+            </div>
+        </div>
+
+        <div class="pax-detail">
+
+            <div class="detalle icon icon-mail fa fa-envelope">
+                {data.contactMail}
+            </div>
+
+            <div class="detalle icon icon-phone fa fa-phone">
+                {data.contactPhone}
+            </div>
+
+            
+                <div class="detalle icon icon-phone fa fa-credit-card">
+                    {data.frequentTravellerCardNumber}
+                </div>
+            
+
+        </div>
+    </div>
+
+    </section>
+    <section class="section avoid-page-break">
+    <h2 class="section-title">
+        <span style="text-transform: capitalize;"
+              class="icon icon-car fa fa-car">
+            {data.pickUpFecha}
+        </span>
+    </h2>
+
+    <div class="main-container">
+
+        <div class="car-icono">
+
+            
+                <img src="{data.companyLogo}" alt=""/>
+            
+
+        </div>
+
+        <div class="detalle-container">
+
+            <div class="detalle">
+                <label class="detail-title">
+                    Recogida:
+                </label>
+
+                <label>{data.pickUpFecha}</label>
+                <label>{data.pickUpHora}</label>
+                <label> - {data.pickUpOficina}</label>
+            </div>
+
+            <div class="detalle">
+                <label class="detail-title">
+                    Devolución:
+                </label>
+
+                <label>{data.dropOffFecha}</label>
+                <label>{data.dropOffHora}</label>
+                <label> - {data.dropOffOficina}</label>
+            </div>
+
+            <div class="detalle">
+                <label class="detail-title">
+                    Teléfonos:
+                </label>
+
+                
+                    <label>{data.pickUpPhone}</label>
+                
+
+                
+                    <label>, {data.dropOffPhone}</label>
+                
+            </div>
+
+            <div class="detalle">
+                <label class="detail-title">
+                    Vehículo:
+                </label>
+
+                <label>
+                    {data.carDetail} o similar
+                </label>
+            </div>
+
+        </div>
+    </div>
+    </section>
+    <section class="section avoid-page-break">
+    <h2 class="section-title">
+        Importe
+    </h2>
+
+    <div class="detalle price-container">
+        <label>Importe Total:</label>
+        <label class="total-price">
+            {data.totalPrice}
+        </label>
+    </div>
+    </section>
+</main>
+
+
+    <div class="generictext">
+        <p>{data.genericText}</p>
+    </div>
+
+
 </body>
 </html>
