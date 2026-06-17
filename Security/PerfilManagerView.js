@@ -7,6 +7,6 @@ const OnLoad = async () => {
     const Dataset = await new Tbl_Profile().Get();
     const ProfilesComp = new PerfilManagerComponent(Dataset);
     // @ts-ignore
-    Main.appendChild(ProfilesComp);
+    MainContainer.appendChild(ProfilesComp);
 }
 window.onload = OnLoad;

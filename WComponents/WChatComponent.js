@@ -1,7 +1,9 @@
 //@ts-check
+import { Tbl_Comments } from "../../Notificaciones_Mensajeria/Gestion_Mensajes/Tbl_Comments.js";
 import { FilterData, OrderData } from "../WModules/CommonModel.js";
 import { WAjaxTools } from "../WModules/WAjaxTools.js";
 import { generateGUID, html, WRender } from "../WModules/WComponentsTools.js";
+import { WContentManager } from "../WModules/WContentManager.js";
 import { css } from "../WModules/WStyledRender.js";
 import { WChatStyle } from "./ComponentsStyles/WChatStyle.js";
 import { WRichText } from "./FormComponents/WRichText.js";
@@ -14,6 +16,7 @@ class WebApiResponse {
 	/**@type {Number?} */ Id_Case = null;
 	/**@type {Number?} */ Id_Comment = null;
 	/**@type {Array< Object.<string, any>> ?} */ Attach_Files = null;
+
 }
 class WChatComponent extends HTMLElement {
 	/**
@@ -22,21 +25,27 @@ class WChatComponent extends HTMLElement {
 		*UrlGetConfigData?:String,
 		*UrlSearch?:String,
 		*UrlAdd?:String,
+		*Dataset?:Array<Tbl_Comments>
 		*UserIdProp?:String,
-		*CommentsIdentify?:String,
+		*CommentsIdentify?:String?,
 		*CommentsIdentifyName?:String,
 		*AddObject?:Boolean,
-		*Header?:HTMLElement
+		*Header?:HTMLElement,
+		*WithAgent?:Boolean?,
+		*UseLocalMemory?:Boolean?,
+		*IdentityValue?:string,
+		*ResponseActions?:Array<{name:String; label?:String;  icon?:String; action:Function}>
 	* }} Config
 	 * 
 	 */
 	constructor(Config) {
 		super();
 		//this.attachShadow({ mode: 'open' });
-		this.Container = html`<div class="container"></div>`
+		this.Container = html`<div class="container-chat"></div>`
 		WRender.SetStyle(this, {
-			display: "block"
+			display: "grid"
 		});
+		this.Dataset = Config.Dataset
 		this.append(css`
 			body {
 				overflow: hidden;
@@ -47,38 +56,37 @@ class WChatComponent extends HTMLElement {
 			localStorage.setItem("themeColor", "light_mode");
 			document.body.classList.toggle("light-mode", themeColor === "light_mode");
 			themeColor = "light_mode";
-
 		}
 		if (themeColor == "light_mode") {
 			document.body.classList.add("light_mode");
 		}
-
-		this.append(html`<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">`)
 		if (Config.Header) {
 			this.appendChild(Config.Header);
-		} else {
-			this.appendChild(html`<div class="header">
-				<h2>${localStorage.getItem("TITULO") ?? "CHATBOT"}</h2>
-			</div>`);
+			this.style.gridTemplateRows = "80px calc(100% - 180px) 100px"
 		}
 		this.RitchInput = new WRichText({
 			activeAttached: true
 		});
 
 		// @ts-ignore
-		this.append(WChatStyle.cloneNode(true), this.Container, this.RitchInput?.AddInputFileSection);
+		this.append(WChatStyle.cloneNode(true), this.Container);
 		this.Config = Config;
 		this.identity = {
 			Tipo: undefined,
-			Value: localStorage.getItem("identity"),
+			Value: this.Config.IdentityValue ?? localStorage.getItem("identity"),
 			Session: sessionStorage.getItem("Session") ?? generateGUID()
 		};
 		this.chatContainer = html`<div class="chat-container"></div>`;
-		this.WithAgent = sessionStorage.getItem("WithAgent") == "true" ? true : false;
+		this.WithAgent = Config.WithAgent ?? sessionStorage.getItem("WithAgent") == "true" ? true : false;
+		this.CommentsIdentifyName = Config.CommentsIdentifyName
 		// @ts-ignore
-		this.Id_Case = sessionStorage.getItem("Id_Case") ? parseInt(sessionStorage.getItem("Id_Case")) : undefined;
+		this.CommentsIdentify = Config.CommentsIdentify ?? (sessionStorage.getItem(this.CommentsIdentifyName) ? parseInt(sessionStorage.getItem(this.CommentsIdentifyName)) : undefined);
+		/**@type {HTMLInputElement} */
+		// @ts-ignore
+		this.chatInput = html`<textarea id="chat-input" spellcheck="false"  required></textarea>`
 
 		this.ActiveInterval();
+
 		this.Draw();
 
 	}
@@ -87,10 +95,10 @@ class WChatComponent extends HTMLElement {
 			top: this.chatContainer.scrollHeight,
 			behavior: 'instant' // Desplazamiento suave instant/smooth
 		});
+		this.update()
 	}
 	Draw = async () => {
 		if (!this.identity.Value) {
-			const header = html`<h1>Ingrese su identificación</h1>`
 			const form = new WForm({
 				ModelObject: {
 					Tipo: {
@@ -133,31 +141,32 @@ class WChatComponent extends HTMLElement {
 			</div>`);
 			return;
 		}
-		/**@type {HTMLInputElement} */
-		// @ts-ignore
-		const chatInput = html`<textarea id="chat-input" spellcheck="false"  required></textarea>`
-		const sendButton = html`<span id="send-btn" class="material-symbols-rounded">send</span>`
+
+		const sendButton = html`<span id="send-btn" class="material-symbols-rounded">
+			<svg viewBox="0 0 24 24" width="30px" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M18.0693 8.50867L9.50929 4.22867C3.75929 1.34867 1.39929 3.70867 4.27929 9.45867L5.14929 11.1987C5.39929 11.7087 5.39929 12.2987 5.14929 12.8087L4.27929 14.5387C1.39929 20.2887 3.74929 22.6487 9.50929 19.7687L18.0693 15.4887C21.9093 13.5687 21.9093 10.4287 18.0693 8.50867ZM14.8393 12.7487H9.43929C9.02929 12.7487 8.68929 12.4087 8.68929 11.9987C8.68929 11.5887 9.02929 11.2487 9.43929 11.2487H14.8393C15.2493 11.2487 15.5893 11.5887 15.5893 11.9987C15.5893 12.4087 15.2493 12.7487 14.8393 12.7487Z" fill="#0263d9"></path> </g></svg>
+		</span>`
 
 		const themeButton = html`<span id="theme-btn" class="material-symbols-rounded" style="display: none">light_mode</span>`;
-		const deleteButton = html`<span id="delete-btn" class="material-symbols-rounded">delete</span>`;
+		const deleteButton = html`<span id="delete-btn" class="material-symbols-rounded">
+			<svg width="256px" height="256px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.048"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M9 4.5V6H6V7.5H18V6H15V4.5H9ZM6.75 8.25H8.25V17.6893L8.56066 18H15.4393L15.75 17.6893V8.25H17.25V18.3107L16.0607 19.5H7.93934L6.75 18.3107V8.25Z" fill="#034d9b"></path> </g></svg>
+		</span>`;
 
 		this.Container.appendChild(this.chatContainer);
 		this.Container.appendChild(html`<div class="typing-container">
 			<div class="typing-content">
 				<div class="typing-textarea">
-					${chatInput}
+					${this.chatInput}
 					${sendButton}					
 				</div>
 				<div class="typing-controls">
+					${this.RitchInput?.AddInputFileSection}
 					${themeButton}
-					${deleteButton}
-				</div>				
+					<!-- ${deleteButton} -->
+				</div>
 			</div>
 		</div>`)
 		let userText = null;
-		userText = this.InicialiceComponent(themeButton, userText, chatInput, deleteButton, sendButton);
-
-
+		userText = this.InicialiceComponent(themeButton, userText, this.chatInput, deleteButton, sendButton);
 	}
 
 	/**
@@ -177,7 +186,7 @@ class WChatComponent extends HTMLElement {
 
 
 
-			this.chatContainer.innerHTML = localStorage.getItem("all-chats") ?? "";
+			this.chatContainer.innerHTML = this.Config.UseLocalMemory ? (localStorage.getItem("all-chats") ?? "") : "";
 			if (this.chatContainer.querySelector(".default-text")) {
 				this.chatContainer.querySelector(".default-text")?.remove();
 			}
@@ -196,10 +205,10 @@ class WChatComponent extends HTMLElement {
 				const model = {
 					SessionId: this.identity.Session,
 					Text: userText,
-					Source: "webapi",
+					Source: "WEB_API",
 					Id: "1",
 					UserId: this.identity.Value,
-					Attach: this.RitchInput.Files.length > 0 ?  this.RitchInput.Files[0] : undefined,
+					Attach: this.RitchInput.Files.length > 0 ? this.RitchInput.Files[0] : undefined,
 					Timestamp: new Date()
 				};
 				/**@type {WebApiResponse} */
@@ -221,12 +230,12 @@ class WChatComponent extends HTMLElement {
 					const href = /^https?:\/\//i.test(match) ? match : `https://${match}`;
 					return `<a href="${href}" target="_blank" rel="noopener noreferrer">${match}</a>`;
 				});
-
+				pElement.innerHTML = "";
 				// 3️⃣ Escribe el contenido resultante en el párrafo
-				pElement.innerHTML = processed;
+				pElement.append(...WContentManager.ParseContent(processed));
 				if (this.WithAgent != true) {
 					// Remove the typing animation, append the paragraph element and save the chats to local storage                 
-					
+
 					if (attachs.children.length > 0) {
 						pElement.append(attachs)
 					}
@@ -240,9 +249,10 @@ class WChatComponent extends HTMLElement {
 				this.WithAgent = response.WithAgentResponse ?? false;
 				sessionStorage.setItem("WithAgent", this.WithAgent == true ? "true" : "false");
 				// @ts-ignore
-				this.Id_Case = response.Id_Case;
+				this.CommentsIdentify = response[this.CommentsIdentifyName];
 				// @ts-ignore
-				sessionStorage.setItem("Id_Case", this.Id_Case?.toString());
+				sessionStorage.setItem("this.CommentsIdentifyName", this.CommentsIdentify?.toString());
+				this.AddResponseActions(processed, pElement);
 				if (condition) {
 					//this.chatContainer.innerHTML = "";
 					this.update();
@@ -279,22 +289,23 @@ class WChatComponent extends HTMLElement {
 
 		const handleOutgoingChat = () => {
 			// @ts-ignore
-			userText = chatInput.value.trim(); // Get chatInput value and remove extra spaces
-			if (!userText) return; // If chatInput is empty return from here
+			userText = this.chatInput.value.trim(); // Get this.chatInput value and remove extra spaces
+			if (!userText) return; // If this.chatInput is empty return from here
 
 
 			// Clear the input field and reset its height
-			chatInput.value = "";
-			chatInput.style.height = `${initialInputHeight}px`;
+			this.chatInput.value = "";
+			//this.chatInput.style.height = `${initialInputHeight}px`;
 
 			const attachs = this.RenderFiles({ Attach_Files: this.RitchInput.Files });
+			const pElement = html`<div class="pElement">
+				${attachs.children.length > 0 ? attachs : ""}
+			</div>`
+			pElement.append(...WContentManager.ParseContent(userText))
 			const chatContent = html`<div class="chat-content">
 					<div class="chat-details">
 						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="6" r="4" fill="#77cef3"></circle> <path opacity="0.5" d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z" fill="#77cef3"></path> </g></svg>
-						<div class="pElement">
-							${userText}
-							${attachs.children.length > 0 ? attachs : ""}
-						</div>
+						${pElement}
 					</div>
 				</div>`;
 			// Create an outgoing chat div with user's message and append it to chat container
@@ -302,7 +313,7 @@ class WChatComponent extends HTMLElement {
 			this.chatContainer.querySelector(".default-text")?.remove();
 			this.chatContainer.appendChild(outgoingChatDiv);
 			this.chatContainer.scrollTo(0, this.chatContainer.scrollHeight);
-			setTimeout(()=> showTypingAnimation(chatContent), 500);
+			setTimeout(() => showTypingAnimation(chatContent), 500);
 		};
 
 		deleteButton.addEventListener("click", () => {
@@ -320,15 +331,15 @@ class WChatComponent extends HTMLElement {
 			themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
 		});
 
-		const initialInputHeight = chatInput.scrollHeight;
+		const initialInputHeight = this.chatInput.scrollHeight;
 
-		chatInput.addEventListener("input", () => {
+		this.chatInput.addEventListener("input", () => {
 			// Adjust the height of the input field dynamically based on its content
-			chatInput.style.height = `${initialInputHeight}px`;
-			chatInput.style.height = `${chatInput.scrollHeight}px`;
+			//this.chatInput.style.height = `${initialInputHeight}px`;
+			//this.chatInput.style.height = `${this.chatInput.scrollHeight}px`;
 		});
 
-		chatInput.addEventListener("keydown", (/** @type {{ key: string; shiftKey: any; preventDefault: () => void; }} */ e) => {
+		this.chatInput.addEventListener("keydown", (/** @type {{ key: string; shiftKey: any; preventDefault: () => void; }} */ e) => {
 			// If the Enter key is pressed without Shift and the window width is larger 
 			// than 800 pixels, handle the outgoing chat
 			if (e.key === "Enter" && !e.shiftKey && window.innerWidth > 800) {
@@ -341,6 +352,24 @@ class WChatComponent extends HTMLElement {
 		loadDataFromLocalstorage();
 		sendButton.addEventListener("click", handleOutgoingChat);
 		return userText;
+	}
+
+	/**
+	 * @param {string} processed
+	 * @param {HTMLDivElement} pElement
+	 */
+	AddResponseActions(processed, pElement) {
+		if (Array.isArray(this.Config.ResponseActions)) {
+			const actions = this.Config.ResponseActions.map(actionElement => {
+				return html`<button class="chat-btn" title="${actionElement.label ?? actionElement.name}"
+							onclick="${() => actionElement.action(processed)}">
+							${actionElement.icon ? actionElement.icon : actionElement.name}
+						</button>`;
+			});
+			pElement.append(html`<div class="chat-btn-container">
+						${actions}
+					</div>`);
+		}
 	}
 
 	ActiveInterval() {
@@ -371,7 +400,8 @@ class WChatComponent extends HTMLElement {
 		this.Id_ComentarioCargados = this.Id_ComentarioCargados ?? ["-1"]
 		if (this.WithAgent == true) {
 			const Message = {}
-			Message["Id_Case"] = this.Id_Case
+			// @ts-ignore
+			Message[this.CommentsIdentifyName] = this.CommentsIdentify
 			this.maxMessage = 30;
 			this.actualPage = this.actualPage ?? 1;
 			//Message.FilterData = [{ FilterType: "limit", Values: ["30"] }]
@@ -380,12 +410,12 @@ class WChatComponent extends HTMLElement {
 
 
 			// @ts-ignore
-			const response = await WAjaxTools.PostRequest(this.Config.UrlSearch, Message, { WithoutLoading: true });
+			this.Dataset = await WAjaxTools.PostRequest(this.Config.UrlSearch, Message, { WithoutLoading: true });
 			//console.log(response);
 			//this.Dataset = response;         
 			this.chatContainer.querySelector(".default-text")?.remove();
 
-			response.sort((/** @type {{ Id_Comentario: number; }} */ a, /** @type {{ Id_Comentario: number; }} */ b) => a.Id_Comentario - b.Id_Comentario)
+			this.Dataset?.sort((/** @type {{ Id_Comentario: number; }} */ a, /** @type {{ Id_Comentario: number; }} */ b) => a.Id_Comentario - b.Id_Comentario)
 				.forEach((/**@type {Object.<string, any>} */ comment) => {
 					this.Id_ComentarioCargados.push(comment.Id_Comentario.toString())
 					if (this.chatContainer.querySelector("#Comment" + comment.Id_Comentario)) {
@@ -404,20 +434,15 @@ class WChatComponent extends HTMLElement {
 
 					const attachs = this.RenderFiles(comment);
 					const incomingChatDiv = html`<div class="chat ${classN}" id="Comment${comment.Id_Comentario}">
-					<div class="chat-content">						
-						<div class="chat-details">
-							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="6" r="4" fill="#77cef3"></circle> <path opacity="0.5" d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z" fill="#77cef3"></path> </g></svg>
-							
-							<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
-							<div class="typing-animation">
+						<div class="chat-content">						
+							<div class="chat-details">
+								<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="6" r="4" fill="#77cef3"></circle> <path opacity="0.5" d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z" fill="#77cef3"></path> </g></svg>
+								
 								<img class="bot" src="/WDevCore/Media/Icons/robot.gif"/>
-								<div class="typing-dot" style="--delay: 0.2s"></div>
-								<div class="typing-dot" style="--delay: 0.3s"></div>
-								<div class="typing-dot" style="--delay: 0.4s"></div>
+								
 							</div>
 						</div>
-					</div>
-				</div>`;
+					</div>`;
 					this.chatContainer.appendChild(incomingChatDiv);
 					const pElement = document.createElement("div");
 					pElement.className = "pElement";
@@ -438,14 +463,16 @@ class WChatComponent extends HTMLElement {
 						});
 
 						// 3️⃣ Escribe el contenido resultante en el párrafo
-						pElement.innerHTML = processed;
+
+						pElement.innerHTML = "";
+						pElement.append(...WContentManager.ParseContent(processed))
 
 						incomingChatDiv.querySelector(".chat-details")?.appendChild(pElement);
+						this.AddResponseActions(processed, pElement);
 					} catch (error) { // Add error class to the paragraph element and set error text
 						pElement.classList.add("error");
 						pElement.textContent = "Oops! Something went wrong while retrieving the response. Please try again.";
 					}
-					incomingChatDiv.querySelector(".typing-animation")?.remove();
 					if (attachs.children.length > 0) {
 						pElement.append(attachs)
 					}
@@ -465,7 +492,7 @@ class WChatComponent extends HTMLElement {
 					|| attach?.Type?.toUpperCase()?.includes("JPEG")
 					|| attach?.Type?.toUpperCase()?.includes("PNG")
 					|| attach?.Value?.toUpperCase()?.includes(".JPEG")
-                    || attach?.Value?.toUpperCase()?.includes(".PNG")) {
+					|| attach?.Value?.toUpperCase()?.includes(".PNG")) {
 					attachs.append(WRender.Create({
 						tagName: "img", src: this.GetFileNameFromPath(attach.Value.replace("wwwroot", "")), onclick: () => {
 							document.body.append(new WModalForm({
@@ -530,6 +557,31 @@ class WChatComponent extends HTMLElement {
 		const parts = normalizedPath.split("/");
 
 		return "/" + parts[parts.length - 1];
+	}
+
+	/**
+	* @param {string | HTMLElement} wrapper
+	*/
+	AddDataChat(wrapper) {
+		let content = WContentManager.ToMarkdown(wrapper);
+		//console.log(wrapper.__proto__);
+		// @ts-ignore
+		// if (wrapper.__proto__ == HTMLDivElement.prototype) {
+		// 	// @ts-ignore
+		// 	content =  //wrapper.innerText
+		// } else {
+		// 	// @ts-ignore
+		// 	content = wrapper
+		// }
+
+
+		this.chatInput.value += "\n ```\n" + content.toString() + "\n```"
+	}
+	/**
+	 * @param {any} editingObject
+	 */
+	AddContext(editingObject) {
+		//throw new Error("Method not implemented.");
 	}
 
 }

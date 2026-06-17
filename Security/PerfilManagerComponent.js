@@ -16,7 +16,7 @@ const OnLoad = async () => {
     // @ts-ignore
     Aside.append(AdminPerfil.MainNav);
     // @ts-ignore
-    Main.appendChild(AdminPerfil);
+    MainContainer.appendChild(AdminPerfil);
 }
 window.onload = OnLoad;
 class PerfilManagerComponent extends HTMLElement {

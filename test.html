@@ -338,6 +338,7 @@ table {
 
 
 <body>
+<<<<<<< HEAD
 
 <div class="header">
     <div class="header-div">
@@ -575,3 +576,221 @@ table {
 
 </body>
 </html>
+=======
+    <!-- Header / Navbar -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/>
+                        </svg>
+                    </div>
+                    TiendaPro
+                </a>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">Inicio</a>
+                    <a href="#productos" class="nav-link">Productos</a>
+                    <a href="#" class="nav-link">Ofertas</a>
+                    <button class="cart-btn">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V6a1 1 0 00-1-1h-4a1 1 0 00-1 1v5"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M21 12v9.99M3 12a9 9 0 0117.98-4l1.5-1.5A9 9 0 013 12z"/>
+                        </svg>
+                        <span id="cart-count">0</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Descubre lo mejor de nuestra tienda</h1>
+            <p>Encuentra los productos más exclusivos con las mejores precios. Calidad garantizada y envío rápido a todo el país.</p>
+        </div>
+    </section>
+
+    <!-- Filtros y Búsqueda -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="🔍 Buscar productos...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active">Todos</button>
+                <button class="filter-btn">Electrónica</button>
+                <button class="filter-btn">Ropa</button>
+                <button class="filter-btn">Hogar</button>
+                <button class="filter-btn">Deportes</button>
+                <button class="filter-btn">Ofertas</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lista de Productos -->
+    <section class="products-section" id="productos">
+        <div class="container">
+            <h2 class="section-title">📦 Nuestros Productos Destacados</h2>
+            
+            <div class="products-grid">
+                <!-- Producto 1 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <span class="badge new">Nuevo</span>
+                        <img src="https://images.unsplash.com/photo-1546813828-6209b70c9d9e?w=500&h=500&fit=crop" alt="Auriculares Premium" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Electrónica</span>
+                        <h3 class="product-title">Auriculares Bluetooth Pro Max</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating-text">(4.8)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$199.99</span>
+                            <span class="original-price">$249.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 2 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <span class="badge sale">-30%</span>
+                        <img src="https://images.unsplash.com/photo-1591793843956-b882c0d9a2e8?w=500&h=500&fit=crop" alt="Smartwatch Deportivo" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Electrónica</span>
+                        <h3 class="product-title">Smartwatch Fitness Tracker</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="rating-text">(4.5)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$89.99</span>
+                            <span class="original-price">$129.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 3 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <img src="https://images.unsplash.com/photo-1529374267416-a8329ad37703?w=500&h=500&fit=crop" alt="Camiseta Básica" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Ropa</span>
+                        <h3 class="product-title">Camiseta Algodón Premium</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating-text">(5.0)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$24.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 4 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <span class="badge new">Nuevo</span>
+                        <img src="https://images.unsplash.com/photo-1586023492195-27b2c44f75bb?w=500&h=500&fit=crop" alt="Cámara DSLR" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Electrónica</span>
+                        <h3 class="product-title">Cámara Profesional 4K</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="rating-text">(4.2)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$599.99</span>
+                            <span class="original-price">$799.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 5 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec0d8b403c?w=500&h=500&fit=crop" alt="Zapatillas Running" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Deportes</span>
+                        <h3 class="product-title">Zapatillas Running Pro</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating-text">(4.9)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$129.99</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+
+                <!-- Producto 6 -->
+                <article class="product-card">
+                    <div class="product-image-container">
+                        <span class="badge sale">-25%</span>
+                        <img src="https://images.unsplash.com/photo-1594818379416-e8c5b2f0903e?w=500&h=500&fit=crop" alt="Lámpara de Escritorio" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <span class="category">Hogar</span>
+                        <h3 class="product-title">Lámpara LED Ajustable</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="rating-text">(4.3)</span>
+                        </div>
+                        <div class="price-container">
+                            <span class="current-price">$45.99</span>
+                            <span class="original-price">$61.32</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>TiendaPro</h3>
+                    <p>📍 Av. Principal 123, Ciudad<br>📧 contacto@tiendapro.com<br>📞 +123 456 7890</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Enlaces Rápidos</h3>
+                    <a href="#">Sobre Nosotros</a><br>
+                    <a href="#">Términos y Condiciones</a><br>
+                    <a href="#">Política de Privacidad</a><br>
+                    <a href="#">Contacto</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Síguenos</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-icon" aria-label="Facebook">
+                            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="#" class="social-icon" aria-label="Instagram">
+                            <svg viewBox="0 0 24 24"><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/></svg>
+                        </a>
+                        <a href="#" class="social-icon" aria-label="Twitter">
+                            <svg viewBox="0 0 24 24"><path d="M23 3a10.93 10.93 0 0 1-3.14 1.5A7.94 7.94 0 0 1 18 3a7.92 7.92 0 0 1-5.64 2.37l1.5 1.5c-.9-.5-2-1-3-1A5.92 5.92 0 0 0 5 4a5.9 5.9 0 0 0 1.75 4.08l-.16.16a8.85 8.85 0 0 1-3.8-1.73A8.95 8.95 0 0 1 2 12c0 2.31.84 4.44 2.22 6.14l-.5.5a11.16 11.16 0 0 1-2.79-1.67A9.83 9.83 0 0 0 4 14c0-2.21.9-4.18 2.3-5.64l-.16-.16a8.85 8.85 0 0 1-1.78-2.6A8.85 8.85 0 0 1 4 4c2.31 0 4.44.84 6.14 2.22l1.5-1.5a9.83 9.83 0 0 1 4.08 1.75A8.85 8.85 0 0 1 20 8c0 2.31-.84 4.44-2.22 6.14l.5.5a11.16 11.16 0 0 1-1.67-2.79A9.83 9.83 0 0 0 14 14c0-2.21-.9-4.18-2.3-5.64l.16-.16a8.85 8.85 0 0 1 1.78-2.6A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l.5-.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a11.16 11.16 0 0 1-2.79-1.67A9.83 9.83 0 0 0 14 4c0-2.21-.9-4.18-2.3-5.64l.16-.16a8.85 8.85 0 0 1 1.78-2.6A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.2"
+                            ></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div></div></footer></body></html>
+>>>>>>> c11824561ee6ae16cd9b0a1a25c07be287afbed2
