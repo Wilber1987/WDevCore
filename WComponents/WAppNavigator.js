@@ -296,7 +296,7 @@ class WAppNavigator extends HTMLElement {
 				border-right: solid 1px rgba(0, 0, 0, 0);
 				border-radius: 0.2cm;
 				color: ${this.DarkMode ? "#4da6ff" : "#ffffff"};
-				background-color: #1f58c7;
+				background-color: var(--primary-background);
 			}
 		
 			a {
@@ -337,7 +337,7 @@ class WAppNavigator extends HTMLElement {
 				border-right: solid 1px rgba(0, 0, 0, 0);
 				border-radius: 0.2cm;
 				color: ${this.DarkMode ? "#4da6ff" : "#ffffff"};
-				background-color: #1f58c7;
+				background-color: var(--primary-background);
 			}
 		
 			h4.elementNavActive {

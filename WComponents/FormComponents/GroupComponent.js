@@ -117,7 +117,7 @@ export class GroupComponent extends HTMLElement {
 		}
 
 		.toggle-icon .icon {
-			fill: #007bff;
+			fill: var(--primary-background);;
 			transition: fill 0.3s ease;
 		}
 
