@@ -26,10 +26,13 @@ class EntityClass {
     }
     /**
      * @param {Array<FilterData>} filterData 
-     * @returns {Array}
+     * @returns {Promise<Array>}
      */
     Where = async (...filters) => {
-        this.FilterData = filters;
+        this.FilterData = this.FilterData ?? []
+        if (filters.length > 0) {
+            this.FilterData.push(...filters)
+        }
         let Data = await this.GetData(this.ApiMethods.Get);
         return Data;
     }
