@@ -172,6 +172,7 @@ export const WChatStyle = css`
  .chat .chat-details {
 	 display: flex;
 	 align-items: center;
+	 width: 100%;
  }
 
  .chat .chat-details svg {
@@ -193,13 +194,15 @@ export const WChatStyle = css`
 
 
  .chat .chat-details .pElement {
-	 white-space: pre-wrap;
-	 font-size: 12px !important;
-	 padding: 10px;
-	 color: var(--text-color);
-	 word-break: break-word;
+	white-space: pre-line;
+	font-size: 12px !important;
+	padding: 10px;
+	color: var(--text-color);
+	word-break: break-word;
+	width: 100%;
+	box-sizing: border-box;
 	 * {
-		max-width: 100%;
+		max-width:calc( 100% - 20px);
 	 }
  }
 
@@ -346,8 +349,7 @@ export const WChatStyle = css`
 	 background: var(--icon-hover-bg);
  }
 
- w-form {
- }
+
  .material-symbols-rounded{
 	max-width: 50px;
 	overflow: hidden;
@@ -382,6 +384,50 @@ export const WChatStyle = css`
 }
  /* Reponsive Media Query */
 
+code {
+    background-color: #3e3e3e;
+    display: block;
+    color: #fff;
+    padding: 20px;
+    overflow-wrap: break-word;
+    word-break: break-word; /* compatibilidad */
+    white-space: pre-wrap;  /* conserva saltos de línea y permite ajuste */
+	border-radius: 5px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;	
+	td, th {
+		border: solid 1px #4d4c4c;
+		padding: 5px;
+	}
+	th {
+		background-color: #eee;
+	}
+}
+.chat-btn-container {
+	display: flex;
+	gap: 10px;
+	justify-content: flex-end;
+	.chat-btn {
+		padding: 0;
+		border: none;
+		background-color: transparent;
+		svg {
+			display: block !important;
+			height: 25px;
+			width: 25px;
+			min-height: 25px;
+			min-width: 25px;
+			cursor: pointer;
+			opacity: 0.5;
+		}
+		svg:hover {
+			opacity:1;
+		}
+	}
+}
 
  @media screen and (max-width: 800px) {
 	 :where(.default-text .pElement, textarea, .chat .pElement) {

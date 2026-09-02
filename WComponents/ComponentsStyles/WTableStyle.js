@@ -50,7 +50,7 @@ w-card-table {
 	cursor: pointer;
 }
 
-.WTable td label, .WTable td p {
+.WTable td label {
 	overflow: hidden;
 	max-height: 200px;
 	text-overflow: ellipsis;
@@ -61,6 +61,13 @@ w-card-table {
 	padding: 0 5px;
 	max-width: 400px;
 	margin: 0px;
+}
+.WTable td p {
+	overflow: hidden;
+	max-height: 200px;
+	font-size: 12px !important;
+	margin: 0px;
+	overflow-y: auto;
 }
 .WTable td label *, .WTable td p * {
 	color: var(--font-primary-color) !important;
@@ -321,10 +328,9 @@ input[type=radio]:checked::before {
 }
 
 .imgPhoto {
-	width: 50px;
-	border-radius: 50%;
-	height: 50px;
-	size: 100%;
+	width: 120px;
+	border-radius: 10px;
+	height: auto;
 	display: block;
 	margin: auto;
 	object-fit: cover;
@@ -385,14 +391,14 @@ input[type=radio]:checked::before {
 		display: grid;		
 		margin: 10px;
 		border-radius: 0.3cm;
-		grid-template-columns: repeat(5, 1fr);
+		grid-template-columns: repeat(5);
 		overflow: hidden;
 		box-shadow: 0 0 3px 0 var(--fifty-color);
 	}
 
 	.WTable td {
 		display: flex;
-		border-bottom: 1px var(--fifty-color) solid;
+		border-bottom: unset;
 		padding: 10px;
 	}
 
@@ -403,7 +409,7 @@ input[type=radio]:checked::before {
 		width: auto;
 		padding: 10px;
 		grid-column: 5 span;
-		border-top: 2px solid #dadada;
+		border-top: 1px solid #dadada;
 	}
 	.BtnTable, .BtnTableA, .BtnTableS, .BtnTableSR {		
 		width: 150px !important;
@@ -415,6 +421,18 @@ input[type=radio]:checked::before {
 	input[type=date] {
 		padding: 5px 10px;
 		width: calc(100% - 20px);
+	}
+	.WTable td label, .WTable td p {
+		overflow: hidden;
+		max-height: 200px;
+		text-overflow: ellipsis;
+		display: block;
+		overflow-y: auto;
+		font-size: 12px !important;
+		color: var(--font-primary-color) !important;
+		padding: 0 5px;
+		max-width: 600px;
+		margin: 0px;
 	}
 }
 
@@ -465,6 +483,12 @@ input[type=radio]:checked::before {
 		padding: 5px 10px;
 		width: calc(100% - 20px);
 	}
+
+	.WTable td label, .WTable td p {		
+		max-width: 100%;
+		margin: 0px;
+	}
+	
 }
 
 @media (max-width: 600px) {

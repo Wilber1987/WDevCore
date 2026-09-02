@@ -1,8 +1,8 @@
 //@ts-check
 // @ts-ignore
 import { ModelProperty } from "../WModules/CommonModel.js";
-import { Tbl_Profile } from "../../Admin/Security/OrganizationModel/Tbl_Profile.js";
 import { EntityClass } from "../WModules/EntityClass.js";
+import { Tbl_Profile } from "./OrganizationModel/Tbl_Profile.js";
 
 class Security_Roles extends EntityClass {	
 	/**

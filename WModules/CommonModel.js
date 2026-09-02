@@ -500,6 +500,7 @@ class TableConfig { };
 	* @property {Function} [ValidateFunction]
 	* @property {Object | WNode | Node} [ObjectModal] nodo o componente html que se dibujara dentro del modal
 	* @property {Boolean} [CloseOption]
+    * @property {Boolean} [FullScreen]
 	* @property {Function} [ProxyAction]
 	* @property {HTMLStyleElement} [CustomStyle]
 	* @property {String} [DivColumns] FullScreen

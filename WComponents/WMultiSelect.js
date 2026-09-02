@@ -615,7 +615,7 @@ const MainMenu = css`
 	.LabelMultiselect label {
 		padding: 4px 7px;
 		border-radius: 0.2cm;
-		background-color: #1f58c7;
+		background-color: var(--primary-background);
 		color: #fff;
 		margin: 0px 3px;
 		font-size: 10px;

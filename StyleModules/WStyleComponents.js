@@ -42,7 +42,7 @@ const StylesControlsV1 = css`
     }
     .BtnPrimary {
         color: #fff;
-        background-color: #007bff;
+        background-color: var(--primary-background);;
 
     }
     .BtnAlert {
@@ -111,7 +111,7 @@ const StylesControlsV2 = css`.green {
 .Btn-Mini,
 .Btn-Mini-Alert,
 .Btn-Mini-Success {
-	background-color: #1f58c7;
+	background-color: var(--primary-background);
 	border: none;
 	outline: none;
 	border-radius: 8px;
@@ -186,14 +186,14 @@ const StylesControlsV2 = css`.green {
 	transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 	transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
 	color: #fff;
-	background-color: #1f58c7;
+	background-color: var(--primary-background);
 	border-color: transparent;
 }
 
 .Btn:active,
 .Btn:focus,
 .Btn:hover {    
-	background-color: #1c4fb3 !important;
+	background-color: var(--secundary-background) !important;
 	border-color: transparent !important;
 }
 
@@ -539,7 +539,7 @@ const StylesControlsV3 = css`
 
     .Block-Primary {
         color: #fff;
-        background-color: #094d95;
+        background-color: var(--primary-background);
     }
 
     .Block-Secundary {

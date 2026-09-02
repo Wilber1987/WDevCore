@@ -179,7 +179,7 @@ import { css } from "./WStyledRender.js";
 
 const buttonStyles = css`
     .my-button {
-        background-color: #007bff;
+        background-color: var(--primary-background);;
         color: white;
         padding: 10px 15px;
         border: none;

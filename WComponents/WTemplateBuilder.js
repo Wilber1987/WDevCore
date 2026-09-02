@@ -16,6 +16,7 @@ import "../libs/prims.js";
 import { WContentManager } from "../WModules/WContentManager.js";
 import { WChatComponent } from "./WChatComponent.js";
 import { WRichTextToolbar } from "./FormComponents/WRichTextToolbar.js";
+import { Tbl_Profiles_Model_ModelComponent } from "../../Admin/Security/Model/Tbl_Profile_Model.js";
 
 
 //#region DEFINICION DE TIPOS
@@ -28,6 +29,7 @@ export class TemplateData extends EntityClass {
     }
     /**@type {Number?} */ Id_Template = null;
     /**@type {String?} */ Description = null;
+    /**@type {String?} */ Token = null;
     /**@type {Array<Section>} */ Sections = [];
 }
 
@@ -49,8 +51,11 @@ export class TemplateData_ModelComponent extends EntityClass {
         // @ts-ignore
         Object.assign(this, props);
     }
+    /**@type {ModelProperty} */ Tbl_Profile = { type: "MODEL", ModelObject: () => new Tbl_Profiles_Model_ModelComponent() };
+
     /**@type {ModelProperty} */ Id_Template = { type: "NUMBER", primary: true };
     /**@type {ModelProperty} */ Descripcion = { type: "TEXT" };
+    /**@type {ModelProperty} */ Fecha = { type: "DATETIME" };
     //**@type {ModelProperty} */ Sections =  { type: "NUMBER", primary: true};
 }
 
@@ -212,7 +217,7 @@ class WTemplateBuilder extends HTMLElement {
             //wrapper.addEventListener("dragstart", this.dragStart);
             //wrapper.addEventListener("dragover", this.dragOver);
             //wrapper.addEventListener("drop", this.drop);
-           // wrapper.addEventListener("dragend", this.dragEnd);
+            // wrapper.addEventListener("dragend", this.dragEnd);
 
             // === 2. Evento input para sincronizar contenido ===
             wrapper.addEventListener("input", () => {
