@@ -56,8 +56,6 @@ class WAcorden extends HTMLElement {
         this.Draw();
     }
     CustomStyle = css`
-@import url(/css/variables.css);
-
 * {
     font-family: Montserrat, sans-serif;
     box-sizing: border-box;
