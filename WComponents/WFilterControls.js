@@ -38,6 +38,8 @@ class WFilterOptions extends HTMLElement {
 		this.FilterFunction = Config.FilterFunction;
 		this.ModelObject = Config.ModelObject;
 		this.EntityModel = Config.EntityModel;
+		/**@type {Array<FilterData>} */
+		this.DefaulFilters = Config.EntityModel ? Config.EntityModel.FilterData : (Config.ModelObject.FilterData ?? [] )
 		this.Display = Config.Display;
 		this.FilterContainer = WRender.Create({ className: "filter-container" });
 		if (this.Config.Direction?.toLowerCase() == "row") {
@@ -50,6 +52,7 @@ class WFilterOptions extends HTMLElement {
 		this.attachShadow({ mode: "open" });
 		this.shadowRoot?.append(StyleScrolls.cloneNode(true));
 		this.shadowRoot?.append(StylesControlsV2.cloneNode(true));
+		// @ts-ignore
 		this.shadowRoot?.append(WRender.createElement(this.styles));
 		this.shadowRoot?.append(this.FilterContainer);
 		this.ModelObject.FilterData = [];
@@ -190,7 +193,9 @@ class WFilterOptions extends HTMLElement {
 	filterFunction = async (sorts) => {
 		//this.IsDataFromFilter = true;
 		this.BuildFiltersAndSorts(sorts);
+		/**@type {EntityClass} */
 		const Model = this.EntityModel ?? this.ModelObject;
+		// @ts-ignore
 		if (Model.Get || this.Config.UseEntityMethods == false) {
 			if (this.Config.UseEntityMethods == false
 				&& this.Config.FilterFunction != undefined) {
@@ -198,7 +203,8 @@ class WFilterOptions extends HTMLElement {
 				this.IsDataFromFilter = false;
 				return;
 			} else if (this.Config.UseEntityMethods == true) {
-				const Dataset = await Model.Get();
+				//const Dataset = await Model.Get();
+				const Dataset = await Model.Where(...this.DefaulFilters);
 				if (this.Config.FilterFunction != undefined) {
 					this.Config.FilterFunction(Dataset, this.IsDataFromFilter);
 					this.IsDataFromFilter = false;

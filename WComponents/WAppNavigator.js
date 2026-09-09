@@ -471,7 +471,7 @@ class WAppNavigator extends HTMLElement {
 						position: absolute;
 						right: 10px;
 						top: 5px;
-						transform: translateY(-10%);
+						transform: translateY(-100%);
 					} 
 					& .zoomBtn .btnZoomOut{
 						display: none;

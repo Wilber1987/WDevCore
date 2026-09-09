@@ -62,6 +62,70 @@ function ModelFunction(EditingObject) {
 	* @property {Boolean} [IsEditableInGrid]
 **/
 class ModelProperty {
+	/**
+	* @param {Partial<ModelProperty>} props 
+	*/
+	constructor(props) {
+		Object.assign(this, props);
+	}
+	// /** @type {undefined | String} type - RADIO | DRAW | PASSWORD |	CHECKBOX | TEXT | IMG | NUMBER | DATE | EMAIL | FILE | MONEY (se trata como number)| PERCENTAGE (se trata como number)| TEL | TEXTAREA | MODEL | MASTERDETAIL | SELECT  | WSELECT | imagecapture  CALENDAR | OPERATION (requiere un action para funcionar y toma el valor que retorne el action) */
+	// type = "TEXT";
+	// /** @type {undefined | Boolean|Function} [hidden] desabilita la propiedad y la oculta */
+	// hidden = null;
+	// /** @type {undefined | TableOptions} [Options]  */
+	// Options = null;
+	// /** @type {undefined | Boolean} [hiddenInTable] oculta en la tabla */
+	// hiddenInTable = null;
+	// /** @type {undefined | Boolean|Function} [require] */
+	// require = null;
+	// /** @type {undefined | Boolean} [primary] */
+	// primary = null;
+	// /** @type {undefined | Boolean|Function} [disabled] */
+	// disabled = null;
+	// /** @type {undefined | String} [label] */
+	// label = null;
+	// /** @type {undefined | String} [Currency] para los tipo "MONEY" puede ser cualquier string ejemplo: NIO, C$ */
+	// Currency = null;
+	// /** @type {undefined | String} [ForeignKeyColumn] nombre de la llave foranea que enlaza el ModelObject de esta propiedad con la propiedad padre */
+	// ForeignKeyColumn = null;
+	// /** @type {undefined | Array} [fileType] */
+	// fileType = null;
+	// /** @type {undefined | { name: string, action: (EditingObject, form, control, propertyName)=>{}}[]} [ControlAction] botones adicionales que se le agregan al control  */
+	// ControlAction = null;
+	// /** @type {undefined | String} [pattern] */
+	// pattern = null;
+	// /** @type {undefined | any} [defaultValue] */
+	// defaultValue = null;
+	// /** @type {undefined | String} [placeholder] */
+	// placeholder = null;
+	// /** @type {undefined | Boolean} [hiddenFilter] */
+	// hiddenFilter = null;
+	// /** @type {undefined | Boolean} [isReadOnly] */
+	// isReadOnly = null;
+	// /** @type {undefined | Boolean} [fullDetail] - esto oculta el detalle del objeto en multiselect(por ahora) */
+	// fullDetail = null;
+	// /** @type {undefined | String | Number} [min] para rangos de tipo number y date */
+	// min = null;
+	// /** @type {undefined | String | Number} [max] para rangos de tipo number y date */
+	// max = null;
+	// /** @type {undefined | String} [fieldRequire] CAMBIA UN ESTADO DE UNA PROPIEDAD A REQUERIDO */
+	// fieldRequire = null;
+	// /** @type {undefined | Object | EntityClass | ModelFunction} [ModelObject] si es una funcion, esta podra recibir de forma opcional el EditingObject el cual es el padre que se esta editando en el formulario y que puede ser utilizado para definir el comportamiento del modelo resultante */
+	// ModelObject = null;
+	// /** @type {undefined |  EntityClass | ModelFunction} [EntityModel] */
+	// EntityModel = null;
+	// /** @type {undefined | Array} [Dataset] */
+	// Dataset = null;
+	// /** @type {undefined | Function} [action] Accion adicional que realizara el control cuando exista un cambio de valor recibe como parametro el objeto editado */
+	// action = null;
+	// /** @type {undefined | () => { Agenda: Agenda[]; Calendario: Tbl_Calendario[]; }} [CalendarFunction] (obj) => {  } */
+	// CalendarFunction = null;
+	// /** @type {undefined | String} [SelfChargeDataset] Si es un WSELECT con el valor de esta propiedad puede usar datos para llenar el desplegable a partir de la entidad padre, es funcional para relaciones recursivas dentro de un master detail */
+	// SelfChargeDataset = null;
+	// /** @type {undefined | Boolean} [IsGridDisplay] Se  usa para el formulario con propiedades MULTISELECT o WSELECT y despliega una tabla en lugar de un combo */
+	// IsGridDisplay = null;
+	// /** @type {undefined | Boolean} [IsEditableInGrid] */
+	// IsEditableInGrid = null;
 	IsNumber() {
 		return this.type?.toUpperCase() == "NUMBER"
 	}
@@ -296,6 +360,7 @@ class ElementStyle { }
 	 * @property {String} [id]
 	 * @property {String} [type]
 	 * @property {String} [title] 
+	 * @property {String} [step]
 	 * @property {Partial<CSSStyleDeclaration> | String} [style]
 	 * @property {String} [className]
 	 * @property {Boolean} [hidden]
@@ -310,7 +375,7 @@ class ElementStyle { }
 	 * @property {number} [colSpan] 
 	 * @property {String} [src]
 	 * @property {String} [href]
-	 * @property {String} [innerText]    
+	 * @property {String?} [innerText]    
 	 * @property {String | Number} [min]
 	 * @property {String | Number} [max]   
 	 * @property {String | Number} [value]
@@ -438,6 +503,7 @@ class TableConfig { };
     * @property {Boolean} [FullScreen]
 	* @property {Function} [ProxyAction]
 	* @property {HTMLStyleElement} [CustomStyle]
+	* @property {String} [DivColumns] FullScreen
  **/
 
 class ModalConfig {
