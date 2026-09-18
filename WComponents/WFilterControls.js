@@ -39,7 +39,7 @@ class WFilterOptions extends HTMLElement {
 		this.ModelObject = Config.ModelObject;
 		this.EntityModel = Config.EntityModel;
 		/**@type {Array<FilterData>} */
-		this.DefaulFilters = Config.EntityModel ? Config.EntityModel.FilterData : (Config.ModelObject.FilterData ?? [] )
+		this.DefaulFilters = Config.EntityModel ? Config.EntityModel.FilterData : (Config.ModelObject.FilterData ?? [])
 		this.Display = Config.Display;
 		this.FilterContainer = WRender.Create({ className: "filter-container" });
 		if (this.Config.Direction?.toLowerCase() == "row") {
@@ -374,23 +374,50 @@ class WFilterOptions extends HTMLElement {
 						break;
 					case "TITLE": case "IMG": case "IMAGE": case "IMAGES":
 						break;
-					case "DATE": case "FECHA": case "TIME":
-						/**TODO */
+					case "DATE":
+					case "FECHA":
+					case "TIME":
 						filterType = "BETWEEN";
 						propType = "Date";
+
 						const inputs = control.querySelectorAll("input");
 
-						if (inputs[0].value != '' || inputs[1].value != '') {
-							values = [];
-							if (inputs[0].value != '') {
-								values.push(inputs[0].value);
-							} else {
-								values.push(null);
+						const isValidDate = (/** @type {string} */ value) => {
+							if (value == undefined || value == null || value == "") {
+								return false;
 							}
-							if (inputs[1].value != '') {
-								values.push(inputs[1].value);
+							if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+								return false;
 							}
+
+							const [year, month, day] = value.split("-").map(Number);
+							const date = new Date(year, month - 1, day);
+
+							return (
+								date.getFullYear() === year &&
+								date.getMonth() === month - 1 &&
+								date.getDate() === day
+							);
+						};
+
+						const from = inputs[0]?.value?.trim() || "";
+						const to = inputs[1]?.value?.trim() || "";
+
+						if (!isValidDate(from)) {
+							throw new Error(`Fecha inicial inválida: ${from}`);
 						}
+
+						if (!isValidDate(to)) {
+							throw new Error(`Fecha final inválida: ${to}`);
+						}
+
+						if (from || to) {
+							values = [
+								from || null,
+								to || null
+							];
+						}
+
 						break;
 					case "WSELECT": case "MULTISELECT":
 						if (control.selectedItems.length > 0 && ModelProperty.ModelObject != undefined) {
@@ -443,12 +470,12 @@ class WFilterOptions extends HTMLElement {
 						break;
 				}
 				if (values != undefined || values != null) {
-					const filterData = new FilterData( {
-							PropName: propiertyName,
-							FilterType: filterType,
-							Values: values, 
-							PropSQLType: propType
-						});
+					const filterData = new FilterData({
+						PropName: propiertyName,
+						FilterType: filterType,
+						Values: values,
+						PropSQLType: propType
+					});
 					if (this.EntityModel) {
 						this.EntityModel.FilterData.push(filterData);
 					}
@@ -527,7 +554,7 @@ class WFilterOptions extends HTMLElement {
 					type: "date",
 					className: prop + " secondDate",
 					// @ts-ignore
-					value: this.Config.AutoSetDate == true ? new Date().addDays(1).toISO() : undefined,
+					value: this.Config.AutoSetDate == true ? new Date().addDays(2).toISO() : undefined,
 					id: prop + "second",
 					placeholder: prop,
 					onchange: () => { this.OnChange(); }
