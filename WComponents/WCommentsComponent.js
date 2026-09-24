@@ -55,6 +55,7 @@ class WCommentsComponent extends HTMLElement {
             w-coment-component {
                 display: flex;
                 flex-direction: column;
+                height: stretch;
             }    
         `)
         this.CommentsContainer = WRender.Create({ className: "CommentsContainer" });  

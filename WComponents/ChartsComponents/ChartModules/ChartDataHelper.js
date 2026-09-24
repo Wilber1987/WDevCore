@@ -100,7 +100,8 @@ export class ChartDataHelper {
     /** @param {any} metricLevels @returns {string[]} */
     static getAvailableMetrics(metricLevels) {
         const sample = metricLevels?.['General Summary'] || {};
-        return Object.keys(sample).filter(k => ['SubTotal', 'Descuento', 'Iva', 'Total'].includes(k));
+        return Object.keys(sample)
+        //return Object.keys(sample).filter(k => ['SubTotal', 'Descuento', 'Iva', 'Total'].includes(k));
     }
 
     static getColorPalette() {
