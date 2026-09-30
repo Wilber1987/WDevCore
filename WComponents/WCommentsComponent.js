@@ -436,9 +436,13 @@ class WCommentsComponent extends HTMLElement {
         }
     }
 
-    GetFileNameFromPath(path) {
+    /**
+	 * @param {string} path
+	 */
+	GetFileNameFromPath(path, isImg = true) {
         if (!this.UseOnlyFileName) {
-            return path;
+            const pathNotIncludesPleca = path != null &&  path.toUpperCase().startsWith("MEDIA");
+            return pathNotIncludesPleca ? "/" + path : path;
         }
         if (!path) return '';
 
@@ -447,8 +451,30 @@ class WCommentsComponent extends HTMLElement {
 
         // Divide la ruta por '/' y obtiene el último elemento
         const parts = normalizedPath.split('/');
-        return "/" + parts[parts.length - 1];
-    }
+       
+		if (!path) return "";
+
+		// Detecta si es un base64 puro (sin encabezado)
+		const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
+
+		// Detecta si es un DataURL tipo data:image/png;base64,...
+		const dataUrlRegex = /^data:(.*);base64,/;
+
+		// ¿Es un dataURL completo?
+		if (dataUrlRegex.test(path)) {
+			return isImg ? path : ""; // ya es válido, no necesita normalizarse
+		}
+
+		// ¿Es un base64 puro?
+		if (base64Regex.test(path)) {
+			return isImg
+				? `data:image/png;base64,${path}`
+				: path;
+		}
+
+		return "/" + parts[parts.length - 1];
+	}
+
     CustomStyle = css`    
         .CommentsContainer{
             display: flex;

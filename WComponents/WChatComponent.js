@@ -75,13 +75,13 @@ class WChatComponent extends HTMLElement {
 		this.identity = {
 			Tipo: undefined,
 			Value: this.Config.IdentityValue ?? localStorage.getItem("identity"),
-			Session: sessionStorage.getItem("Session") ?? generateGUID()
+			Session: localStorage.getItem("Session") ?? generateGUID()
 		};
 		this.chatContainer = html`<div class="chat-container"></div>`;
-		this.WithAgent = Config.WithAgent ?? sessionStorage.getItem("WithAgent") == "true" ? true : false;
+		this.WithAgent = Config.WithAgent ?? localStorage.getItem("WithAgent") == "true" ? true : false;
 		this.CommentsIdentifyName = Config.CommentsIdentifyName
 		// @ts-ignore
-		this.CommentsIdentify = Config.CommentsIdentify ?? (sessionStorage.getItem(this.CommentsIdentifyName) ? parseInt(sessionStorage.getItem(this.CommentsIdentifyName)) : undefined);
+		this.CommentsIdentify = Config.CommentsIdentify ?? (localStorage.getItem(this.CommentsIdentifyName) ? parseInt(localStorage.getItem(this.CommentsIdentifyName)) : undefined);
 		/**@type {HTMLInputElement} */
 		// @ts-ignore
 		this.chatInput = html`<textarea id="chat-input" spellcheck="false"  required></textarea>`
@@ -189,10 +189,11 @@ class WChatComponent extends HTMLElement {
 
 			document.body.classList.toggle("light-mode", themeColor === "light_mode");
 			themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
-
-
-
-			this.chatContainer.innerHTML = this.Config.UseLocalMemory ? (localStorage.getItem("all-chats") ?? "") : "";
+			if (this.WithAgent) {
+				this.chatContainer.innerHTML = "";
+			} else{
+				this.chatContainer.innerHTML = this.Config.UseLocalMemory ? (localStorage.getItem("all-chats") ?? "") : "";
+			}			
 			if (this.chatContainer.querySelector(".default-text")) {
 				this.chatContainer.querySelector(".default-text")?.remove();
 			}
@@ -239,25 +240,30 @@ class WChatComponent extends HTMLElement {
 				pElement.innerHTML = "";
 				// 3️⃣ Escribe el contenido resultante en el párrafo
 				pElement.append(...WContentManager.ParseContent(processed));
-				if (this.WithAgent != true) {
-					// Remove the typing animation, append the paragraph element and save the chats to local storage                 
 
-					if (attachs.children.length > 0) {
-						pElement.append(attachs)
-					}
-				} else {
-					//incomingChatDiv.remove();
-					//localStorage.removeItem("all-chats");
-				}
 				incomingChatDiv.querySelector(".chat-details")?.appendChild(pElement);
 				const oldWithAgent = this.WithAgent;
 				const condition = oldWithAgent != response.WithAgentResponse;
 				this.WithAgent = response.WithAgentResponse ?? false;
-				sessionStorage.setItem("WithAgent", this.WithAgent == true ? "true" : "false");
+				localStorage.setItem("WithAgent", this.WithAgent == true ? "true" : "false");
+				if (this.WithAgent != true) {
+					// Remove the typing animation, append the paragraph element and save the chats to local storage 
+					if (attachs.children.length > 0) {
+						pElement.append(attachs)
+					}
+					this.chatContainer.appendChild(incomingChatDiv);
+				} else {
+					if (response.Reply) {
+						this.chatContainer.appendChild(incomingChatDiv);
+					} else {
+						incomingChatDiv.remove();
+					}
+					//localStorage.removeItem("all-chats");
+				}
 				// @ts-ignore
 				this.CommentsIdentify = response[this.CommentsIdentifyName];
 				// @ts-ignore
-				sessionStorage.setItem("this.CommentsIdentifyName", this.CommentsIdentify?.toString());
+				localStorage.setItem("CommentsIdentifyName", this.CommentsIdentify?.toString());
 				this.AddResponseActions(processed, pElement);
 				if (condition) {
 					//this.chatContainer.innerHTML = "";
@@ -288,7 +294,9 @@ class WChatComponent extends HTMLElement {
 				</div>`;
 			// Create an incoming chat div with typing animation and append it to chat container
 			const incomingChatDiv = createChatElement(chatContent, "incoming");
-			this.chatContainer.appendChild(incomingChatDiv);
+			if (this.WithAgent != true) {
+				this.chatContainer.appendChild(incomingChatDiv);
+			}
 			this.chatContainer.scrollTo(0, this.chatContainer.scrollHeight);
 			getChatResponse(incomingChatDiv, sendChatContent);
 		};
@@ -398,7 +406,10 @@ class WChatComponent extends HTMLElement {
 	async SendMessage(model) {
 		return await WAjaxTools.PostRequest(this.Config.Url ?? "", model, {
 			headers: [{ name: "X-Platform", value: "webapi" }],
-			WithoutLoading: true
+			WithoutLoading: false,
+			RequestType: null,
+			HeaderType: null,
+			CSRFToken: null
 		});
 	}
 
@@ -412,7 +423,7 @@ class WChatComponent extends HTMLElement {
 			this.actualPage = this.actualPage ?? 1;
 			//Message.FilterData = [{ FilterType: "limit", Values: ["30"] }]
 			Message.FilterData = [FilterData.NotIn("Id_Comentario", ...this.Id_ComentarioCargados)]
-			Message.OrderData = [OrderData.Asc("Fecha")]
+			Message.OrderData = [OrderData.Desc("Id_Comentario")]
 
 
 			// @ts-ignore
@@ -425,14 +436,6 @@ class WChatComponent extends HTMLElement {
 				.forEach((/**@type {Object.<string, any>} */ comment) => {
 					this.Id_ComentarioCargados.push(comment.Id_Comentario.toString())
 					if (this.chatContainer.querySelector("#Comment" + comment.Id_Comentario)) {
-						return;
-					}
-
-					//TODO MEJORAR ESTO Y HACERLO MAS ESPECIFICO
-					const val = Array.from(document.querySelectorAll(`.chat.outgoing`))
-						// @ts-ignore
-						.find(el => el.innerText === (comment.Body ?? comment.mensaje));
-					if (val) {
 						return;
 					}
 					const classN = comment.NickName == this.identity.Value ? "outgoing" : "incoming";

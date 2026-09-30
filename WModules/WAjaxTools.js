@@ -41,9 +41,13 @@ class PostConfig {
      * @param {{ RequestType: string; } | undefined} [props]
      */
     constructor(props) { Object.assign(this, props); }
+    /**@type {string?} */
     RequestType = "POST";
+     /**@type {string?} */
     HeaderType = "json";
+     /**@type {string?} */
     CSRFToken = "";
+     /**@type {Boolean?} */
     WithoutLoading = false;
     /**
      * @type {any[]}
