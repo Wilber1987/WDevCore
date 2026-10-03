@@ -8,7 +8,7 @@ import { WAlertMessage } from "../WComponents/WAlertMessage.js";
  * 🛡️ COLA DE PETICIONES (Request Queue)
  */
 class RequestQueue {
-    static MAX_CONCURRENT = 3; 
+    static MAX_CONCURRENT = 3;
     static activeCount = 0;
     /**
      * @type {((value: any) => void)[]}
@@ -43,17 +43,19 @@ class PostConfig {
     constructor(props) { Object.assign(this, props); }
     /**@type {string?} */
     RequestType = "POST";
-     /**@type {string?} */
+    /**@type {string?} */
     HeaderType = "json";
-     /**@type {string?} */
+    /**@type {string?} */
     CSRFToken = "";
-     /**@type {Boolean?} */
+    /**@type {Boolean?} */
     WithoutLoading = false;
     /**
      * @type {any[]}
      */
     // @ts-ignore
     headers;
+    /**@type {AbortSignal?} */
+    signal = null;
 }
 
 class WAjaxTools {
@@ -65,7 +67,7 @@ class WAjaxTools {
      */
     static Request = async (/** @type {RequestInfo | URL} */ Url, Data = {}, /** @type {PostConfig | undefined} */ postConfig, maxRetries = 3) => {
         const method = postConfig?.RequestType || 'POST';
-        
+
         // 1. Generar una "Firma" única para esta petición
         let bodyString = '';
         try {
@@ -87,7 +89,7 @@ class WAjaxTools {
 
         // 🚀 Si no está en curso, creamos la promesa de ejecución real
         const executionPromise = WAjaxTools._executeNetworkRequest(Url, Data, postConfig, maxRetries);
-        
+
         // La registramos en el mapa
         WAjaxTools.inFlightRequests.set(requestKey, executionPromise);
 
@@ -102,9 +104,9 @@ class WAjaxTools {
     /**
      * Lógica interna de red (Cola, Reintentos, Fetch)
      */
-    static _executeNetworkRequest = async (/** @type {RequestInfo | URL} */ Url, 
-        /** @type {{}} */ Data, 
-        /** @type {PostConfig | undefined} */ postConfig, 
+    static _executeNetworkRequest = async (/** @type {RequestInfo | URL} */ Url,
+        /** @type {{}} */ Data,
+        /** @type {PostConfig | undefined} */ postConfig,
         /** @type {number} */ maxRetries) => {
         const loadinModal = new LoadinModal();
         let isComplete = false;
@@ -118,16 +120,29 @@ class WAjaxTools {
 
         const executeAttempt = async () => {
             await RequestQueue.acquire();
-            
+
             let response = null;
             let networkError = null;
 
+            const controller = new AbortController();
+            const timeoutMs = postConfig?.TimeoutMs ?? 15000;
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
             try {
                 const config = WAjaxTools.BuildConfigRequest(postConfig, Data);
+                // 🆕 Pasar signal al fetch
+                if (postConfig?.signal) {
+                    config.signal = postConfig.signal;
+                }
                 response = await fetch(Url, config);
             } catch (err) {
+                // 🆕 Distinguir AbortError de errores de red
+                if (err.name === 'AbortError') {
+                    throw err; // No reintentar si fue cancelado
+                }
                 networkError = err;
             } finally {
+                clearTimeout(timeoutId);
                 RequestQueue.release();
             }
 
@@ -172,14 +187,14 @@ class WAjaxTools {
             clearTimeout(loadingTimeout);
             loadinModal.close();
             isComplete = true;
-            
+
             console.error(`❌ [WAjaxTools] Error final tras ${attemptsMade} intentos:`, error);
             // @ts-ignore
-            const errorMessage = error?.message?.includes("Failed to fetch") 
-                ? "Error de conexión con el servidor." 
+            const errorMessage = error?.message?.includes("Failed to fetch")
+                ? "Error de conexión con el servidor."
                 // @ts-ignore
                 : (error?.message || "Error inesperado.");
-                
+
             WAlertMessage.Danger(errorMessage, true);
             throw error;
         }
@@ -190,7 +205,7 @@ class WAjaxTools {
         const lineas = messageError?.split(/\r?\n/);
         console.error(`[HTTP Error ${response?.status}]`, lineas);
         // @ts-ignore
-        if(lineas[0]) {
+        if (lineas[0]) {
             // @ts-ignore
             document.body.append(ModalMessage(lineas[0]));
             // @ts-ignore
@@ -224,7 +239,7 @@ class WAjaxTools {
 
             if (text.length < 1024 * 1024 * 2) {
                 // @ts-ignore
-                try { localStorage.setItem(Url, text); } 
+                try { localStorage.setItem(Url, text); }
                 catch (e) { console.warn(`localStorage lleno o error: ${Url}`); }
             }
             return JSON.parse(text);
@@ -238,10 +253,10 @@ class WAjaxTools {
      * @param {{}} Data
      */
     static BuildConfigRequest(postConfig = new PostConfig(), Data) {
-        let ContentType = postConfig.HeaderType === HeaderType.FORM 
-            ? "application/x-www-form-urlencoded; charset=UTF-8" 
+        let ContentType = postConfig.HeaderType === HeaderType.FORM
+            ? "application/x-www-form-urlencoded; charset=UTF-8"
             : "application/json; charset=utf-8";
-            
+
         let dataRequest = {
             method: postConfig.RequestType,
             headers: { 'Content-Type': ContentType, 'Accept': '*/*', dataType: 'json' }
