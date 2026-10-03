@@ -434,9 +434,13 @@ class WCommentsComponent extends HTMLElement {
         }
     }
 
+    /**
+     * @param {string} path
+     */
     GetFileNameFromPath(path) {
         if (!this.UseOnlyFileName) {
-            return path;
+            const pathNotIncludesPleca = path != null &&  path.toUpperCase().startsWith("MEDIA");
+            return pathNotIncludesPleca ? "/" + path : path;
         }
         if (!path) return '';
 
