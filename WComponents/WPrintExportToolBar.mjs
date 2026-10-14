@@ -347,7 +347,7 @@ class WPrintExportToolBar extends HTMLElement {
 		rows.forEach((row, index) => {
 			const trheader = WRender.Create({ tagName: "tr" });
 			const tr = WRender.Create({ tagName: "tr" });
-			if (row.__proto__ == Object.prototype || (row.__proto__.__proto__).toString() == "[object Object]") {
+			if (model && (row._proto_ == Object.prototype || (row._proto.proto_).toString() == "[object Object]")) {
 				for (const key in row) {
 					if (this.isNotDrawable(key, model, row)) {
 						continue;
