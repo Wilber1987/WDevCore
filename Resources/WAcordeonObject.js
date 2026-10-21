@@ -26,12 +26,12 @@ class WAcorden extends HTMLElement {
     connectedCallback() { }
     Draw = async () => {
         // ${Object.keys(element).map(key => this.BuildPropiertyDetail(element, key))}
-        this.Config.Dataset?.forEach(element => {
+        this.Config.Dataset?.forEach((/** @type {{ Descripcion?: any; }} */ element) => {
             const content = html`<div class="element-content" id="${element.Descripcion?.toString().replaceAll(" ", "")}">
                 ${Object.keys(element).map(key => this.BuildPropiertyDetail(element, key))}
             </div>`;
             this.Acordeon?.append(html`<div class="element-container">
-                <div class="accordion-button" onclick="${(ev) => {
+                <div class="accordion-button" onclick="${(/** @type {{ target: { className: string; }; }} */ ev) => {
                     ev.target.className = content.className.includes("active")
                         ? "accordion-button" : "accordion-button active-btn";
                     content.className = content.className.includes("active")
@@ -41,17 +41,21 @@ class WAcorden extends HTMLElement {
             </div>`)
         });
     }
+    /**
+     * @param {Object.<string, any>} ObjectF
+     * @param {string } prop
+     */
     BuildPropiertyDetail(ObjectF, prop) {
         switch (this.Config.ModelObject[prop]?.type.toUpperCase()) {
             case "MASTERDETAIL":
                 const modelClass = this.Config.ModelObject[prop].ModelObject.__proto__ == Function.prototype ? this.Config.ModelObject[prop].ModelObject() : this.Config.ModelObject[prop].ModelObject;
                 //console.log(this.Config.ModelObject, prop, this.Config.ModelObject[prop], this.Config.ModelObject[prop].ModelObject, ObjectF[prop]);
-                const maxDetails = ObjectF[prop].reduce((max, detail) => {
+                const maxDetails = ObjectF[prop].reduce((/** @type {number} */ max, /** @type {any} */ detail) => {
                     const DetailsLength = new modelClass.constructor(detail).Details
                         ? new modelClass.constructor(detail).Details.length : 0;
                     return Math.max(max, DetailsLength);
                 }, 0);
-                return html`<div class="detail-content">${ObjectF[prop].map(element => {
+                return html`<div class="detail-content">${ObjectF[prop].map((/** @type {any} */ element) => {
                     const instance = new modelClass.constructor(element);
                     const index = ObjectF[prop].indexOf(element)
                     return html`<div class="container">
@@ -60,7 +64,7 @@ class WAcorden extends HTMLElement {
                             <span class="value">${instance.Descripcion}</span>
                         </div>
                         <div class="element-details" style=" grid-template-columns: repeat(${maxDetails}, ${100 / maxDetails}%);">
-                            ${instance.Details.map((detail, indexDetail) => {
+                            ${instance.Details.map((/** @type {any} */ detail, /** @type {any} */ indexDetail) => {
                             return this.buildDetail(detail, indexDetail);
                     })}</div>
                 </div>`
@@ -70,6 +74,10 @@ class WAcorden extends HTMLElement {
         }
     }
 
+    /**
+     * @param {{ Evaluacion: any; Resultado: any; }} detail
+     * @param {number} index
+     */
     buildDetail(detail, index) {    
         return html`<div class="element-detail" >
             <span class="header ${index == 0 ? "" : "hidden"}">${detail.Evaluacion}</span>
@@ -80,7 +88,7 @@ class WAcorden extends HTMLElement {
     update() {
         this.Draw();
     }
-    CustomStyle = css`@import url(/css/variables.css);
+    CustomStyle = css`
         *{ font-family:  Montserrat, sans-serif;}
         
         .accordion {

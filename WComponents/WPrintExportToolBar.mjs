@@ -9,7 +9,7 @@ import { PageType } from "./WReportComponent.js";
 
 /**
  * @typedef {Object} Config 
-	* @property {Function} [PrintAction]
+	* @property {(tool: WPrintExportToolBar)=> void} [PrintAction]
 	* @property {Function} [ExportPdfAction]
 	* @property {Function} [ExportCvsAction]
 	* @property {Function} [ExportXlsAction]
@@ -32,7 +32,7 @@ class WPrintExportToolBar extends HTMLElement {
 	Draw = async () => {
 		this.shadowRoot?.append(html`<div class="toolbar">
 			${this.Confg.Controls ?? []}
-			${this.Confg.PrintAction ? html`<button class="toolbar-button cyan" onclick="${(ev) => {
+			${this.Confg.PrintAction ? html`<button class="toolbar-button cyan" onclick="${() => {
 				// @ts-ignore
 				this.Confg.PrintAction(this)
 			}}">
@@ -40,7 +40,7 @@ class WPrintExportToolBar extends HTMLElement {
 				Imprimir
 			</button>`: ""}
 		   
-			${this.Confg.ExportPdfAction ? html`<button class="toolbar-button red" onclick="${(ev) => {
+			${this.Confg.ExportPdfAction ? html`<button class="toolbar-button red" onclick="${() => {
 				// @ts-ignore
 				this.Confg.ExportPdfAction(this)
 			}}">
@@ -49,7 +49,7 @@ class WPrintExportToolBar extends HTMLElement {
 				</svg>
 				IMPRIMIR
 			</button>`: ""}
-			${this.Confg.ExportCvsAction ? html`<button class="toolbar-button cyan" onclick="${(ev) => {
+			${this.Confg.ExportCvsAction ? html`<button class="toolbar-button cyan" onclick="${() => {
 				// @ts-ignore
 				this.Confg.ExportCvsAction(this)
 			}}">
@@ -58,13 +58,13 @@ class WPrintExportToolBar extends HTMLElement {
 				</svg>
 				CVS
 			</button>`: ""}
-			${this.Confg.ExportXlsAction ? html`<button class="toolbar-button green" onclick="${(ev) => {
+			${this.Confg.ExportXlsAction ? html`<button class="toolbar-button green" onclick="${() => {
 				// @ts-ignore
 				this.Confg.ExportXlsAction(this)
 			}}">
 				XLS
 			</button>`: ""}
-				${this.Confg.UploadAction ? html`<button class="toolbar-button red" onclick="${(ev) => {
+				${this.Confg.UploadAction ? html`<button class="toolbar-button red" onclick="${(/** @type {any} */ ev) => {
 				// @ts-ignore
 				this.Confg.UploadAction(ev)
 			}}">
@@ -139,6 +139,13 @@ class WPrintExportToolBar extends HTMLElement {
 		console.log(resp);
 
 	}
+	/**
+	 * @param {any} rows
+	 * @param {any} header
+	 * @param {any} model
+	 * @param {RequestInfo | URL} apiUrl
+	 * @param {{ outerHTML: any; }} style
+	 */
 	async ExportPdfFromApi(rows,
 		header,
 		model,
@@ -185,6 +192,9 @@ class WPrintExportToolBar extends HTMLElement {
 		a.remove();
 		window.URL.revokeObjectURL(url);
 	}
+	/**
+	 * @param {HTMLElement | Node} body
+	 */
 	async SendToApi(body, pagetype = PageType.A4) {
 		const apiUrl = "/api/ApiDocumentsData/GeneratePdf";
 
@@ -195,6 +205,7 @@ class WPrintExportToolBar extends HTMLElement {
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify({
+				// @ts-ignore
 				HtmlContent: body.outerHTML,
 				PageType: pagetype
 			})
@@ -247,7 +258,7 @@ class WPrintExportToolBar extends HTMLElement {
 	 
 	 */
 	exportToCsv(rows, filename) {
-		const processRow = row => {
+		const processRow = (/** @type {any[]} */ row) => {
 			return row.join(',');
 		};
 
@@ -315,6 +326,11 @@ class WPrintExportToolBar extends HTMLElement {
 	}
 
 
+	/**
+	 * @param {HTMLElement} header
+	 * @param {any[]} rows
+	 * @param {Object | undefined} model
+	 */
 	async BuildTableFromRows(header, rows, model, withImage = false) {
 		const table = html`<table style="border-collapse: collapse; width: 100%;">`; // Añade estilo inicial
 		const thead = WRender.Create({ tagName: "thead" });
@@ -351,6 +367,7 @@ class WPrintExportToolBar extends HTMLElement {
 					}
 					if (index === 0) {
 						// Encabezados de columna con fondo gris tenue
+						// @ts-ignore
 						const datoHeader = { value: model[key] && model[key].label ? model[key].label : WOrtograficValidation.es(key) };
 						trheader.append(WRender.Create({
 							tagName: "td",
@@ -376,7 +393,7 @@ class WPrintExportToolBar extends HTMLElement {
 				// Fila para arreglos
 				tableBody.append(WRender.Create({
 					tagName: "tr",
-					children: row.map(dato => WRender.Create({
+					children: row.map((/** @type {{ value: { toString: () => any; }; }} */ dato) => WRender.Create({
 						tagName: "td",
 						style: "border: 1px solid #D2D2D2; text-align: left; padding: 5px;",
 						innerHTML: dato.value?.toString() ?? "-"
@@ -387,6 +404,11 @@ class WPrintExportToolBar extends HTMLElement {
 		return table;
 	}
 
+	/**
+	 * @param {string} prop
+	 * @param {Object<String, any>} ModelObject
+	 * @param {{ [x: string]: { __proto__: { constructor: { name: string; }; }; }; }} element
+	 */
 	isNotDrawable(prop, ModelObject, element) {
 
 		if (ModelObject != undefined && ((ModelObject[prop]?.type == undefined

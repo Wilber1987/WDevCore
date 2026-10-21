@@ -50,7 +50,7 @@ w-card-table {
 	cursor: pointer;
 }
 
-.WTable td label, .WTable td p {
+.WTable td label {
 	overflow: hidden;
 	max-height: 200px;
 	text-overflow: ellipsis;
@@ -60,6 +60,14 @@ w-card-table {
 	color: var(--font-primary-color) !important;
 	padding: 0 5px;
 	max-width: 400px;
+	margin: 0px;
+}
+.WTable td p {
+	overflow: hidden;
+	max-height: 200px;
+	font-size: 12px !important;
+	margin: 0px;
+	overflow-y: auto;
 }
 .WTable td label *, .WTable td p * {
 	color: var(--font-primary-color) !important;
@@ -320,10 +328,9 @@ input[type=radio]:checked::before {
 }
 
 .imgPhoto {
-	width: 50px;
-	border-radius: 50%;
-	height: 50px;
-	size: 100%;
+	width: 120px;
+	border-radius: 10px;
+	height: auto;
 	display: block;
 	margin: auto;
 	object-fit: cover;
@@ -362,7 +369,74 @@ input[type=radio]:checked::before {
 	padding: 0px 5px;
 }
 
-@container (width < 600px) {
+@container (width <= 1000px) {
+	divForm div {
+		width: calc(100% - 10px);
+		margin: 5px;
+	}
+
+	.WTable {
+		display: block;
+	}
+
+	.WTable tbody {
+		display: block;
+	}
+
+	.WTable thead {
+		display: none;
+	}
+
+	.WTable tr {
+		display: grid;		
+		margin: 10px;
+		border-radius: 0.3cm;
+		grid-template-columns: repeat(5);
+		overflow: hidden;
+		box-shadow: 0 0 3px 0 var(--fifty-color);
+	}
+
+	.WTable td {
+		display: flex;
+		border-bottom: unset;
+		padding: 10px;
+	}
+
+	.WTable .tdAction {
+		display: block;
+		gap: 20px;
+		text-align: end;
+		width: auto;
+		padding: 10px;
+		grid-column: 5 span;
+		border-top: 1px solid #dadada;
+	}
+	.BtnTable, .BtnTableA, .BtnTableS, .BtnTableSR {		
+		width: 150px !important;
+	}
+
+	input[type=text],
+	input[type=string],
+	input[type=number],
+	input[type=date] {
+		padding: 5px 10px;
+		width: calc(100% - 20px);
+	}
+	.WTable td label, .WTable td p {
+		overflow: hidden;
+		max-height: 200px;
+		text-overflow: ellipsis;
+		display: block;
+		overflow-y: auto;
+		font-size: 12px !important;
+		color: var(--font-primary-color) !important;
+		padding: 0 5px;
+		max-width: 600px;
+		margin: 0px;
+	}
+}
+
+@container (width <= 600px) {
 	divForm div {
 		width: calc(100% - 10px);
 		margin: 5px;
@@ -409,6 +483,12 @@ input[type=radio]:checked::before {
 		padding: 5px 10px;
 		width: calc(100% - 20px);
 	}
+
+	.WTable td label, .WTable td p {		
+		max-width: 100%;
+		margin: 0px;
+	}
+	
 }
 
 @media (max-width: 600px) {

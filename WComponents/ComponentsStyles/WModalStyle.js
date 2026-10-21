@@ -12,6 +12,9 @@ export const WModalStyle = css`
        box-shadow: 0 0px 3px 0px #000;
        padding: 0 0 20px 0;
   }
+  .fullscreen {
+    border-radius: 0cm;
+  }
 
   .ContainerFormWModal h1,
   .ContainerFormWModal h3,
@@ -76,7 +79,7 @@ export const WModalStyle = css`
 
   .ObjectModalContainer {
        height: 100%;
-       width: 90%;
+       width: 100%;
        margin: 0px auto;
        margin-bottom: 20px;
        display: block;
@@ -91,6 +94,9 @@ export const WModalStyle = css`
   @media (max-width: 1200px) {
        .ContainerFormWModal {
             width: 90% !important;
+       }
+       .fullscreen {
+         width: 100% !important;
        }
   }
 

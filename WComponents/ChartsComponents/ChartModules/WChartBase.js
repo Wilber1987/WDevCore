@@ -14,6 +14,7 @@ import { ChartLayoutBuilder } from "./ChartLayoutBuilder.js";
  * @property {boolean} [showValues]
  * @property {string[]} [GroupParams]
  * @property {string[]} [EvalParams]
+ * @property {string[]} [Colors]
  */
 export class WChartBase extends HTMLElement {
     /** @param {WChartConfig} [Config] */
@@ -24,12 +25,15 @@ export class WChartBase extends HTMLElement {
         this.attachShadow({ mode: 'open' });
 
         this._data = Config.data ?? [];
-        this._selectedMetric = Config.metric ?? 'Total';
+
+        this.Colors = Config.Colors;
+        
         this._title = Config.title ?? 'Gráfico';
         this._showLegend = Config.showLegend !== false;
         this._showValues = Config.showValues !== false;
         this.GroupParams = Config.GroupParams ?? [];
         this.EvalParams = Config.EvalParams ?? [];
+        this._selectedMetric = Config.metric ?? this.EvalParams[this.EvalParams?.length - 1] ?? "count";
 
         this._activeLegendItems = new Set();
         this._colorMap = new Map();
@@ -73,13 +77,13 @@ export class WChartBase extends HTMLElement {
     /** @private */
     _renderContent() {
         const { mainGroups, colorMap } = ChartDataHelper.processTreeData(
-            this._data.groupedData, this._data.metricLevels, this._selectedMetric, this.EvalMetric
+            this._data.groupedData, this._data.metricLevels, this._selectedMetric,  this.EvalMetric, this.Colors
         );
         this._colorMap = colorMap;
 
         const header = this._renderHeader();
         const legend = this._showLegend ? ChartLayoutBuilder.renderLegend(
-            ChartDataHelper.extractLegendData(this._data.groupedData, ChartDataHelper.getColorPalette()),
+            ChartDataHelper.extractLegendData(this._data.groupedData, this.Colors ?? ChartDataHelper.getColorPalette()),
             this._activeLegendItems, (/** @type {any} */ k) => this._toggleLegendItem(k)
         ) : '';
         const chartArea = this._renderChartArea(mainGroups);

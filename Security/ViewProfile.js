@@ -14,7 +14,7 @@ import {WAjaxTools} from "../WModules/WAjaxTools.js";
 const OnLoad = async () => {   
     const AdminPerfil = new PerfilClass();
     Aside.append(AdminPerfil.MainNav);
-    Main.appendChild(AdminPerfil);
+    MainContainer.appendChild(AdminPerfil);
 
 }
 window.onload = OnLoad;

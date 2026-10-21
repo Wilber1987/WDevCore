@@ -7,7 +7,7 @@ export const WFormStyle = css`
 .divForm {
 	display: grid;
 	grid-template-rows: auto;
-	height: calc(100% - 70px);
+	/* height: calc(100% - 70px); */
 	column-gap: 10px;
 	row-gap: 5px;
 }
