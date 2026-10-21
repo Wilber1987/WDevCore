@@ -2,7 +2,7 @@ import { WRender, ComponentsManager, html } from "../WModules/WComponentsTools.j
 import { WCssClass } from "../WModules/WStyledRender.js";
 import { StyleScrolls, StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
 import { ModalConfig } from "../WModules/CommonModel.js";
-import { WModalStyle } from "./ComponentsStyles/WModalStyle.mjs";
+import { WModalStyle } from "./ComponentsStyles/WModalStyle.js";
 import { WArrayF } from "../WModules/WArrayF.js";
 
 
@@ -21,7 +21,10 @@ class WModalForm extends HTMLElement {
             this[p] = Config[p];
         }
         this.DivColumns = this.Config.DivColumns;
-        this.StyleForm = this.Config.DivColumns == "FullScreen" ? this.WidthContainer = "90%" : this.WidthContainer = "60%"
+        this.WidthContainer = "60%";
+        this.HeightContainer = this.Config.FullScreen ? "100%": "auto"
+        this.StyleForm = this.Config.FullScreen  ? this.WidthContainer = "100%" : this.WidthContainer = "60%"
+        
         /*if (this.StyleForm == "columnX1") {
             this.WidthContainer = "40%";
             this.Config.DivColumns = "calc(100%)";
@@ -102,12 +105,13 @@ class WModalForm extends HTMLElement {
         if (this.id == undefined || this.id == "") {
             this.id = "TempModal";
         }
-        this.className = "ModalContentWModal";
+        this.className = "ModalContentWModal" ;
         this.Modal = {
-            class: "ContainerFormWModal",
+            class: "ContainerFormWModal" + (this.Config.FullScreen ? " fullscreen": ""),
             style: {
                 gridTemplateColumns: this.DivColumns,
                 width: this.WidthContainer,
+                height: this.HeightContainer,
                 textAling: "center"
             },
             children: []
@@ -119,6 +123,7 @@ class WModalForm extends HTMLElement {
         } else if (this.ObjectDetail || this.ModelObject || this.EditObject) { // MUESTRA EL DETALLE DE UN OBJETO EN UNA LISTA
             const { WForm } = await import("./WForm.js");
             const config = WArrayF.CloneObject(this.Config);
+            config.CustomStyle = this.Config.CustomStyle?.cloneNode(true)
             config.SaveFunction = (ObjectF, response) => {
                 if (this.ObjectOptions != undefined) {  /**TODO REVISAR */
                     if (this.ObjectOptions.SaveFunction != undefined) {

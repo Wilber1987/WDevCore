@@ -6,6 +6,118 @@ import { ElementStyle, WNode } from "./CommonModel.js";
  * @param {any} strings
  * @param {any[]} values
  */
+function html2(strings, ...values) {
+    // Unir las partes de la plantilla de cadena
+    const result = strings.reduce((accumulator, currentString, index) => {
+        accumulator += currentString;
+
+        if (index < values.length) {
+            let value = values[index];
+            if (value == undefined) {
+                value = "";
+            }
+            if (value instanceof Node) {
+                // Si el valor es un nodo HTML, lo añadimos al wrapper
+                const placeholder = document.createElement('div');
+                placeholder.setAttribute('data-placeholder', index); // Marcador de posición
+                accumulator += placeholder.outerHTML;
+            } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement || item.__proto__.__proto__ == HTMLElement.prototype)) {
+                // Si el valor es un array de nodos HTML, creamos un marcador para cada uno
+                value.forEach((_, i) => {
+                    const placeholder = document.createElement('div');
+                    placeholder.setAttribute('data-placeholder', `${index}-${i}`);
+                    accumulator += placeholder.outerHTML;
+                });
+            } else if (Array.isArray(value) && value.every(item => item.tagName?.toUpperCase()?.includes("SVG"))) {
+                // Si el valor es un array de nodos HTML, creamos un marcador para cada uno
+                value.forEach((_, i) => {
+                    const placeholder = document.createElement('div');
+                    placeholder.setAttribute('data-placeholder', `${index}-${i}`);
+                    accumulator += placeholder.outerHTML;
+                });
+            } else if (typeof value === 'function') {
+                // Insertamos un marcador de posición para la función
+                let placeholder = ``;
+                // Expresión regular para detectar las combinaciones al final del string
+                const patron = /(onclick=['"]|ondragstart=['"]|ondragleave=['"]|ondragend=['"]|ondragover=['"]|ondragover=['"]|ondrop=['"]|ontransitionend=['"]|onload=['"]|onchange=['"]|onkeypress=['"]|onkeydown=['"]|onmouseenter=['"]|onmouseleave=['"])$/;
+                // Buscar la coincidencia al final del string
+                const coincidencia = accumulator.match(patron);
+                //console.log(accumulator);
+
+                if (coincidencia) {
+                    // Almacenar el fragmento que se va a reemplazar en una constante
+                    const fragmentoAReemplazar = coincidencia[0];
+                    const patronEvent = /(onclick|ondragstart|ondragleave|ondragend|ondragover|ondragover|ondrop|onload|ontransitionend|onchange|onkeypress|onkeydown|onmouseenter|onmouseleave)=['"]$/;
+                    const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
+                    // Almacenar solo la palabra (onclick, onload, onchange) en una constante
+                    const event = coincidenciaEvent[1];
+                    if (fragmentoAReemplazar.contain == "'") {
+                        placeholder = `data-function-placeholder-${index}='${event}`;
+                    } else {
+                        placeholder = `data-function-placeholder-${index}="${event}`;
+                    }
+                    // Si pasa la validación, se realiza el reemplazo
+                    accumulator = accumulator.replace(patron, "");
+                }
+                accumulator += placeholder;
+            } else {
+                accumulator += value;
+            }
+        }
+
+        return accumulator;
+    }, '');
+
+    const isSVG = result.trim().startsWith("<svg")
+        || result.includes("<g")
+        || result.includes("<text")
+        || result.includes("<line")
+        || result.includes("<path")
+        || result.includes("<circle")
+        || result.includes("<polyline");
+
+    let wrapper;
+
+    if (isSVG) {
+        wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        wrapper.innerHTML = result;
+    } else {
+        wrapper = document.createElement("div");
+        wrapper.innerHTML = result;
+    }
+
+    // Reemplazar los marcadores de posición con los nodos HTML reales o asociar funciones a eventos
+    values.forEach((value, index) => {
+        if (value instanceof HTMLElement) {
+            const placeholder = wrapper.querySelector(`[data-placeholder="${index}"]`);
+            if (placeholder) {
+                placeholder.replaceWith(value); // Reemplaza el marcador de posición con el nodo real
+            }
+        } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement)) {
+            // Si es un array de nodos, los insertamos secuencialmente
+            value.forEach((node, i) => {
+                const placeholder = wrapper.querySelector(`[data-placeholder="${index}-${i}"]`);
+                if (placeholder) {
+                    placeholder.replaceWith(node);
+                }
+            });
+        } else if (typeof value === 'function') {
+            // Asociamos la función al evento correspondiente
+            //const placeholder = wrapper.innerHTML.indexOf(`data-function-placeholder-${index}`);
+            const element = wrapper.querySelector(`[data-function-placeholder-${index}]`);
+            const event = element.getAttribute(`data-function-placeholder-${index}`);
+            element[event] = value
+        }
+    });
+
+    return wrapper.childNodes.length > 1 ? wrapper.childNodes : wrapper.firstChild;
+}
+
+/** 
+ * @returns {HTMLElement|HTMLInputElement|HTMLSelectElement}
+ * @param {any} strings
+ * @param {any[]} values
+ */
 function html(strings, ...values) {
     // Unir las partes de la plantilla de cadena
     const result = strings.reduce((accumulator, currentString, index) => {
@@ -32,7 +144,7 @@ function html(strings, ...values) {
                 // Insertamos un marcador de posición para la función
                 let placeholder = ``;
                 // Expresión regular para detectar las combinaciones al final del string
-                const patron = /(onclick=['"]|onload=['"]|ontransitionend=['"]|onload=['"]|onchange=['"]|onkeypress=['"]|onkeydown=['"])$/;
+                const patron = /(onclick=['"]|ondragstart=['"]|ondragleave=['"]|ondragend=['"]|ondragover=['"]|ondragover=['"]|ondrop=['"]|ontransitionend=['"]|onload=['"]|onchange=['"]|onkeypress=['"]|onkeydown=['"]|onmouseenter=['"]|onmouseleave=['"])$/;
                 // Buscar la coincidencia al final del string
                 const coincidencia = accumulator.match(patron);
                 //console.log(accumulator);
@@ -40,7 +152,7 @@ function html(strings, ...values) {
                 if (coincidencia) {
                     // Almacenar el fragmento que se va a reemplazar en una constante
                     const fragmentoAReemplazar = coincidencia[0];
-                    const patronEvent = /(onclick|onload|ontransitionend|onchange|onkeypress|onkeydown)=['"]$/;
+                    const patronEvent = /(onclick|ondragstart|ondragleave|ondragend|ondragover|ondragover|ondrop|onload|ontransitionend|onchange|onkeypress|onkeydown|onmouseenter|onmouseleave)=['"]$/;
                     const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
                     // Almacenar solo la palabra (onclick, onload, onchange) en una constante
                     const event = coincidenciaEvent[1];
@@ -83,10 +195,203 @@ function html(strings, ...values) {
             // Asociamos la función al evento correspondiente
             //const placeholder = wrapper.innerHTML.indexOf(`data-function-placeholder-${index}`);
             const element = wrapper.querySelector(`[data-function-placeholder-${index}]`);
-            const event = element.getAttribute(`data-function-placeholder-${index}`);
-            element[event] = value
+            if (element) {
+                const event = element.getAttribute(
+                    `data-function-placeholder-${index}`
+                );
+                element[event] = value;
+                element.removeAttribute(`data-function-placeholder-${index}`);
+            }
+        }
+    });
 
+    return wrapper.childNodes.length > 1 ? wrapper.childNodes : wrapper.firstChild;
+}
 
+/** 
+ * @returns {HTMLElement|HTMLInputElement|HTMLSelectElement}
+ * @param {any} strings
+ * @param {any[]} values
+ */
+function html(strings, ...values) {
+    // Unir las partes de la plantilla de cadena
+    const result = strings.reduce((accumulator, currentString, index) => {
+        accumulator += currentString;
+
+        if (index < values.length) {
+            let value = values[index];
+            if (value == undefined) {
+                value = "";
+            }
+            if (value instanceof HTMLElement || value.__proto__.__proto__ == HTMLElement.prototype) {
+                // Si el valor es un nodo HTML, lo añadimos al wrapper
+                const placeholder = document.createElement('div');
+                placeholder.setAttribute('data-placeholder', index); // Marcador de posición
+                accumulator += placeholder.outerHTML;
+            } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement || item.__proto__.__proto__ == HTMLElement.prototype)) {
+                // Si el valor es un array de nodos HTML, creamos un marcador para cada uno
+                value.forEach((_, i) => {
+                    const placeholder = document.createElement('div');
+                    placeholder.setAttribute('data-placeholder', `${index}-${i}`);
+                    accumulator += placeholder.outerHTML;
+                });
+            } else if (typeof value === 'function') {
+                // Insertamos un marcador de posición para la función
+                let placeholder = ``;
+                // Expresión regular para detectar las combinaciones al final del string
+                const patron = /(onclick=['"]|ondragstart=['"]|ondragleave=['"]|ondragend=['"]|ondragover=['"]|ondragover=['"]|ondrop=['"]|ontransitionend=['"]|onload=['"]|onchange=['"]|onkeypress=['"]|onkeydown=['"]|onmouseenter=['"]|onmouseleave=['"])$/;
+                // Buscar la coincidencia al final del string
+                const coincidencia = accumulator.match(patron);
+                //console.log(accumulator);
+
+                if (coincidencia) {
+                    // Almacenar el fragmento que se va a reemplazar en una constante
+                    const fragmentoAReemplazar = coincidencia[0];
+                    const patronEvent = /(onclick|ondragstart|ondragleave|ondragend|ondragover|ondragover|ondrop|onload|ontransitionend|onchange|onkeypress|onkeydown|onmouseenter|onmouseleave)=['"]$/;
+                    const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
+                    // Almacenar solo la palabra (onclick, onload, onchange) en una constante
+                    const event = coincidenciaEvent[1];
+                    if (fragmentoAReemplazar.contain == "'") {
+                        placeholder = `data-function-placeholder-${index}='${event}`;
+                    } else {
+                        placeholder = `data-function-placeholder-${index}="${event}`;
+                    }
+                    // Si pasa la validación, se realiza el reemplazo
+                    accumulator = accumulator.replace(patron, "");
+                }
+                accumulator += placeholder;
+            } else {
+                accumulator += value;
+            }
+        }
+
+        return accumulator;
+    }, '');
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = result;
+
+    // Reemplazar los marcadores de posición con los nodos HTML reales o asociar funciones a eventos
+    values.forEach((value, index) => {
+        if (value instanceof HTMLElement) {
+            const placeholder = wrapper.querySelector(`[data-placeholder="${index}"]`);
+            if (placeholder) {
+                placeholder.replaceWith(value); // Reemplaza el marcador de posición con el nodo real
+            }
+        } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement)) {
+            // Si es un array de nodos, los insertamos secuencialmente
+            value.forEach((node, i) => {
+                const placeholder = wrapper.querySelector(`[data-placeholder="${index}-${i}"]`);
+                if (placeholder) {
+                    placeholder.replaceWith(node);
+                }
+            });
+        } else if (typeof value === 'function') {
+            // Asociamos la función al evento correspondiente
+            //const placeholder = wrapper.innerHTML.indexOf(`data-function-placeholder-${index}`);
+            const element = wrapper.querySelector(`[data-function-placeholder-${index}]`);
+            if (element) {
+                const event = element.getAttribute(
+                    `data-function-placeholder-${index}`
+                );
+                element[event] = value;
+                element.removeAttribute(`data-function-placeholder-${index}`);
+            }
+        }
+    });
+
+    return wrapper.childNodes.length > 1 ? wrapper.childNodes : wrapper.firstChild;
+}
+
+/** 
+ * @returns {HTMLElement|HTMLInputElement|HTMLSelectElement}
+ * @param {any} strings
+ * @param {any[]} values
+ */
+function html(strings, ...values) {
+    // Unir las partes de la plantilla de cadena
+    const result = strings.reduce((accumulator, currentString, index) => {
+        accumulator += currentString;
+
+        if (index < values.length) {
+            let value = values[index];
+            if (value == undefined) {
+                value = "";
+            }
+            if (value instanceof HTMLElement || value.__proto__.__proto__ == HTMLElement.prototype) {
+                // Si el valor es un nodo HTML, lo añadimos al wrapper
+                const placeholder = document.createElement('div');
+                placeholder.setAttribute('data-placeholder', index); // Marcador de posición
+                accumulator += placeholder.outerHTML;
+            } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement || item.__proto__.__proto__ == HTMLElement.prototype)) {
+                // Si el valor es un array de nodos HTML, creamos un marcador para cada uno
+                value.forEach((_, i) => {
+                    const placeholder = document.createElement('div');
+                    placeholder.setAttribute('data-placeholder', `${index}-${i}`);
+                    accumulator += placeholder.outerHTML;
+                });
+            } else if (typeof value === 'function') {
+                // Insertamos un marcador de posición para la función
+                let placeholder = ``;
+                // Expresión regular para detectar las combinaciones al final del string
+                const patron = /(onclick=['"]|ondragstart=['"]|ondragleave=['"]|ondragend=['"]|ondragover=['"]|ondragover=['"]|ondrop=['"]|ontransitionend=['"]|onload=['"]|onchange=['"]|onkeypress=['"]|onkeydown=['"]|onmouseenter=['"]|onmouseleave=['"])$/;
+                // Buscar la coincidencia al final del string
+                const coincidencia = accumulator.match(patron);
+                //console.log(accumulator);
+
+                if (coincidencia) {
+                    // Almacenar el fragmento que se va a reemplazar en una constante
+                    const fragmentoAReemplazar = coincidencia[0];
+                    const patronEvent = /(onclick|ondragstart|ondragleave|ondragend|ondragover|ondragover|ondrop|onload|ontransitionend|onchange|onkeypress|onkeydown|onmouseenter|onmouseleave)=['"]$/;
+                    const coincidenciaEvent = fragmentoAReemplazar.match(patronEvent);
+                    // Almacenar solo la palabra (onclick, onload, onchange) en una constante
+                    const event = coincidenciaEvent[1];
+                    if (fragmentoAReemplazar.contain == "'") {
+                        placeholder = `data-function-placeholder-${index}='${event}`;
+                    } else {
+                        placeholder = `data-function-placeholder-${index}="${event}`;
+                    }
+                    // Si pasa la validación, se realiza el reemplazo
+                    accumulator = accumulator.replace(patron, "");
+                }
+                accumulator += placeholder;
+            } else {
+                accumulator += value;
+            }
+        }
+
+        return accumulator;
+    }, '');
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = result;
+
+    // Reemplazar los marcadores de posición con los nodos HTML reales o asociar funciones a eventos
+    values.forEach((value, index) => {
+        if (value instanceof HTMLElement) {
+            const placeholder = wrapper.querySelector(`[data-placeholder="${index}"]`);
+            if (placeholder) {
+                placeholder.replaceWith(value); // Reemplaza el marcador de posición con el nodo real
+            }
+        } else if (Array.isArray(value) && value.every(item => item instanceof HTMLElement)) {
+            // Si es un array de nodos, los insertamos secuencialmente
+            value.forEach((node, i) => {
+                const placeholder = wrapper.querySelector(`[data-placeholder="${index}-${i}"]`);
+                if (placeholder) {
+                    placeholder.replaceWith(node);
+                }
+            });
+        } else if (typeof value === 'function') {
+            // Asociamos la función al evento correspondiente
+            //const placeholder = wrapper.innerHTML.indexOf(`data-function-placeholder-${index}`);
+            const element = wrapper.querySelector(`[data-function-placeholder-${index}]`);
+            if (element) {
+                const event = element.getAttribute(
+                    `data-function-placeholder-${index}`
+                );
+                element[event] = value;
+                element.removeAttribute(`data-function-placeholder-${index}`);
+            }
         }
     });
 
@@ -94,6 +399,8 @@ function html(strings, ...values) {
 }
 
 export { html }
+
+
 
 /**
  * Carga recursos externos (scripts y hojas de estilo) de forma idempotente y concurrente.
@@ -109,7 +416,7 @@ export { html }
 export async function loadExternalResources(resources) {
     // Función para cargar un recurso individual
     const loadResource = (res) => {
-        return new Promise((resolve, reject) => {            
+        return new Promise((resolve, reject) => {
             let element;
 
             if (res.type === 'script' && res.src) {
@@ -156,6 +463,11 @@ class WRender {
         let node = document.createRange().createContextualFragment(string);
         return node.childNodes[0];
     }
+    /**
+     * 
+     * @param {WNode} Node 
+     * @returns {HTMLElement}
+     */
     static createElement = (Node) => {
         try {
             if (typeof Node === "undefined" || Node == null) {
@@ -196,6 +508,11 @@ class WRender {
             return document.createTextNode("Problemas en la construcción del nodo.");
         }
     }
+    /**
+     * 
+     * @param {WNode} Node 
+     * @returns {HTMLElement}
+     */
     static createElementNS = (node, uri = "svg") => {
         try {
             let URI = null;
@@ -473,7 +790,7 @@ class ComponentsManager {
             this.MainContainer = document.querySelector("#" + this.ContainerName);
         }
         const ContainerNavigate = this.MainContainer;
-        let Nodes = ContainerNavigate.querySelectorAll(".DivContainer");
+        let Nodes = ContainerNavigate.querySelectorAll(":scope > .DivContainer");
         Nodes.forEach((node) => {
             if (node.id != IdComponent) {
                 let nodeF = this.DomComponents.find(n => n == node);
@@ -517,7 +834,7 @@ class ComponentsManager {
             && this.DomComponents.find(node => node.id == IdComponent) != null;
     }
     Remove = (IdComponent) => {
-        if(this.Exists(IdComponent)) {
+        if (this.Exists(IdComponent)) {
             const component = this.DomComponents.find(node => node.id == IdComponent);
             this.DomComponents.splice(this.DomComponents.indexOf(component), 1);
         }

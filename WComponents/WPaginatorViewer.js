@@ -39,7 +39,7 @@ class WPaginatorViewer extends HTMLElement {
         this.DrawPaginator();
     }
     disconnectedCallback() {
-                
+
     }
     DrawPaginator = async () => {
         this.DarkMode = this.DarkMode ?? false;
@@ -73,7 +73,7 @@ class WPaginatorViewer extends HTMLElement {
         if (this.filter) {
             this.container.innerHTML = "";
             this.body = WRender.Create({ class: "paginator-pages-container", id: "MainBody" });
-              if (Dataset?.length > 0) {
+            if (Dataset?.length > 0) {
                 this.Dataset = Dataset.map(element => html`<div class="elementWrapper" id="${element.id}wrapper">${element}</div>`);
                 this.filter = false;
             }
@@ -83,7 +83,7 @@ class WPaginatorViewer extends HTMLElement {
             });
             this.container.append(this.body);
             this.container.append(this.DrawTFooter(this.pages));
-          
+
             return;
         }
         /* this.Dataset.filter(item1 => 
@@ -98,10 +98,16 @@ class WPaginatorViewer extends HTMLElement {
                     this.pages[0].insertBefore(elementWrapper, this.pages[0].firstChild);
                 } else {
                     this.pages[0].append(elementWrapper);
-                }               
+                }
             } else {
                 findElement.innerHTML = "";
                 findElement.append(element);
+                if (this.pages[0]?.firstChild) {
+                    this.pages[0].insertBefore(findElement, this.pages[0].firstChild);
+                }
+                else {
+                    this.pages[0].append(findElement);
+                }
             }
         });
 
@@ -226,7 +232,7 @@ class WPaginatorViewer extends HTMLElement {
                 this.ActualPage = this.ActualPage + 1;
                 if (this.ActualPage > pages.length - 1) {
                     this.ActualPage = 0
-                }   
+                }
                 SelectPage(this.ActualPage);
             }
         }))

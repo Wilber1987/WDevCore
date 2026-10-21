@@ -380,7 +380,7 @@ class WEstadisicAnalitic extends HTMLElement {
         }
 
         .significant-categories h4 {
-            color: #007bff;
+            color: var(--primary-background);;
         }
 
         .significant-categories ul {

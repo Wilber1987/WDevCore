@@ -19,12 +19,14 @@ class WDocumentViewer extends HTMLElement {
 	 * @property {boolean} [exportPdf]
 	 * @property {boolean} [exportPdfApi]
 	 * @property {boolean} [exportXls]
+	 * @property {boolean} [contentEditable]
 	 * @property {any[]} [Dataset]
 	 * @property {boolean} [print]
 	 * @property {Function} [exportXlsAction]
 	 * @property {string} [PageType]
 	 * @property {HTMLElement} [Header]
 	 * @property {Node} [CustomStyle]
+	 * @property {Function} [contentEditableAction]
 	 */
 
 	/**
@@ -97,7 +99,7 @@ class WDocumentViewer extends HTMLElement {
 		//let availableSpace = currentPage.offsetHeight - 40; // Margen de seguridad
 		this.Dataset?.forEach((/** @type {string | HTMLElement} */ element) => {
 			// @ts-ignore
-			const elementClone = typeof element !== "string"  ? element.cloneNode(true) : element;
+			const elementClone = typeof element !== "string" ? element.cloneNode(true) : element;
 			// @ts-ignore
 			const elementFitsInPage = this.elementFitsInPage(currentPage, elementClone)
 			let isSplited = false;
@@ -124,7 +126,7 @@ class WDocumentViewer extends HTMLElement {
 					currentPage.append(element);
 				} else {
 					currentPage.append(elementClone);
-				}				
+				}
 			}
 		});
 	}
@@ -146,7 +148,7 @@ class WDocumentViewer extends HTMLElement {
 		const availableHeight = page.clientHeight - paddingTop - paddingBottom;
 		// Altura real con contenido
 		//const contentHeight = page.scrollHeight - paddingTop - paddingBottom;
-		const contentNodeHeight = Array.from(page.children)
+		const contentNodeHeightOld = Array.from(page.children)
 			.map(node => {
 				const computedNode = getComputedStyle(node);
 				// @ts-ignore
@@ -155,6 +157,8 @@ class WDocumentViewer extends HTMLElement {
 					+ parseFloat(computedNode.marginBottom ?? "0");
 			})
 			.reduce((a, b) => a + b, 0);
+
+		const contentNodeHeight = page.scrollHeight - paddingTop - paddingBottom;
 		const fits = contentNodeHeight <= availableHeight;
 		// @ts-ignore
 		//const nodeHeight = element.offsetHeight + parseFloat(element.marginTop ?? "0")
@@ -178,7 +182,15 @@ class WDocumentViewer extends HTMLElement {
 	 * @returns {HTMLElement}
 	 */
 	CreateNewPage() {
-		const page = WRender.Create({ className: `page ${this.Config.PageType}` });
+		const page = WRender.Create({ className: `page ${this.Config.PageType}`, contentEditable: this.Config.contentEditable == true });
+
+		if (this.Config.contentEditable == true) {
+			page.oninput = (ev) => {
+				if (this.Config.contentEditableAction) {
+					this.Config.contentEditableAction(ev, page);
+				}				
+			}
+		}
 		if (typeof this.Header === "string") {
 			page.append(this.Header);
 		} else if (this.Header) {
@@ -332,11 +344,11 @@ class WDocumentViewer extends HTMLElement {
 				ExportPdfAction: this.Config.exportPdf ? async (/** @type {{ ExportPdf: (arg0: HTMLElement | HTMLInputElement | HTMLSelectElement, arg1: string | undefined, arg2: boolean) => void; }} */ tool) => {
 					const body = this.GetExportBody();
 					tool.ExportPdf(body, this.Config.PageType, this.Config.exportPdfApi ?? false);
-				} : undefined, 
+				} : undefined,
 				ExportXlsAction: this.Config.exportXls ? async (/**@type {WPrintExportToolBar} */ tool) => {
 					// @ts-ignore
 					this.Config.exportXlsAction(tool)
-				}: undefined
+				} : undefined
 			}));
 		}
 	}
@@ -353,7 +365,6 @@ class WDocumentViewer extends HTMLElement {
 			padding: 20px;
 			background-color: #dfdfdf;
 			box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-			max-height: 600px;
 			overflow: auto;
 		}
 		.content-container {
@@ -363,7 +374,7 @@ class WDocumentViewer extends HTMLElement {
 		}
 		.page {
 			color: #000;
-			padding: 30px 30px;
+			padding: 60px;
 			background: #fff;
 			box-shadow: 0 2px 5px 0px #858585;
 			width: 210mm;

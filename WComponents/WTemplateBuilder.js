@@ -10,6 +10,15 @@ import { html } from "../WModules/WComponentsTools.js";
 import { css } from "../WModules/WStyledRender.js";
 import { WAlertMessage } from "./WAlertMessage.js";
 
+import "../libs/mdToHtml.js";
+import TurndownService from "../libs/htmlToMd.js";
+import "../libs/prims.js";
+import { WContentManager } from "../WModules/WContentManager.js";
+import { WChatComponent } from "./WChatComponent.js";
+import { WRichTextToolbar } from "./FormComponents/WRichTextToolbar.js";
+import { Tbl_Profiles_Model_ModelComponent } from "../../Admin/Security/Model/Tbl_Profile_Model.js";
+
+
 //#region DEFINICION DE TIPOS
 export class TemplateData extends EntityClass {
     /** @param {Partial<TemplateData>} [props] */
@@ -20,6 +29,7 @@ export class TemplateData extends EntityClass {
     }
     /**@type {Number?} */ Id_Template = null;
     /**@type {String?} */ Description = null;
+    /**@type {String?} */ Token = null;
     /**@type {Array<Section>} */ Sections = [];
 }
 
@@ -41,8 +51,11 @@ export class TemplateData_ModelComponent extends EntityClass {
         // @ts-ignore
         Object.assign(this, props);
     }
+    /**@type {ModelProperty} */ Tbl_Profile = { type: "MODEL", ModelObject: () => new Tbl_Profiles_Model_ModelComponent() };
+
     /**@type {ModelProperty} */ Id_Template = { type: "NUMBER", primary: true };
     /**@type {ModelProperty} */ Descripcion = { type: "TEXT" };
+    /**@type {ModelProperty} */ Fecha = { type: "DATETIME" };
     //**@type {ModelProperty} */ Sections =  { type: "NUMBER", primary: true};
 }
 
@@ -52,7 +65,7 @@ export class Section_ModelComponent {
 //#endregion
 class WTemplateBuilder extends HTMLElement {
     /**
-     * @param {{ Data: TemplateData; PageType: string?  }} Config
+     * @param {{ Data: TemplateData; PageType: string?; SectionActions: Array<{ name: string, action: Function, title: string? }>|undefined  }} Config
      */
     constructor(Config) {
         super();
@@ -61,17 +74,71 @@ class WTemplateBuilder extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this.shadowRoot?.append(this.CustomStyle);
         this.OptionsContainer = html`<div class="options-container"></div>`;
+        /**
+         * @type {Node[]}
+         */
+        this.Dataset = []
+        this.TemplateData.Sections.forEach(section => {
+            const content = this.BuildWrappercontent(section)
+            this.Dataset.push(...content)
+        })
+
+        this.RitchTextToolBar = new WRichTextToolbar({
+            showTableBuilder: true,
+            showHtmlEditor: true,
+            showImageInput: true,
+            //showParamInput: true,
+            showFontSize: true,
+            showFontColor: true
+        });
+
+        // Eventos específicos del toolbar que requieren contexto de WRichText
+        // this.toolbar.addEventListener("command-executed", (e) => {
+        //     // Para comandos execCommand, necesitamos el contexto del editor
+        //     document.execCommand(e.detail.command, false, e.detail.value);
+        //     this.#syncValue();
+        // });
+
         this.DocumentViewer = new WDocumentViewer({
             PageType: this.Config.PageType ?? PageType.A4,
             CustomStyle: this.CustomStyle.cloneNode(true),
-            Dataset: this.TemplateData.Sections
-                .map(section => this.BuildSectionWrapper(section))
+            Dataset: this.Dataset,
+            //contentEditable: true,
+            contentEditableAction: (/** @type {{ target: any; }} */ ev, /** @type {HTMLElement} */ page) => {
+                // Obtenemos el shadowRoot del componente
+                const shadowRoot = ev.target.getRootNode();
+
+                // Obtenemos la selección dentro del shadow DOM
+                const selection = shadowRoot.getSelection?.() ?? window.getSelection();
+
+                if (!selection || selection.rangeCount === 0) return;
+
+                const nodoActivo = selection.getRangeAt(0).startContainer;
+
+                const sectionWrapper = nodoActivo.nodeType === Node.TEXT_NODE
+                    ? nodoActivo.parentElement?.closest('.section-wrapper-content')
+                    : nodoActivo.closest?.('.section-wrapper-content');
+
+                if (!sectionWrapper) return;
+
+                console.log('Section wrapper activo:', sectionWrapper);
+                sectionWrapper.action();
+            }
         });
         this.Container = html`<div class="template-builder-container">
             ${this.OptionsContainer}
             ${this.DocumentViewer}
         </div>`
         this.shadowRoot?.append(this.Container, this.CustomStyle, StylesControlsV2.cloneNode(true))
+        this.btnAddSection = html`<button class="Btn-Mini"
+            onclick="${() => this.AddSection()}">Agregar sección</button>`;
+        this.btnSave = html`<button class="Btn-Mini"
+            onclick="${() => {
+                this.shadowRoot?.append(ModalVericateAction(async () => {
+                    await this.GetTemplateData().Update();
+                    WAlertMessage.Success("Cambios guardados", true);
+                }, "¿Desea guardar los cambios?"))
+            }}">Guardar</button>`
 
     }
     // Propiedades para gestionar el arrastre
@@ -79,90 +146,148 @@ class WTemplateBuilder extends HTMLElement {
     dragOverTarget = null;
     connectedCallback() {
         this.Draw();
-        if (this.children.length > 0) {
+        /*if (this.children.length > 0) {
             this.TemplateData.Sections.push(...(Array.from(this.children).map(child => new Section({
                 Body: child.outerHTML,
             }))));
             this.DocumentViewer.Dataset.push(...this.TemplateData.Sections
                 .map(section => this.BuildSectionWrapper(section)));
             this.DocumentViewer.Update();
-        }
+        }*/
     }
     Draw = async () => {
-        this.OptionsContainer.append(html`<button class="Btn-Mini"
-            onclick="${() => this.AddSection()}">Agregar sección</button>`);
-        this.OptionsContainer.append(html`<button class="Btn-Mini"
-            onclick="${() => {
-                this.shadowRoot?.append(ModalVericateAction(async ()=> {
-                    await this.GetTemplateData().Update();
-                    WAlertMessage.Success("Cambios guardados", true);
-                }, "¿Desea guardar los cambios?"))                
-            }}">Guardar</button>`);
+        this.OptionsContainer.append(this.RitchTextToolBar)
+        this.OptionsContainer.append(this.btnAddSection);
+        this.OptionsContainer.append(this.btnSave);
     }
     AddSection() {
         this.shadowRoot?.append(new WModalForm({
             ModelObject: new Section_ModelComponent(),
             title: "Nueva",
             ObjectOptions: {
-                SaveFunction: (/**@type {Section} */ editingObject) => {
-                    const sectionWrapper = this.BuildSectionWrapper(editingObject);
-                    // @ts-ignore
-                    //newContent.forEach(item => sectionWrapper.append(item));
-                    this.DocumentViewer.Dataset?.push(sectionWrapper);
+                SaveFunction: (/**@type {Section} */ newSection) => {
+                    const newContent = this.BuildWrappercontent(newSection);
+                    this.TemplateData.Sections.push(newSection)
+                    this.DocumentViewer.Dataset?.push(...newContent);
                     this.DocumentViewer.Update();
+                    // @ts-ignore
+                    newContent[0].focus();
                 }
             }
         }));
     }
-    /**
-     * @param { Section } editingObject
-     */
-    BuildSectionWrapper(editingObject) {
-        const sectionWrapper = html`<div class="section-wrapper"></div>`;
-        // @ts-ignore
-        sectionWrapper.sectionWrapper = editingObject;
-        const newContent = this.BuildWrappercontent(editingObject, sectionWrapper);
-        sectionWrapper.append(...newContent);
-        return sectionWrapper;
-    }
+
 
     /**
-     * @param {any} editingO
-     * @param {HTMLElement} sectionWrapper
+     * @param {Section} editingO
      */
-    EditSection(editingO, sectionWrapper) {
-        this.shadowRoot?.append(new WModalForm({
+    EditSection(editingO) {
+        editingO.Body = WContentManager.ParseContentToString(editingO.Body);
+        const form = new WModalForm({
             ModelObject: new Section_ModelComponent(),
             EditObject: editingO,
             title: "Editar",
+            CustomStyle: css`.RICHTEXT { height: 400px;}`,
             ObjectOptions: {
-                SaveFunction: (/**@type {Section} */ editingObject) => {
-                    sectionWrapper.innerHTML = "";
+                SaveFunction: (/**@type {Section} */ newSection) => {
                     // @ts-ignore
-                    sectionWrapper.append(...this.BuildWrappercontent(editingObject, sectionWrapper));
+                    sectionWrapper.append(...this.BuildWrappercontent(newSection, sectionWrapper));
                     this.DocumentViewer.Update();
                 }
             }
-        }));
+        })
+        //form.shadowRoot?.append(css` .RICHTEXT { height: 400px;}`)
+        this.shadowRoot?.append(form);
     }
     /**
-     * @param {any} editingObject
-     * @param {HTMLElement} sectionWrapper
-     * @returns {Array<Node>}
-     */
-    BuildWrappercontent(editingObject, sectionWrapper) {
-        // 1. Habilitar arrastre y adjuntar manejadores de eventos
-        sectionWrapper.setAttribute("draggable", "true");
-        sectionWrapper.addEventListener("dragstart", this.dragStart);
-        sectionWrapper.addEventListener("dragover", this.dragOver);
-        sectionWrapper.addEventListener("drop", this.drop);
-        sectionWrapper.addEventListener("dragend", this.dragEnd); // Limpieza al finalizar
-        // @ts-ignore
-        return html`<div class="section-wrapper-option">
-            <button onclick="${() => this.EditSection(editingObject, sectionWrapper)}">Edit</button>
-            <button onclick="${() => this.DeleteSection(editingObject, sectionWrapper)}">Delete</button>
-        </div>
-        <div class="section-wrapper-content">${editingObject.Body}</div>`;
+ * @param {any} editingObject
+ * @returns {Array<Node>}
+ */
+    BuildWrappercontent(editingObject) {
+        const content = WContentManager.ParseContent(editingObject.Body)
+
+        /**@type {HTMLElement[]} */
+        const returnData = []
+
+        content.forEach(c => {
+            const wrapper = html`<div class="section-wrapper-content" contenteditable="true">${c}</div>`
+
+            // === 1. Configurar arrastre (tu código existente) ===
+            //wrapper.setAttribute("draggable", "true");
+            //wrapper.addEventListener("dragstart", this.dragStart);
+            //wrapper.addEventListener("dragover", this.dragOver);
+            //wrapper.addEventListener("drop", this.drop);
+            // wrapper.addEventListener("dragend", this.dragEnd);
+
+            // === 2. Evento input para sincronizar contenido ===
+            wrapper.addEventListener("input", () => {
+                const content = returnData.map(object => object.innerHTML).join('');
+                editingObject.body = content
+                console.log("contenido editado");
+            })
+
+            // === 3. Guardar selección al hacer mousedown (para toolbar) ===
+            wrapper.addEventListener("mousedown", (ev) => this.RitchTextToolBar?.saveSelectionContainer?.(ev))
+
+            // === 👉 NUEVO: Hover para mostrar/ocultar opciones ===
+
+            // Crear el contenedor de opciones (oculto por defecto)
+            const options = html`<div class="section-wrapper-options">
+                <button class="option-btn delete-btn" title="Eliminar" onclick="${() => this.DeleteSection(editingObject, wrapper)}">
+                    <svg width="256px" height="256px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.048"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M9 4.5V6H6V7.5H18V6H15V4.5H9ZM6.75 8.25H8.25V17.6893L8.56066 18H15.4393L15.75 17.6893V8.25H17.25V18.3107L16.0607 19.5H7.93934L6.75 18.3107V8.25Z" fill="#080341"></path> </g></svg>
+                </button>
+            </div>`
+
+            this.Config.SectionActions?.forEach(sectionAction => {
+                options.append(html`<button class="option-btn" title="${sectionAction.title ?? ""}" 
+                    onclick="${() => {
+                        sectionAction.action(editingObject, wrapper)
+                        console.log(wrapper);
+
+                    }}">
+                    ${sectionAction.name}
+                </button>`);
+            });
+
+            // Función para mostrar opciones
+            const showOptions = (/** @type {{ stopPropagation: () => void; }} */ ev) => {
+                ev.stopPropagation();
+                // Posicionar opciones en la esquina superior derecha del wrapper
+                options.style.position = "absolute";
+                options.style.top = "5px";
+                options.style.right = "5px";
+                options.style.display = "flex";
+                options.style.gap = "4px";
+                options.style.zIndex = "100";
+                if (!options.parentNode) {
+                    wrapper.appendChild(options);
+                }
+            }
+
+            // Función para ocultar/remover opciones
+            const hideOptions = () => {
+                // Pequeño delay para permitir click en los botones sin que se oculten antes
+                setTimeout(() => {
+                    if (!options.matches(":hover") && !wrapper.matches(":hover")) {
+                        options.remove();
+                    }
+                }, 150);
+            }
+
+            // Eventos hover en el wrapper
+            wrapper.addEventListener("mouseenter", showOptions);
+            wrapper.addEventListener("mouseleave", hideOptions);
+
+            // Prevenir que el hover de las opciones cierre las opciones inmediatamente
+            options.addEventListener("mouseenter", (e) => e.stopPropagation());
+            options.addEventListener("mouseleave", hideOptions);
+
+
+            // === 4. Agregar al array de retorno ===
+            returnData.push(wrapper)
+        })
+
+        return returnData;
     }
     /**
      * @param {any} editingObject
@@ -180,9 +305,7 @@ class WTemplateBuilder extends HTMLElement {
     }
 
     GetTemplateData() {
-        this.TemplateData.Sections = this.DocumentViewer
-            .Dataset.map((/**@type {HTMLElement} */ node) =>
-                new Section({ Body: node?.querySelector(".section-wrapper-content")?.innerHTML }));
+
         return this.TemplateData;
     }
 
@@ -321,8 +444,50 @@ class WTemplateBuilder extends HTMLElement {
     }
 
     CustomStyle = css`
+        * {            
+            text-align: justify;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            border: 2px solid #ddd;
+        }
+        table th {
+            background: #f5f5f5;
+            text-align: left;
+            padding: 6px 10px;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+        table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        table tr:last-child td {
+            border-bottom: none;
+        }
         .options-container {
             padding: 10px;
+            border: 1px solid #dfdfdf;
+            z-index:1;
+            display: flex;
+            height: 60px;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .option-btn {
+            padding: 0;
+            border: 0;
+            font-size: 25px;
+            border: unset;
+            background-color: unset;
+            cursor: pointer;
+            svg {
+                height: 25px;
+                width: 25px;
+            }
         }
         .template-builder-container{
             display: flex;
@@ -331,7 +496,7 @@ class WTemplateBuilder extends HTMLElement {
             box-sizing: border-box;
         }
         w-document-viewer {
-            height: calc(100% - 50px);
+            height: calc(100% - 100px);
             box-sizing: border-box;
             display: block;
         }
@@ -347,23 +512,36 @@ class WTemplateBuilder extends HTMLElement {
             padding: 10px 0;
             position: relative;
             padding-top: 20px;
-            cursor: grab; /* Indica que es arrastrable */
-            .section-wrapper-option {
-                position: absolute;
-                right: 10px;
-                top:5px;
-                button {
-                    height: 20px;
-                    font-size: 10px;
-                    background-color: #0873a5;
-                    cursor: pointer;
-                    border: none;
-                    border-radius: 5px;
-                    color: #fff;
-                }
-            }
-
+            cursor: grab; /* Indica que es arrastrable */   
         } 
+        .section-wrapper-content {
+            position: relative;
+        }
+        .section-wrapper-options {
+            background-color: rgba(0, 0 , 0, 0.2);
+            margin-top: -30px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-wrapper-content:focus-visible {
+            outline: #b1b1b1 auto 1px;
+        }
+        .section-wrapper-option {
+            position: absolute;
+            right: 10px;
+            top:5px;
+            button {
+                height: 20px;
+                font-size: 10px;
+                background-color: #0873a5;
+                cursor: pointer;
+                border: none;
+                border-radius: 5px;
+                color: #fff;
+            }
+        }
      `
 }
 customElements.define('w-template-builder', WTemplateBuilder);

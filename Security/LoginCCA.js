@@ -15,10 +15,6 @@ const OnLoad = async () => {
         const LoginForm = GetLoginLayout(WRender.Create({
             className: "sign-in-form",
             children: [
-                WRender.Create({
-                    tagName: "style",
-                    innerHTML: '@import url(/css/variables.css);'
-                }),
                 {
                     class: "text-center mt-2",
                     children: [{

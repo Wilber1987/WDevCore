@@ -44,20 +44,21 @@ class WCommentsComponent extends HTMLElement {
         this.User = props.User;
         this.UseOnlyFileName = props.UseOnlyFileName ?? false;
         this.CommentsIdentify = props.CommentsIdentify;
-        this.CommentsIdentifyName = props.CommentsIdentifyName;        
+        this.CommentsIdentifyName = props.CommentsIdentifyName;
         this.hubStarted = false;
         this.autoScroll = true;
         this.updating = false;
         this.isRichTextActive = props.isRichTextActive ?? true;
-        
+
         //UI ELEMENTS
         this.append(css`
             w-coment-component {
                 display: flex;
                 flex-direction: column;
+                height: stretch;
             }    
         `)
-        this.CommentsContainer = WRender.Create({ className: "CommentsContainer" });  
+        this.CommentsContainer = WRender.Create({ className: "CommentsContainer" });
 
         this.MessageInput = WRender.Create({
             tagName: 'textarea', onkeydown: async (e) => {
@@ -79,15 +80,17 @@ class WCommentsComponent extends HTMLElement {
                 }
             }
         });
+        /**@type {HTMLButtonElement} */// @ts-ignore
+        this.SendBtn = WRender.Create({
+            tagName: 'input', type: "button", className: 'Btn-Mini',
+            value: 'Enviar', onclick: async () => {
+                this.saveComment();
+            }
+        });
         this.OptionContainer = WRender.Create({
             className: "OptionContainer", children: [
                 this.MessageInput,
-                {
-                    tagName: 'input', type: "button", className: 'Btn-Mini',
-                    value: 'Enviar', onclick: async () => {
-                        this.saveComment();
-                    }
-                }
+                this.SendBtn
             ]
         });
         this.RitchInput = new WRichText({
@@ -151,9 +154,18 @@ class WCommentsComponent extends HTMLElement {
         } else if (this.UseAttach && this.RitchInput?.AddInputFileSection) {
             this.shadowRoot?.append(this.RitchInput?.AddInputFileSection)
         };
-         //CONFIGURACIONES
+        //CONFIGURACIONES
         this.isInSaveTransaction = false;
         this.IsWithSocket = props.IsWithSocket;
+
+
+        // 🆕 Estado de control centralizado
+        this._abortController = null;
+        this._isScrollingProgrammatically = false;
+        this._isLoadingPage = false;
+        this._updating = false;
+        this._lastConversationId = null;
+        this._hasMorePages = true;  // 🆕 detiene paginación cuando se acaba
     }
 
     // --- Inicializar SignalR ---
@@ -162,17 +174,19 @@ class WCommentsComponent extends HTMLElement {
             return;
         }
         WSocketServices.InitSignalR(this, async (/** @type {{ [x: string]: number; }} */ mensaje) => {
+            console.log(mensaje);
             // Solo agregar si es de la conversación actual
             if (mensaje[this.CommentsIdentifyName] == this.CommentsIdentify) {
                 //this.Dataset = [...this.Dataset, mensaje];
                 await this.update();
-                this.DrawWCommentsComponent();
+                //this.DrawWCommentsComponent();
                 this.scrollToBottom();
             }
         })
     }
     saveComment = async () => {
         if (!this.isInSaveTransaction) {
+            this.SendBtn.disabled = true;
             // @ts-ignore
             if (this.MessageInput.value.toString().trim().length == 0 && this.RitchInput.Files?.length == 0) {
                 return;
@@ -195,10 +209,12 @@ class WCommentsComponent extends HTMLElement {
             this.RitchInput.FunctionClear();
             this.InicializarActualizacion();
             this.isInSaveTransaction = false;
+            this.SendBtn.disabled = false;
         }
     }
     saveRitchComment = async () => {
         if (!this.isInSaveTransaction) {
+            this.SendBtn.disabled = true;
             // @ts-ignore
             if (this.MessageInput.value.toString().trim().length == 0 && this.RitchInput.Files?.length == 0) {
                 return;
@@ -211,6 +227,7 @@ class WCommentsComponent extends HTMLElement {
                 Attach_Files: this.RitchInput.Files,
                 Id_User: this.User.UserI
             }
+            // @ts-ignore
             Message[this.CommentsIdentifyName] = this.CommentsIdentify
             // @ts-ignore
             const response = await WAjaxTools.PostRequest(this.UrlAdd, Message, { WithoutLoading: true });
@@ -219,6 +236,7 @@ class WCommentsComponent extends HTMLElement {
             this.RitchInput.FunctionClear();
             this.InicializarActualizacion();
             this.isInSaveTransaction = false;
+            this.SendBtn.disabled = false;
         }
     }
 
@@ -227,22 +245,57 @@ class WCommentsComponent extends HTMLElement {
         this.initSignalR();
     }
     scrollToBottom = () => {
-        if (this.autoScroll) {
+        // 🆕 No hacer scroll si estamos en scroll programático
+        if (this.autoScroll && !this._isScrollingProgrammatically) {
+            this._isScrollingProgrammatically = true;
+
             this.CommentsContainer.scrollTo({
                 top: this.CommentsContainer.scrollHeight,
-                behavior: 'instant' // Desplazamiento suave instant/smooth
+                behavior: 'instant'
+            });
+
+            // 🆕 Liberar la bandera después de que el navegador procese el scroll
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    this._isScrollingProgrammatically = false;
+                });
             });
         }
     }
     async InicializarActualizacion() {
+        // 🆕 Detección de cambio de conversación: reset total
+        if (this._lastConversationId !== this.CommentsIdentify) {
+            this._lastConversationId = this.CommentsIdentify;
+            this.actualPage = 1;
+            this.Dataset = [];
+            this._hasMorePages = true;
+        }
+
+        // Cancelar cualquier operación previa en esta misma instancia
+        if (this._abortController) {
+            this._abortController.abort();
+        }
+        this._abortController = new AbortController();
+        const signal = this._abortController.signal;
         // Guardar referencia al intervalo para poder limpiarlo luego
+
         if (!this.IsWithSocket) {
+            if (this.Interval) clearInterval(this.Interval);
             this.Interval = setInterval(async () => {
                 if (this.updating) {
                     return;
                 }
                 this.updating = true;
-                await this.update();
+                try {
+                    await this.update(true);
+                } catch (err) {
+                    // Capturar AbortError en polling
+                    // @ts-ignore
+                    if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+                        return;
+                    }
+                    console.error("Error en polling:", err);
+                }
                 this.scrollToBottom();
                 this.updating = false;
             }, 5000);
@@ -251,30 +304,70 @@ class WCommentsComponent extends HTMLElement {
 
         // Definir la función de manejo de scroll por separado
         this.scrollHandler = this.debounce(async () => {
-            if (isLoading) {
-                return;
-            }
+            // Defensa 1: ignorar scroll programático (el scrollTo del init)
+            if (this._isScrollingProgrammatically) return;
+
+            // Defensa 2: no cargar si ya estamos cargando
+            if (this._isLoadingPage) return;
+
+            // Defensa 3: no paginar si ya llegamos al final
+            if (!this._hasMorePages) return;
+
+            // Defensa 4: componente desmontado
+            if (!this.isConnected) return;
 
             const { scrollTop, clientHeight, scrollHeight } = this.CommentsContainer;
-            const isAtBottom = scrollTop + clientHeight >= scrollHeight;
-
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50; // margen 50px
             this.autoScroll = isAtBottom;
 
-            if (scrollTop === 0) {
-                isLoading = true;
+            // 🆕 Trigger de paginación con protecciones
+            if (scrollTop <= 10) {  // margen de 10px, no estrictamente === 0
+                this._isLoadingPage = true;
                 this.actualPage++;
-                await this.update(false, true);
-                isLoading = false;
+
+                try {
+                    const previousItems = this.Dataset?.length || 0;
+                    await this.update(false, true);
+                    const newItems = (this.Dataset?.length || 0) - previousItems;
+
+                    // 🆕 Si no llegaron items nuevos, detener paginación
+                    if (newItems <= 0) {
+                        this._hasMorePages = false;
+                    }
+                } catch (e) {
+                    // Si falló, devolver la página para no saltarla
+                    this.actualPage--;
+                } finally {
+                    this._isLoadingPage = false;
+                }
             }
-        }, 1000); // Ajusta el tiempo de debounce según sea necesario
+        }, 300); // Ajusta el tiempo de debounce según sea necesario
 
-        // Agregar evento de scroll
-        this.CommentsContainer.addEventListener('scroll', this.scrollHandler);
+        // Limpiar listener previo por si acaso
+        if (this.CommentsContainer) {
+            this.CommentsContainer.removeEventListener('scroll', this.scrollHandler);
+            this.CommentsContainer.addEventListener('scroll', this.scrollHandler, { passive: true });
+        }
 
-        await this.update();
+        // 🆕 Primera carga con AbortSignal
+        try {
+            await this.update(true, false, signal);
+        } catch (e) {
+            if (e.name === 'AbortError') return; // abortado por cambio de conversación
+            throw e;
+        }
+
+        // 🆕 Scroll con bandera para no disparar el handler
+        this._isScrollingProgrammatically = true;
         this.CommentsContainer.scrollTo({
             top: this.CommentsContainer.scrollHeight,
             behavior: 'instant' // Desplazamiento suave instant/smooth
+        });
+        // Dar tiempo al navegador para procesar el scroll y luego liberar la bandera
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                this._isScrollingProgrammatically = false;
+            });
         });
     }
     debounce(func, delay) {
@@ -290,6 +383,27 @@ class WCommentsComponent extends HTMLElement {
         this.hubStarted = false;
         WSocketServices.StopSignalR(this);
         //this.ClearEvents()
+        // 1. Cancelar cualquier fetch en vuelo
+        if (this._abortController) {
+            this._abortController.abort();
+            this._abortController = null;
+        }
+
+        // 2. Limpiar el intervalo de polling
+        if (this.Interval) {
+            clearInterval(this.Interval);
+            this.Interval = null;
+        }
+
+        // 3. Remover el listener de scroll (evita listener #1, #2, #3...)
+        if (this.scrollHandler && this.CommentsContainer) {
+            this.CommentsContainer.removeEventListener('scroll', this.scrollHandler);
+        }
+
+        // 4. Resetear estado
+        this._updating = false;
+        this._isLoadingPage = false;
+        this.scrollHandler = null;
     }
     ClearEvents() {
         if (this.Interval) {
@@ -341,7 +455,7 @@ class WCommentsComponent extends HTMLElement {
                         }
                     }));
                 } else if (attach?.Type?.toUpperCase()?.includes("PDF")
-                || attach?.Value?.toUpperCase()?.includes(".PDF") ) {
+                    || attach?.Value?.toUpperCase()?.includes(".PDF")) {
                     attachs.append(WRender.Create({
                         tagName: "a", innerText: attach.Name, onclick: () => {
                             this.shadowRoot?.append(new WModalForm({
@@ -408,35 +522,128 @@ class WCommentsComponent extends HTMLElement {
             }
         });
     }
-    update = async (inicialize = false, isUpScrolling = false) => {
-        const Message = {}
-        Message[this.CommentsIdentifyName] = this.CommentsIdentify
+    update = async (inicialize = false, isUpScrolling = false, signal = null) => {
+        // 🆕 Mutex: solo una ejecución a la vez (excepto polling)
+        if (this._updating && !inicialize) {
+            return;
+        }
+
+        this._updating = true;
+
+        const Message = {};
+        Message[this.CommentsIdentifyName] = this.CommentsIdentify;
         this.maxMessage = 30;
         this.actualPage = this.actualPage ?? 1;
+
         if (isUpScrolling) {
             Message.FilterData = [{
                 FilterType: "PAGINATED",
                 Values: [this.actualPage.toString(), this.maxMessage.toString()]
-            }]
+            }];
         } else {
-            Message.FilterData = [{ FilterType: "PAGINATED", Values: ["1", "30"] }]
+            Message.FilterData = [{ FilterType: "PAGINATED", Values: ["1", "30"] }];
         }
+
         try {
+            // 🆕 Usar AbortSignal si está disponible
+            const effectiveSignal = signal || this._abortController?.signal;
+
             // @ts-ignore
-            const response = await WAjaxTools.PostRequest(this.UrlSearch, Message, { WithoutLoading: true });
-            //console.log(response);
-            this.Dataset = response;
-            if (!inicialize) {
-                await this.DrawWCommentsComponent();
+            const response = await WAjaxTools.PostRequest(this.UrlSearch, Message, {
+                WithoutLoading: true,
+                signal: effectiveSignal  // 🆕 Pasar signal para cancelación
+            });
+
+            // 🆕 Detección de cambio de conversación: reset total
+            if (this._lastConversationId !== this.CommentsIdentify) {
+                this._lastConversationId = this.CommentsIdentify;
+                this.actualPage = 1;
+                this.Dataset = [];
+                this._hasMorePages = true;
             }
+
+            // 🆕 Para paginación: detectar si llegaron items nuevos
+            if (isUpScrolling) {
+                const previousCount = this.Dataset?.length || 0;
+                this.Dataset = [...(this.Dataset || []), ...(response || [])];
+                const newItems = this.Dataset.length - previousCount;
+
+                // 🆕 Si no llegaron items nuevos, detener paginación
+                if (newItems <= 0) {
+                    this._hasMorePages = false;
+                }
+            } else {
+                this.Dataset = response;
+            }
+
+            //if (!inicialize) {
+            await this.DrawWCommentsComponent();
+            //}
         } catch (err) {
+            // 🆕 Silenciar AbortError (cancelación por cambio de conversación)
+            // ✅ CAPTURAR AbortError SILENCIOSAMENTE
+            if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+                console.log('🛑 Operación cancelada por cambio de conversación');
+                return; // No hacer nada, es esperado
+            }
             console.error("Error al cargar mensajes:", err);
+        } finally {
+            this._updating = false;
         }
     }
 
+    /**
+     * @param {string} path
+     */
+<<<<<<< HEAD
     GetFileNameFromPath(path) {
         if (!this.UseOnlyFileName) {
-            return path;
+            const pathNotIncludesPleca = path != null &&  path.toUpperCase().startsWith("MEDIA");
+=======
+    GetFileNameFromPath(path, isImg = true) {
+        if (!this.UseOnlyFileName) {
+            const pathNotIncludesPleca = path != null && path.toUpperCase().startsWith("MEDIA");
+            return pathNotIncludesPleca ? "/" + path : path;
+        }
+        if (!path) return '';
+
+        // Reemplaza las barras invertidas por barras normales para evitar problemas
+        const normalizedPath = path.replace(/\\/g, '/');
+
+        // Divide la ruta por '/' y obtiene el último elemento
+        const parts = normalizedPath.split('/');
+
+        if (!path) return "";
+
+        // Detecta si es un base64 puro (sin encabezado)
+        const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
+
+        // Detecta si es un DataURL tipo data:image/png;base64,...
+        const dataUrlRegex = /^data:(.*);base64,/;
+
+        // ¿Es un dataURL completo?
+        if (dataUrlRegex.test(path)) {
+            return isImg ? path : ""; // ya es válido, no necesita normalizarse
+        }
+
+        // ¿Es un base64 puro?
+        if (base64Regex.test(path)) {
+            return isImg
+                ? `data:image/png;base64,${path}`
+                : path;
+        }
+
+        return "/" + parts[parts.length - 1];
+    }
+
+    /**
+     * @param {string} path
+     */
+    GetFileNameOldFromPath(path) {
+        if (!this.UseOnlyFileName) {
+            const pathNotIncludesPleca = path != null && path.toUpperCase().startsWith("MEDIA");
+>>>>>>> c8f1941eccfed86a40aff7f6f8a7327e033f7a39
+            return pathNotIncludesPleca ? "/" + path : path;
         }
         if (!path) return '';
 
@@ -447,6 +654,7 @@ class WCommentsComponent extends HTMLElement {
         const parts = normalizedPath.split('/');
         return "/" + parts[parts.length - 1];
     }
+
     CustomStyle = css`    
         .CommentsContainer{
             display: flex;

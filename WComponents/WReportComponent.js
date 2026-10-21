@@ -1,7 +1,9 @@
 //@ts-check
 import { StylesControlsV2 } from "../StyleModules/WStyleComponents.js";
+// @ts-ignore
 import { ModelProperty } from "../WModules/CommonModel.js";
 import { Money } from "../WModules/Types/Money.js";
+import { WArrayF } from "../WModules/WArrayF.js";
 import { ComponentsManager, ConvertToMoneyString, html, WRender } from "../WModules/WComponentsTools.js";
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css } from "../WModules/WStyledRender.js";
@@ -9,8 +11,8 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 
 /**
  * @typedef {Object} ReportConfig
- * @property {Array} [Dataset]
- * @property {Object.<string, any>} [ModelObject]
+ * @property {Array<Object.<string, any>>} [Dataset]
+ * @property {Object.<string, ModelProperty>} [ModelObject]
  * @property {HTMLElement} [Header]
  * @property {HTMLStyleElement} [CustomStyle]
  * @property {String} [PageType]
@@ -54,9 +56,14 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		this.MainContainer.innerHTML = "";
 		this.ReportContainer.innerHTML = "";
 		this.Manager.DomComponents = [];
-		this.MetricLevels = {}; // Reiniciamos la propiedad para recalcular
-		const groupedData = this.groupData(this.Config.Dataset);
+		
+		const { GroupParams, EvalParams, ModelObject } = this.Config;
+		const { groupedData, metricLevels } = WArrayF.GroupData(this.Config.Dataset, GroupParams, EvalParams, ModelObject, this.Config.title);
+		this.MetricLevels = metricLevels; // Reiniciamos la propiedad para recalcular
 		this.RenderGroups(groupedData);
+		
+		
+
 		this.ReportContainer.append(WRender.Create({
 			tagName: "table",
 			className: "report-table summary",
@@ -105,88 +112,8 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 		});
 	}
 
-	groupData(data) {
-		const { GroupParams, EvalParams } = this.Config;
-		if (!GroupParams || GroupParams.length === 0) {
-			// @ts-ignore
-			this.MetricLevels[this.Config.title ?? "Reporte"] = this.calculateSummary(data);
-			const metric = {};
-			// @ts-ignore
-			metric[this.Config.title ?? "Reporte"] = data
-			return metric;
-		}
-		const grouped = {};
-		data.forEach(item => {
-			let currentLevel = grouped;
-			let path = []; // Almacena el nivel de agrupación
-			GroupParams.forEach((param, index) => {
-				const key = item[param] ?? "Undefined";
-				path.push(key);
-				if (!currentLevel[key]) {
-					currentLevel[key] = index === GroupParams.length - 1 ? [] : {};
-				}
-				currentLevel = currentLevel[key];
-			});
-			currentLevel.push(item);
-		});
-		// Función recursiva para calcular los resúmenes de cada grupo
-		const processGroup = (group, path = []) => {
-			let allItems = [];
-			Object.keys(group).forEach(key => {
-				const currentPath = [...path, key];
-				if (Array.isArray(group[key])) {
-					// Si es un array, calcular resumen y almacenarlo en MetricLevels
-					// @ts-ignore
-					this.MetricLevels[currentPath.join(" > ")] = this.calculateSummary(group[key], data);
-					allItems = allItems.concat(group[key]);
-				} else {
-					// Si es un objeto anidado, procesarlo recursivamente
-					const subItems = processGroup(group[key], currentPath);
-					allItems = allItems.concat(subItems);
-				}
-			});
-			// Resumen del nivel actual
-			if (allItems.length > 0) {
-				// @ts-ignore
-				this.MetricLevels[path.join(" > ")] = this.calculateSummary(allItems, data);
-			}
-			return allItems;
-		};
-		processGroup(grouped);
-		// Consolidado general
-		// @ts-ignore
-		this.MetricLevels["General Summary"] = this.calculateSummary(data);
-		return grouped;
-	}
+	
 
-	// Método auxiliar para calcular el resumen de un conjunto de datos
-	calculateSummary(data, parentData) {
-		const summary = {};
-		const { EvalParams, ModelObject } = this.Config;
-
-		EvalParams?.forEach(param => {
-			const isWithModel = ModelObject != null && ModelObject != undefined;
-			const isMoney = isWithModel && ModelObject[param]?.type?.toUpperCase() === "MONEY";
-			const isNumber = isWithModel && ModelObject[param]?.type?.toUpperCase() === "NUMBER";
-
-			// Solo sumar valores numéricos si el tipo es MONEY o NUMBER
-			const totalSum = (isMoney || isNumber)
-				? data.reduce((acc, item) => acc + (typeof item[param] === 'number' ? item[param] : 0), 0)
-				: undefined;
-
-			const totalElements = parentData?.length ?? data.length; // Total de elementos en data
-			const validCount = data.filter(item => item[param] !== undefined && item[param] !== null).length; // Cuenta los elementos válidos
-			const avg = totalElements > 0 ? (validCount / totalElements) * 100 : 0; // % de elementos válidos
-
-			summary[param] = {
-				...(totalSum !== undefined ? { sum: totalSum } : {}), // Solo incluir 'sum' si se calculó
-				count: validCount, // Número de elementos válidos
-				avg // % de elementos válidos sobre el total
-			};
-		});
-
-		return summary;
-	}
 	RenderGroups(groupedData, level = 0, path = []) {
 		Object.keys(groupedData).forEach(key => {
 			const currentPath = [...path, key]; // Construimos el identificador del grupo

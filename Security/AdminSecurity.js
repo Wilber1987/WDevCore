@@ -16,7 +16,7 @@ window.addEventListener("load", async () => {
 	const DOMManager = new ComponentsManager({ MainContainer: Main });
 	const Roles = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Roles", {});
 	const Permisos = await WAjaxTools.PostRequest("../api/ApiEntitySECURITY/getSecurity_Permissions", {});
-	Main.append(WRender.createElement(StylesControlsV2));
+	MainContainer.append(WRender.createElement(StylesControlsV2));
 	Aside.append(WRender.Create({ tagName: "h3", innerText: "Mantenimiento de Usuarios" }));
 	Aside.append(new WAppNavigator({
 		DarkMode: false,
@@ -67,22 +67,22 @@ function ElementTab(TabName = "Tab", DOMManager, Model) {
 					UserActions: [
 						TabName == "Usuarios" ? {
 							name: "Cambiar estado", action: (object) => {
-								Main.append(ChangeState(object));
+								MainContainer.append(ChangeState(object));
 							}
 						} : null,
 						TabName == "Usuarios" ? {
 							name: "Editar contraseña", action: (object) => {
-								Main.append(ChangePassword(object));
+								MainContainer.append(ChangePassword(object));
 							}
 						} : null,
 						TabName == "Usuarios" ? {
 							name: "Editar roles", action: async (object) => {
-								Main.append(await ChangeRoles(object));
+								MainContainer.append(await ChangeRoles(object));
 							}
 						} : null,
 						TabName == "Usuarios" ? {
 							name: "Editar datos", action: async (object) => {
-								Main.append(await ChangeDatos(object, mainComponent));
+								MainContainer.append(await ChangeDatos(object, mainComponent));
 							}
 						} : null
 					]
