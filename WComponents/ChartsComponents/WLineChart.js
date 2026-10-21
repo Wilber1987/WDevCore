@@ -8,7 +8,7 @@ class WLineChart extends WChartBase {
     /** @protected */
     getSpecificStyles() {
         return css`
-        .bar-leaf { width: 0px; min-width: 16px; border-radius: 3px 3px 0 0; transition: all 0.2s ease; cursor: pointer; position: relative; min-height: 4px; }
+        .bar-leaf { width: 0px;border-radius: 3px 3px 0 0; transition: all 0.2s ease; cursor: pointer; position: relative; min-height: 4px; }
         .chart-group-nested[data-level="2"] .bar-leaf, .chart-group-nested[data-level="3"] .bar-leaf, .chart-group-nested[data-level="4"] .bar-leaf { width: 0px; min-width: 0px; }
         .bar-value { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 0.625rem; font-weight: 700; color: var(--chart-text); white-space: nowrap; opacity: 0; transition: opacity 0.2s; }
         .PathLine { pointer-events: stroke; }

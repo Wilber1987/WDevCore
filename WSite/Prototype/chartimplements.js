@@ -13,7 +13,7 @@ import { data, ModelObject } from "../WDevCoreSite/Examples/ExampleData.js";
 
 
 
-const GroupParams = ["Sucursal", "Categoria", "Tipo", "Producto"]
+const GroupParams = [ "Tipo", "Producto"]
 const EvalParams = ["SubTotal",
     "Descuento",
     "Iva",

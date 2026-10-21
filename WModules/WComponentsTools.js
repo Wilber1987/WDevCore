@@ -107,8 +107,6 @@ function html(strings, ...values) {
             const element = wrapper.querySelector(`[data-function-placeholder-${index}]`);
             const event = element.getAttribute(`data-function-placeholder-${index}`);
             element[event] = value
-
-
         }
     });
 
