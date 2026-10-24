@@ -11,6 +11,7 @@ export const WTableStyle = css`
 	font-size: 12px;
 	border: 1px var(--fifty-color) solid;
 	color: var(--font-primary-color);
+	table-layout: fixed
 }
 
 .WTable th {
@@ -64,10 +65,12 @@ w-card-table {
 }
 .WTable td p {
 	overflow: hidden;
-	max-height: 200px;
-	font-size: 12px !important;
-	margin: 0px;
-	overflow-y: auto;
+    max-height: 200px;
+    font-size: 12px !important;
+    margin: 0px;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    word-break: break-all;
 }
 .WTable td label *, .WTable td p * {
 	color: var(--font-primary-color) !important;

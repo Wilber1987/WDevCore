@@ -101,7 +101,7 @@ class WAppNavigator extends HTMLElement {
 				const nav = this.querySelector("#MainNav");
 				// @ts-ignore
 				nav.className = nav?.className == "navActive" ? this.NavStyle + " navInactive" : nav.className = this.NavStyle + " navActive";
-			}}">
+			 }}">
 				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g clip-path="url(#clip0_429_11066)"> <path d="M3 6.00092H21M3 12.0009H21M3 18.0009H21" stroke="#292929" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path> </g> <defs> <clipPath id="clip0_429_11066"> <rect width="24" height="24" fill="white" transform="translate(0 0.000915527)"></rect> </clipPath> </defs> </g></svg>
 				${this.NavTitle ? html`<label class="NavTitle">${this.NavTitle}</label>` : ""}
 			</header>`
@@ -350,7 +350,7 @@ class WAppNavigator extends HTMLElement {
 				height: calc(100% - 100px);
 			}
 			#content-container {
-				padding: 15px;
+				padding: 20px 15px;
 			}
 		
 			.elementNav:hover {
@@ -470,7 +470,7 @@ class WAppNavigator extends HTMLElement {
 						width: 18px;
 						position: absolute;
 						right: 10px;
-						top: 5px;
+						top: 0px;
 						transform: translateY(-100%);
 					} 
 					& .zoomBtn .btnZoomOut{

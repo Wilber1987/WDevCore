@@ -86,11 +86,25 @@ export const WModalStyle = css`
        justify-content: center;
        padding: 5px;
        overflow-y: auto;
+       box-sizing: border-box;
   }
   .ObjectModalElementContainer {
      overflow-y: auto;
   }
 
+  .ContainerFormWModal.fullscreen {
+     position: fixed;
+     top: 0px;
+     left: 0px;
+     right: 0px;
+     bottom: 0px;
+     height: 100% !important;
+     margin-top: 0px;
+     width: 100% !important;
+     max-height: calc(100vh - 0px);
+     height: calc(100vh - 0px);
+     border-radius: 0cm;
+  }
   @media (max-width: 1200px) {
        .ContainerFormWModal {
             width: 90% !important;

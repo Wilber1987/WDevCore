@@ -36,7 +36,7 @@ class WAcorden extends HTMLElement {
                         ? "accordion-button" : "accordion-button active-btn";
                     content.className = content.className.includes("active")
                         ? "element-content" : "element-content active";
-                }}">${element.Descripcion}</div>
+               }}">${element.Descripcion}</div>
                 ${content}
             </div>`)
         });

@@ -403,11 +403,11 @@ class WFilterOptions extends HTMLElement {
 						const from = inputs[0]?.value?.trim() || "";
 						const to = inputs[1]?.value?.trim() || "";
 
-						if (!isValidDate(from)) {
+						if (!isValidDate(from) && from != "") {
 							throw new Error(`Fecha inicial inválida: ${from}`);
 						}
 
-						if (!isValidDate(to)) {
+						if (!isValidDate(to) && to != "") {
 							throw new Error(`Fecha final inválida: ${to}`);
 						}
 
