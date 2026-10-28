@@ -94,8 +94,8 @@ class WTemplateBuilder extends HTMLElement {
         this.OptionsContainer.append(html`<button class="Btn-Mini"
             onclick="${() => {
                 this.shadowRoot?.append(ModalVericateAction(async ()=> {
-                    await this.GetTemplateData().Update();
-                    WAlertMessage.Success("Cambios guardados", true);
+                    const response = await this.GetTemplateData().Update();                    
+                    WAlertMessage.ResponseMessage(response);
                 }, "¿Desea guardar los cambios?"))                
             }}">Guardar</button>`);
     }
@@ -170,8 +170,8 @@ class WTemplateBuilder extends HTMLElement {
      */
     DeleteSection(editingObject, sectionWrapper) {
         this.shadowRoot?.append(ModalVericateAction(() => {
-            sectionWrapper.remove();
-            this.DocumentViewer.Dataset?.splice(this.DocumentViewer.Dataset?.indexOf(editingObject), 1);
+            sectionWrapper.remove();          
+            this.DocumentViewer.Dataset?.splice(this.DocumentViewer.Dataset?.indexOf(sectionWrapper), 1);
         }, "¿Esta seguro que desea eliminar esta sección?"))
     }
 
@@ -179,7 +179,7 @@ class WTemplateBuilder extends HTMLElement {
         this.Draw();
     }
 
-    GetTemplateData() {
+    GetTemplateData() {        
         this.TemplateData.Sections = this.DocumentViewer
             .Dataset.map((/**@type {HTMLElement} */ node) =>
                 new Section({ Body: node?.querySelector(".section-wrapper-content")?.innerHTML }));
