@@ -507,7 +507,7 @@ export class ModelPropertyFormBuilder {
 	* @returns {Promise<HTMLElement>}
 	*/
 	static async CreateFileInput(ModelProperty, EditingObject, prop, onChangeListener) {
-		const { FileComponent } = await import("../WComponents/FormComponents/FileComponent.js");
+		const { FileComponent } = await import("../WComponents/FormComponents/FileComponent.js?profile-file-refactor-20261024");
 		const { require, disabled } = await this.DefineRequireAndDisable(ModelProperty, EditingObject);
 		const { multiple, filesType } = this.DefineFileConfig(ModelProperty);
 		ModelProperty.require = require;

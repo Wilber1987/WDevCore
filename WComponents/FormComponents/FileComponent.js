@@ -239,10 +239,10 @@ export class FileComponent extends HTMLElement {
 	styles() {
 		return css`
 			.file-uploader {
-				border: 2px dashed #ccc;
+				border: 2px dashed var(--profile-file-border, #ccc);
 				padding: 20px;
 				text-align: center;
-				background-color: #f9f9f9;
+				background-color: var(--profile-file-surface, #f9f9f9);
 				border-radius: 10px;
 			}
 			
@@ -295,7 +295,7 @@ export class FileComponent extends HTMLElement {
 			}
 
 			.custom-file-label {
-				background-color: #6200ee;
+				background-color: var(--profile-file-accent, #6200ee);
 				color: white;
 				padding: 8px;
 				border-radius: 5px;
@@ -305,7 +305,7 @@ export class FileComponent extends HTMLElement {
 			}
 
 			.custom-file-label:hover {
-				background-color: #3700b3;
+				background-color: var(--profile-file-accent-hover, #3700b3);
 			}
 			@media (max-width: 768px) {
 				.file-item {
