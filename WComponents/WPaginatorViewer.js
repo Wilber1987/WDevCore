@@ -4,11 +4,7 @@ import { html, WRender } from "../WModules/WComponentsTools.js";
 import { css, WCssClass } from "../WModules/WStyledRender.js";
 class PaginatorConfig {
     Dataset = [];
-    ModelObject = {};
     paginate = true;
-    TypeMoney = "Dollar";
-    selectedItems = [];
-    DisplayData = [];
     maxElementByPage = 10;
     Options = {
         UserActions: [{
@@ -17,7 +13,10 @@ class PaginatorConfig {
         }]
     }
 }
-class WPaginatorViewer extends HTMLElement {
+class WPaginatorViewer extends HTMLElement {    
+    /**
+    * @param {Partial<PaginatorConfig>} Config 
+    */
     constructor(Config = (new PaginatorConfig())) {
         super();
         this.Dataset = [];
@@ -172,10 +171,7 @@ class WPaginatorViewer extends HTMLElement {
         this.Draw(Dataset);
     }
 
-    isSorteable(element, prop) {
-        return element[prop] != null &&
-            parseFloat(element[prop].toString().replaceAll("%", "").replaceAll(Money[this.TypeMoney], "")).toString() != "NaN";
-    }
+    
 
     DrawTFooter(pages = []) {
         let tfooter = WRender.Create({ className: "tfooter" });
@@ -237,51 +233,8 @@ class WPaginatorViewer extends HTMLElement {
             }
         }))
         return tfooter;
-    }
-    //#endregion fin tabla basica
-    //#region ESTILOS-------------------------------------------------------------------------------------------
-    MediaStyleResponsive() {
-        if (this.querySelector("MediaStyleResponsive" + this.id)) {
-            this.removeChild(this.querySelector("MediaStyleResponsive" + this.id));
-        }
-        const ClassList = [];
-        let index = 1;
-        for (const prop in this.ModelObject) {
-            const flag = WArrayF.checkDisplay(this.DisplayData, prop);
-            if (flag) {
-                if (!prop.includes("Photo") &&
-                    !prop.includes("img") &&
-                    !prop.includes("image") &&
-                    !prop.includes("Image") &&
-                    !prop.includes("Pict") &&
-                    !prop.includes("_hidden")) {
-                    ClassList.push(new WCssClass(`td:nth-of-type(${index}):before`, {
-                        content: `"${prop}:"`,
-                        "margin-right": "10px"
-                    }))
-                }
-                index++;
-            }
-        }
-        if (this.PaginatorConfig.StyleType != undefined
-            && this.PaginatorConfig.StyleType.includes("Cards")) {
-            return {
-                type: "w-style",
-                props: { ClassList: ClassList }
-            }
-        }
-        return {
-            type: "w-style",
-            props: {
-                id: "MediaStyleResponsive" + this.id,
-                MediaQuery: [{
-                    condicion: "(max-width: 600px)",
-                    ClassList: ClassList
-                }]
-            }
-        }
-    }
-
+    }   
+   
     PaginateTOptionsStyle() {
         const style = this.querySelector("#PaginateTOptionsStyle" + this.id);
         if (style) {
@@ -397,6 +350,12 @@ class WPaginatorViewer extends HTMLElement {
                 object-fit: cover;
                 box-shadow: 0 2px 5px 0 rgb(0 0 0 / 30%);
                 margin: 10px;
+            }
+            .paginator-pages-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 0px; 
             }
         `;
         return WTableStyle;

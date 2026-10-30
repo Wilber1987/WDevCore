@@ -52,7 +52,7 @@ w-card-table {
 
 .WTable td label {
 	overflow: hidden;
-	max-height: 200px;
+	max-height: 150px;
 	text-overflow: ellipsis;
 	display: block;
 	overflow-y: auto;
@@ -64,7 +64,7 @@ w-card-table {
 }
 .WTable td p {
 	overflow: hidden;
-	max-height: 200px;
+	max-height: 150px;
 	font-size: 12px !important;
 	margin: 0px;
 	overflow-y: auto;
@@ -424,7 +424,7 @@ input[type=radio]:checked::before {
 	}
 	.WTable td label, .WTable td p {
 		overflow: hidden;
-		max-height: 200px;
+		max-height: 150px;
 		text-overflow: ellipsis;
 		display: block;
 		overflow-y: auto;

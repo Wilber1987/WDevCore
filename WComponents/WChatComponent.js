@@ -45,7 +45,8 @@ class WChatComponent extends HTMLElement {
 		WRender.SetStyle(this, {
 			display: "grid"
 		});
-		this.Dataset = Config.Dataset
+		this.Dataset = Config.Dataset ?? [];
+		this.Id_ComentarioCargados = this.Id_ComentarioCargados ?? ["-1"]
 		this.append(css`
 			body {
 				overflow: hidden;
@@ -78,7 +79,7 @@ class WChatComponent extends HTMLElement {
 		};
 		this.chatContainer = html`<div class="chat-container"></div>`;
 		this.WithAgent = Config.WithAgent ?? sessionStorage.getItem("WithAgent") == "true" ? true : false;
-		this.CommentsIdentifyName = Config.CommentsIdentifyName
+		this.CommentsIdentifyName = Config.CommentsIdentifyName ?? "Token"
 		// @ts-ignore
 		this.CommentsIdentify = Config.CommentsIdentify ?? (sessionStorage.getItem(this.CommentsIdentifyName) ? parseInt(sessionStorage.getItem(this.CommentsIdentifyName)) : undefined);
 		/**@type {HTMLInputElement} */
@@ -167,6 +168,9 @@ class WChatComponent extends HTMLElement {
 		</div>`)
 		let userText = null;
 		userText = this.InicialiceComponent(themeButton, userText, this.chatInput, deleteButton, sendButton);
+		if (this.WithAgent == false && this.Dataset.length > 0) {
+			this.RenderDataset();
+		}
 	}
 
 	/**
@@ -202,6 +206,7 @@ class WChatComponent extends HTMLElement {
 			pElement.className = "pElement";
 			// Send POST request to API, get response and set the reponse as paragraph element text
 			try {
+				/**@type {Object.<string, any>} */
 				const model = {
 					SessionId: this.identity.Session,
 					Text: userText,
@@ -211,6 +216,7 @@ class WChatComponent extends HTMLElement {
 					Attach: this.RitchInput.Files.length > 0 ? this.RitchInput.Files[0] : undefined,
 					Timestamp: new Date()
 				};
+				model[this.CommentsIdentifyName] = this.CommentsIdentify
 				/**@type {WebApiResponse} */
 				const response = await this.SendMessage(model);
 				// @ts-ignore
@@ -291,12 +297,10 @@ class WChatComponent extends HTMLElement {
 			// @ts-ignore
 			userText = this.chatInput.value.trim(); // Get this.chatInput value and remove extra spaces
 			if (!userText) return; // If this.chatInput is empty return from here
-
-
+			
 			// Clear the input field and reset its height
 			this.chatInput.value = "";
 			//this.chatInput.style.height = `${initialInputHeight}px`;
-
 			const attachs = this.RenderFiles({ Attach_Files: this.RitchInput.Files });
 			const pElement = html`<div class="pElement">
 				${attachs.children.length > 0 ? attachs : ""}
@@ -397,7 +401,7 @@ class WChatComponent extends HTMLElement {
 	}
 
 	async update() {
-		this.Id_ComentarioCargados = this.Id_ComentarioCargados ?? ["-1"]
+		
 		if (this.WithAgent == true) {
 			const Message = {}
 			// @ts-ignore
@@ -415,25 +419,28 @@ class WChatComponent extends HTMLElement {
 			//this.Dataset = response;         
 			this.chatContainer.querySelector(".default-text")?.remove();
 
-			this.Dataset?.sort((/** @type {{ Id_Comentario: number; }} */ a, /** @type {{ Id_Comentario: number; }} */ b) => a.Id_Comentario - b.Id_Comentario)
-				.forEach((/**@type {Object.<string, any>} */ comment) => {
-					this.Id_ComentarioCargados.push(comment.Id_Comentario.toString())
-					if (this.chatContainer.querySelector("#Comment" + comment.Id_Comentario)) {
-						return;
-					}
+			this.RenderDataset();
+		}
+	}
+	RenderDataset() {
+		this.Dataset?.sort((/** @type {{ Id_Comentario: number; }} */ a, /** @type {{ Id_Comentario: number; }} */ b) => a.Id_Comentario - b.Id_Comentario)
+			.forEach((/**@type {Object.<string, any>} */ comment) => {
+				this.Id_ComentarioCargados.push(comment.Id_Comentario.toString());
+				if (this.chatContainer.querySelector("#Comment" + comment.Id_Comentario)) {
+					return;
+				}
 
-					//TODO MEJORAR ESTO Y HACERLO MAS ESPECIFICO
-					const val = Array.from(document.querySelectorAll(`.chat.outgoing`))
-						// @ts-ignore
-						.find(el => el.innerText === (comment.Body ?? comment.mensaje));
-					if (val) {
-						return;
-					}
-					const classN = comment.NickName == this.identity.Value ? "outgoing" : "incoming";
-					// Create an incoming chat div with typing animation and append it to chat container
-
-					const attachs = this.RenderFiles(comment);
-					const incomingChatDiv = html`<div class="chat ${classN}" id="Comment${comment.Id_Comentario}">
+				//TODO MEJORAR ESTO Y HACERLO MAS ESPECIFICO
+				const val = Array.from(document.querySelectorAll(`.chat.outgoing`))
+					// @ts-ignore
+					.find(el => el.innerText === (comment.Body ?? comment.mensaje));
+				if (val) {
+					return;
+				}
+				const classN = comment.NickName == this.identity.Value ? "outgoing" : "incoming";
+				// Create an incoming chat div with typing animation and append it to chat container
+				const attachs = this.RenderFiles(comment);
+				const incomingChatDiv = html`<div class="chat ${classN}" id="Comment${comment.Id_Comentario}">
 						<div class="chat-content">						
 							<div class="chat-details">
 								<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="6" r="4" fill="#77cef3"></circle> <path opacity="0.5" d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z" fill="#77cef3"></path> </g></svg>
@@ -443,44 +450,42 @@ class WChatComponent extends HTMLElement {
 							</div>
 						</div>
 					</div>`;
-					this.chatContainer.appendChild(incomingChatDiv);
-					const pElement = document.createElement("div");
-					pElement.className = "pElement";
-					// Send POST request to API, get response and set the reponse as paragraph element text
-					try {
+				this.chatContainer.appendChild(incomingChatDiv);
+				const pElement = document.createElement("div");
+				pElement.className = "pElement";
+				// Send POST request to API, get response and set the reponse as paragraph element text
+				try {
 
-						// 1️⃣ Obtén el texto original
-						const raw = comment.Body ?? comment.mensaje ?? "";
+					// 1️⃣ Obtén el texto original
+					const raw = comment.Body ?? comment.mensaje ?? "";
 
-						// 2️⃣ Convierte las URLs en <a>
-						const urlRegex =
-							/((?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9\-._~:/?#@!$&'()*+,;=%]+\.[a-z]{2,})(?![^<]*>)/gi;
+					// 2️⃣ Convierte las URLs en <a>
+					const urlRegex = /((?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9\-._~:/?#@!$&'()*+,;=%]+\.[a-z]{2,})(?![^<]*>)/gi;
 
-						const processed = raw.replace(urlRegex, (/** @type {string} */ match) => {
-							// Asegura que la URL tenga http/https para que el enlace funcione bien
-							const href = /^https?:\/\//i.test(match) ? match : `https://${match}`;
-							return `<a href="${href}" target="_blank" rel="noopener noreferrer">${match}</a>`;
-						});
+					const processed = raw.replace(urlRegex, (/** @type {string} */ match) => {
+						// Asegura que la URL tenga http/https para que el enlace funcione bien
+						const href = /^https?:\/\//i.test(match) ? match : `https://${match}`;
+						return `<a href="${href}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+					});
 
-						// 3️⃣ Escribe el contenido resultante en el párrafo
+					// 3️⃣ Escribe el contenido resultante en el párrafo
+					pElement.innerHTML = "";
+					pElement.append(...WContentManager.ParseContent(processed));
 
-						pElement.innerHTML = "";
-						pElement.append(...WContentManager.ParseContent(processed))
-
-						incomingChatDiv.querySelector(".chat-details")?.appendChild(pElement);
-						this.AddResponseActions(processed, pElement);
-					} catch (error) { // Add error class to the paragraph element and set error text
-						pElement.classList.add("error");
-						pElement.textContent = "Oops! Something went wrong while retrieving the response. Please try again.";
-					}
-					if (attachs.children.length > 0) {
-						pElement.append(attachs)
-					}
-					localStorage.setItem("all-chats", this.chatContainer.innerHTML);
-					this.chatContainer.scrollTo(0, this.chatContainer.scrollHeight);
-				});
-		}
+					incomingChatDiv.querySelector(".chat-details")?.appendChild(pElement);
+					this.AddResponseActions(processed, pElement);
+				} catch (error) { // Add error class to the paragraph element and set error text
+					pElement.classList.add("error");
+					pElement.textContent = "Oops! Something went wrong while retrieving the response. Please try again.";
+				}
+				if (attachs.children.length > 0) {
+					pElement.append(attachs);
+				}
+				localStorage.setItem("all-chats", this.chatContainer.innerHTML);
+				this.chatContainer.scrollTo(0, this.chatContainer.scrollHeight);
+			});
 	}
+
 	/**
 	 * @param {{ Attach_Files?: any; }} comment
 	 */
