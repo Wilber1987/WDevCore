@@ -84,11 +84,11 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 	SetOptions() {
 		this.OptionContainer.appendChild(html`<button class="Btn-Mini" onclick="${() => {
 			this.Manager.NavigateFunction("report", this.ReportContainer);
-		}}">${this.Config.title ? this.Config.title : "Reporte"}</button>`);
+		 }}">${this.Config.title ? this.Config.title : "Reporte"}</button>`);
 
 		this.OptionContainer.appendChild(html`<button class="Btn-Mini" onclick="${() => {
 			this.GoToDocumentView();
-		}}">Vista de documento</button>`);
+		 }}">Vista de documento</button>`);
 	}
 
 	GoToDocumentView() {

@@ -48,7 +48,7 @@ class WEstadisicAnalitic extends HTMLElement {
             printWindow.focus();
             // @ts-ignore
             printWindow.print();
-        }}" class="BtnPrimary">Imprimir Resultados</button>`
+       }}" class="BtnPrimary">Imprimir Resultados</button>`
 
 
         this.jsonOutput = html`<pre id="jsonOutput"></pre>`
@@ -380,7 +380,7 @@ class WEstadisicAnalitic extends HTMLElement {
         }
 
         .significant-categories h4 {
-            color: #007bff;
+            color: var(--primary-background);;
         }
 
         .significant-categories ul {

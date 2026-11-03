@@ -65,6 +65,7 @@ class WForm extends HTMLElement {
 
 		this.InizializeConfig(this.Config);
 
+		// @ts-ignore
 		this.shadowRoot?.append(WRender.createElement(this.FormStyle()));
 		if (this.Config.CustomStyle) {
 			this.shadowRoot?.append(this.Config.CustomStyle);

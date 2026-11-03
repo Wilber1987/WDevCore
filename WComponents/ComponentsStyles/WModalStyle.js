@@ -12,6 +12,9 @@ export const WModalStyle = css`
        box-shadow: 0 0px 3px 0px #000;
        padding: 0 0 20px 0;
   }
+  .fullscreen {
+    border-radius: 0cm;
+  }
 
   .ContainerFormWModal h1,
   .ContainerFormWModal h3,
@@ -76,21 +79,38 @@ export const WModalStyle = css`
 
   .ObjectModalContainer {
        height: 100%;
-       width: 90%;
+       width: 100%;
        margin: 0px auto;
        margin-bottom: 20px;
        display: block;
        justify-content: center;
        padding: 5px;
        overflow-y: auto;
+       box-sizing: border-box;
   }
   .ObjectModalElementContainer {
      overflow-y: auto;
   }
 
+  .ContainerFormWModal.fullscreen {
+     position: fixed;
+     top: 0px;
+     left: 0px;
+     right: 0px;
+     bottom: 0px;
+     height: 100% !important;
+     margin-top: 0px;
+     width: 100% !important;
+     max-height: calc(100vh - 0px);
+     height: calc(100vh - 0px);
+     border-radius: 0cm;
+  }
   @media (max-width: 1200px) {
        .ContainerFormWModal {
             width: 90% !important;
+       }
+       .fullscreen {
+         width: 100% !important;
        }
   }
 

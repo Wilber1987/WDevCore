@@ -1,722 +1,720 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda Moderna - Catálogo de Productos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* ============================================
-           VARIABLES Y RESET
-           ============================================ */
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #f59e0b;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-radius: 16px;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.15);
-        }
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es"
+      xml:lang="es">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* ============================================
-           HEADER / NAVBAR
-           ============================================ */
-        header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-md);
-        }
-
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .cart-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            padding: 0.75rem 1.25rem;
-            border-radius: 10px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .cart-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* ============================================
-           HERO SECTION
-           ============================================ */
-        .hero {
-            text-align: center;
-            padding: 4rem 1.5rem;
-            background: linear-gradient(180deg, var(--bg-color) 0%, #eef2ff 100%);
-        }
-
-        .hero h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 1.125rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-
-        /* ============================================
-           FILTROS Y BÚSQUEDA
-           ============================================ */
-        .filters-section {
-            padding: 1.5rem 0;
-            background: white;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .search-container {
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 0.625rem 1.25rem;
-            border: 2px solid #e2e8f0;
-            background: white;
-            color: var(--text-secondary);
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn:hover,
-        .filter-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        /* ============================================
-           GRID DE PRODUCTOS
-           ============================================ */
-        .products-section {
-            padding: 3rem 0;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 2.5rem;
-            color: var(--text-primary);
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        /* ============================================
-           TARJETA DE PRODUCTO
-           ============================================ */
-        .product-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .product-image-container {
-            position: relative;
-            padding-top: 125%; /* Aspect ratio 4:3 */
-            overflow: hidden;
-        }
-
-        .product-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .product-card:hover .product-image {
-            transform: scale(1.05);
-        }
-
-        .badge {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            padding: 0.375rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: white;
-        }
-
-        .badge.new {
-            background: var(--accent-color);
-        }
-
-        .badge.sale {
-            background: #ef4444;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .category {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.25rem;
-        }
-
-        .product-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
-        }
-
-        .rating {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .stars {
-            color: var(--accent-color);
-        }
-
-        .rating-text {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .price-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .current-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .original-price {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            text-decoration: line-through;
-        }
-
-        .add-to-cart-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .add-to-cart-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* ============================================
-           FOOTER
-           ============================================ */
-        footer {
-            background: #1e293b;
-            color: white;
-            padding: 3rem 0;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2.5rem;
-        }
-
-        .footer-section h3 {
-            font-size: 1.125rem;
-            margin-bottom: 1rem;
-            color: white;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            color: #94a3b8;
-            text-decoration: none;
-            line-height: 1.8;
-        }
-
-        .footer-section a:hover {
-            color: var(--accent-color);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .social-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .social-icon:hover {
-            background: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        .social-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 2rem;
-            margin-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #64748b;
-        }
-
-        /* ============================================
-           RESPONSIVE DESIGN
-           ============================================ */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
+    <head>
+        <title> Servicio de Autorizaciones de Viajes de Grupo Iris </title>
+        <!--[if !mso]><!-->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!--<![endif]-->
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style type="text/css">
+            #outlook a {
+                padding: 0;
             }
 
-            .hero h1 {
-                font-size: 2rem;
+            body {
+                margin: 0;
+                padding: 0;
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
             }
 
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 1.25rem;
+            table,
+            td {
+                border-collapse: collapse;
+                mso-table-lspace: 0pt;
+                mso-table-rspace: 0pt;
             }
 
-            .filter-buttons {
-                overflow-x: auto;
-                padding-bottom: 0.5rem;
+            img {
+                border: 0;
+                height: auto;
+                line-height: 100%;
+                outline: none;
+                text-decoration: none;
+                -ms-interpolation-mode: bicubic;
             }
 
-            .search-container {
-                margin: 0 auto 1.5rem;
+            p {
+                display: block;
+                margin: 13px 0;
             }
-        }
+        </style>
+        <!--[if mso]>
+        <noscript>
+            <xml>
+                <o:OfficeDocumentSettings>
+                    <o:AllowPNG/>
+                    <o:PixelsPerInch>96</o:PixelsPerInch>
+                </o:OfficeDocumentSettings>
+            </xml>
+        </noscript>
+        <![endif]-->
+        <!--[if lte mso 11]>
+        <style type="text/css">
+            .mj-outlook-group-fix { width:100% !important; }
+        </style>
+        <![endif]-->
+        <style type="text/css">
+            @media only screen and (min-width:480px) {
+                .mj-column-per-50 {
+                    width: 50% !important;
+                    max-width: 50%;
+                }
 
-        /* ============================================
-           ANIMACIONES
-           ============================================ */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+                .mj-column-per-100 {
+                    width: 100% !important;
+                    max-width: 100%;
+                }
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        </style>
+        <style media="screen and (min-width:480px)">
+            .moz-text-html .mj-column-per-50 {
+                width: 50% !important;
+                max-width: 50%;
             }
-        }
 
-        .product-card {
-            animation: fadeInUp 0.5s ease forwards;
-        }
+            .moz-text-html .mj-column-per-100 {
+                width: 100% !important;
+                max-width: 100%;
+            }
+        </style>
+        <style type="text/css">
+            @media only screen and (max-width:480px) {
+                table.mj-full-width-mobile {
+                    width: 100% !important;
+                }
 
-        .product-card:nth-child(1) { animation-delay: 0.1s; }
-        .product-card:nth-child(2) { animation-delay: 0.2s; }
-        .product-card:nth-child(3) { animation-delay: 0.3s; }
-        .product-card:nth-child(4) { animation-delay: 0.4s; }
-        .product-card:nth-child(5) { animation-delay: 0.5s; }
-        .product-card:nth-child(6) { animation-delay: 0.6s; }
+                td.mj-full-width-mobile {
+                    width: auto !important;
+                }
+            }
+        </style>
+    </head>
 
-        /* ============================================
-           NOTIFICACIÓN DE AGREGADO AL CARRITO
-           ============================================ */
-        .toast-notification {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            background: var(--primary-color);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
+<body style="word-spacing:normal;background-color:#f2f2f2;">
+<div style="background-color:#f2f2f2;">
+    
+    <!-- Section Encabezado logotipos -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><![endif]-->
+                    <!-- Columna logo Izqda -->
+                    <!--[if mso | IE]><td class="" style="vertical-align:middle;width:300px;" ><![endif]-->
+                    <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:middle;" width="100%">
+                            <tbody>
+                            <!-- Logo Izqda -->
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                                        <tbody>
+                                        <tr>
+                                            <td style="width:150px;">
+                                                <img alt="Company Logo" height="auto" src="https://public.grupoiris.net/apps/pst/iris_logo.svg" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="150" />
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td><![endif]-->
+                    <!-- Columna logo Dcha -->
+                    <!--[if mso | IE]><td class="" style="vertical-align:middle;width:300px;" ><![endif]-->
+                    <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:middle;" width="100%">
+                            <tbody>
+                            <!-- Logo Dcha -->
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                                        <tbody>
+                                        <tr>
+                                            <td style="width:150px;">
+                                                <img alt="Company Logo" height="auto" src="https://public.grupoiris.net/apps/pst/client/gi/empresas/cliente_referencias_221x53.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="150" />
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+    <!-- Section Encabezado logotipo unico -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
 
-        .toast-notification.show {
-            transform: translateX(0);
-        }
+    
+    
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+    <!-- Encabezado textos -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="#f2f2f2" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:#f2f2f2;background-color:#f2f2f2;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f2f2f2;background-color:#f2f2f2;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:24px;font-weight:bold;line-height:24px;text-align:center;color:#000000;">Autorización pendiente de gestionar</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:18px;line-height:24px;text-align:center;color:grey;">La siguiente reserva se encuentra pendiente de aprobación por su parte. Por favor, revise la información y proceda a aceptar o rechazar.</div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
 
-        .toast-icon {
-            width: 24px;
-            height: 24px;
-            margin-right: 0.5rem;
-        }
-    </style>
-</head>
-<body>
-    <!-- Header / Navbar -->
-    <header>
-        <div class="container">
-            <nav>
-                <a href="#" class="logo">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/>
-                        </svg>
-                    </div>
-                    TiendaPro
-                </a>
-                <div class="nav-links">
-                    <a href="#" class="nav-link">Inicio</a>
-                    <a href="#productos" class="nav-link">Productos</a>
-                    <a href="#" class="nav-link">Ofertas</a>
-                    <button class="cart-btn">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V6a1 1 0 00-1-1h-4a1 1 0 00-1 1v5"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M21 12v9.99M3 12a9 9 0 0117.98-4l1.5-1.5A9 9 0 013 12z"/>
-                        </svg>
-                        <span id="cart-count">0</span>
-                    </button>
-                </div>
-            </nav>
-        </div>
-    </header>
+    <div>
+        
+    
+    <!-- Tarjeta de reserva -->
+    <!-- Origen y destino -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;border-radius:15px 15px 0px 0px;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;border-radius:15px 15px 0px 0px;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-left:20px;padding-right:20px;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                                        <tbody>
+                                        <tr>
+                                            <td style="width:24px;">
+                                                <img alt="AIR" height="auto" src="https://public.grupoiris.net/apps/pst/icon/plane-solid.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="24" />
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <div>
+                                <div>
+                                    <tr>
+                                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                            <div style="font-family:Arial, sans-serif;font-size:24px;font-weight:bold;line-height:24px;text-align:center;color:#000000;">Barcelona [EL PRAT], España</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                            <div style="font-family:Arial, sans-serif;font-size:24px;font-weight:bold;line-height:24px;text-align:center;color:#000000;">Madrid [Barajas], España</div>
+                                        </td>
+                                    </tr>
+                                </div>
+                            </div>
+                            <div>
+                                <div>
+                                    <tr>
+                                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                            <div style="font-family:Arial, sans-serif;font-size:24px;font-weight:bold;line-height:24px;text-align:center;color:#000000;">Madrid [Barajas], España</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                            <div style="font-family:Arial, sans-serif;font-size:24px;font-weight:bold;line-height:24px;text-align:center;color:#000000;">Barcelona [EL PRAT], España</div>
+                                        </td>
+                                    </tr>
+                                </div>
+                            </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Descubre lo mejor de nuestra tienda</h1>
-            <p>Encuentra los productos más exclusivos con las mejores precios. Calidad garantizada y envío rápido a todo el país.</p>
-        </div>
-    </section>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
 
-    <!-- Filtros y Búsqueda -->
-    <section class="filters-section">
-        <div class="container">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="🔍 Buscar productos...">
-            </div>
-            <div class="filter-buttons">
-                <button class="filter-btn active">Todos</button>
-                <button class="filter-btn">Electrónica</button>
-                <button class="filter-btn">Ropa</button>
-                <button class="filter-btn">Hogar</button>
-                <button class="filter-btn">Deportes</button>
-                <button class="filter-btn">Ofertas</button>
-            </div>
-        </div>
-    </section>
+    
+    <!-- Localizador -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-left:20px;padding-right:20px;padding-top:0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:16px;line-height:24px;text-align:left;color:#000000;"><strong>Localizador</strong>
+                                        <br />
+                                        <span >7R2HKQ</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
 
-    <!-- Lista de Productos -->
-    <section class="products-section" id="productos">
-        <div class="container">
-            <h2 class="section-title">📦 Nuestros Productos Destacados</h2>
-            
-            <div class="products-grid">
-                <!-- Producto 1 -->
-                <article class="product-card">
-                    <div class="product-image-container">
-                        <span class="badge new">Nuevo</span>
-                        <img src="https://images.unsplash.com/photo-1546813828-6209b70c9d9e?w=500&h=500&fit=crop" alt="Auriculares Premium" class="product-image">
+    
+    <!-- Pasajeros -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-left:20px;padding-right:20px;padding-top:0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <p style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:100%;">
+                                    </p>
+                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:510px;" role="presentation" width="510px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+            </td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:16px;line-height:24px;text-align:left;color:#000000;">
+                                        <strong>Pasajeros</strong>
+                                        <div>
+                                            <span>Nombre completo</span>: <span>EMPLEADO</span> <span>COMUNITARIO</span> 
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="product-info">
-                        <span class="category">Electrónica</span>
-                        <h3 class="product-title">Auriculares Bluetooth Pro Max</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★★</span>
-                            <span class="rating-text">(4.8)</span>
-                        </div>
-                        <div class="price-container">
-                            <span class="current-price">$199.99</span>
-                            <span class="original-price">$249.99</span>
-                        </div>
-                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
-                    </div>
-                </article>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
 
-                <!-- Producto 2 -->
-                <article class="product-card">
-                    <div class="product-image-container">
-                        <span class="badge sale">-30%</span>
-                        <img src="https://images.unsplash.com/photo-1591793843956-b882c0d9a2e8?w=500&h=500&fit=crop" alt="Smartwatch Deportivo" class="product-image">
-                    </div>
-                    <div class="product-info">
-                        <span class="category">Electrónica</span>
-                        <h3 class="product-title">Smartwatch Fitness Tracker</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★☆</span>
-                            <span class="rating-text">(4.5)</span>
-                        </div>
-                        <div class="price-container">
-                            <span class="current-price">$89.99</span>
-                            <span class="original-price">$129.99</span>
-                        </div>
-                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
-                    </div>
-                </article>
+    
+    <!-- Trayectos -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-left:20px;padding-right:20px;padding-top:0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <p style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:100%;">
+                                    </p>
+                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:510px;" role="presentation" width="510px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+            </td></tr></table><![endif]-->
+                                </td>bun
+                            </tr>
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:16px;line-height:24px;text-align:left;color:#000000;"><strong>Trayectos</strong></div>
+                                </td>
+                            </tr>
 
-                <!-- Producto 3 -->
-                <article class="product-card">
-                    <div class="product-image-container">
-                        <img src="https://images.unsplash.com/photo-1529374267416-a8329ad37703?w=500&h=500&fit=crop" alt="Camiseta Básica" class="product-image">
-                    </div>
-                    <div class="product-info">
-                        <span class="category">Ropa</span>
-                        <h3 class="product-title">Camiseta Algodón Premium</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★★</span>
-                            <span class="rating-text">(5.0)</span>
-                        </div>
-                        <div class="price-container">
-                            <span class="current-price">$24.99</span>
-                        </div>
-                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
-                    </div>
-                </article>
+                            <div>
 
-                <!-- Producto 4 -->
-                <article class="product-card">
-                    <div class="product-image-container">
-                        <span class="badge new">Nuevo</span>
-                        <img src="https://images.unsplash.com/photo-1586023492195-27b2c44f75bb?w=500&h=500&fit=crop" alt="Cámara DSLR" class="product-image">
-                    </div>
-                    <div class="product-info">
-                        <span class="category">Electrónica</span>
-                        <h3 class="product-title">Cámara Profesional 4K</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★☆</span>
-                            <span class="rating-text">(4.2)</span>
-                        </div>
-                        <div class="price-container">
-                            <span class="current-price">$599.99</span>
-                            <span class="original-price">$799.99</span>
-                        </div>
-                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
-                    </div>
-                </article>
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Arial, sans-serif;font-size:14px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                                        <tr>
+                                            <div>
+                                                <th colspan="4" style="text-align:left; padding: 10px; font-size: 16px;">Ida</th>
+                                                
+                                            </div>
+                                        </tr>
+                                        <div>
+                                            <tr style="background-color: #f2f2f2;text-align:center;">
+                                                <td rowspan="2" style="padding: 10px; font-weight: bold; border-top: 1px solid #f2f2f2;">
+                                                    <span style="font-size: 14px; margin: 0;">UX</span><span style="font-size: 14px; margin: 0;">7706</span>
+                                                </td>
+                                                <td rowspan="2" style="padding: 10px;">
+                                                    <p style="font-size: 14px; margin: 0;">Air Europa</p>
+                                                </td>
+                                                <td style="padding: 10px; ">
+                                                    <span style="font-size: 14px; margin: 0;">Barcelona </span> (<span>BCN</span>)
+                                                </td>
+                                                <td style="padding: 10px; ">
+                                                    <p style="font-size: 14px; margin: 0;">21-10-2026 11:50</p>
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #f2f2f2;text-align:center;">
+                                                <td style="padding: 10px;">
+                                                    <span style="font-size: 14px; margin: 0;">Madrid </span>(<span>MAD</span>)
+                                                </td>
+                                                <td style="padding: 10px;">
+                                                    <p style="font-size: 14px; margin: 0;">21-10-2026 13:20</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4" style="text-align:left; padding: 10px;">
+                                                    <span>Número de maletas añadidas</span> : <span style="font-size: 14px; margin: 0;">0</span>
+                                                </td>
+                                            </tr>
+                                        </div>
+                                    </table>
+                                </td>
+                            </tr>
+                            </div>
 
-                <!-- Producto 5 -->
-                <article class="product-card">
-                    <div class="product-image-container">
-                        <img src="https://images.unsplash.com/photo-1542291026-7eec0d8b403c?w=500&h=500&fit=crop" alt="Zapatillas Running" class="product-image">
-                    </div>
-                    <div class="product-info">
-                        <span class="category">Deportes</span>
-                        <h3 class="product-title">Zapatillas Running Pro</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★★</span>
-                            <span class="rating-text">(4.9)</span>
-                        </div>
-                        <div class="price-container">
-                            <span class="current-price">$129.99</span>
-                        </div>
-                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
-                    </div>
-                </article>
+                            <div>
 
-                <!-- Producto 6 -->
-                <article class="product-card">
-                    <div class="product-image-container">
-                        <span class="badge sale">-25%</span>
-                        <img src="https://images.unsplash.com/photo-1594818379416-e8c5b2f0903e?w=500&h=500&fit=crop" alt="Lámpara de Escritorio" class="product-image">
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Arial, sans-serif;font-size:14px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                                        <tr>
+                                            <div>
+                                                
+                                                <th colspan="4" style="text-align:left; padding: 10px; font-size: 16px;">Vuelta</th>
+                                            </div>
+                                        </tr>
+                                        <div>
+                                            <tr style="background-color: #f2f2f2;text-align:center;">
+                                                <td rowspan="2" style="padding: 10px; font-weight: bold; border-top: 1px solid #f2f2f2;">
+                                                    <span style="font-size: 14px; margin: 0;">UX</span><span style="font-size: 14px; margin: 0;">7703</span>
+                                                </td>
+                                                <td rowspan="2" style="padding: 10px;">
+                                                    <p style="font-size: 14px; margin: 0;">Air Europa</p>
+                                                </td>
+                                                <td style="padding: 10px; ">
+                                                    <span style="font-size: 14px; margin: 0;">Madrid </span> (<span>MAD</span>)
+                                                </td>
+                                                <td style="padding: 10px; ">
+                                                    <p style="font-size: 14px; margin: 0;">23-10-2026 15:10</p>
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #f2f2f2;text-align:center;">
+                                                <td style="padding: 10px;">
+                                                    <span style="font-size: 14px; margin: 0;">Barcelona </span>(<span>BCN</span>)
+                                                </td>
+                                                <td style="padding: 10px;">
+                                                    <p style="font-size: 14px; margin: 0;">23-10-2026 16:35</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4" style="text-align:left; padding: 10px;">
+                                                    <span>Número de maletas añadidas</span> : <span style="font-size: 14px; margin: 0;">0</span>
+                                                </td>
+                                            </tr>
+                                        </div>
+                                    </table>
+                                </td>
+                            </tr>
+                            </div>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="product-info">
-                        <span class="category">Hogar</span>
-                        <h3 class="product-title">Lámpara LED Ajustable</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★☆</span>
-                            <span class="rating-text">(4.3)</span>
-                        </div>
-                        <div class="price-container">
-                            <span class="current-price">$45.99</span>
-                            <span class="original-price">$61.32</span>
-                        </div>
-                        <button class="add-to-cart-btn" onclick="addToCart()">Agregar al carrito</button>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </section>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>TiendaPro</h3>
-                    <p>📍 Av. Principal 123, Ciudad<br>📧 contacto@tiendapro.com<br>📞 +123 456 7890</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Enlaces Rápidos</h3>
-                    <a href="#">Sobre Nosotros</a><br>
-                    <a href="#">Términos y Condiciones</a><br>
-                    <a href="#">Política de Privacidad</a><br>
-                    <a href="#">Contacto</a>
-                </div>
-                <div class="footer-section">
-                    <h3>Síguenos</h3>
-                    <div class="social-links">
-                        <a href="#" class="social-icon" aria-label="Facebook">
-                            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Instagram">
-                            <svg viewBox="0 0 24 24"><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/></svg>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Twitter">
-                            <svg viewBox="0 0 24 24"><path d="M23 3a10.93 10.93 0 0 1-3.14 1.5A7.94 7.94 0 0 1 18 3a7.92 7.92 0 0 1-5.64 2.37l1.5 1.5c-.9-.5-2-1-3-1A5.92 5.92 0 0 0 5 4a5.9 5.9 0 0 0 1.75 4.08l-.16.16a8.85 8.85 0 0 1-3.8-1.73A8.95 8.95 0 0 1 2 12c0 2.31.84 4.44 2.22 6.14l-.5.5a11.16 11.16 0 0 1-2.79-1.67A9.83 9.83 0 0 0 4 14c0-2.21.9-4.18 2.3-5.64l-.16-.16a8.85 8.85 0 0 1-1.78-2.6A8.85 8.85 0 0 1 4 4c2.31 0 4.44.84 6.14 2.22l1.5-1.5a9.83 9.83 0 0 1 4.08 1.75A8.85 8.85 0 0 1 20 8c0 2.31-.84 4.44-2.22 6.14l.5.5a11.16 11.16 0 0 1-1.67-2.79A9.83 9.83 0 0 0 14 14c0-2.21-.9-4.18-2.3-5.64l.16-.16a8.85 8.85 0 0 1 1.78-2.6A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l.5-.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a11.16 11.16 0 0 1-2.79-1.67A9.83 9.83 0 0 0 14 4c0-2.21-.9-4.18-2.3-5.64l.16-.16a8.85 8.85 0 0 1 1.78-2.6A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.22l-.5.5a9.83 9.83 0 0 1-1.67-2.79A8.85 8.85 0 0 1 14 4c2.31 0 4.44.84 6.14 2.2"
-                            ></path>
-                            </svg>
-                        </a>
+    
+    <!-- Fecha límite de emisión -->
+    <!--[if mso | IE]>
+    <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-left:20px;padding-right:20px;padding-top:0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <p style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:100%;">
+                                    </p>
+                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:510px;" role="presentation" width="510px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+            </td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:16px;line-height:24px;text-align:left;color:#000000;"><strong>Fecha límite de emisión</strong>
+                                        <br />
+                                        <div>
+                                            <span>07-09-2026 23:59</span>
+                                            
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </div></div></footer></body></html>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+
+    
+    <!-- Precio -->
+    <!--[if mso | IE]>
+    <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-left:20px;padding-right:20px;padding-top:0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <p style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:100%;">
+                                    </p>
+                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:510px;" role="presentation" width="510px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+            </td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:16px;line-height:24px;text-align:left;color:#000000;" ><strong>Importes</strong>
+                                        <br />
+                                        
+                                        
+                                        <div>
+                                            
+                                            <span>Precio total</span>: <strong>247,22 €</strong>
+                                        </div>
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <p style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:100%;">
+                                    </p>
+                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:510px;" role="presentation" width="510px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+            </td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+
+    
+    <!-- Referencias -->
+     <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-left:20px;padding-right:20px;padding-top:0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;padding-bottom:0;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:16px;line-height:24px;text-align:left;color:#000000;">
+                                        <strong>Referencias</strong>
+
+                                        <!-- Validación para REFERENCE -->
+                                        <div>
+                                            <ul>
+                                                <li>AÑO: 2026</li>
+                                            </ul>
+                                            <ul>
+                                                <li>centroCoste: 222</li>
+                                            </ul>
+                                            <ul>
+                                                <li>PROPINA: 5</li>
+                                            </ul>
+                                        </div>
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <p style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:100%;">
+                                    </p>
+                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:510px;" role="presentation" width="510px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+            </td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+
+    
+    <!-- Motivo -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-left:20px;padding-right:20px;padding-top:0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;padding-bottom:0;word-break:break-word;">
+                                    <div style="font-family:Arial, sans-serif;font-size:16px;line-height:24px;text-align:left;color:#000000;">
+                                        <strong>Motivo del incumplimiento</strong>
+                                        
+                                        <div>
+                                            <ul>
+                                                <li>No cumple política de precio máximo permitido</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <p style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:100%;">
+                                    </p>
+                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 2px #f2f2f2;font-size:1px;margin:0px auto;width:510px;" role="presentation" width="510px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+            </td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+
+        
+        
+        
+    </div>
+    
+    
+    <!-- Botón CTA -->
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="white" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:white;background-color:white;margin:0px auto;border-radius:0px 0px 15px 15px;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:white;background-color:white;width:100%;border-radius:0px 0px 15px 15px;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-left:20px;padding-right:20px;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="center" vertical-align="middle" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;width:100%;line-height:100%;">
+                                        <tr>
+                                            <td align="center" bgcolor="#4381f4" role="presentation" style="border:none;border-radius:7px;cursor:auto;mso-padding-alt:10px 25px;background:#4381f4;" valign="middle">
+                                                <a href="http://localhost:8077/login/loginPST.xhtml?tokenAuthorizationId=bb9f0bbb-f8b8-49f7-ab50-9546506e3590" style="display:inline-block;background:#4381f4;color:white;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:7px;" target="_blank">Gestionar reserva</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+
+    
+    <div style="margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><![endif]-->
+                    <!-- Margen inferior (mjml no permite añadir márgenes de otra forma) -->
+                    <!--[if mso | IE]></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+
+</div>
+</body>
+</html>

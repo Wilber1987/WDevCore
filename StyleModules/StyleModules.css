@@ -114,7 +114,7 @@
 }
 .BtnPrimary {
     color: var(--primary-color);
-    background-color:#007bff;
+    background-color:var(--primary-background);;
     border-right: rgb(3, 106, 175) 5px solid;
 }
 .BtnAlert {

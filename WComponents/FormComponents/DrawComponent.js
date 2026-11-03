@@ -219,7 +219,7 @@ export class DrawComponent extends HTMLElement {
 		}
 
 		.controls button {
-			background-color: #007BFF;
+			background-color: var(--primary-background);;
 			color: white;
 			border: none;
 			transition: background-color 0.3s ease;

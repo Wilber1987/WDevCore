@@ -227,7 +227,7 @@ class WRichTextToolbar extends HTMLElement {
                         // @ts-ignore
                         input.focus();
                     }
-                }}"> 
+               }}"> 
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M1 1H15V15H1V1ZM6 9L8 11L13 6V13H3V12L6 9ZM6.5 7C7.32843 7 8 6.32843 8 5.5C8 4.67157 7.32843 4 6.5 4C5.67157 4 5 4.67157 5 5.5C5 6.32843 5.67157 7 6.5 7Z" fill="#000000"></path> </g></svg>          
             </button>
             <input type= "url" style="display:none" placeholder= "Image URL" class="ROption tool-input image-url-input"  onkeypress="${(/** @type {{ key: string; preventDefault: () => void; target: { value: string; style: { display: string; }; }; }} */ e) => {
@@ -239,7 +239,7 @@ class WRichTextToolbar extends HTMLElement {
                         // @ts-ignore
                         e.target.style.display = "none";
                     }
-                }}">
+               }}">
         </div>`
             OptionsSection.append(ImageContainer);
         }
@@ -258,7 +258,7 @@ class WRichTextToolbar extends HTMLElement {
                         // @ts-ignore
                         input.focus();
                     }
-                }}">P</button>
+               }}">P</button>
             <input type= "text" placeholder= "Nombre del parámetro" class="ROption tool-input param-input" onkeypress="${(/** @type {{ key: string; preventDefault: () => void; target: { value: string; style: { display: string; }; }; }} */ e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
@@ -280,7 +280,7 @@ class WRichTextToolbar extends HTMLElement {
                             this.savedSelection?.focus();
                         }
                     }
-                }}">
+               }}">
         </div>`
             OptionsSection.append(ParamContainer);
         }

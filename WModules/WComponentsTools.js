@@ -68,12 +68,12 @@ function html2(strings, ...values) {
         return accumulator;
     }, '');
 
-    const isSVG = result.trim().startsWith("<svg") 
-        || result.includes("<g") 
-        || result.includes("<text") 
+    const isSVG = result.trim().startsWith("<svg")
+        || result.includes("<g")
+        || result.includes("<text")
         || result.includes("<line")
-        || result.includes("<path") 
-        || result.includes("<circle") 
+        || result.includes("<path")
+        || result.includes("<circle")
         || result.includes("<polyline");
 
     let wrapper;
@@ -197,8 +197,13 @@ function html(strings, ...values) {
             // Asociamos la función al evento correspondiente
             //const placeholder = wrapper.innerHTML.indexOf(`data-function-placeholder-${index}`);
             const element = wrapper.querySelector(`[data-function-placeholder-${index}]`);
-            const event = element.getAttribute(`data-function-placeholder-${index}`);
-            element[event] = value
+            if (element) {
+                const event = element.getAttribute(
+                    `data-function-placeholder-${index}`
+                );
+                element[event] = value;
+                element.removeAttribute(`data-function-placeholder-${index}`);
+            }
         }
     });
 

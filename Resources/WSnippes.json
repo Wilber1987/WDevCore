@@ -23,18 +23,18 @@
 	},"WImgBtn": {
 		"prefix": ["wimgbtn", "WimgBtn"],
 		"body": ["{ tagName:'img',  src: 'imgUrl', class: 'className',onclick: async ()=>{",
-			"\t//code.....","}}"],
+			"\t//code....."," }}"],
 		"description": "Objeto para WREnder."
 	},
 	"WBTN": {
 		"prefix": ["wbtn", "wbtn"],
 		"body": ["{ tagName:'input',  type:'button', className: 'className', value: 'Ok', onclick: async ()=>{",
-			"\t//code.....","}}"],
+			"\t//code....."," }}"],
 		"description": "Objeto para WREnder."
 	},"WSelect": {
 		"prefix": ["wsel", "wselect"],
 		"body": ["{ tagName:'select', class: 'className', children:[",
-			"\t{tagName:'option', innerText:'Select Option', value: 'Select Option'}}",
+			"\t{tagName:'option', innerText:'Select Option', value: 'Select Option' }}",
 			"]}"],
 		"description": "Objeto para WREnder."
 	},"WStyle": {

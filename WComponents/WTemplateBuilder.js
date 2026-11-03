@@ -23,7 +23,7 @@ import { Section, Section_ModelComponent, TemplateData } from "./Models/Template
 //#endregion
 class WTemplateBuilder extends HTMLElement {
     /**
-     * @param {{ Data: TemplateData; PageType: string?; SectionActions: Array<{ name: string, action: Function, title: string? }>|undefined  }} Config
+     * @param {{ Data: TemplateData; PageType: string?; SectionActions: Array<{ name: string, action: Function, title: string? }>|undefined }} Config
      */
     constructor(Config) {
         super();
@@ -96,7 +96,7 @@ class WTemplateBuilder extends HTMLElement {
                     await this.GetTemplateData().Update();
                     WAlertMessage.Success("Cambios guardados", true);
                 }, "¿Desea guardar los cambios?"))
-            }}">Guardar</button>`
+           }}">Guardar</button>`
 
     }
     // Propiedades para gestionar el arrastre
@@ -202,7 +202,7 @@ class WTemplateBuilder extends HTMLElement {
                         sectionAction.action(editingObject, wrapper)
                         console.log(wrapper);
 
-                    }}">
+                   }}">
                     ${sectionAction.name}
                 </button>`);
             });

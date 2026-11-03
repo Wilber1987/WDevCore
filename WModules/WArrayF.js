@@ -620,7 +620,7 @@ class WArrayF {
       * @param {string | undefined} title
       * @param {any[] | undefined} GroupParams
       * @param {string[] | undefined} EvalParams
-      * @param {Object.<string, ModelProperty>} [ModelObject]
+      * @param {Object} [ModelObject]
       */
     static GroupData(data, GroupParams, EvalParams, ModelObject, title, isFinalGroupedData = false) {
         const metricLevels = {}
@@ -637,6 +637,8 @@ class WArrayF {
         let metricKey;
         data.forEach(item => {
             //const item = Object.assign({}, itemData)//TODO REVISAR LA MUTABILIDAD
+
+
 
             /**@type {Object.<string, any>} */
             let currentLevel = groupedData;
@@ -659,7 +661,12 @@ class WArrayF {
                 } else {
                     itemIncluded.count++;
                     EvalParams.forEach(param => {
-                        itemIncluded[param] += item[param]
+                        const isWithModel = ModelObject != null && ModelObject != undefined;
+                        const isMoney = isWithModel && ModelObject[param]?.type?.toUpperCase() === "MONEY";
+                        const isNumber = isWithModel && ModelObject[param]?.type?.toUpperCase() === "NUMBER";
+                        if (isMoney || isNumber) {
+                            itemIncluded[param] += item[param]
+                        }
                     })
                 }
             } else {
@@ -737,6 +744,8 @@ class WArrayF {
                 avg // % de elementos válidos sobre el total
             };
         });
+        console.log(summary);
+
         return summary;
     }
 }

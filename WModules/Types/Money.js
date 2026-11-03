@@ -1,4 +1,5 @@
 export class Money extends Number {
+
     constructor(amount, currency = 'USD') {
         super(amount);
 
@@ -177,5 +178,45 @@ export class Money extends Number {
     }
     isZero() {
         return this._minor === 0;
+    }
+
+    /**
+     * Redondea al múltiplo de `step` (por defecto 0.50).
+     * Por defecto redondea hacia arriba: 23.21 -> 23.50, 23.51 -> 24.00
+     */
+    Round({ step = 0.5, rounding = 'UP' } = {}) {
+        const decimals = Money.#getCurrencyDecimals(this.currency);
+        const factor = 10 ** decimals;
+
+        // el paso expresado en unidades menores (0.50 USD = 50 centavos)
+        const stepMinor = Math.round(step * factor);
+        if (stepMinor <= 0) throw new Error('Invalid rounding step');
+
+        const rounded = Money.#round(this._minor / stepMinor, rounding) * stepMinor;
+
+        return Money.#fromMinor(rounded, this.currency);
+    }
+    /**
+     * Entero mínimo: el entero inmediatamente menor o igual.
+     * 23.21 -> 23
+     */
+    RoundToMin() {
+        const decimals = Money.#getCurrencyDecimals(this.currency);
+        const factor = 10 ** decimals;
+
+        const minor = Math.floor(this._minor / factor) * factor;
+        return Money.#fromMinor(minor, this.currency);
+    }
+
+    /**
+     * Entero máximo: el entero inmediatamente mayor o igual.
+     * 23.21 -> 24
+     */
+    RoundToMax() {
+        const decimals = Money.#getCurrencyDecimals(this.currency);
+        const factor = 10 ** decimals;
+
+        const minor = Math.ceil(this._minor / factor) * factor;
+        return Money.#fromMinor(minor, this.currency);
     }
 }
