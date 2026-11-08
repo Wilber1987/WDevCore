@@ -1,10 +1,10 @@
 class DateTime extends Date {
 
     /**
-    * @param {String|Date} [dateTime] 
+    * @param {String|Date|DateTime?|null} [dateTime] 
     */
     constructor(dateTime) {
-        if (dateTime == undefined) {
+        if (dateTime == undefined || dateTime == null) {
             super(new Date().getTime());
             this.Date = new Date();
         } else if (dateTime instanceof Date) {
@@ -156,8 +156,8 @@ class DateTime extends Date {
      * @returns {DateTime} The modified DateTime object
      */
     subtractDays(days) {
-        this.Date.subtractDays(days);
-        return this;
+        this.Date = this.Date.subtractDays(days);
+        return this.Date ;
     }
 
     /**

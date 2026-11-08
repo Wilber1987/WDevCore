@@ -53,6 +53,7 @@ class LoadinModal extends HTMLElement {
         <div class="spin"></div>
     </div>
     </div>`;
+    
     modalStyle = css`
         w-loading-modal{
             position: fixed;
