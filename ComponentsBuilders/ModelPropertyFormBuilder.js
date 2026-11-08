@@ -440,7 +440,8 @@ export class ModelPropertyFormBuilder {
 			} else if (ModelProperty.type?.toUpperCase() == "MULTISELECT") {
 				EditingObject[prop] = tableForm.selectedItems;
 			}
-			if (onChangeListener) {				
+			if (onChangeListener) {	
+				tableForm.EvalOperations();			
 				onChangeListener(undefined)
 			}
 		}

@@ -277,6 +277,55 @@ class WPrintExportToolBar extends HTMLElement {
 		link.remove();
 	}
 	/**
+	 * @param {HTMLElement} content
+	 * @param {HTMLElement} header      
+	 * @param {string} [filename] example: 
+	 * @param {Function} [action] example: 
+		const data = [
+			[{value: "Nombre", style: "color:red"}, {value: "Edad"},{value: "Nac."}],
+			[{value: "Juan"}, {value: 12}, {value: "Nic"}],
+			[{value: "Ana"}, {value: 10}, {value: "Es"}]
+		];
+		WPrintExportToolBarInstance.exportToCsv("filename", data);
+	 * @param {Object} [model] example: 
+	 */
+	async exportToXlsContent(content, header, filename = "Reporte", action, model) {		
+		
+		// Generar datos para el archivo Excel
+
+		const data = `<html xmlns:o="urn:schemas-microsoft-com:office:office" 
+			xmlns:x="urn:schemas-microsoft-com:office:excel"  
+			xmlns="http://www.w3.org/TR/REC-html40">
+			<head> <meta charset="utf-8">
+				<style>
+					table, td {
+						border-collapse: collapse;
+						border: 1px solid #D2D2D2;
+					}
+				</style>
+			</head>
+			<body>
+				${header?.outerHTML ?? "<td style='font-weight:bold; font-size: 20px'>"+ filename +"</td>"}
+				${content.outerHTML}
+			</body>
+		</html>`;
+
+		const blob = new Blob([data], {
+			type: 'application/vnd.ms-excel'
+		});
+
+		// Crear enlace para descarga
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = filename ? `${filename}.xls` : 'tabla-exportada.xls';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		console.log(content);
+
+	}
+	/**
 	 * @param {Array<Array<{value:string|number, style:string}>|Object>} rows
 	 * @param {HTMLElement} header      
 	 * @param {string} [filename] example: 
@@ -289,7 +338,7 @@ class WPrintExportToolBar extends HTMLElement {
 		WPrintExportToolBarInstance.exportToCsv("filename", data);
 	 * @param {Object} [model] example: 
 	 */
-	async exportToXls(rows, header, filename, action, model) {
+	async exportToXls(rows, header, filename, action, model) {		
 		const table = await this.BuildTableFromRows(header, rows, model);
 		if (action) {
 			action(table)

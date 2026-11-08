@@ -329,7 +329,7 @@ class WArrayF {
      * @returns {Money}
      */
     static sumMoney(DataArry, EvalValue, currency = 'USD') {
-        return DataArry.reduce((acc, item) => {
+        return DataArry.reduce((/**@type {Money} */ acc, item) => {
             return acc.add(new Money(item[EvalValue] ?? 0, currency));
         }, new Money(0, currency));
     }

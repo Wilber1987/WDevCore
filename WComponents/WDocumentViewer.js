@@ -346,8 +346,9 @@ class WDocumentViewer extends HTMLElement {
 					tool.ExportPdf(body, this.Config.PageType, this.Config.exportPdfApi ?? false);
 				} : undefined,
 				ExportXlsAction: this.Config.exportXls ? async (/**@type {WPrintExportToolBar} */ tool) => {
-					// @ts-ignore
-					this.Config.exportXlsAction(tool)
+					if (this.Config.exportXlsAction) {
+						this.Config.exportXlsAction(tool)
+					} 					
 				} : undefined
 			}));
 		}

@@ -192,7 +192,7 @@ class WTableComponent extends HTMLElement {
         const loadinModal = new LoadinModal();
         this.shadowRoot?.append(loadinModal);
         const isWithtUrl = (this.Config?.Options?.UrlSearch != null || this.Config?.Options?.UrlSearch != undefined);
-        const isWithtModel = this.Config.ModelObject?.Get != undefined ||  this.Config.EntityModel?.Get != undefined
+        const isWithtModel = this.Config.ModelObject?.Get != undefined || this.Config.EntityModel?.Get != undefined
         this.AddItemsFromApi = this.Config.AddItemsFromApi ?? (isWithtUrl || isWithtModel);
         let chargeWithFilter = false;
         if ((Dataset == undefined || Dataset == null) && this.AddItemsFromApi && !this.withFilter) {
@@ -339,11 +339,7 @@ class WTableComponent extends HTMLElement {
     }
     DrawTRow = async (/** @type {HTMLElement} */ tr, /** @type {any} */ element, /** @type {number} */ index) => {
         tr.innerHTML = "";
-        for (const prop in this.ModelObject) {
-            if (this.IsDrawableRow(element, prop)) {
-                await this.EvalModelPrototype(this.ModelObject, prop, tr, element, index);
-            }
-        }
+        await this.EvalModel(element, tr, index);
         if (this.TrueOptions()) {
             const Options = WRender.Create({ tagName: "td", class: "tdAction" });
             this.SelectBTN(element, Options, index, tr);
@@ -387,6 +383,19 @@ class WTableComponent extends HTMLElement {
                 }
             }
         });
+    }
+
+    /**
+     * @param {{ [x: string]: any; }} element
+     * @param {HTMLElement | undefined} tr
+     * @param {number | undefined} index
+     */
+    async EvalModel(element, tr, index) {
+        for (const prop in this.ModelObject) {
+            if (this.IsDrawableRow(element, prop)) {
+                await this.EvalModelPrototype(this.ModelObject, prop, tr, element, index);
+            }
+        }
     }
 
     /**
@@ -607,7 +616,8 @@ class WTableComponent extends HTMLElement {
                     break;
                 case "MONEY":
                     if (modelProperty.IsEditableInGrid) {
-                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop, (ev) => { this.OnChangeAction(ev, element, prop, Model) }));
+                        td.append(await ModelPropertyFormBuilder.CreateInput(modelProperty, element, prop,
+                            (ev) => { this.OnChangeAction(ev, element, prop, Model) }));
                         td.classList.add("inputContainer")
                     } else {
                         td.append(WRender.Create({
@@ -837,14 +847,14 @@ class WTableComponent extends HTMLElement {
                     this.Dataset.splice(this.Dataset.indexOf(NewObject), 1);
                 }
             }
-            this.DrawTable();
+
         } else {
-            //this.DrawTRow(tr, element);
+            //this.DrawTRow(tr, element);            
             if (this.Options?.EditAction != undefined) {
                 this.Options.EditAction(element, this);
             }
-            this.DrawTable();
-        }
+        }        
+        this.DrawTable();
     }
     SearchFunction = async (/** @type {{ target: { value: string | number; }; }} */ ev) => {
         if (this.SearchItemsFromApi != undefined) {
@@ -869,7 +879,7 @@ class WTableComponent extends HTMLElement {
                     && ev.target.value.replaceAll(" ", "") != "") {
                     // @ts-ignore
                     filterData.push({ PropName: prop, FilterType: "like", Values: [ev.target.value] })
-                // @ts-ignore
+                    // @ts-ignore
                 } else if ((this.ModelObject[prop]?.type?.toUpperCase() == "NUMBER" && !isNaN(ev.target.value))
                     // @ts-ignore
                     && ev.target.value.replaceAll(" ", "") != "") {
@@ -900,6 +910,23 @@ class WTableComponent extends HTMLElement {
             this.DrawTable(Dataset);
         }
     }
+    EvalOperations() {
+        for (const element of this.Dataset) {
+            for (const prop in this.ModelObject) {
+                const modelProperty = this.ModelObject[prop];
+                switch (this.ModelObject[prop]?.type?.toUpperCase()) {
+                    case "OPERATION":
+                        if (modelProperty?.action) {
+                            modelProperty?.action(element);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
     TrueOptions() {
 
         return this.Options?.MultiSelect == true ||
@@ -1021,7 +1048,7 @@ class WTableComponent extends HTMLElement {
     //#endregion fin tabla basica
     //#region ESTILOS-------------------------------------------------------------------------------------------
     /** @returns {HTMLStyleElement[]} */
-    
+
     MediaStyleResponsive() {
         const ClassList = [];
         let index = 1;

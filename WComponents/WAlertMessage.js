@@ -31,9 +31,9 @@ export class WAlertMessage extends HTMLElement {
         this.style.opacity = "0";
         this.style.transform = "scale(0.9)";
         setTimeout(() => {
-           this.remove();
+            this.remove();
         }, 700);
-        
+
     }
 
     Draw() {
@@ -57,9 +57,25 @@ export class WAlertMessage extends HTMLElement {
     }
 
     /**
-     * @param {{ Message: String, CloseOption?: Boolean, Direction?: String , Temporal?: Boolean, Type?: String }} Config 
+     * @param {{ Message: String, 
+     * CloseOption?: Boolean,
+     *  Direction?: String ,
+     *  Temporal?: Boolean, 
+     * Type?: String, 
+     * reload?: Boolean }} Config 
      */
     static Connect(Config) {
+        if (Config.reload) {
+            localStorage.setItem("reloadWAlertMessageConfig", JSON.stringify({
+                Message: Config.Message,
+                CloseOption: Config.CloseOption,
+                Direction: Config.Direction,
+                Temporal: Config.Temporal,
+                Type: Config.Type
+            }));
+            window.location.reload();
+            return;
+        }
         const direction = Config.Direction ?? 'top';
         let container = document.body.querySelector(`.w-alert-container.${direction}`);
 
@@ -94,7 +110,7 @@ export class WAlertMessage extends HTMLElement {
         if (Config.Temporal == true) {
             setTimeout(() => alert.Close(), 3000);
         }
-    }   
+    }
     /**
     * conecta un nuevo alert en el document body
     * @param { import("../WModules/CommonModel.js").ResponseServices? } Response 
@@ -102,7 +118,7 @@ export class WAlertMessage extends HTMLElement {
     static ResponseMessage(Response) {
         /**@type {{ Message: String, CloseOption?:  Boolean, Direction?: String , Temporal?: Boolean, Type?: String }} */
         const Config = {
-            Type : "info",
+            Type: "info",
             CloseOption: true,
             Direction: "top",
             Temporal: true,
@@ -131,25 +147,25 @@ export class WAlertMessage extends HTMLElement {
      * @param {boolean} [Temporal]
      * @param {string} [Direction]
      */
-    static Warning(Message, Temporal, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'warning' }); }
+    static Warning(Message, Temporal = true, Direction, reload = false) { this.Connect({ Message, Temporal, Direction, Type: 'warning', reload }); }
     /**
      * @param {string} Message
      * @param {boolean} Temporal
      * @param {string} [Direction]
      */
-    static Info(Message, Temporal, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'info' }); }
+    static Info(Message, Temporal = true, Direction, reload = false) { this.Connect({ Message, Temporal, Direction, Type: 'info', reload }); }
     /**
      * @param {string} Message
      * @param {boolean} [Temporal]
      * @param {string} [Direction]
      */
-    static Success(Message, Temporal = true, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'success' }); }
+    static Success(Message, Temporal = true, Direction, reload = false) { this.Connect({ Message, Temporal, Direction, Type: 'success', reload }); }
     /**
      * @param {string} Message
      * @param {boolean} [Temporal]
      * @param {string} [Direction]
      */
-    static Danger(Message, Temporal, Direction) { this.Connect({ Message, Temporal, Direction, Type: 'danger' }); }
+    static Danger(Message, Temporal = true, Direction, reload = false) { this.Connect({ Message, Temporal, Direction, Type: 'danger', reload }); }
 
     CustomStyles = css`
      :host{
@@ -241,5 +257,14 @@ export class WAlertMessage extends HTMLElement {
         document.querySelectorAll(".w-alert-container").forEach(c => c.innerHTML = "");
     }
 }
+
+window.addEventListener('load', async () => {
+    console.log(localStorage.getItem("reloadWAlertMessageConfig"));
+    const messageConfig = localStorage.getItem("reloadWAlertMessageConfig");
+    if (messageConfig != null) {
+        WAlertMessage.Connect(JSON.parse(messageConfig))
+        localStorage.removeItem("reloadWAlertMessageConfig");
+    }
+})
 
 customElements.define('w-alert-mensaje', WAlertMessage);

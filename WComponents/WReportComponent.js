@@ -8,6 +8,7 @@ import { ComponentsManager, ConvertToMoneyString, html, WRender } from "../WModu
 import { WOrtograficValidation } from "../WModules/WOrtograficValidation.js";
 import { css } from "../WModules/WStyledRender.js";
 import { WDocumentViewer } from "./WDocumentViewer.js";
+import { WPrintExportToolBar } from "./WPrintExportToolBar.mjs";
 
 /**
  * @typedef {Object} ReportConfig
@@ -98,6 +99,9 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 	}
 
 	ViewDocument() {
+		const exportXlsFunction = (/**@type {WPrintExportToolBar} */ tool)=> {
+			tool.exportToXlsContent(this.ReportContainer, this.Config.Header)
+		}
 		return new WDocumentViewer({
 			Header: this.Config.Header,
 			PageType: this.Config.PageType,
@@ -105,7 +109,7 @@ import { WDocumentViewer } from "./WDocumentViewer.js";
 			exportPdfApi: this.Config.exportPdfApi,
 			exportXls: this.Config.exportXls,
 			print: this.Config.print,
-			exportXlsAction: this.Config.exportXlsAction,
+			exportXlsAction: this.Config.exportXlsAction ?? exportXlsFunction,
 			CustomStyle: this.CustomStyle.cloneNode(true),
 			// @ts-ignore
 			Dataset: this.ReportContainer.cloneNode(true).childNodes

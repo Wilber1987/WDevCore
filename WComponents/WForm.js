@@ -489,8 +489,9 @@ class WForm extends HTMLElement {
 	 * @param {string} prop
 	 */
 	isMethod(Model, prop) {
-		return Model[prop]?.__proto__ == Function.prototype
-			|| Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "ApiMethods" || prop == "FilterData" || prop == "OrderData";
+		return Model[prop] != undefined && (
+		 Model[prop]?.__proto__ == Function.prototype
+			|| Model[prop]?.__proto__.constructor.name == "AsyncFunction" || prop == "ApiMethods" || prop == "FilterData" || prop == "OrderData");
 	}
 	/**
 	 * @param {Object.<string,ModelProperty>} Model
